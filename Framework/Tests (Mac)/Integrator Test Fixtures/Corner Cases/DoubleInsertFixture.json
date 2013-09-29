@@ -1,0 +1,38 @@
+[
+    {
+        "store": "first",
+        "otherstores": [],
+        "revision": 0,
+        "timestamp": 13450.0,
+		"globalCount": 0,
+        "changes": [
+            {
+                "entity": "Parent",
+                "id": "parent1",
+                "type": "insert",
+                "properties": {
+	                "date": 10.0,
+                    "name": "parent1"
+                },
+            }
+        ]
+    },
+    {
+        "store": "second",
+        "otherstores": [],
+        "revision": 0,
+        "timestamp": 14450.0,
+		"globalCount": 0,
+        "changes": [
+            {
+                "entity": "Parent",
+                "id": "parent1",
+                "type": "insert",
+                "properties": {
+	                "date": 20.0,
+                    "name": "parent1"
+                },
+            }
+        ]
+	}
+]

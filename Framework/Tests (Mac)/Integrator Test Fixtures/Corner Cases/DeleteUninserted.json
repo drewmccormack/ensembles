@@ -1,0 +1,16 @@
+[
+    {
+        "store": "first",
+        "otherstores": [],
+        "revision": 0,
+        "timestamp": 13450.0,
+		"globalCount": 0,
+        "changes": [
+            {
+                "entity": "Parent",
+                "id": "parent1",
+                "type": "delete"
+            }
+        ]
+    }
+]

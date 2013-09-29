@@ -1,0 +1,61 @@
+[
+    {
+        "store": "123",
+        "otherstores": [],
+        "revision": 0,
+        "timestamp": 13450.0,
+        "globalCount": 0,
+        "changes": [
+            {
+                "entity": "Parent",
+                "id": "parent1",
+                "type": "insert",
+                "properties": {
+                    "child": "child1",
+	                "date": 58472395723.0,
+                    "name": "parent1",
+                    "children": {
+                        "add": [
+                            "child1"
+                        ],
+                        "remove": []
+                    },
+                    "friends": {
+                        "add": ["child1"], 
+						"remove": []
+                    }
+                },
+            },
+            {
+                "entity": "Parent",
+                "id": "parent2",
+                "type": "insert",
+                "properties": {
+                    "name": "parent2"
+                }
+            },
+            {
+                "entity": "Child",
+                "id": "child1",
+                "type": "insert",
+                "properties": {
+                    "parent": "parent1",
+                    "name": "child1",
+                    "parentWithSiblings" : "parent1",
+                    "testFriends": {
+                        "add": ["parent1"], 
+						"remove": []
+                    }
+                }
+            },
+            {
+                "entity": "Child",
+                "id": "child3",
+                "type": "insert",
+                "properties": {
+                    "name": "child3"
+                }
+            }
+        ]
+    }
+]

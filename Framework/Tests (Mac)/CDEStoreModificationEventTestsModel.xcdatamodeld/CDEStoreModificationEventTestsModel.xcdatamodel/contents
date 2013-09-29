@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="3389" systemVersion="13A538g" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="Child" syncable="YES">
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Parent" inverseName="child" inverseEntity="Parent" syncable="YES"/>
+        <relationship name="parentWithSiblings" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Parent" inverseName="children" inverseEntity="Parent" syncable="YES"/>
+        <relationship name="testFriends" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Parent" inverseName="friends" inverseEntity="Parent" syncable="YES"/>
+    </entity>
+    <entity name="Parent" syncable="YES">
+        <attribute name="date" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="child" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Child" inverseName="parent" inverseEntity="Child" syncable="YES"/>
+        <relationship name="children" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Child" inverseName="parentWithSiblings" inverseEntity="Child" syncable="YES"/>
+        <relationship name="friends" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Child" inverseName="testFriends" inverseEntity="Child" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="Child" positionX="394" positionY="11" width="128" height="103"/>
+        <element name="Parent" positionX="0" positionY="0" width="128" height="118"/>
+    </elements>
+</model>

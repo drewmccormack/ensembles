@@ -1,0 +1,78 @@
+[
+    {
+        "store": "123",
+        "otherstores": [],
+        "revision": 1,
+        "timestamp": 14450.0,
+        "globalCount": 1,
+        "changes": [
+            {
+                "entity": "Parent",
+                "id": "parent1",
+                "type": "update",
+                "properties": {
+                    "child": null,
+	                "date": null,
+                    "children": {
+                        "add": ["child2"],
+                        "remove": ["child1"]
+                    },
+                    "friends": {
+                        "add": ["child2"], 
+						"remove": []
+                    }
+                },
+            },
+            {
+                "entity": "Parent",
+                "id": "parent2",
+                "type": "update",
+                "properties": {
+                    "date": 0.0
+                }
+            },
+            {
+                "entity": "Child",
+                "id": "child1",
+                "type": "update",
+                "properties": {
+                    "parent": null,
+                    "parentWithSiblings" : null
+                }
+            },
+            {
+                "entity": "Child",
+                "id": "child2",
+                "type": "insert",
+                "properties": {
+                    "parent": null,
+                    "name": "child2",
+                    "parentWithSiblings" : "parent1",
+                    "testFriends": {
+                        "add": ["parent1"], 
+						"remove": []
+                    }
+                }
+            },
+            {
+	            "entity": "Child",
+	            "id": "child3",
+	            "type": "delete"
+            }
+        ]
+    },
+    {
+        "store": "123",
+        "otherstores": [],
+        "revision": 2,
+        "timestamp": 14460.0,
+        "globalCount": 2,
+        "changes": [
+            {
+	            "entity": "Parent",
+	            "id": "parent2",
+	            "type": "delete"
+            }
+		]
+	}
+]

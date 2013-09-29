@@ -1,0 +1,90 @@
+[
+    {
+        "store": "first",
+        "otherstores": [],
+        "revision": 0,
+        "timestamp": 13450.0,
+		"globalCount": 0,
+        "changes": [
+            {
+                "entity": "Parent",
+                "id": "parent1",
+                "type": "insert",
+                "properties": {
+	                "date": 10.0,
+                    "name": "parent1"
+                },
+            },
+            {
+                "entity": "Child",
+                "id": "child1",
+                "type": "insert",
+                "properties": {
+                    "name": "child1"
+                }
+            }
+        ]
+    },
+    {
+        "store": "second",
+        "otherstores": [],
+        "revision": 0,
+        "timestamp": 13430.0,
+		"globalCount": 1,
+        "changes": [
+            {
+                "entity": "Parent",
+                "id": "parent1",
+                "type": "update",
+                "properties": {
+					"friends": {
+						"add": ["child1"],
+						"remove": []
+					}
+                },
+            },
+            {
+                "entity": "Child",
+                "id": "child1",
+                "type": "update",
+                "properties": {
+                    "testFriends": {
+                        "add": ["parent1"], 
+						"remove": []
+                    }
+                }
+            }
+        ]
+	},
+    {
+        "store": "first",
+        "otherstores": [],
+        "revision": 1,
+        "timestamp": 13420.0,
+		"globalCount": 1,
+        "changes": [
+            {
+                "entity": "Parent",
+                "id": "parent1",
+                "type": "update",
+                "properties": {
+					"friends": {
+						"add": [],
+						"remove": ["child1"]
+					}
+                },
+            },
+            {
+                "entity": "Child",
+                "id": "child1",
+                "type": "update",
+                "properties": {
+                    "testFriends": {
+                        "add": [], 
+						"remove": ["parent1"]
+                    }
+                }
+            }
+        ]
+	}
+]

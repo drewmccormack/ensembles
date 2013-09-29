@@ -1,0 +1,52 @@
+[
+    {
+        "store": "first",
+        "otherstores": [],
+        "revision": 0,
+        "timestamp": 13450.0,
+		"globalCount": 0,
+        "changes": [
+            {
+                "entity": "Parent",
+                "id": "parent1",
+                "type": "insert",
+                "properties": {
+	                "date": 10.0,
+                    "name": "parent1"
+                },
+            }
+        ]
+    },
+    {
+        "store": "first",
+        "otherstores": [],
+        "revision": 1,
+        "timestamp": 13460.0,
+		"globalCount": 1,
+        "changes": [
+            {
+                "entity": "Parent",
+                "id": "parent1",
+                "type": "delete"
+            }
+        ]
+    },
+    {
+        "store": "second",
+        "otherstores": [],
+        "revision": 0,
+        "timestamp": 13460.0,
+		"globalCount": 1,
+        "changes": [
+            {
+                "entity": "Parent",
+                "id": "parent1",
+                "type": "update",
+                "properties": {
+	                "date": 20.0,
+                    "name": "parent1"
+                },
+            }
+        ]
+	}
+]

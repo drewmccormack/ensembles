@@ -1,0 +1,908 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		071B9F9717E30ECB00E6977A /* IntegratorUpdateTestsFixture1.json in Resources */ = {isa = PBXBuildFile; fileRef = 071B9F9517E30ECB00E6977A /* IntegratorUpdateTestsFixture1.json */; };
+		071B9F9817E30ECB00E6977A /* IntegratorUpdateTestsFixture2.json in Resources */ = {isa = PBXBuildFile; fileRef = 071B9F9617E30ECB00E6977A /* IntegratorUpdateTestsFixture2.json */; };
+		0722B26717B76B2400496F4A /* CDERevision.h in Headers */ = {isa = PBXBuildFile; fileRef = 0722B26117B76B2400496F4A /* CDERevision.h */; };
+		0722B26917B76B2400496F4A /* CDERevision.m in Sources */ = {isa = PBXBuildFile; fileRef = 0722B26217B76B2400496F4A /* CDERevision.m */; };
+		0722B26A17B76B2400496F4A /* CDERevisionSet.h in Headers */ = {isa = PBXBuildFile; fileRef = 0722B26317B76B2400496F4A /* CDERevisionSet.h */; };
+		0722B26C17B76B2400496F4A /* CDERevisionSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 0722B26417B76B2400496F4A /* CDERevisionSet.m */; };
+		0722B27017B770A000496F4A /* CDEEventStoreTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07592CB6177F320800816034 /* CDEEventStoreTests.m */; };
+		0722B27117B770A600496F4A /* CDEObjectChangeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 073747181782093C0049BB92 /* CDEObjectChangeTests.m */; };
+		0722B27217B770AC00496F4A /* CDEPropertyChangeValueTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07428859178356670082C327 /* CDEPropertyChangeValueTests.m */; };
+		0722B27317B770BF00496F4A /* CDEDeviceRevisionSetTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 0796B5A8179F5FAE0005264D /* CDEDeviceRevisionSetTests.m */; };
+		0722B27417B7713D00496F4A /* CDESaveMonitorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BAE701178D65D00036E743 /* CDESaveMonitorTests.m */; };
+		0728FA9817E0ACB800497BF5 /* CDECloudFileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 0728FA9717E0ACB800497BF5 /* CDECloudFileSystem.h */; };
+		072A87DB17EDFBB000F8B2CB /* CDEPersistentStoreImporter.h in Headers */ = {isa = PBXBuildFile; fileRef = 072A87D917EDFBB000F8B2CB /* CDEPersistentStoreImporter.h */; };
+		072A87DD17EDFBB000F8B2CB /* CDEPersistentStoreImporter.m in Sources */ = {isa = PBXBuildFile; fileRef = 072A87DA17EDFBB000F8B2CB /* CDEPersistentStoreImporter.m */; };
+		072A87E017EEE55600F8B2CB /* CDEEventBuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 072A87DE17EEE55600F8B2CB /* CDEEventBuilder.h */; };
+		072A87E217EEE55600F8B2CB /* CDEEventBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 072A87DF17EEE55600F8B2CB /* CDEEventBuilder.m */; };
+		072BD7BF17F30A1E00D19306 /* CDEPersistentStoreEnsembleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 072BD7BE17F30A1E00D19306 /* CDEPersistentStoreEnsembleTests.m */; };
+		072E5AEC17EB4332002D9604 /* CDESyncTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 072E5AEB17EB4332002D9604 /* CDESyncTest.m */; };
+		072E5AEE17EB44C3002D9604 /* CDETwoWaySyncTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 072E5AED17EB44C3002D9604 /* CDETwoWaySyncTests.m */; };
+		072E5AF717EC37C0002D9604 /* CDELocalCloudFileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 072E5AF517EC37C0002D9604 /* CDELocalCloudFileSystem.h */; };
+		072E5AF917EC37C0002D9604 /* CDELocalCloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 072E5AF617EC37C0002D9604 /* CDELocalCloudFileSystem.m */; };
+		072E7AE117BFC1D30076117D /* CDEIntegratorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 072E7AE017BFC1D30076117D /* CDEIntegratorTests.m */; };
+		072F316417D4A72D00541FED /* UpdateFollowingDeletion.json in Resources */ = {isa = PBXBuildFile; fileRef = 072F316317D4A72D00541FED /* UpdateFollowingDeletion.json */; };
+		072F316617D4AA0A00541FED /* InsertFollowingDeletion.json in Resources */ = {isa = PBXBuildFile; fileRef = 072F316517D4AA0A00541FED /* InsertFollowingDeletion.json */; };
+		072F316817D4AAD900541FED /* UpdateConcurrentWithInsert.json in Resources */ = {isa = PBXBuildFile; fileRef = 072F316717D4AAD900541FED /* UpdateConcurrentWithInsert.json */; };
+		072F316A17D4ABDF00541FED /* UpdateToUninserted.json in Resources */ = {isa = PBXBuildFile; fileRef = 072F316917D4ABDF00541FED /* UpdateToUninserted.json */; };
+		072F316C17D4C41B00541FED /* DeleteUninserted.json in Resources */ = {isa = PBXBuildFile; fileRef = 072F316B17D4C41B00541FED /* DeleteUninserted.json */; };
+		072F316E17D4C72C00541FED /* UpdateRelationshipConcurrently.json in Resources */ = {isa = PBXBuildFile; fileRef = 072F316D17D4C72C00541FED /* UpdateRelationshipConcurrently.json */; };
+		072F317017D4C9CB00541FED /* UpdateRelationshipConcurrentWithDeletion.json in Resources */ = {isa = PBXBuildFile; fileRef = 072F316F17D4C9CB00541FED /* UpdateRelationshipConcurrentWithDeletion.json */; };
+		07374717178207610049BB92 /* CDEEventStoreTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 07374716178207610049BB92 /* CDEEventStoreTestCase.m */; };
+		073BB0CB1780841E0061466E /* CDEStoreModificationEventTestsModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 073BB0C91780841E0061466E /* CDEStoreModificationEventTestsModel.xcdatamodeld */; };
+		0747CDA217C3DCE300221ED7 /* CDEBasicIntegratorRelationshipTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 0747CDA117C3DCE300221ED7 /* CDEBasicIntegratorRelationshipTests.m */; };
+		0747CDA517C3E0A300221ED7 /* CDEIntegratorTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 0747CDA417C3E0A300221ED7 /* CDEIntegratorTestCase.m */; };
+		074B956F17EC3F7E0016F84D /* CDEICloudFileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 074B956D17EC3F7E0016F84D /* CDEICloudFileSystem.h */; };
+		074B957217EC45660016F84D /* CDEICloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 074B956E17EC3F7E0016F84D /* CDEICloudFileSystem.m */; };
+		074DE60E17B77970009755EB /* CDEStoreModificationEventTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 073BB0C717807EAF0061466E /* CDEStoreModificationEventTests.m */; };
+		074DE60F17B7797E009755EB /* CDEEventDeviceRevisionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 077C87D61792AB00007A0919 /* CDEEventDeviceRevisionTests.m */; };
+		074DE61117B779D8009755EB /* CDEDeviceRevisionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 074DE61017B779D8009755EB /* CDEDeviceRevisionTests.m */; };
+		074DE61217B77BB6009755EB /* CDEEventMigratorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07157A2217B555A4004AAD22 /* CDEEventMigratorTests.m */; };
+		074DE61717B80325009755EB /* CDEEventIntegrator.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF79FA177F0A9D0029D500 /* CDEEventIntegrator.m */; };
+		0754307717F20BEE00FA4946 /* CDECloudManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07697A7117E0B6C000A9BB63 /* CDECloudManagerTests.m */; };
+		07592CA7177F2D1000816034 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF78E9177F03320029D500 /* XCTest.framework */; };
+		07592CAD177F2D1000816034 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 07592CAB177F2D1000816034 /* InfoPlist.strings */; };
+		0760274217F8672200329299 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 078ABF4917F19195008C9B27 /* CDEEventStoreModel.xcdatamodeld */; };
+		07697A7817E0BD0800A9BB63 /* CDEMockCloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 07697A7717E0BD0800A9BB63 /* CDEMockCloudFileSystem.m */; };
+		077B555317D1E5A0008AA7F7 /* DoubleInsertFixture.json in Resources */ = {isa = PBXBuildFile; fileRef = 077B555217D1E5A0008AA7F7 /* DoubleInsertFixture.json */; };
+		077B555517D1E5CF008AA7F7 /* CDEIntegratorCornerCases.m in Sources */ = {isa = PBXBuildFile; fileRef = 077B555417D1E5CF008AA7F7 /* CDEIntegratorCornerCases.m */; };
+		078A3F82178C9B32009C8821 /* CDEEventRevision.h in Headers */ = {isa = PBXBuildFile; fileRef = 078A3F80178C9B32009C8821 /* CDEEventRevision.h */; };
+		078A3F84178C9B32009C8821 /* CDEEventRevision.m in Sources */ = {isa = PBXBuildFile; fileRef = 078A3F81178C9B32009C8821 /* CDEEventRevision.m */; };
+		078ABF4B17F19195008C9B27 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 078ABF4917F19195008C9B27 /* CDEEventStoreModel.xcdatamodeld */; };
+		07BF7A1F177F0A9D0029D500 /* CDECloudDirectory.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF79E8177F0A9D0029D500 /* CDECloudDirectory.h */; };
+		07BF7A21177F0A9D0029D500 /* CDECloudDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF79E9177F0A9D0029D500 /* CDECloudDirectory.m */; };
+		07BF7A22177F0A9D0029D500 /* CDECloudFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF79EA177F0A9D0029D500 /* CDECloudFile.h */; };
+		07BF7A24177F0A9D0029D500 /* CDECloudFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF79EB177F0A9D0029D500 /* CDECloudFile.m */; };
+		07BF7A26177F0A9D0029D500 /* CDECloudManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF79ED177F0A9D0029D500 /* CDECloudManager.h */; };
+		07BF7A28177F0A9D0029D500 /* CDECloudManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF79EE177F0A9D0029D500 /* CDECloudManager.m */; };
+		07BF7A32177F0A9D0029D500 /* CDEPersistentStoreEnsemble.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF79F6177F0A9D0029D500 /* CDEPersistentStoreEnsemble.h */; };
+		07BF7A34177F0A9D0029D500 /* CDEPersistentStoreEnsemble.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF79F7177F0A9D0029D500 /* CDEPersistentStoreEnsemble.m */; };
+		07BF7A35177F0A9D0029D500 /* CDEEventIntegrator.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF79F9177F0A9D0029D500 /* CDEEventIntegrator.h */; };
+		07BF7A38177F0A9D0029D500 /* CDEEventMigrator.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF79FB177F0A9D0029D500 /* CDEEventMigrator.h */; };
+		07BF7A3A177F0A9D0029D500 /* CDEEventMigrator.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF79FC177F0A9D0029D500 /* CDEEventMigrator.m */; };
+		07BF7A3B177F0A9D0029D500 /* CDEEventStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF79FD177F0A9D0029D500 /* CDEEventStore.h */; };
+		07BF7A3D177F0A9D0029D500 /* CDEEventStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF79FE177F0A9D0029D500 /* CDEEventStore.m */; };
+		07BF7A3E177F0A9D0029D500 /* CDESaveMonitor.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF79FF177F0A9D0029D500 /* CDESaveMonitor.h */; };
+		07BF7A40177F0A9D0029D500 /* CDESaveMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF7A00177F0A9D0029D500 /* CDESaveMonitor.m */; };
+		07BF7A41177F0A9D0029D500 /* CDEPropertyChangeValue.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF7A01177F0A9D0029D500 /* CDEPropertyChangeValue.h */; };
+		07BF7A43177F0A9D0029D500 /* CDEPropertyChangeValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF7A02177F0A9D0029D500 /* CDEPropertyChangeValue.m */; };
+		07BF7A44177F0A9D0029D500 /* NSMapTable+CDEAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF7A04177F0A9D0029D500 /* NSMapTable+CDEAdditions.h */; };
+		07BF7A46177F0A9D0029D500 /* NSMapTable+CDEAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF7A05177F0A9D0029D500 /* NSMapTable+CDEAdditions.m */; };
+		07BF7A47177F0A9D0029D500 /* CDEAsynchronousTaskQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF7A06177F0A9D0029D500 /* CDEAsynchronousTaskQueue.h */; };
+		07BF7A49177F0A9D0029D500 /* CDEAsynchronousTaskQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF7A07177F0A9D0029D500 /* CDEAsynchronousTaskQueue.m */; };
+		07BF7A4A177F0A9D0029D500 /* CDEDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF7A08177F0A9D0029D500 /* CDEDefines.h */; };
+		07BF7A4C177F0A9D0029D500 /* CDEDefines.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF7A09177F0A9D0029D500 /* CDEDefines.m */; };
+		07BF7A4D177F0A9D0029D500 /* CDEFoundationAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF7A0A177F0A9D0029D500 /* CDEFoundationAdditions.h */; };
+		07BF7A4F177F0A9D0029D500 /* CDEFoundationAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF7A0B177F0A9D0029D500 /* CDEFoundationAdditions.m */; };
+		07BF7A5B177F0A9D0029D500 /* CDEGlobalIdentifier.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF7A15177F0A9D0029D500 /* CDEGlobalIdentifier.h */; };
+		07BF7A5D177F0A9D0029D500 /* CDEGlobalIdentifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF7A16177F0A9D0029D500 /* CDEGlobalIdentifier.m */; };
+		07BF7A61177F0A9D0029D500 /* CDEObjectChange.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF7A19177F0A9D0029D500 /* CDEObjectChange.h */; };
+		07BF7A63177F0A9D0029D500 /* CDEObjectChange.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF7A1A177F0A9D0029D500 /* CDEObjectChange.m */; };
+		07BF7A67177F0A9D0029D500 /* CDEStoreModificationEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF7A1D177F0A9D0029D500 /* CDEStoreModificationEvent.h */; };
+		07BF7A69177F0A9D0029D500 /* CDEStoreModificationEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF7A1E177F0A9D0029D500 /* CDEStoreModificationEvent.m */; };
+		07CCA9D717E49CA80017B6C4 /* CoreDataEnsembles.h in Headers */ = {isa = PBXBuildFile; fileRef = 07CCA9D617E49CA80017B6C4 /* CoreDataEnsembles.h */; };
+		07CCA9D917E4AF0E0017B6C4 /* CDEOneWaySyncTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07CCA9D417E49B4A0017B6C4 /* CDEOneWaySyncTests.m */; };
+		07DDA7E417C8FE25009C6F94 /* CDEIntegratorUpdateTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07DDA7E317C8FE25009C6F94 /* CDEIntegratorUpdateTests.m */; };
+		07DDA7E717C9ECF6009C6F94 /* CDERevisionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 07DDA7E617C9ECF6009C6F94 /* CDERevisionManager.m */; };
+		07DDA7E917CA256E009C6F94 /* CDERevisionManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07DDA7E817CA256E009C6F94 /* CDERevisionManagerTests.m */; };
+		07DDA7EA17CD1A4A009C6F94 /* libensembles_mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF7933177F04B30029D500 /* libensembles_mac.a */; };
+		07E2042417C8F2EB00ED9AB3 /* BasicIntegratorRelationshipTestsFixture.json in Resources */ = {isa = PBXBuildFile; fileRef = 07E2042317C8F2EB00ED9AB3 /* BasicIntegratorRelationshipTestsFixture.json */; };
+		07E2875417BF8D470008CC4F /* CDESaveMonitorRelationshipTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07E2875317BF8D470008CC4F /* CDESaveMonitorRelationshipTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		07592CB1177F2D1000816034 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 07E492DE17172CB200FE81B5 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 07BF7932177F04B30029D500;
+			remoteInfo = "Ensembles Mac";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		07157A2217B555A4004AAD22 /* CDEEventMigratorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEEventMigratorTests.m; sourceTree = "<group>"; };
+		071B9F9517E30ECB00E6977A /* IntegratorUpdateTestsFixture1.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = IntegratorUpdateTestsFixture1.json; sourceTree = "<group>"; };
+		071B9F9617E30ECB00E6977A /* IntegratorUpdateTestsFixture2.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = IntegratorUpdateTestsFixture2.json; sourceTree = "<group>"; };
+		0722B26117B76B2400496F4A /* CDERevision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDERevision.h; sourceTree = "<group>"; };
+		0722B26217B76B2400496F4A /* CDERevision.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDERevision.m; sourceTree = "<group>"; };
+		0722B26317B76B2400496F4A /* CDERevisionSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDERevisionSet.h; sourceTree = "<group>"; };
+		0722B26417B76B2400496F4A /* CDERevisionSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDERevisionSet.m; sourceTree = "<group>"; };
+		0728FA9717E0ACB800497BF5 /* CDECloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDECloudFileSystem.h; sourceTree = "<group>"; };
+		072A87D917EDFBB000F8B2CB /* CDEPersistentStoreImporter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEPersistentStoreImporter.h; sourceTree = "<group>"; };
+		072A87DA17EDFBB000F8B2CB /* CDEPersistentStoreImporter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEPersistentStoreImporter.m; sourceTree = "<group>"; };
+		072A87DE17EEE55600F8B2CB /* CDEEventBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEEventBuilder.h; sourceTree = "<group>"; };
+		072A87DF17EEE55600F8B2CB /* CDEEventBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEEventBuilder.m; sourceTree = "<group>"; };
+		072BD7BE17F30A1E00D19306 /* CDEPersistentStoreEnsembleTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEPersistentStoreEnsembleTests.m; sourceTree = "<group>"; };
+		072E5AEA17EB4332002D9604 /* CDESyncTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDESyncTest.h; sourceTree = "<group>"; };
+		072E5AEB17EB4332002D9604 /* CDESyncTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDESyncTest.m; sourceTree = "<group>"; };
+		072E5AED17EB44C3002D9604 /* CDETwoWaySyncTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDETwoWaySyncTests.m; sourceTree = "<group>"; };
+		072E5AF517EC37C0002D9604 /* CDELocalCloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDELocalCloudFileSystem.h; path = "Cloud File Systems/CDELocalCloudFileSystem.h"; sourceTree = SOURCE_ROOT; };
+		072E5AF617EC37C0002D9604 /* CDELocalCloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDELocalCloudFileSystem.m; path = "Cloud File Systems/CDELocalCloudFileSystem.m"; sourceTree = SOURCE_ROOT; };
+		072E7AE017BFC1D30076117D /* CDEIntegratorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEIntegratorTests.m; sourceTree = "<group>"; };
+		072F316317D4A72D00541FED /* UpdateFollowingDeletion.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = UpdateFollowingDeletion.json; sourceTree = "<group>"; };
+		072F316517D4AA0A00541FED /* InsertFollowingDeletion.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = InsertFollowingDeletion.json; sourceTree = "<group>"; };
+		072F316717D4AAD900541FED /* UpdateConcurrentWithInsert.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = UpdateConcurrentWithInsert.json; sourceTree = "<group>"; };
+		072F316917D4ABDF00541FED /* UpdateToUninserted.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = UpdateToUninserted.json; sourceTree = "<group>"; };
+		072F316B17D4C41B00541FED /* DeleteUninserted.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = DeleteUninserted.json; sourceTree = "<group>"; };
+		072F316D17D4C72C00541FED /* UpdateRelationshipConcurrently.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = UpdateRelationshipConcurrently.json; sourceTree = "<group>"; };
+		072F316F17D4C9CB00541FED /* UpdateRelationshipConcurrentWithDeletion.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = UpdateRelationshipConcurrentWithDeletion.json; sourceTree = "<group>"; };
+		07374715178207610049BB92 /* CDEEventStoreTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEEventStoreTestCase.h; sourceTree = "<group>"; };
+		07374716178207610049BB92 /* CDEEventStoreTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEEventStoreTestCase.m; sourceTree = "<group>"; };
+		073747181782093C0049BB92 /* CDEObjectChangeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEObjectChangeTests.m; sourceTree = "<group>"; };
+		073BB0C717807EAF0061466E /* CDEStoreModificationEventTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEStoreModificationEventTests.m; sourceTree = "<group>"; };
+		073BB0CA1780841E0061466E /* CDEStoreModificationEventTestsModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEStoreModificationEventTestsModel.xcdatamodel; sourceTree = "<group>"; };
+		07428859178356670082C327 /* CDEPropertyChangeValueTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEPropertyChangeValueTests.m; sourceTree = "<group>"; };
+		0747CDA117C3DCE300221ED7 /* CDEBasicIntegratorRelationshipTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEBasicIntegratorRelationshipTests.m; sourceTree = "<group>"; };
+		0747CDA317C3E0A300221ED7 /* CDEIntegratorTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEIntegratorTestCase.h; sourceTree = "<group>"; };
+		0747CDA417C3E0A300221ED7 /* CDEIntegratorTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEIntegratorTestCase.m; sourceTree = "<group>"; };
+		074B956D17EC3F7E0016F84D /* CDEICloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDEICloudFileSystem.h; path = "Cloud File Systems/CDEICloudFileSystem.h"; sourceTree = SOURCE_ROOT; };
+		074B956E17EC3F7E0016F84D /* CDEICloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDEICloudFileSystem.m; path = "Cloud File Systems/CDEICloudFileSystem.m"; sourceTree = SOURCE_ROOT; };
+		074DE61017B779D8009755EB /* CDEDeviceRevisionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEDeviceRevisionTests.m; sourceTree = "<group>"; };
+		07592CA6177F2D1000816034 /* Tests (Mac).xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests (Mac).xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		07592CAA177F2D1000816034 /* Tests (Mac)-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Tests (Mac)-Info.plist"; sourceTree = "<group>"; };
+		07592CAC177F2D1000816034 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		07592CB0177F2D1000816034 /* Tests (Mac)-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tests (Mac)-Prefix.pch"; sourceTree = "<group>"; };
+		07592CB6177F320800816034 /* CDEEventStoreTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEEventStoreTests.m; sourceTree = "<group>"; };
+		07697A7117E0B6C000A9BB63 /* CDECloudManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDECloudManagerTests.m; sourceTree = "<group>"; };
+		07697A7617E0BD0800A9BB63 /* CDEMockCloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEMockCloudFileSystem.h; sourceTree = "<group>"; };
+		07697A7717E0BD0800A9BB63 /* CDEMockCloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEMockCloudFileSystem.m; sourceTree = "<group>"; };
+		077B555217D1E5A0008AA7F7 /* DoubleInsertFixture.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = DoubleInsertFixture.json; sourceTree = "<group>"; };
+		077B555417D1E5CF008AA7F7 /* CDEIntegratorCornerCases.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEIntegratorCornerCases.m; sourceTree = "<group>"; };
+		077C87D61792AB00007A0919 /* CDEEventDeviceRevisionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEEventDeviceRevisionTests.m; sourceTree = "<group>"; };
+		078A3F80178C9B32009C8821 /* CDEEventRevision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEEventRevision.h; sourceTree = "<group>"; };
+		078A3F81178C9B32009C8821 /* CDEEventRevision.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEEventRevision.m; sourceTree = "<group>"; };
+		078ABF4A17F19195008C9B27 /* CDEEventStoreModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel.xcdatamodel; sourceTree = "<group>"; };
+		0796B5A8179F5FAE0005264D /* CDEDeviceRevisionSetTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEDeviceRevisionSetTests.m; sourceTree = "<group>"; };
+		07BAE701178D65D00036E743 /* CDESaveMonitorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDESaveMonitorTests.m; sourceTree = "<group>"; };
+		07BF78E9177F03320029D500 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		07BF7933177F04B30029D500 /* libensembles_mac.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libensembles_mac.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		07BF79E8177F0A9D0029D500 /* CDECloudDirectory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDECloudDirectory.h; sourceTree = "<group>"; };
+		07BF79E9177F0A9D0029D500 /* CDECloudDirectory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDECloudDirectory.m; sourceTree = "<group>"; };
+		07BF79EA177F0A9D0029D500 /* CDECloudFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDECloudFile.h; sourceTree = "<group>"; };
+		07BF79EB177F0A9D0029D500 /* CDECloudFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDECloudFile.m; sourceTree = "<group>"; };
+		07BF79ED177F0A9D0029D500 /* CDECloudManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDECloudManager.h; sourceTree = "<group>"; };
+		07BF79EE177F0A9D0029D500 /* CDECloudManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDECloudManager.m; sourceTree = "<group>"; };
+		07BF79F6177F0A9D0029D500 /* CDEPersistentStoreEnsemble.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEPersistentStoreEnsemble.h; sourceTree = "<group>"; };
+		07BF79F7177F0A9D0029D500 /* CDEPersistentStoreEnsemble.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEPersistentStoreEnsemble.m; sourceTree = "<group>"; };
+		07BF79F9177F0A9D0029D500 /* CDEEventIntegrator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEEventIntegrator.h; sourceTree = "<group>"; };
+		07BF79FA177F0A9D0029D500 /* CDEEventIntegrator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEEventIntegrator.m; sourceTree = "<group>"; };
+		07BF79FB177F0A9D0029D500 /* CDEEventMigrator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEEventMigrator.h; sourceTree = "<group>"; };
+		07BF79FC177F0A9D0029D500 /* CDEEventMigrator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEEventMigrator.m; sourceTree = "<group>"; };
+		07BF79FD177F0A9D0029D500 /* CDEEventStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEEventStore.h; sourceTree = "<group>"; };
+		07BF79FE177F0A9D0029D500 /* CDEEventStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEEventStore.m; sourceTree = "<group>"; };
+		07BF79FF177F0A9D0029D500 /* CDESaveMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDESaveMonitor.h; sourceTree = "<group>"; };
+		07BF7A00177F0A9D0029D500 /* CDESaveMonitor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDESaveMonitor.m; sourceTree = "<group>"; };
+		07BF7A01177F0A9D0029D500 /* CDEPropertyChangeValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDEPropertyChangeValue.h; path = ../Events/CDEPropertyChangeValue.h; sourceTree = "<group>"; };
+		07BF7A02177F0A9D0029D500 /* CDEPropertyChangeValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDEPropertyChangeValue.m; path = ../Events/CDEPropertyChangeValue.m; sourceTree = "<group>"; };
+		07BF7A04177F0A9D0029D500 /* NSMapTable+CDEAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMapTable+CDEAdditions.h"; sourceTree = "<group>"; };
+		07BF7A05177F0A9D0029D500 /* NSMapTable+CDEAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMapTable+CDEAdditions.m"; sourceTree = "<group>"; };
+		07BF7A06177F0A9D0029D500 /* CDEAsynchronousTaskQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEAsynchronousTaskQueue.h; sourceTree = "<group>"; };
+		07BF7A07177F0A9D0029D500 /* CDEAsynchronousTaskQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEAsynchronousTaskQueue.m; sourceTree = "<group>"; };
+		07BF7A08177F0A9D0029D500 /* CDEDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEDefines.h; sourceTree = "<group>"; };
+		07BF7A09177F0A9D0029D500 /* CDEDefines.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEDefines.m; sourceTree = "<group>"; };
+		07BF7A0A177F0A9D0029D500 /* CDEFoundationAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEFoundationAdditions.h; sourceTree = "<group>"; };
+		07BF7A0B177F0A9D0029D500 /* CDEFoundationAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEFoundationAdditions.m; sourceTree = "<group>"; };
+		07BF7A15177F0A9D0029D500 /* CDEGlobalIdentifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEGlobalIdentifier.h; sourceTree = "<group>"; };
+		07BF7A16177F0A9D0029D500 /* CDEGlobalIdentifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEGlobalIdentifier.m; sourceTree = "<group>"; };
+		07BF7A19177F0A9D0029D500 /* CDEObjectChange.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEObjectChange.h; sourceTree = "<group>"; };
+		07BF7A1A177F0A9D0029D500 /* CDEObjectChange.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEObjectChange.m; sourceTree = "<group>"; };
+		07BF7A1D177F0A9D0029D500 /* CDEStoreModificationEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEStoreModificationEvent.h; sourceTree = "<group>"; };
+		07BF7A1E177F0A9D0029D500 /* CDEStoreModificationEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEStoreModificationEvent.m; sourceTree = "<group>"; };
+		07BF7A72177F0D570029D500 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		07CCA9D417E49B4A0017B6C4 /* CDEOneWaySyncTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEOneWaySyncTests.m; sourceTree = "<group>"; };
+		07CCA9D617E49CA80017B6C4 /* CoreDataEnsembles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreDataEnsembles.h; sourceTree = "<group>"; };
+		07DDA7E317C8FE25009C6F94 /* CDEIntegratorUpdateTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEIntegratorUpdateTests.m; sourceTree = "<group>"; };
+		07DDA7E517C9ECF6009C6F94 /* CDERevisionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDERevisionManager.h; path = Source/Revisioning/CDERevisionManager.h; sourceTree = SOURCE_ROOT; };
+		07DDA7E617C9ECF6009C6F94 /* CDERevisionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDERevisionManager.m; path = Source/Revisioning/CDERevisionManager.m; sourceTree = SOURCE_ROOT; };
+		07DDA7E817CA256E009C6F94 /* CDERevisionManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDERevisionManagerTests.m; sourceTree = "<group>"; };
+		07E2042317C8F2EB00ED9AB3 /* BasicIntegratorRelationshipTestsFixture.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = BasicIntegratorRelationshipTestsFixture.json; sourceTree = "<group>"; };
+		07E2875317BF8D470008CC4F /* CDESaveMonitorRelationshipTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDESaveMonitorRelationshipTests.m; sourceTree = "<group>"; };
+		07E492E917172CB200FE81B5 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		07592CA3177F2D1000816034 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				07DDA7EA17CD1A4A009C6F94 /* libensembles_mac.a in Frameworks */,
+				07592CA7177F2D1000816034 /* XCTest.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		07BF7930177F04B30029D500 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		070CF7A717E4C8DB0009AC0B /* Unit Tests */ = {
+			isa = PBXGroup;
+			children = (
+				07374715178207610049BB92 /* CDEEventStoreTestCase.h */,
+				07374716178207610049BB92 /* CDEEventStoreTestCase.m */,
+				07592CB6177F320800816034 /* CDEEventStoreTests.m */,
+				073747181782093C0049BB92 /* CDEObjectChangeTests.m */,
+				073BB0C717807EAF0061466E /* CDEStoreModificationEventTests.m */,
+				07DDA7E817CA256E009C6F94 /* CDERevisionManagerTests.m */,
+				07428859178356670082C327 /* CDEPropertyChangeValueTests.m */,
+				07BAE701178D65D00036E743 /* CDESaveMonitorTests.m */,
+				07E2875317BF8D470008CC4F /* CDESaveMonitorRelationshipTests.m */,
+				077C87D61792AB00007A0919 /* CDEEventDeviceRevisionTests.m */,
+				074DE61017B779D8009755EB /* CDEDeviceRevisionTests.m */,
+				0796B5A8179F5FAE0005264D /* CDEDeviceRevisionSetTests.m */,
+				07157A2217B555A4004AAD22 /* CDEEventMigratorTests.m */,
+				0747CDA317C3E0A300221ED7 /* CDEIntegratorTestCase.h */,
+				0747CDA417C3E0A300221ED7 /* CDEIntegratorTestCase.m */,
+				072E7AE017BFC1D30076117D /* CDEIntegratorTests.m */,
+				0747CDA117C3DCE300221ED7 /* CDEBasicIntegratorRelationshipTests.m */,
+				07DDA7E317C8FE25009C6F94 /* CDEIntegratorUpdateTests.m */,
+				077B555417D1E5CF008AA7F7 /* CDEIntegratorCornerCases.m */,
+				07697A7117E0B6C000A9BB63 /* CDECloudManagerTests.m */,
+				07697A7617E0BD0800A9BB63 /* CDEMockCloudFileSystem.h */,
+				07697A7717E0BD0800A9BB63 /* CDEMockCloudFileSystem.m */,
+				072BD7BE17F30A1E00D19306 /* CDEPersistentStoreEnsembleTests.m */,
+			);
+			name = "Unit Tests";
+			sourceTree = "<group>";
+		};
+		070CF7A817E4C8F40009AC0B /* Sync System Tests */ = {
+			isa = PBXGroup;
+			children = (
+				072E5AEA17EB4332002D9604 /* CDESyncTest.h */,
+				072E5AEB17EB4332002D9604 /* CDESyncTest.m */,
+				07CCA9D417E49B4A0017B6C4 /* CDEOneWaySyncTests.m */,
+				072E5AED17EB44C3002D9604 /* CDETwoWaySyncTests.m */,
+			);
+			name = "Sync System Tests";
+			sourceTree = "<group>";
+		};
+		0722B26017B76B2400496F4A /* Revisioning */ = {
+			isa = PBXGroup;
+			children = (
+				07DDA7E517C9ECF6009C6F94 /* CDERevisionManager.h */,
+				07DDA7E617C9ECF6009C6F94 /* CDERevisionManager.m */,
+				0722B26117B76B2400496F4A /* CDERevision.h */,
+				0722B26217B76B2400496F4A /* CDERevision.m */,
+				0722B26317B76B2400496F4A /* CDERevisionSet.h */,
+				0722B26417B76B2400496F4A /* CDERevisionSet.m */,
+			);
+			path = Revisioning;
+			sourceTree = "<group>";
+		};
+		07592CA8177F2D1000816034 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				070CF7A817E4C8F40009AC0B /* Sync System Tests */,
+				070CF7A717E4C8DB0009AC0B /* Unit Tests */,
+				07592CA9177F2D1000816034 /* Supporting Files */,
+			);
+			name = Tests;
+			path = "Tests (Mac)";
+			sourceTree = "<group>";
+		};
+		07592CA9177F2D1000816034 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				07E2042217C8F2EB00ED9AB3 /* Integrator Test Fixtures */,
+				07592CAA177F2D1000816034 /* Tests (Mac)-Info.plist */,
+				07592CAB177F2D1000816034 /* InfoPlist.strings */,
+				07592CB0177F2D1000816034 /* Tests (Mac)-Prefix.pch */,
+				073BB0C91780841E0061466E /* CDEStoreModificationEventTestsModel.xcdatamodeld */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		0777BF0F17183FD500F1D0D2 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				07BF7A03177F0A9D0029D500 /* General */,
+				07BF79E7177F0A9D0029D500 /* Cloud */,
+				07BF79F5177F0A9D0029D500 /* Ensemble */,
+				07BF79F8177F0A9D0029D500 /* Events */,
+				07BF7A0C177F0A9D0029D500 /* Model */,
+				0722B26017B76B2400496F4A /* Revisioning */,
+			);
+			path = Source;
+			sourceTree = "<group>";
+		};
+		077B555117D1E3DC008AA7F7 /* Corner Cases */ = {
+			isa = PBXGroup;
+			children = (
+				072F316F17D4C9CB00541FED /* UpdateRelationshipConcurrentWithDeletion.json */,
+				072F316D17D4C72C00541FED /* UpdateRelationshipConcurrently.json */,
+				072F316B17D4C41B00541FED /* DeleteUninserted.json */,
+				072F316917D4ABDF00541FED /* UpdateToUninserted.json */,
+				072F316717D4AAD900541FED /* UpdateConcurrentWithInsert.json */,
+				072F316517D4AA0A00541FED /* InsertFollowingDeletion.json */,
+				072F316317D4A72D00541FED /* UpdateFollowingDeletion.json */,
+				077B555217D1E5A0008AA7F7 /* DoubleInsertFixture.json */,
+			);
+			path = "Corner Cases";
+			sourceTree = "<group>";
+		};
+		07BF79B8177F05800029D500 /* Mac */ = {
+			isa = PBXGroup;
+			children = (
+				07BF7A72177F0D570029D500 /* CoreData.framework */,
+				07BF78E9177F03320029D500 /* XCTest.framework */,
+				07E492E917172CB200FE81B5 /* Foundation.framework */,
+			);
+			name = Mac;
+			sourceTree = "<group>";
+		};
+		07BF79E7177F0A9D0029D500 /* Cloud */ = {
+			isa = PBXGroup;
+			children = (
+				0728FA9717E0ACB800497BF5 /* CDECloudFileSystem.h */,
+				07BF79ED177F0A9D0029D500 /* CDECloudManager.h */,
+				07BF79EE177F0A9D0029D500 /* CDECloudManager.m */,
+				072E5AF517EC37C0002D9604 /* CDELocalCloudFileSystem.h */,
+				072E5AF617EC37C0002D9604 /* CDELocalCloudFileSystem.m */,
+				074B956D17EC3F7E0016F84D /* CDEICloudFileSystem.h */,
+				074B956E17EC3F7E0016F84D /* CDEICloudFileSystem.m */,
+				07BF79E8177F0A9D0029D500 /* CDECloudDirectory.h */,
+				07BF79E9177F0A9D0029D500 /* CDECloudDirectory.m */,
+				07BF79EA177F0A9D0029D500 /* CDECloudFile.h */,
+				07BF79EB177F0A9D0029D500 /* CDECloudFile.m */,
+			);
+			path = Cloud;
+			sourceTree = "<group>";
+		};
+		07BF79F5177F0A9D0029D500 /* Ensemble */ = {
+			isa = PBXGroup;
+			children = (
+				07BF79F6177F0A9D0029D500 /* CDEPersistentStoreEnsemble.h */,
+				07BF79F7177F0A9D0029D500 /* CDEPersistentStoreEnsemble.m */,
+				072A87D917EDFBB000F8B2CB /* CDEPersistentStoreImporter.h */,
+				072A87DA17EDFBB000F8B2CB /* CDEPersistentStoreImporter.m */,
+			);
+			path = Ensemble;
+			sourceTree = "<group>";
+		};
+		07BF79F8177F0A9D0029D500 /* Events */ = {
+			isa = PBXGroup;
+			children = (
+				07BF79FD177F0A9D0029D500 /* CDEEventStore.h */,
+				07BF79FE177F0A9D0029D500 /* CDEEventStore.m */,
+				07BF79F9177F0A9D0029D500 /* CDEEventIntegrator.h */,
+				07BF79FA177F0A9D0029D500 /* CDEEventIntegrator.m */,
+				07BF79FB177F0A9D0029D500 /* CDEEventMigrator.h */,
+				07BF79FC177F0A9D0029D500 /* CDEEventMigrator.m */,
+				07BF79FF177F0A9D0029D500 /* CDESaveMonitor.h */,
+				07BF7A00177F0A9D0029D500 /* CDESaveMonitor.m */,
+				072A87DE17EEE55600F8B2CB /* CDEEventBuilder.h */,
+				072A87DF17EEE55600F8B2CB /* CDEEventBuilder.m */,
+			);
+			path = Events;
+			sourceTree = "<group>";
+		};
+		07BF7A03177F0A9D0029D500 /* General */ = {
+			isa = PBXGroup;
+			children = (
+				07CCA9D617E49CA80017B6C4 /* CoreDataEnsembles.h */,
+				07BF7A04177F0A9D0029D500 /* NSMapTable+CDEAdditions.h */,
+				07BF7A05177F0A9D0029D500 /* NSMapTable+CDEAdditions.m */,
+				07BF7A06177F0A9D0029D500 /* CDEAsynchronousTaskQueue.h */,
+				07BF7A07177F0A9D0029D500 /* CDEAsynchronousTaskQueue.m */,
+				07BF7A08177F0A9D0029D500 /* CDEDefines.h */,
+				07BF7A09177F0A9D0029D500 /* CDEDefines.m */,
+				07BF7A0A177F0A9D0029D500 /* CDEFoundationAdditions.h */,
+				07BF7A0B177F0A9D0029D500 /* CDEFoundationAdditions.m */,
+			);
+			path = General;
+			sourceTree = "<group>";
+		};
+		07BF7A0C177F0A9D0029D500 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				078ABF4917F19195008C9B27 /* CDEEventStoreModel.xcdatamodeld */,
+				078A3F80178C9B32009C8821 /* CDEEventRevision.h */,
+				078A3F81178C9B32009C8821 /* CDEEventRevision.m */,
+				07BF7A15177F0A9D0029D500 /* CDEGlobalIdentifier.h */,
+				07BF7A16177F0A9D0029D500 /* CDEGlobalIdentifier.m */,
+				07BF7A19177F0A9D0029D500 /* CDEObjectChange.h */,
+				07BF7A1A177F0A9D0029D500 /* CDEObjectChange.m */,
+				07BF7A01177F0A9D0029D500 /* CDEPropertyChangeValue.h */,
+				07BF7A02177F0A9D0029D500 /* CDEPropertyChangeValue.m */,
+				07BF7A1D177F0A9D0029D500 /* CDEStoreModificationEvent.h */,
+				07BF7A1E177F0A9D0029D500 /* CDEStoreModificationEvent.m */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		07E2042217C8F2EB00ED9AB3 /* Integrator Test Fixtures */ = {
+			isa = PBXGroup;
+			children = (
+				077B555117D1E3DC008AA7F7 /* Corner Cases */,
+				071B9F9517E30ECB00E6977A /* IntegratorUpdateTestsFixture1.json */,
+				071B9F9617E30ECB00E6977A /* IntegratorUpdateTestsFixture2.json */,
+				07E2042317C8F2EB00ED9AB3 /* BasicIntegratorRelationshipTestsFixture.json */,
+			);
+			path = "Integrator Test Fixtures";
+			sourceTree = "<group>";
+		};
+		07E492DD17172CB200FE81B5 = {
+			isa = PBXGroup;
+			children = (
+				0777BF0F17183FD500F1D0D2 /* Source */,
+				07592CA8177F2D1000816034 /* Tests */,
+				07E492E817172CB200FE81B5 /* Frameworks */,
+				07E492E717172CB200FE81B5 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		07E492E717172CB200FE81B5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				07BF7933177F04B30029D500 /* libensembles_mac.a */,
+				07592CA6177F2D1000816034 /* Tests (Mac).xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		07E492E817172CB200FE81B5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				07BF79B8177F05800029D500 /* Mac */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		07BF7931177F04B30029D500 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				07BF7A47177F0A9D0029D500 /* CDEAsynchronousTaskQueue.h in Headers */,
+				072A87E017EEE55600F8B2CB /* CDEEventBuilder.h in Headers */,
+				07BF7A26177F0A9D0029D500 /* CDECloudManager.h in Headers */,
+				0728FA9817E0ACB800497BF5 /* CDECloudFileSystem.h in Headers */,
+				07CCA9D717E49CA80017B6C4 /* CoreDataEnsembles.h in Headers */,
+				07BF7A38177F0A9D0029D500 /* CDEEventMigrator.h in Headers */,
+				07BF7A3B177F0A9D0029D500 /* CDEEventStore.h in Headers */,
+				07BF7A22177F0A9D0029D500 /* CDECloudFile.h in Headers */,
+				07BF7A3E177F0A9D0029D500 /* CDESaveMonitor.h in Headers */,
+				07BF7A61177F0A9D0029D500 /* CDEObjectChange.h in Headers */,
+				07BF7A67177F0A9D0029D500 /* CDEStoreModificationEvent.h in Headers */,
+				07BF7A41177F0A9D0029D500 /* CDEPropertyChangeValue.h in Headers */,
+				07BF7A5B177F0A9D0029D500 /* CDEGlobalIdentifier.h in Headers */,
+				07BF7A1F177F0A9D0029D500 /* CDECloudDirectory.h in Headers */,
+				07BF7A4A177F0A9D0029D500 /* CDEDefines.h in Headers */,
+				07BF7A32177F0A9D0029D500 /* CDEPersistentStoreEnsemble.h in Headers */,
+				0722B26A17B76B2400496F4A /* CDERevisionSet.h in Headers */,
+				07BF7A44177F0A9D0029D500 /* NSMapTable+CDEAdditions.h in Headers */,
+				07BF7A35177F0A9D0029D500 /* CDEEventIntegrator.h in Headers */,
+				072A87DB17EDFBB000F8B2CB /* CDEPersistentStoreImporter.h in Headers */,
+				072E5AF717EC37C0002D9604 /* CDELocalCloudFileSystem.h in Headers */,
+				074B956F17EC3F7E0016F84D /* CDEICloudFileSystem.h in Headers */,
+				0722B26717B76B2400496F4A /* CDERevision.h in Headers */,
+				07BF7A4D177F0A9D0029D500 /* CDEFoundationAdditions.h in Headers */,
+				078A3F82178C9B32009C8821 /* CDEEventRevision.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		07592CA5177F2D1000816034 /* Tests (Mac) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 07592CB5177F2D1000816034 /* Build configuration list for PBXNativeTarget "Tests (Mac)" */;
+			buildPhases = (
+				07592CA2177F2D1000816034 /* Sources */,
+				07592CA3177F2D1000816034 /* Frameworks */,
+				07592CA4177F2D1000816034 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				07592CB2177F2D1000816034 /* PBXTargetDependency */,
+			);
+			name = "Tests (Mac)";
+			productName = "Tests (Mac)";
+			productReference = 07592CA6177F2D1000816034 /* Tests (Mac).xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		07BF7932177F04B30029D500 /* Ensembles Mac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 07BF794D177F04B40029D500 /* Build configuration list for PBXNativeTarget "Ensembles Mac" */;
+			buildPhases = (
+				07BF792F177F04B30029D500 /* Sources */,
+				07BF7930177F04B30029D500 /* Frameworks */,
+				07BF7931177F04B30029D500 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Ensembles Mac";
+			productName = "Syncophant Mac";
+			productReference = 07BF7933177F04B30029D500 /* libensembles_mac.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		07E492DE17172CB200FE81B5 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = CDE;
+				LastUpgradeCheck = 0500;
+				ORGANIZATIONNAME = "Drew McCormack";
+				TargetAttributes = {
+					07592CA5177F2D1000816034 = {
+						TestTargetID = 07E492E517172CB200FE81B5;
+					};
+				};
+			};
+			buildConfigurationList = 07E492E117172CB200FE81B5 /* Build configuration list for PBXProject "Ensembles Mac" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 07E492DD17172CB200FE81B5;
+			productRefGroup = 07E492E717172CB200FE81B5 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				07BF7932177F04B30029D500 /* Ensembles Mac */,
+				07592CA5177F2D1000816034 /* Tests (Mac) */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		07592CA4177F2D1000816034 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				072F316E17D4C72C00541FED /* UpdateRelationshipConcurrently.json in Resources */,
+				072F316817D4AAD900541FED /* UpdateConcurrentWithInsert.json in Resources */,
+				072F316617D4AA0A00541FED /* InsertFollowingDeletion.json in Resources */,
+				071B9F9717E30ECB00E6977A /* IntegratorUpdateTestsFixture1.json in Resources */,
+				071B9F9817E30ECB00E6977A /* IntegratorUpdateTestsFixture2.json in Resources */,
+				07E2042417C8F2EB00ED9AB3 /* BasicIntegratorRelationshipTestsFixture.json in Resources */,
+				072F317017D4C9CB00541FED /* UpdateRelationshipConcurrentWithDeletion.json in Resources */,
+				07592CAD177F2D1000816034 /* InfoPlist.strings in Resources */,
+				072F316417D4A72D00541FED /* UpdateFollowingDeletion.json in Resources */,
+				072F316C17D4C41B00541FED /* DeleteUninserted.json in Resources */,
+				072F316A17D4ABDF00541FED /* UpdateToUninserted.json in Resources */,
+				077B555317D1E5A0008AA7F7 /* DoubleInsertFixture.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		07592CA2177F2D1000816034 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0722B27117B770A600496F4A /* CDEObjectChangeTests.m in Sources */,
+				072E5AEE17EB44C3002D9604 /* CDETwoWaySyncTests.m in Sources */,
+				0722B27017B770A000496F4A /* CDEEventStoreTests.m in Sources */,
+				07E2875417BF8D470008CC4F /* CDESaveMonitorRelationshipTests.m in Sources */,
+				07374717178207610049BB92 /* CDEEventStoreTestCase.m in Sources */,
+				0722B27317B770BF00496F4A /* CDEDeviceRevisionSetTests.m in Sources */,
+				074DE60E17B77970009755EB /* CDEStoreModificationEventTests.m in Sources */,
+				074DE61217B77BB6009755EB /* CDEEventMigratorTests.m in Sources */,
+				07697A7817E0BD0800A9BB63 /* CDEMockCloudFileSystem.m in Sources */,
+				07CCA9D917E4AF0E0017B6C4 /* CDEOneWaySyncTests.m in Sources */,
+				0754307717F20BEE00FA4946 /* CDECloudManagerTests.m in Sources */,
+				0747CDA517C3E0A300221ED7 /* CDEIntegratorTestCase.m in Sources */,
+				07DDA7E917CA256E009C6F94 /* CDERevisionManagerTests.m in Sources */,
+				0760274217F8672200329299 /* CDEEventStoreModel.xcdatamodeld in Sources */,
+				072E7AE117BFC1D30076117D /* CDEIntegratorTests.m in Sources */,
+				0722B27417B7713D00496F4A /* CDESaveMonitorTests.m in Sources */,
+				0747CDA217C3DCE300221ED7 /* CDEBasicIntegratorRelationshipTests.m in Sources */,
+				07DDA7E417C8FE25009C6F94 /* CDEIntegratorUpdateTests.m in Sources */,
+				072E5AEC17EB4332002D9604 /* CDESyncTest.m in Sources */,
+				073BB0CB1780841E0061466E /* CDEStoreModificationEventTestsModel.xcdatamodeld in Sources */,
+				07DDA7E717C9ECF6009C6F94 /* CDERevisionManager.m in Sources */,
+				074DE60F17B7797E009755EB /* CDEEventDeviceRevisionTests.m in Sources */,
+				072BD7BF17F30A1E00D19306 /* CDEPersistentStoreEnsembleTests.m in Sources */,
+				074DE61117B779D8009755EB /* CDEDeviceRevisionTests.m in Sources */,
+				0722B27217B770AC00496F4A /* CDEPropertyChangeValueTests.m in Sources */,
+				077B555517D1E5CF008AA7F7 /* CDEIntegratorCornerCases.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		07BF792F177F04B30029D500 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				074B957217EC45660016F84D /* CDEICloudFileSystem.m in Sources */,
+				07BF7A21177F0A9D0029D500 /* CDECloudDirectory.m in Sources */,
+				07BF7A43177F0A9D0029D500 /* CDEPropertyChangeValue.m in Sources */,
+				0722B26C17B76B2400496F4A /* CDERevisionSet.m in Sources */,
+				07BF7A34177F0A9D0029D500 /* CDEPersistentStoreEnsemble.m in Sources */,
+				07BF7A4F177F0A9D0029D500 /* CDEFoundationAdditions.m in Sources */,
+				078ABF4B17F19195008C9B27 /* CDEEventStoreModel.xcdatamodeld in Sources */,
+				072A87E217EEE55600F8B2CB /* CDEEventBuilder.m in Sources */,
+				07BF7A69177F0A9D0029D500 /* CDEStoreModificationEvent.m in Sources */,
+				07BF7A49177F0A9D0029D500 /* CDEAsynchronousTaskQueue.m in Sources */,
+				07BF7A3A177F0A9D0029D500 /* CDEEventMigrator.m in Sources */,
+				0722B26917B76B2400496F4A /* CDERevision.m in Sources */,
+				074DE61717B80325009755EB /* CDEEventIntegrator.m in Sources */,
+				07BF7A28177F0A9D0029D500 /* CDECloudManager.m in Sources */,
+				07BF7A63177F0A9D0029D500 /* CDEObjectChange.m in Sources */,
+				072E5AF917EC37C0002D9604 /* CDELocalCloudFileSystem.m in Sources */,
+				07BF7A4C177F0A9D0029D500 /* CDEDefines.m in Sources */,
+				07BF7A5D177F0A9D0029D500 /* CDEGlobalIdentifier.m in Sources */,
+				07BF7A3D177F0A9D0029D500 /* CDEEventStore.m in Sources */,
+				07BF7A40177F0A9D0029D500 /* CDESaveMonitor.m in Sources */,
+				07BF7A24177F0A9D0029D500 /* CDECloudFile.m in Sources */,
+				072A87DD17EDFBB000F8B2CB /* CDEPersistentStoreImporter.m in Sources */,
+				07BF7A46177F0A9D0029D500 /* NSMapTable+CDEAdditions.m in Sources */,
+				078A3F84178C9B32009C8821 /* CDEEventRevision.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		07592CB2177F2D1000816034 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 07BF7932177F04B30029D500 /* Ensembles Mac */;
+			targetProxy = 07592CB1177F2D1000816034 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		07592CAB177F2D1000816034 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				07592CAC177F2D1000816034 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		07592CB3177F2D1000816034 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Tests (Mac)/Tests (Mac)-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = "Tests (Mac)/Tests (Mac)-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		07592CB4177F2D1000816034 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Tests (Mac)/Tests (Mac)-Prefix.pch";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = "Tests (Mac)/Tests (Mac)-Info.plist";
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
+		07BF794E177F04B40029D500 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SYSTEM_APPS_DIR)/Xcode5-DP2.app/Contents/Developer/Library/Frameworks",
+				);
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_NAME = ensembles_mac;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		07BF794F177F04B40029D500 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SYSTEM_APPS_DIR)/Xcode5-DP2.app/Contents/Developer/Library/Frameworks",
+				);
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_NAME = ensembles_mac;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		07E492F217172CB200FE81B5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				ONLY_ACTIVE_ARCH = YES;
+			};
+			name = Debug;
+		};
+		07E492F317172CB200FE81B5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		07592CB5177F2D1000816034 /* Build configuration list for PBXNativeTarget "Tests (Mac)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				07592CB3177F2D1000816034 /* Debug */,
+				07592CB4177F2D1000816034 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		07BF794D177F04B40029D500 /* Build configuration list for PBXNativeTarget "Ensembles Mac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				07BF794E177F04B40029D500 /* Debug */,
+				07BF794F177F04B40029D500 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		07E492E117172CB200FE81B5 /* Build configuration list for PBXProject "Ensembles Mac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				07E492F217172CB200FE81B5 /* Debug */,
+				07E492F317172CB200FE81B5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		073BB0C91780841E0061466E /* CDEStoreModificationEventTestsModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				073BB0CA1780841E0061466E /* CDEStoreModificationEventTestsModel.xcdatamodel */,
+			);
+			currentVersion = 073BB0CA1780841E0061466E /* CDEStoreModificationEventTestsModel.xcdatamodel */;
+			path = CDEStoreModificationEventTestsModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+		078ABF4917F19195008C9B27 /* CDEEventStoreModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				078ABF4A17F19195008C9B27 /* CDEEventStoreModel.xcdatamodel */,
+			);
+			currentVersion = 078ABF4A17F19195008C9B27 /* CDEEventStoreModel.xcdatamodel */;
+			name = CDEEventStoreModel.xcdatamodeld;
+			path = ../../Resources/CDEEventStoreModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = 07E492DE17172CB200FE81B5 /* Project object */;
+}
