@@ -85,9 +85,9 @@ There is one other delegate method that you will probably want to implement, in 
 	    return [objects valueForKeyPath:@"uniqueIdentifier"];
 	} 
 
-This method is also invoked on a background thread. Care should be taken to only access the objects passed on the thread used to invoke the method.
+This method is also invoked on a background thread. Care should be taken to only access the objects passed on this thread.
 
-It is not compulsory to provide global identifiers, but if you do, the framework will automatically ensure that no objects get duplicated due to multiple imports on different devices. If you don't provide global identifiers, the framework has no way to identify a new object, and will assign its own unique identifier.
+It is not compulsory to provide global identifiers, but if you do, the framework will automatically ensure that no objects get duplicated due to multiple imports on different devices. If you don't provide global identifiers, the framework has no way to identify a new object, and will assign it a new unique identifier.
 
 If you do decide to provide global identifiers, it is up to you how you generate them, and where you store them. A common choice is to add an extra attribute to entities in your data model, and set that to a uuid on insertion into the store.
 
