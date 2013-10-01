@@ -16,7 +16,8 @@ To add Ensembles to your App's Xcode Project...
 4. Choose the `libensembles_ios.a` library and add it.
 5. Select the Build Settings tab. Locate the Header Search Paths setting. 
 6. Add a path to the Ensembles directory `Framework`, and make the search path _recursive_. (You may want to form the path relative to your Xcode project, eg, `$(SRCROOT)/../../Framework`).
-7. Drag the `Framework/Resources` directory from the Ensembles project into your App project. Make sure the _Create groups for any added Folders_ option is selected.
+7. Locate the Other Linker Flags setting, and add the flag `-ObjC`.
+8. Drag the `Framework/Resources` directory from the Ensembles project into your App project. Make sure the _Create groups for any added Folders_ option is selected.
 
 #### Idiomatic  App
 
