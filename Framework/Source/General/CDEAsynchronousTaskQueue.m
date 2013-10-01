@@ -1,6 +1,6 @@
 //
 //  CDEAsynchronousTaskQueue.m
-//  Syncophant for iOS
+//  Ensembles
 //
 //  Created by Drew McCormack on 4/13/13.
 //  Copyright (c) 2013 Drew McCormack. All rights reserved.
