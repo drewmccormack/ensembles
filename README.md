@@ -1,7 +1,7 @@
 Core Data Ensembles
 ===
 
-_Author:_ Drew McCormack
+_Author:_ Drew McCormack<br>
 _Date:_ 29th September, 2013
 
 Ensembles extends Apple's Core Data framework to add peer-to-peer synchronization for Mac OS and iOS. Multiple SQLite persistent stores can be coupled together via a file synchronization platform like iCloud or Dropbox. The framework can be readily extended to support any service capable of moving files between devices, including custom servers.
