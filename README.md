@@ -6,20 +6,32 @@ _Date:_ 29th September, 2013
 
 Ensembles extends Apple's Core Data framework to add peer-to-peer synchronization for Mac OS and iOS. Multiple SQLite persistent stores can be coupled together via a file synchronization platform like iCloud or Dropbox. The framework can be readily extended to support any service capable of moving files between devices, including custom servers.
 
+#### Incorporating Ensembles in an iOS Project
+
+To add Ensembles to your App's Xcode Project...
+
+1. Drag the `Ensembles iOS.xcodeproj` project from the `Framework` directory into your Xcode project.
+2. Select the App's project root, and the App target.
+3. In the General tab, click the + button in the _Linked Frameworks and Libraries_ section.
+4. Choose the `libensembles_ios.a` library and add it.
+5. Select the Build Settings tab. Locate the Header Search Paths setting. 
+6. Add a path to the Ensembles directory `Framework`, and make the search path _recursive_. (You may want to form the path relative to your Xcode project, eg, `$(SRCROOT)/../../Framework`).
+7. Drag the `Framework/Resources` directory from the Ensembles project into your App project. Make sure the _Create groups for any added Folders_ option is selected.
+
 #### Idiomatic  App
 
 Idiomatic is a relatively simple example app that incorporates Ensembles and works with iCloud to sync across devices. The app allows you to record your ideas, and add tags to group them. The Core Data model of the app includes two entities, with a many-to-many relationship.
 
 The Idiomatic project is a good way to get acquainted with Ensembles, and how it is integrated in a Core Data app. Idiomatic can be run in the iPhone Simulator, or on a device, but in order to test it, you need to follow a few preparatory steps.
 
-1. Register an App ID for Idiomatic (_eg_ com.yourcompany.idiomatic) in the Certificates, Identifiers & Profiles section of the iOS Developer Center, and make sure the iCloud service is enabled.
+1. Register an App ID for Idiomatic (eg com.yourcompany.idiomatic) in the Certificates, Identifiers & Profiles section of the iOS Developer Center, and make sure the iCloud service is enabled.
 2. Select the Idiomatic Project in the source list of the Xcode project, and then select the Idiomatic target.
-3. In the General section, set the bundle identifier (_eg_ com.yourcompany.idiomatic).
+3. In the General section, set the bundle identifier (eg com.yourcompany.idiomatic).
 4. Select the _Capabilities_ section, turn on the iCloud switch, and replace the existing Ubiquity Container with your own.
 5. In the IDMAppDelegate class, locate this code in application:didFinishLaunchingWithOptions:
 
-	// Setup Ensemble
-	cloudFileSystem = [[CDEICloudFileSystem alloc] initWithUbiquityContainerIdentifier:@"P7BXV6PHLD.com.mentalfaculty.idiomatic"];
+		// Setup Ensemble
+		cloudFileSystem = [[CDEICloudFileSystem alloc] initWithUbiquityContainerIdentifier:@"P7BXV6PHLD.com.mentalfaculty.idiomatic"];
 
 6. Fill in the Ubiquity Container Identifier appropriate for your bundle identifier and team identifier. You can find this on the iOS Developer Center under the App ID you registered. Just combine the _Prefix_ entry with the _ID_.
 7. Build and install on devices and simulators that are logged into the same iCloud account.
