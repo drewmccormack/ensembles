@@ -117,7 +117,7 @@ static NSString * const kCDEIdentityTokenContext = @"kCDEIdentityTokenContext";
     self.eventIntegrator.didSaveBlock = ^(NSManagedObjectContext *context, NSDictionary *info) {
         CDEPersistentStoreEnsemble *strongSelf = weakSelf;
         if ([strongSelf.delegate respondsToSelector:@selector(persistentStoreEnsemble:didSaveMergeChangesWithNotification:)]) {
-            NSNotification *notification = [[NSNotification alloc] initWithName:NSManagedObjectContextDidSaveNotification object:context userInfo:info];
+            NSNotification *notification = [NSNotification notificationWithName:NSManagedObjectContextDidSaveNotification object:context userInfo:info];
             [strongSelf.delegate persistentStoreEnsemble:strongSelf didSaveMergeChangesWithNotification:notification];
         }
     };
