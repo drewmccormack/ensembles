@@ -8,7 +8,14 @@ Ensembles extends Apple's Core Data framework to add peer-to-peer synchronizatio
 
 #### Incorporating Ensembles in an iOS Project
 
-To add Ensembles to your App's Xcode Project...
+To add Ensembles to your App's Xcode Project with CocoaPods...
+
+1. Add the following to your Podfile 
+
+		platform :ios, '7.0'
+		pod "Ensembles", "~> 0.1"
+
+To manually add Ensembles to your App's Xcode Project...
 
 1. Drag the `Ensembles iOS.xcodeproj` project from the `Framework` directory into your Xcode project.
 2. Select the App's project root, and the App target.
