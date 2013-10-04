@@ -11,6 +11,7 @@
 #import "CDEPersistentStoreImporter.h"
 #import "CDEEventStore.h"
 #import "CDEDefines.h"
+#import "CDEAsynchronousTaskQueue.h"
 #import "CDECloudFile.h"
 #import "CDECloudDirectory.h"
 #import "CDECloudFileSystem.h"
@@ -48,6 +49,8 @@ static NSString * const kCDEIdentityTokenContext = @"kCDEIdentityTokenContext";
 @synthesize saveMonitor = saveMonitor;
 @synthesize eventIntegrator = eventIntegrator;
 @synthesize managedObjectModel = managedObjectModel;
+
+#pragma mark - Initialization and Deallocation
 
 + (instancetype)persistentStoreEnsembleForPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator ensembleIdentifier:(NSString *)identifier cloudFileSystem:(id <CDECloudFileSystem>)cloudFileSystem
 {
@@ -117,7 +120,7 @@ static NSString * const kCDEIdentityTokenContext = @"kCDEIdentityTokenContext";
     self.eventIntegrator.didSaveBlock = ^(NSManagedObjectContext *context, NSDictionary *info) {
         CDEPersistentStoreEnsemble *strongSelf = weakSelf;
         if ([strongSelf.delegate respondsToSelector:@selector(persistentStoreEnsemble:didSaveMergeChangesWithNotification:)]) {
-            NSNotification *notification = [[NSNotification alloc] initWithName:NSManagedObjectContextDidSaveNotification object:context userInfo:info];
+            NSNotification *notification = [NSNotification notificationWithName:NSManagedObjectContextDidSaveNotification object:context userInfo:info];
             [strongSelf.delegate persistentStoreEnsemble:strongSelf didSaveMergeChangesWithNotification:notification];
         }
     };
@@ -126,6 +129,15 @@ static NSString * const kCDEIdentityTokenContext = @"kCDEIdentityTokenContext";
 - (void)dealloc
 {
     [saveMonitor stopMonitoring];
+}
+
+#pragma mark - Completing Operations
+
+- (void)dispatchCompletion:(CDECompletionBlock)completion withError:(NSError *)error
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (completion) completion(error);
+    });
 }
 
 #pragma mark - Key Value Observing
@@ -247,9 +259,7 @@ static NSString * const kCDEIdentityTokenContext = @"kCDEIdentityTokenContext";
         }];
     }
     else {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (completion) completion(nil);
-        });
+        [self dispatchCompletion:completion withError:nil];
     }
 }
 
@@ -268,52 +278,55 @@ static NSString * const kCDEIdentityTokenContext = @"kCDEIdentityTokenContext";
     
     if (!self.leeched) {
         NSError *error = [[NSError alloc] initWithDomain:CDEErrorDomain code:CDEErrorCodeDisallowedStateChange userInfo:@{NSLocalizedDescriptionKey : @"Attempt to merge a store that is not leeched."}];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (completion) completion(error);
-        });
+        [self dispatchCompletion:completion withError:error];
         return;
     }
     
     if (self.merging) {
         NSError *error = [[NSError alloc] initWithDomain:CDEErrorDomain code:CDEErrorCodeDisallowedStateChange userInfo:@{NSLocalizedDescriptionKey : @"Attempt to merge when merge is already underway."}];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (completion) completion(error);
-        });
+        [self dispatchCompletion:completion withError:error];
         return;
     }
     
     self.merging = YES;
-    [self checkCloudFileSystemIdentityWithCompletion:^(NSError *error) {
-        if (error) {
-            if (completion) completion(error);
-            self.merging = NO;
-            return;
-        }
-        
-        [self processPendingChangesWithCompletion:^(NSError *error) {
-            [self.cloudManager importNewRemoteEventsWithCompletion:^(NSError *error) {
-                if (error) {
-                    if (completion) completion(error);
-                    self.merging = NO;
-                    return;
-                }
-                
-                CDERevisionNumber lastMerge = [self.eventStore lastMergeRevision];
-                [self.eventIntegrator mergeEventsImportedSinceRevision:lastMerge completion:^(NSError *error) {
-                    if (error) {
-                        if (completion) completion(error);
-                        self.merging = NO;
-                        return;
-                    }
-
-                    [self.cloudManager exportNewLocalEventsWithCompletion:^(NSError *error) {
-                        if (completion) completion(error);
-                        self.merging = NO;
-                    }];
-                }];
-            }];
+    
+    CDEAsynchronousTaskBlock checkIdentityTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self checkCloudFileSystemIdentityWithCompletion:^(NSError *error) {
+            next(error, NO);
         }];
+    };
+    
+    CDEAsynchronousTaskBlock processChangesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self processPendingChangesWithCompletion:^(NSError *error) {
+            next(error, NO);
+        }];
+    };
+    
+    CDEAsynchronousTaskBlock importRemoteEventsTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self.cloudManager importNewRemoteEventsWithCompletion:^(NSError *error) {
+            next(error, NO);
+        }];
+    };
+    
+    CDEAsynchronousTaskBlock mergeEventsTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        CDERevisionNumber lastMerge = [self.eventStore lastMergeRevision];
+        [self.eventIntegrator mergeEventsImportedSinceRevision:lastMerge completion:^(NSError *error) {
+            next(error, NO);
+        }];
+    };
+    
+    CDEAsynchronousTaskBlock exportEventsTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self.cloudManager exportNewLocalEventsWithCompletion:^(NSError *error) {
+            next(error, NO);
+        }];
+    };
+    
+    NSArray *tasks = @[checkIdentityTask, processChangesTask, importRemoteEventsTask, mergeEventsTask, exportEventsTask];
+    CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:tasks terminationPolicy:CDETaskQueueTerminationPolicyStopOnError completion:^(NSError *error) {
+        if (completion) completion(error);
+        self.merging = NO;
     }];
+    [taskQueue start];
 }
 
 - (void)cancelMergeWithCompletion:(CDECompletionBlock)completion
