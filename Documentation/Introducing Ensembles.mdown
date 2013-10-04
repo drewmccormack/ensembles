@@ -1,0 +1,100 @@
+**This document originally appeared at http://mentalfaculty.tumblr.com/post/62909673342/introducing-ensembles-core-data-sync-the-way-it-should**
+
+
+Introducing Ensembles
+===
+
+_by Drew McCormack_
+
+Earlier this month, I announced at [iOSDevUK](http://www.iosdevuk.com) that I was working in my spare time on a new Core Data Synchronisation framework: Ensembles. Yesterday, while rehashing the presentation at [GOTO Aarhus](http://gotocon.com/aarhus-2013/) in Denmark, I pushed the working source code to [GitHub](https://github.com/drewmccormack/ensembles). 
+
+It's been a long journey, and there is still a long way to go. Anyone who follows me on Twitter, or reads this blog, knows that I have been struggling for years to replace the Wi-Fi sync in my [Mental Case](http://www.mentalcase.com) product with a _more contemporary_ cloud-based solution. Mental Case deals with non-trivial amounts of data, and a moderately complex data model; the existing options for Core Data synchronisation, including Apple's iCloud, have fallen short.
+
+Although I did eventually ship Mental Case 2 with cloud sync, built upon the [TICDS framework](https://github.com/nothirst/TICoreDataSync), I have never been completely happy with the result. TICDS was a brave first attempt at a solution when no other options existed. But it pre-dates iCloud, has lost its creator to Apple, and is starting to show its age. 
+
+I contributed code to the TICDS project, and considered whether it could be updated to incorporate design changes that we now know work better. In the end, I decided it would involve such widespread changes, it was probably more work than just starting again, with today's Objective-C language, Core Data, and the knowledge gained from TICDS, iCloud, and other attempts to solve the problem.
+
+And so, back in April, I started hacking away on the beginnings of a framework codenamed 'Syncophant'. I didn't have a clear direction: the design had not fully crystallised, and I began winging it without any tests. After a month or two, I realised that I would never get the framework to any stable state without good tests, so I started developing each component using Xcode 5's unit testing framework. 
+
+As I went, I developed clear ideas about how things should work in a peer-to-peer synchronisation framework like Ensembles. I started to see where other frameworks were going wrong, and also where they were doing things right. I took the best, and looked for ways to avoid the worst. 
+
+In this way, I came to develop a set of informal requirements and specifications for the framework. It's useful to know what these are in order to understand the framework, so I am going to spell them out here in detail. This is the essence of the Ensembles framework.
+
+##### Requires minimal changes to existing code
+There is nothing in Core Data that should necessitate major changes to your data model, or class hierarchy, in order to support synchronisation. The `NSManagedObjectContext` class already fires notifications before and after each save, with all of the information necessary to form change sets.
+
+A major goal of Ensembles was that the API should be as simple as possible, and that it should be as non-invasive as possible. You should not need to subclass `NSManagedObjectContext` or `NSManagedObject`. You should not have to alter your model.
+
+In stark contrast to iCloud—Core Data, you also shouldn't need to tear down your Core Data stack at any point just to accommodate Ensembles. Your `NSManagedObjectContext` can proceed unhindered, even when Ensembles has no connection to the cloud, or a catastrophic problem arises, such as the user changing cloud accounts. Syncing may terminate, but your app will go forth as though nothing happened.
+
+And when your app is ready to reconnect to the cloud, Ensembles automatically migrates data to the cloud, so again, you are not required to play musical chairs with store files, and artificial migrations between stores, like you must when using iCloud—Core Data synchronisation.
+
+##### Backend agnostic
+The framework should work with any system capable of syncing up blobs of data (i.e. files) located at paths. Examples include, but are not limited to, iCloud, [Dropbox](http://dropbox.com), [S3](http://aws.amazon.com/s3/), [OmniPresence](http://www.omnigroup.com/omnipresence/), [WebDav](http://en.wikipedia.org/wiki/WebDAV), [FTP](http://en.wikipedia.org/wiki/File_Transfer_Protocol), Wi-Fi, and Bluetooth.
+
+##### Files in the cloud are immutable
+Once a file is added to the cloud, it should not be moved, and the contents should not be changed. 
+
+Many of the issues that arise when using services like iCloud come from mutating a file on multiple devices. Making files immutable makes it much less likely that problems will be encountered.
+
+##### Real time testing
+Real time testing is essential for development, and for running automated tests. To achieve this goal, Ensembles supports backends that allow near instant transfer, such as the local file system.
+
+One of the great difficulties with iCloud—Core Data sync is that testing your app is mind-numbingly frustrating. You make a change on one device, and wait for it to propagate to another device where you can observe the effect of your change. This process can be minutes long. If you happen to overwhelm iCloud with too much data, it will throttle back transfers and you may not be able to test for the rest of the day.
+
+(It should be noted that things are better in Xcode 5 for testing iCloud than they were. You can now test in the simulator, though you will still need to wait for data to pass through the cloud to another device.)
+
+##### Eventual consistency of data across client devices
+This sounds obvious, but is actually more difficult than it seems. We are dealing with a decentralised, peer-to-peer synchronisation model, where no device can assume it has the complete global state at any point in time. When merging a change set from a different device, it is often necessary to reapply changes from a change set that has already been merged, in order to guarantee eventual consistency.
+
+In order to ensure all devices apply and compare changes in the same order, whenever a new set of changes is first stored, the known revisions of all other devices are included. This forms a [vector clock](http://en.wikipedia.org/wiki/Vector_clock), which allows Ensembles to establish exactly which change sets occurred concurrently, and provide a global ordering.
+
+A centralised, server-based synchronisation model, by contrast, such as the newly introduced [Dropbox Datastore](https://www.dropbox.com/developers/datastore), can make simplifying assumptions([1](https://www.dropbox.com/developers/blog/48/how-the-datastore-api-handles-conflicts-part-1-basics-of-offline-conflict-handling)[2](https://www.dropbox.com/developers/blog/56/how-the-dropbox-datastore-api-handles-conflicts-part-two-resolving-collisions)) about what data needs to be included in merge operations. In short, only the change sets that are _new_ since the last merge operation need to be considered.
+
+(As an aside, one of the biggest problems with TICDS when used with a file syncing service like iCloud is that it uses the simple, centralised merge algorithm. In some cases, it is possible for devices to get permanently _out-of-sync_ as a result.)
+
+##### Conflict resolution handled in the spirit of Core Data
+Conflict resolution is tricky. You can flag every conflict, like TICDS, and require the host app resolve each one. Or you can try to handle conflicts automatically, like iCloud—Core Data, giving no insight or influence over what is happening. Ensembles adopts a completely new model of conflict resolution, tailored very much to the design ethos of Core Data. 
+
+An `NSManagedObjectContext` is often used as a scratch pad for temporary data edits when working with Core Data. Data can be manipulated, and is only required to be in a valid state when it is saved to the store. If a validation problem arises, it is possible to fix it, and retry.
+
+This is a common pattern in Core Data apps, where a temporary context gets setup just for the purpose of making changes that may or may not end up committed to the store. Ensembles adopts this same approach to merging changes from other devices. 
+
+A temporary background `NSManagedObjectContext` is created which shares the same SQLite store as the main context. Change sets are merged into this context, in order, with no regard to validity of the object graph. When it is time to commit the changes, a delegate method is invoked to give the host app an opportunity to apply any _repairs_ that it wants to make before the data is sent to disk. A second delegate method is called if the background save fails, offering another opportunity to make repairs. Any repairs made by the application code are _captured_ and added as a change set.
+
+(This whole process is very much analogous to how a developer uses a DVCS like Git. Typically, you pull new versions from a server, and merge them with your local changes. If conflicts arise, you repair them, and commit these new changes, before pushing all local changes back to the server.)
+
+Many data models will never demand repairs be made, but some &mdash; particularly models with strict validation rules &mdash; will need this capability. Even when repairs are needed, they will usually be localised to specific parts of the data model, and should not need a complete scan of every updated object.
+
+##### Persistent store never left in invalid state
+Ensembles allows you to stipulate the global identities of objects via a delegate callback. This has broad implications. It means that Ensembles can take on the responsibility of automatically adding data to the cloud when a store is first synchronised. It also means that data is automatically de-duplicated when logically identical objects are added on two different devices. This, and the repair mechanism discussed above, means that the persistent store should never be in an invalid state, and certainly not by design.
+
+This is not the case with the iCloud—Core Data framework. Apple's advice is to de-duplicate objects upon receiving the merge notification &mdash; after the changes have already been committed to the persistent store. And if you have validation rules, you will probably need to remove those from your model, in order to be able to fix the issue in the post save notification method.
+
+##### Large data blobs handled efficiently
+The application I develop, Mental Case, has the ability to store image, audio, and video files. It is important that Ensembles handle this data efficiently on low memory devices, and without duplication in the cloud. This aspect of the framework has not yet been developed, but this requirement will guide further development.
+
+##### Rebasing without wholesale copies of the datastore
+Rebasing is also not yet handled in the framework, but will be important. It involves cleaning up cloud files that are no longer needed, and compacting changes into a new baseline. I already have many ideas related to this, but it will be a fairly major undertaking.
+
+The TICDS framework makes wholesale copies of the SQLite database to create a baseline. This seems like a flaky solution to me, particularly in iOS 7. Apple have moved to a more optimised file format for SQLite, which involves multiple files, and they explicitly advise against moving the store file around.
+
+The plan for rebasing in Ensembles is to represent the baseline as the set of all insert changes needed to generate the store. In this way, the main context could be rebuilt from the change sets at any time. You could even say that the real store is in Ensembles, and the main context is acting more like a high performance cache.
+
+##### Graceful handling of model versions
+I'll be honest: I have no grand vision for handling multiple versions of the entity model. I think Apple already got this pretty right, at least for a first attempt.
+
+This is not yet implemented in the framework, but the approach taken in Ensembles will be to record the model version used to create each change set. When merging changes from other devices, a preflight check will be run to see if the current device supports the model versions of all change sets. If not, the merge will terminate with an error to inform the host app of the problem. It will then be up to the host app to encourage the user to upgrade, and get the latest model. When that happens, merging will proceed as usual. (Ensembles will continue to gather changes from save operations in the interim, so no data loss will occur.)
+
+
+#### Future Plans
+
+Ensembles is very immature. It will develop and stabilise over time, particularly if app developers adopt it and report issues. 
+
+You could argue that Ensembles is at a disadvantage with respect to the incumbent iCloud—Core Data framework, with Apple holding all the cards. It is true Apple has access to code that we do not. Luckily, the Core Data API is complete enough to develop Ensembles without the need for private APIs.
+
+And there are also advantages that a small open source project like Ensembles has over a major company like Apple. Agility for one. Apple is restricted in how often it can issue updates to frameworks, not to mention what can be included. (Hint: Don't hold your breath for Dropbox sync support in Core Data.) A bug can be fixed in Ensembles in a matter of hours, and in your app the next day. Supporting a new backend takes an hour or two of work.
+
+There will always be an open source project for Ensembles. It will probably look a lot like the current framework, but more stable. In addition, I am considering offering a commercial product based around the project, though this is far from certain. It would likely include a few more pro features, like rebasing, as well as detailed documentation, and support. 
+
+Far from undermining the open source project, I actually think this is the best way to ensure it survives and thrives. With a commercial incentive, I will be able to spend more working hours improving the framework, which also benefits the open source project.
