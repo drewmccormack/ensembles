@@ -35,6 +35,10 @@
 		9477ED501800137300C2A419 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9477ED301800137300C2A419 /* Cocoa.framework */; };
 		9477ED581800137400C2A419 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9477ED561800137400C2A419 /* InfoPlist.strings */; };
 		9477ED5A1800137400C2A419 /* IdiomaticMacTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9477ED591800137400C2A419 /* IdiomaticMacTests.m */; };
+		9477ED621800140200C2A419 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9477ED611800140200C2A419 /* CoreData.framework */; };
+		9477ED631800143200C2A419 /* libensembles_mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9477ED281800132F00C2A419 /* libensembles_mac.a */; };
+		9477ED651800158200C2A419 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 077F114217F70BFC0093A212 /* CDEEventStoreModel.xcdatamodeld */; };
+		9477ED66180015F300C2A419 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 074B95D017EC7B0B0016F84D /* Model.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -115,6 +119,7 @@
 		9477ED551800137400C2A419 /* IdiomaticMacTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "IdiomaticMacTests-Info.plist"; sourceTree = "<group>"; };
 		9477ED571800137400C2A419 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		9477ED591800137400C2A419 /* IdiomaticMacTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IdiomaticMacTests.m; sourceTree = "<group>"; };
+		9477ED611800140200C2A419 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/CoreData.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -133,6 +138,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9477ED631800143200C2A419 /* libensembles_mac.a in Frameworks */,
+				9477ED621800140200C2A419 /* CoreData.framework in Frameworks */,
 				9477ED311800137300C2A419 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -175,6 +182,7 @@
 		074B959A17EC783B0016F84D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				9477ED611800140200C2A419 /* CoreData.framework */,
 				07BF37D417F189EB00C56F64 /* libensembles_ios.a */,
 				074B959B17EC783B0016F84D /* Foundation.framework */,
 				074B959D17EC783B0016F84D /* CoreGraphics.framework */,
@@ -487,7 +495,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				9477ED441800137300C2A419 /* AppDelegate.m in Sources */,
+				9477ED651800158200C2A419 /* CDEEventStoreModel.xcdatamodeld in Sources */,
 				9477ED3D1800137300C2A419 /* main.m in Sources */,
+				9477ED66180015F300C2A419 /* Model.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -705,6 +715,11 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(SRCROOT)/../../Framework/**",
+				);
 				INFOPLIST_FILE = "IdiomaticMac/IdiomaticMac-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -726,6 +741,11 @@
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "IdiomaticMac/IdiomaticMac-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(SRCROOT)/../../Framework/**",
+				);
 				INFOPLIST_FILE = "IdiomaticMac/IdiomaticMac-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";

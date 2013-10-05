@@ -9,7 +9,7 @@
 	<key>CFBundleIconFile</key>
 	<string></string>
 	<key>CFBundleIdentifier</key>
-	<string>com.mentalfaculty.idiomaticmac.${PRODUCT_NAME:rfc1034identifier}</string>
+	<string>com.mentalfaculty.idiomaticmac</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
