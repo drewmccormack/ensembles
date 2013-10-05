@@ -31,10 +31,6 @@
 		9477ED441800137300C2A419 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9477ED431800137300C2A419 /* AppDelegate.m */; };
 		9477ED471800137300C2A419 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9477ED451800137300C2A419 /* MainMenu.xib */; };
 		9477ED491800137300C2A419 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9477ED481800137300C2A419 /* Images.xcassets */; };
-		9477ED4F1800137300C2A419 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 074B95BA17EC783B0016F84D /* XCTest.framework */; };
-		9477ED501800137300C2A419 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9477ED301800137300C2A419 /* Cocoa.framework */; };
-		9477ED581800137400C2A419 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9477ED561800137400C2A419 /* InfoPlist.strings */; };
-		9477ED5A1800137400C2A419 /* IdiomaticMacTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9477ED591800137400C2A419 /* IdiomaticMacTests.m */; };
 		9477ED621800140200C2A419 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9477ED611800140200C2A419 /* CoreData.framework */; };
 		9477ED631800143200C2A419 /* libensembles_mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9477ED281800132F00C2A419 /* libensembles_mac.a */; };
 		9477ED651800158200C2A419 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 077F114217F70BFC0093A212 /* CDEEventStoreModel.xcdatamodeld */; };
@@ -67,13 +63,6 @@
 			proxyType = 2;
 			remoteGlobalIDString = 07592CA6177F2D1000816034;
 			remoteInfo = "Tests (Mac)";
-		};
-		9477ED511800137300C2A419 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 074B959017EC783B0016F84D /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 9477ED2E1800137300C2A419;
-			remoteInfo = IdiomaticMac;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -120,7 +109,6 @@
 		9477ED431800137300C2A419 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		9477ED461800137300C2A419 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		9477ED481800137300C2A419 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		9477ED4E1800137300C2A419 /* IdiomaticMacTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IdiomaticMacTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9477ED551800137400C2A419 /* IdiomaticMacTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "IdiomaticMacTests-Info.plist"; sourceTree = "<group>"; };
 		9477ED571800137400C2A419 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		9477ED591800137400C2A419 /* IdiomaticMacTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IdiomaticMacTests.m; sourceTree = "<group>"; };
@@ -155,15 +143,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9477ED4B1800137300C2A419 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				9477ED501800137300C2A419 /* Cocoa.framework in Frameworks */,
-				9477ED4F1800137300C2A419 /* XCTest.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -185,7 +164,6 @@
 			children = (
 				074B959817EC783B0016F84D /* Idiomatic.app */,
 				9477ED2F1800137300C2A419 /* IdiomaticMac.app */,
-				9477ED4E1800137300C2A419 /* IdiomaticMacTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -362,24 +340,6 @@
 			productReference = 9477ED2F1800137300C2A419 /* IdiomaticMac.app */;
 			productType = "com.apple.product-type.application";
 		};
-		9477ED4D1800137300C2A419 /* IdiomaticMacTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 9477ED5E1800137400C2A419 /* Build configuration list for PBXNativeTarget "IdiomaticMacTests" */;
-			buildPhases = (
-				9477ED4A1800137300C2A419 /* Sources */,
-				9477ED4B1800137300C2A419 /* Frameworks */,
-				9477ED4C1800137300C2A419 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				9477ED521800137300C2A419 /* PBXTargetDependency */,
-			);
-			name = IdiomaticMacTests;
-			productName = IdiomaticMacTests;
-			productReference = 9477ED4E1800137300C2A419 /* IdiomaticMacTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -404,9 +364,6 @@
 								enabled = 1;
 							};
 						};
-					};
-					9477ED4D1800137300C2A419 = {
-						TestTargetID = 074B959717EC783B0016F84D;
 					};
 				};
 			};
@@ -435,7 +392,6 @@
 			targets = (
 				074B959717EC783B0016F84D /* Idiomatic */,
 				9477ED2E1800137300C2A419 /* IdiomaticMac */,
-				9477ED4D1800137300C2A419 /* IdiomaticMacTests */,
 			);
 		};
 /* End PBXProject section */
@@ -488,14 +444,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9477ED4C1800137300C2A419 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				9477ED581800137400C2A419 /* InfoPlist.strings in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -530,23 +478,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9477ED4A1800137300C2A419 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				9477ED5A1800137400C2A419 /* IdiomaticMacTests.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		9477ED521800137300C2A419 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 9477ED2E1800137300C2A419 /* IdiomaticMac */;
-			targetProxy = 9477ED511800137300C2A419 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		074B95A417EC783B0016F84D /* InfoPlist.strings */ = {
@@ -791,53 +723,6 @@
 			};
 			name = Release;
 		};
-		9477ED5F1800137400C2A419 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Idiomatic.app/Idiomatic";
-				COMBINE_HIDPI_IMAGES = YES;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-					"$(inherited)",
-				);
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "IdiomaticMac/IdiomaticMac-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = "IdiomaticMacTests/IdiomaticMacTests-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Debug;
-		};
-		9477ED601800137400C2A419 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Idiomatic.app/Idiomatic";
-				COMBINE_HIDPI_IMAGES = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-					"$(inherited)",
-				);
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "IdiomaticMac/IdiomaticMac-Prefix.pch";
-				INFOPLIST_FILE = "IdiomaticMacTests/IdiomaticMacTests-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -864,14 +749,6 @@
 			buildConfigurations = (
 				9477ED5C1800137400C2A419 /* Debug */,
 				9477ED5D1800137400C2A419 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-		};
-		9477ED5E1800137400C2A419 /* Build configuration list for PBXNativeTarget "IdiomaticMacTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				9477ED5F1800137400C2A419 /* Debug */,
-				9477ED601800137400C2A419 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 		};
