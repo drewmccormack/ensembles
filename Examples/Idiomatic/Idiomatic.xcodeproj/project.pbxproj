@@ -39,6 +39,11 @@
 		9477ED631800143200C2A419 /* libensembles_mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9477ED281800132F00C2A419 /* libensembles_mac.a */; };
 		9477ED651800158200C2A419 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 077F114217F70BFC0093A212 /* CDEEventStoreModel.xcdatamodeld */; };
 		9477ED66180015F300C2A419 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 074B95D017EC7B0B0016F84D /* Model.xcdatamodeld */; };
+		9477ED6B18001B7000C2A419 /* IDMAddNoteViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9477ED6918001B7000C2A419 /* IDMAddNoteViewController.m */; };
+		9477ED6C18001B7000C2A419 /* IDMAddNoteViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9477ED6A18001B7000C2A419 /* IDMAddNoteViewController.xib */; };
+		9477ED6D18006FD300C2A419 /* IDMTag.m in Sources */ = {isa = PBXBuildFile; fileRef = 074B95D417EC7C570016F84D /* IDMTag.m */; };
+		9477ED6E180070F300C2A419 /* IDMNote.m in Sources */ = {isa = PBXBuildFile; fileRef = 074B95D717EC7C570016F84D /* IDMNote.m */; };
+		9477ED711800723D00C2A419 /* IDMCoreDataHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9477ED701800723D00C2A419 /* IDMCoreDataHelper.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -120,6 +125,12 @@
 		9477ED571800137400C2A419 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		9477ED591800137400C2A419 /* IdiomaticMacTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IdiomaticMacTests.m; sourceTree = "<group>"; };
 		9477ED611800140200C2A419 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/CoreData.framework; sourceTree = DEVELOPER_DIR; };
+		9477ED671800168400C2A419 /* IdiomaticMac.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = IdiomaticMac.entitlements; sourceTree = "<group>"; };
+		9477ED6818001B7000C2A419 /* IDMAddNoteViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IDMAddNoteViewController.h; sourceTree = "<group>"; };
+		9477ED6918001B7000C2A419 /* IDMAddNoteViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDMAddNoteViewController.m; sourceTree = "<group>"; };
+		9477ED6A18001B7000C2A419 /* IDMAddNoteViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = IDMAddNoteViewController.xib; sourceTree = "<group>"; };
+		9477ED6F1800723D00C2A419 /* IDMCoreDataHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IDMCoreDataHelper.h; sourceTree = "<group>"; };
+		9477ED701800723D00C2A419 /* IDMCoreDataHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDMCoreDataHelper.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -269,11 +280,17 @@
 		9477ED361800137300C2A419 /* IdiomaticMac */ = {
 			isa = PBXGroup;
 			children = (
+				9477ED671800168400C2A419 /* IdiomaticMac.entitlements */,
 				9477ED421800137300C2A419 /* AppDelegate.h */,
 				9477ED431800137300C2A419 /* AppDelegate.m */,
 				9477ED451800137300C2A419 /* MainMenu.xib */,
 				9477ED481800137300C2A419 /* Images.xcassets */,
 				9477ED371800137300C2A419 /* Supporting Files */,
+				9477ED6818001B7000C2A419 /* IDMAddNoteViewController.h */,
+				9477ED6918001B7000C2A419 /* IDMAddNoteViewController.m */,
+				9477ED6A18001B7000C2A419 /* IDMAddNoteViewController.xib */,
+				9477ED6F1800723D00C2A419 /* IDMCoreDataHelper.h */,
+				9477ED701800723D00C2A419 /* IDMCoreDataHelper.m */,
 			);
 			path = IdiomaticMac;
 			sourceTree = "<group>";
@@ -381,6 +398,13 @@
 							};
 						};
 					};
+					9477ED2E1800137300C2A419 = {
+						SystemCapabilities = {
+							com.apple.iCloud = {
+								enabled = 1;
+							};
+						};
+					};
 					9477ED4D1800137300C2A419 = {
 						TestTargetID = 074B959717EC783B0016F84D;
 					};
@@ -456,6 +480,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9477ED6C18001B7000C2A419 /* IDMAddNoteViewController.xib in Resources */,
 				9477ED3B1800137300C2A419 /* InfoPlist.strings in Resources */,
 				9477ED491800137300C2A419 /* Images.xcassets in Resources */,
 				9477ED411800137300C2A419 /* Credits.rtf in Resources */,
@@ -496,8 +521,12 @@
 			files = (
 				9477ED441800137300C2A419 /* AppDelegate.m in Sources */,
 				9477ED651800158200C2A419 /* CDEEventStoreModel.xcdatamodeld in Sources */,
+				9477ED6B18001B7000C2A419 /* IDMAddNoteViewController.m in Sources */,
+				9477ED711800723D00C2A419 /* IDMCoreDataHelper.m in Sources */,
+				9477ED6E180070F300C2A419 /* IDMNote.m in Sources */,
 				9477ED3D1800137300C2A419 /* main.m in Sources */,
 				9477ED66180015F300C2A419 /* Model.xcdatamodeld in Sources */,
+				9477ED6D18006FD300C2A419 /* IDMTag.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -703,6 +732,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = IdiomaticMac/IdiomaticMac.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -723,6 +755,7 @@
 				INFOPLIST_FILE = "IdiomaticMac/IdiomaticMac-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
@@ -732,6 +765,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = IdiomaticMac/IdiomaticMac.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -749,6 +785,7 @@
 				INFOPLIST_FILE = "IdiomaticMac/IdiomaticMac-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx;
 				WRAPPER_EXTENSION = app;
 			};
