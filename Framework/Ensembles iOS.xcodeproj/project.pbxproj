@@ -673,8 +673,6 @@
 				INFOPLIST_FILE = "Tests/Tests-Info.plist";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
-					"-framework",
-					XCTest,
 					"-ObjC",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -696,8 +694,6 @@
 				INFOPLIST_FILE = "Tests/Tests-Info.plist";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
-					"-framework",
-					XCTest,
 					"-ObjC",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
