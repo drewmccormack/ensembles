@@ -17,6 +17,6 @@
 @property (nonatomic, retain) NSString *nameOfEntity;
 
 + (NSArray *)fetchGlobalIdentifiersForObjectIDs:(NSArray *)uris inManagedObjectContext:(NSManagedObjectContext *)context;
-+ (NSArray *)fetchGlobalIdentifiersForIdentifierStrings:(NSArray *)strings inManagedObjectContext:(NSManagedObjectContext *)context;
++ (NSArray *)fetchGlobalIdentifiersForIdentifierStrings:(NSArray *)strings withEntityNames:(NSArray *)entityNames inManagedObjectContext:(NSManagedObjectContext *)context;
 
 @end

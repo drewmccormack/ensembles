@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		070D33D018019A680054BA23 /* CDEGlobalIdentifierTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D33CF18019A680054BA23 /* CDEGlobalIdentifierTests.m */; };
 		071B9F9717E30ECB00E6977A /* IntegratorUpdateTestsFixture1.json in Resources */ = {isa = PBXBuildFile; fileRef = 071B9F9517E30ECB00E6977A /* IntegratorUpdateTestsFixture1.json */; };
 		071B9F9817E30ECB00E6977A /* IntegratorUpdateTestsFixture2.json in Resources */ = {isa = PBXBuildFile; fileRef = 071B9F9617E30ECB00E6977A /* IntegratorUpdateTestsFixture2.json */; };
 		0722B26717B76B2400496F4A /* CDERevision.h in Headers */ = {isa = PBXBuildFile; fileRef = 0722B26117B76B2400496F4A /* CDERevision.h */; };
@@ -109,6 +110,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		070D33CF18019A680054BA23 /* CDEGlobalIdentifierTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEGlobalIdentifierTests.m; sourceTree = "<group>"; };
 		07157A2217B555A4004AAD22 /* CDEEventMigratorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEEventMigratorTests.m; sourceTree = "<group>"; };
 		071B9F9517E30ECB00E6977A /* IntegratorUpdateTestsFixture1.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = IntegratorUpdateTestsFixture1.json; sourceTree = "<group>"; };
 		071B9F9617E30ECB00E6977A /* IntegratorUpdateTestsFixture2.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = IntegratorUpdateTestsFixture2.json; sourceTree = "<group>"; };
@@ -237,6 +239,7 @@
 				07592CB6177F320800816034 /* CDEEventStoreTests.m */,
 				073747181782093C0049BB92 /* CDEObjectChangeTests.m */,
 				073BB0C717807EAF0061466E /* CDEStoreModificationEventTests.m */,
+				070D33CF18019A680054BA23 /* CDEGlobalIdentifierTests.m */,
 				07DDA7E817CA256E009C6F94 /* CDERevisionManagerTests.m */,
 				07428859178356670082C327 /* CDEPropertyChangeValueTests.m */,
 				07BAE701178D65D00036E743 /* CDESaveMonitorTests.m */,
@@ -612,6 +615,7 @@
 				0722B27417B7713D00496F4A /* CDESaveMonitorTests.m in Sources */,
 				0747CDA217C3DCE300221ED7 /* CDEBasicIntegratorRelationshipTests.m in Sources */,
 				07DDA7E417C8FE25009C6F94 /* CDEIntegratorUpdateTests.m in Sources */,
+				070D33D018019A680054BA23 /* CDEGlobalIdentifierTests.m in Sources */,
 				072E5AEC17EB4332002D9604 /* CDESyncTest.m in Sources */,
 				073BB0CB1780841E0061466E /* CDEStoreModificationEventTestsModel.xcdatamodeld in Sources */,
 				07DDA7E717C9ECF6009C6F94 /* CDERevisionManager.m in Sources */,

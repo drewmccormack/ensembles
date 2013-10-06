@@ -131,7 +131,10 @@
     [eventManagedObjectContext performBlockAndWait:^{
         
         // Retrieve existing global identifiers
-        NSArray *existingGlobalIdentifiers = [CDEGlobalIdentifier fetchGlobalIdentifiersForIdentifierStrings:globalIdStrings inManagedObjectContext:eventManagedObjectContext];
+        NSArray *existingGlobalIdentifiers = nil;
+        if (globalIdStrings) {
+            [CDEGlobalIdentifier fetchGlobalIdentifiersForIdentifierStrings:globalIdStrings withEntityNames:entityNames inManagedObjectContext:eventManagedObjectContext];
+        }
         
         // Make global ids for all objects first before creating object changes.
         // We need all global ids to exist before trying to store relationships which utilize global ids.

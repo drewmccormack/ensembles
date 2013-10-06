@@ -46,9 +46,9 @@
     return result;
 }
 
-+ (NSArray *)fetchGlobalIdentifiersForIdentifierStrings:(NSArray *)idStrings inManagedObjectContext:(NSManagedObjectContext *)context
++ (NSArray *)fetchGlobalIdentifiersForIdentifierStrings:(NSArray *)idStrings withEntityNames:(NSArray *)entityNames inManagedObjectContext:(NSManagedObjectContext *)context
 {
-    if (!idStrings) return nil;
+    NSParameterAssert(idStrings.count == entityNames.count);
     
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEGlobalIdentifier"];
     fetch.predicate = [NSPredicate predicateWithFormat:@"globalIdentifier IN %@", idStrings];
@@ -60,12 +60,23 @@
         return nil;
     }
     
-    // Sort in same order as input strings
-    NSDictionary *globalIdsByIdString = [NSDictionary dictionaryWithObjects:globalIds forKeys:[globalIds valueForKeyPath:@"globalIdentifier"]];
+    // Group results by id string, and index on entity
+    NSMutableDictionary *globalIdsByIdString = [NSMutableDictionary dictionaryWithCapacity:globalIds.count];
+    for (CDEGlobalIdentifier *globalId in globalIds) {
+        NSMutableDictionary *globalIdsByEntity = globalIdsByIdString[globalId.globalIdentifier];
+        if (!globalIdsByEntity) globalIdsByEntity = [[NSMutableDictionary alloc] init];
+        [globalIdsByEntity setObject:globalId forKey:globalId.nameOfEntity];
+        [globalIdsByIdString setObject:globalIdsByEntity forKey:globalId.globalIdentifier];
+    }
+    
+    // Create result in same order as input
     NSMutableArray *result = [NSMutableArray arrayWithCapacity:idStrings.count];
+    NSUInteger i = 0;
     for (NSManagedObjectID *idString in idStrings) {
-        CDEGlobalIdentifier *globalId = globalIdsByIdString[idString];
-        [result addObject:globalId ? : [NSNull null]];
+        NSDictionary *globalIdsByEntity = globalIdsByIdString[idString];
+        NSString *entityName = entityNames[i++];
+        CDEGlobalIdentifier *entityGlobalId = globalIdsByEntity[entityName];
+        [result addObject:entityGlobalId ? : [NSNull null]];
     }
     
     return result;
