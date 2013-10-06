@@ -7,6 +7,49 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		070D336318018A960054BA23 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 070D336218018A960054BA23 /* XCTest.framework */; };
+		070D336418018A960054BA23 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF374817F184DD00C56F64 /* Foundation.framework */; };
+		070D336618018A960054BA23 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 070D336518018A960054BA23 /* UIKit.framework */; };
+		070D33A418018AAD0054BA23 /* CDEBasicIntegratorRelationshipTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D337618018AAD0054BA23 /* CDEBasicIntegratorRelationshipTests.m */; };
+		070D33A518018AAD0054BA23 /* CDECloudManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D337718018AAD0054BA23 /* CDECloudManagerTests.m */; };
+		070D33A618018AAD0054BA23 /* CDEDeviceRevisionSetTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D337818018AAD0054BA23 /* CDEDeviceRevisionSetTests.m */; };
+		070D33A718018AAD0054BA23 /* CDEDeviceRevisionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D337918018AAD0054BA23 /* CDEDeviceRevisionTests.m */; };
+		070D33A818018AAD0054BA23 /* CDEEventDeviceRevisionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D337A18018AAD0054BA23 /* CDEEventDeviceRevisionTests.m */; };
+		070D33A918018AAD0054BA23 /* CDEEventMigratorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D337B18018AAD0054BA23 /* CDEEventMigratorTests.m */; };
+		070D33AA18018AAD0054BA23 /* CDEEventStoreTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D337D18018AAD0054BA23 /* CDEEventStoreTestCase.m */; };
+		070D33AB18018AAD0054BA23 /* CDEEventStoreTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D337E18018AAD0054BA23 /* CDEEventStoreTests.m */; };
+		070D33AC18018AAD0054BA23 /* CDEIntegratorCornerCases.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D337F18018AAD0054BA23 /* CDEIntegratorCornerCases.m */; };
+		070D33AD18018AAD0054BA23 /* CDEIntegratorTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D338118018AAD0054BA23 /* CDEIntegratorTestCase.m */; };
+		070D33AE18018AAD0054BA23 /* CDEIntegratorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D338218018AAD0054BA23 /* CDEIntegratorTests.m */; };
+		070D33AF18018AAD0054BA23 /* CDEIntegratorUpdateTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D338318018AAD0054BA23 /* CDEIntegratorUpdateTests.m */; };
+		070D33B018018AAD0054BA23 /* CDEMockCloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D338518018AAD0054BA23 /* CDEMockCloudFileSystem.m */; };
+		070D33B118018AAD0054BA23 /* CDEObjectChangeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D338618018AAD0054BA23 /* CDEObjectChangeTests.m */; };
+		070D33B218018AAD0054BA23 /* CDEOneWaySyncTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D338718018AAD0054BA23 /* CDEOneWaySyncTests.m */; };
+		070D33B318018AAD0054BA23 /* CDEPersistentStoreEnsembleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D338818018AAD0054BA23 /* CDEPersistentStoreEnsembleTests.m */; };
+		070D33B418018AAD0054BA23 /* CDEPropertyChangeValueTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D338918018AAD0054BA23 /* CDEPropertyChangeValueTests.m */; };
+		070D33B518018AAD0054BA23 /* CDERevisionManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D338A18018AAD0054BA23 /* CDERevisionManagerTests.m */; };
+		070D33B618018AAD0054BA23 /* CDESaveMonitorRelationshipTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D338B18018AAD0054BA23 /* CDESaveMonitorRelationshipTests.m */; };
+		070D33B718018AAD0054BA23 /* CDESaveMonitorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D338C18018AAD0054BA23 /* CDESaveMonitorTests.m */; };
+		070D33B818018AAD0054BA23 /* CDEStoreModificationEventTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D338D18018AAD0054BA23 /* CDEStoreModificationEventTests.m */; };
+		070D33B918018AAD0054BA23 /* CDEStoreModificationEventTestsModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 070D338E18018AAD0054BA23 /* CDEStoreModificationEventTestsModel.xcdatamodeld */; };
+		070D33BA18018AAD0054BA23 /* CDESyncTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D339118018AAD0054BA23 /* CDESyncTest.m */; };
+		070D33BB18018AAD0054BA23 /* CDETwoWaySyncTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D339218018AAD0054BA23 /* CDETwoWaySyncTests.m */; };
+		070D33BC18018AAD0054BA23 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 070D339318018AAD0054BA23 /* InfoPlist.strings */; };
+		070D33BD18018AAD0054BA23 /* BasicIntegratorRelationshipTestsFixture.json in Resources */ = {isa = PBXBuildFile; fileRef = 070D339618018AAD0054BA23 /* BasicIntegratorRelationshipTestsFixture.json */; };
+		070D33BE18018AAD0054BA23 /* DeleteUninserted.json in Resources */ = {isa = PBXBuildFile; fileRef = 070D339818018AAD0054BA23 /* DeleteUninserted.json */; };
+		070D33BF18018AAD0054BA23 /* DoubleInsertFixture.json in Resources */ = {isa = PBXBuildFile; fileRef = 070D339918018AAD0054BA23 /* DoubleInsertFixture.json */; };
+		070D33C018018AAD0054BA23 /* InsertFollowingDeletion.json in Resources */ = {isa = PBXBuildFile; fileRef = 070D339A18018AAD0054BA23 /* InsertFollowingDeletion.json */; };
+		070D33C118018AAD0054BA23 /* UpdateConcurrentWithInsert.json in Resources */ = {isa = PBXBuildFile; fileRef = 070D339B18018AAD0054BA23 /* UpdateConcurrentWithInsert.json */; };
+		070D33C218018AAD0054BA23 /* UpdateFollowingDeletion.json in Resources */ = {isa = PBXBuildFile; fileRef = 070D339C18018AAD0054BA23 /* UpdateFollowingDeletion.json */; };
+		070D33C318018AAD0054BA23 /* UpdateRelationshipConcurrently.json in Resources */ = {isa = PBXBuildFile; fileRef = 070D339D18018AAD0054BA23 /* UpdateRelationshipConcurrently.json */; };
+		070D33C418018AAD0054BA23 /* UpdateRelationshipConcurrentWithDeletion.json in Resources */ = {isa = PBXBuildFile; fileRef = 070D339E18018AAD0054BA23 /* UpdateRelationshipConcurrentWithDeletion.json */; };
+		070D33C518018AAD0054BA23 /* UpdateToUninserted.json in Resources */ = {isa = PBXBuildFile; fileRef = 070D339F18018AAD0054BA23 /* UpdateToUninserted.json */; };
+		070D33C618018AAD0054BA23 /* IntegratorUpdateTestsFixture1.json in Resources */ = {isa = PBXBuildFile; fileRef = 070D33A018018AAD0054BA23 /* IntegratorUpdateTestsFixture1.json */; };
+		070D33C718018AAD0054BA23 /* IntegratorUpdateTestsFixture2.json in Resources */ = {isa = PBXBuildFile; fileRef = 070D33A118018AAD0054BA23 /* IntegratorUpdateTestsFixture2.json */; };
+		070D33C818018AAD0054BA23 /* Tests-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 070D33A218018AAD0054BA23 /* Tests-Info.plist */; };
+		070D33C918018B8E0054BA23 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF37CE17F185DE00C56F64 /* CoreData.framework */; };
+		070D33CA18018BB00054BA23 /* libensembles_ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF374517F184DD00C56F64 /* libensembles_ios.a */; };
+		070D33CE18018C950054BA23 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 078ABF4C17F191BA008C9B27 /* CDEEventStoreModel.xcdatamodeld */; };
 		078ABF4E17F191BA008C9B27 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 078ABF4C17F191BA008C9B27 /* CDEEventStoreModel.xcdatamodeld */; };
 		07BF374917F184DD00C56F64 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF374817F184DD00C56F64 /* Foundation.framework */; };
 		07BF37AA17F1853000C56F64 /* CDECloudDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF377017F1853000C56F64 /* CDECloudDirectory.m */; };
@@ -36,6 +79,16 @@
 		07BF37CF17F185DE00C56F64 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF37CE17F185DE00C56F64 /* CoreData.framework */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		070D337018018A960054BA23 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 07BF373D17F184DD00C56F64 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 07BF374417F184DD00C56F64;
+			remoteInfo = "Ensembles iOS";
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXCopyFilesBuildPhase section */
 		07BF374317F184DD00C56F64 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -49,6 +102,51 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		070D336118018A960054BA23 /* Tests iOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests iOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		070D336218018A960054BA23 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		070D336518018A960054BA23 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		070D337618018AAD0054BA23 /* CDEBasicIntegratorRelationshipTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEBasicIntegratorRelationshipTests.m; sourceTree = "<group>"; };
+		070D337718018AAD0054BA23 /* CDECloudManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDECloudManagerTests.m; sourceTree = "<group>"; };
+		070D337818018AAD0054BA23 /* CDEDeviceRevisionSetTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEDeviceRevisionSetTests.m; sourceTree = "<group>"; };
+		070D337918018AAD0054BA23 /* CDEDeviceRevisionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEDeviceRevisionTests.m; sourceTree = "<group>"; };
+		070D337A18018AAD0054BA23 /* CDEEventDeviceRevisionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEEventDeviceRevisionTests.m; sourceTree = "<group>"; };
+		070D337B18018AAD0054BA23 /* CDEEventMigratorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEEventMigratorTests.m; sourceTree = "<group>"; };
+		070D337C18018AAD0054BA23 /* CDEEventStoreTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEEventStoreTestCase.h; sourceTree = "<group>"; };
+		070D337D18018AAD0054BA23 /* CDEEventStoreTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEEventStoreTestCase.m; sourceTree = "<group>"; };
+		070D337E18018AAD0054BA23 /* CDEEventStoreTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEEventStoreTests.m; sourceTree = "<group>"; };
+		070D337F18018AAD0054BA23 /* CDEIntegratorCornerCases.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEIntegratorCornerCases.m; sourceTree = "<group>"; };
+		070D338018018AAD0054BA23 /* CDEIntegratorTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEIntegratorTestCase.h; sourceTree = "<group>"; };
+		070D338118018AAD0054BA23 /* CDEIntegratorTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEIntegratorTestCase.m; sourceTree = "<group>"; };
+		070D338218018AAD0054BA23 /* CDEIntegratorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEIntegratorTests.m; sourceTree = "<group>"; };
+		070D338318018AAD0054BA23 /* CDEIntegratorUpdateTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEIntegratorUpdateTests.m; sourceTree = "<group>"; };
+		070D338418018AAD0054BA23 /* CDEMockCloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEMockCloudFileSystem.h; sourceTree = "<group>"; };
+		070D338518018AAD0054BA23 /* CDEMockCloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEMockCloudFileSystem.m; sourceTree = "<group>"; };
+		070D338618018AAD0054BA23 /* CDEObjectChangeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEObjectChangeTests.m; sourceTree = "<group>"; };
+		070D338718018AAD0054BA23 /* CDEOneWaySyncTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEOneWaySyncTests.m; sourceTree = "<group>"; };
+		070D338818018AAD0054BA23 /* CDEPersistentStoreEnsembleTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEPersistentStoreEnsembleTests.m; sourceTree = "<group>"; };
+		070D338918018AAD0054BA23 /* CDEPropertyChangeValueTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEPropertyChangeValueTests.m; sourceTree = "<group>"; };
+		070D338A18018AAD0054BA23 /* CDERevisionManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDERevisionManagerTests.m; sourceTree = "<group>"; };
+		070D338B18018AAD0054BA23 /* CDESaveMonitorRelationshipTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDESaveMonitorRelationshipTests.m; sourceTree = "<group>"; };
+		070D338C18018AAD0054BA23 /* CDESaveMonitorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDESaveMonitorTests.m; sourceTree = "<group>"; };
+		070D338D18018AAD0054BA23 /* CDEStoreModificationEventTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEStoreModificationEventTests.m; sourceTree = "<group>"; };
+		070D338F18018AAD0054BA23 /* CDEStoreModificationEventTestsModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEStoreModificationEventTestsModel.xcdatamodel; sourceTree = "<group>"; };
+		070D339018018AAD0054BA23 /* CDESyncTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDESyncTest.h; sourceTree = "<group>"; };
+		070D339118018AAD0054BA23 /* CDESyncTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDESyncTest.m; sourceTree = "<group>"; };
+		070D339218018AAD0054BA23 /* CDETwoWaySyncTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDETwoWaySyncTests.m; sourceTree = "<group>"; };
+		070D339418018AAD0054BA23 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		070D339618018AAD0054BA23 /* BasicIntegratorRelationshipTestsFixture.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = BasicIntegratorRelationshipTestsFixture.json; sourceTree = "<group>"; };
+		070D339818018AAD0054BA23 /* DeleteUninserted.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = DeleteUninserted.json; sourceTree = "<group>"; };
+		070D339918018AAD0054BA23 /* DoubleInsertFixture.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = DoubleInsertFixture.json; sourceTree = "<group>"; };
+		070D339A18018AAD0054BA23 /* InsertFollowingDeletion.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = InsertFollowingDeletion.json; sourceTree = "<group>"; };
+		070D339B18018AAD0054BA23 /* UpdateConcurrentWithInsert.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = UpdateConcurrentWithInsert.json; sourceTree = "<group>"; };
+		070D339C18018AAD0054BA23 /* UpdateFollowingDeletion.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = UpdateFollowingDeletion.json; sourceTree = "<group>"; };
+		070D339D18018AAD0054BA23 /* UpdateRelationshipConcurrently.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = UpdateRelationshipConcurrently.json; sourceTree = "<group>"; };
+		070D339E18018AAD0054BA23 /* UpdateRelationshipConcurrentWithDeletion.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = UpdateRelationshipConcurrentWithDeletion.json; sourceTree = "<group>"; };
+		070D339F18018AAD0054BA23 /* UpdateToUninserted.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = UpdateToUninserted.json; sourceTree = "<group>"; };
+		070D33A018018AAD0054BA23 /* IntegratorUpdateTestsFixture1.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = IntegratorUpdateTestsFixture1.json; sourceTree = "<group>"; };
+		070D33A118018AAD0054BA23 /* IntegratorUpdateTestsFixture2.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = IntegratorUpdateTestsFixture2.json; sourceTree = "<group>"; };
+		070D33A218018AAD0054BA23 /* Tests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Tests-Info.plist"; sourceTree = "<group>"; };
+		070D33A318018AAD0054BA23 /* Tests-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Tests-Prefix.pch"; sourceTree = "<group>"; };
 		078ABF4D17F191BA008C9B27 /* CDEEventStoreModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel.xcdatamodel; sourceTree = "<group>"; };
 		07BF374517F184DD00C56F64 /* libensembles_ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libensembles_ios.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		07BF374817F184DD00C56F64 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -106,6 +204,18 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		070D335E18018A960054BA23 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				070D33CA18018BB00054BA23 /* libensembles_ios.a in Frameworks */,
+				070D33C918018B8E0054BA23 /* CoreData.framework in Frameworks */,
+				070D336318018A960054BA23 /* XCTest.framework in Frameworks */,
+				070D336618018A960054BA23 /* UIKit.framework in Frameworks */,
+				070D336418018A960054BA23 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		07BF374217F184DD00C56F64 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -118,12 +228,102 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		070D337518018AAD0054BA23 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				070D33CD18018C020054BA23 /* Sync System Tests */,
+				070D33CC18018BF80054BA23 /* Unit Tests */,
+				070D33CB18018BE10054BA23 /* Supporting Files */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		070D339518018AAD0054BA23 /* Integrator Test Fixtures */ = {
+			isa = PBXGroup;
+			children = (
+				070D339618018AAD0054BA23 /* BasicIntegratorRelationshipTestsFixture.json */,
+				070D339718018AAD0054BA23 /* Corner Cases */,
+				070D33A018018AAD0054BA23 /* IntegratorUpdateTestsFixture1.json */,
+				070D33A118018AAD0054BA23 /* IntegratorUpdateTestsFixture2.json */,
+			);
+			path = "Integrator Test Fixtures";
+			sourceTree = "<group>";
+		};
+		070D339718018AAD0054BA23 /* Corner Cases */ = {
+			isa = PBXGroup;
+			children = (
+				070D339818018AAD0054BA23 /* DeleteUninserted.json */,
+				070D339918018AAD0054BA23 /* DoubleInsertFixture.json */,
+				070D339A18018AAD0054BA23 /* InsertFollowingDeletion.json */,
+				070D339B18018AAD0054BA23 /* UpdateConcurrentWithInsert.json */,
+				070D339C18018AAD0054BA23 /* UpdateFollowingDeletion.json */,
+				070D339D18018AAD0054BA23 /* UpdateRelationshipConcurrently.json */,
+				070D339E18018AAD0054BA23 /* UpdateRelationshipConcurrentWithDeletion.json */,
+				070D339F18018AAD0054BA23 /* UpdateToUninserted.json */,
+			);
+			path = "Corner Cases";
+			sourceTree = "<group>";
+		};
+		070D33CB18018BE10054BA23 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				070D339518018AAD0054BA23 /* Integrator Test Fixtures */,
+				070D339318018AAD0054BA23 /* InfoPlist.strings */,
+				070D33A218018AAD0054BA23 /* Tests-Info.plist */,
+				070D33A318018AAD0054BA23 /* Tests-Prefix.pch */,
+				070D338E18018AAD0054BA23 /* CDEStoreModificationEventTestsModel.xcdatamodeld */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		070D33CC18018BF80054BA23 /* Unit Tests */ = {
+			isa = PBXGroup;
+			children = (
+				070D337618018AAD0054BA23 /* CDEBasicIntegratorRelationshipTests.m */,
+				070D337718018AAD0054BA23 /* CDECloudManagerTests.m */,
+				070D337818018AAD0054BA23 /* CDEDeviceRevisionSetTests.m */,
+				070D337918018AAD0054BA23 /* CDEDeviceRevisionTests.m */,
+				070D337A18018AAD0054BA23 /* CDEEventDeviceRevisionTests.m */,
+				070D337B18018AAD0054BA23 /* CDEEventMigratorTests.m */,
+				070D337C18018AAD0054BA23 /* CDEEventStoreTestCase.h */,
+				070D337D18018AAD0054BA23 /* CDEEventStoreTestCase.m */,
+				070D337E18018AAD0054BA23 /* CDEEventStoreTests.m */,
+				070D337F18018AAD0054BA23 /* CDEIntegratorCornerCases.m */,
+				070D338018018AAD0054BA23 /* CDEIntegratorTestCase.h */,
+				070D338118018AAD0054BA23 /* CDEIntegratorTestCase.m */,
+				070D338218018AAD0054BA23 /* CDEIntegratorTests.m */,
+				070D338318018AAD0054BA23 /* CDEIntegratorUpdateTests.m */,
+				070D338418018AAD0054BA23 /* CDEMockCloudFileSystem.h */,
+				070D338518018AAD0054BA23 /* CDEMockCloudFileSystem.m */,
+				070D338618018AAD0054BA23 /* CDEObjectChangeTests.m */,
+				070D338818018AAD0054BA23 /* CDEPersistentStoreEnsembleTests.m */,
+				070D338918018AAD0054BA23 /* CDEPropertyChangeValueTests.m */,
+				070D338A18018AAD0054BA23 /* CDERevisionManagerTests.m */,
+				070D338B18018AAD0054BA23 /* CDESaveMonitorRelationshipTests.m */,
+				070D338C18018AAD0054BA23 /* CDESaveMonitorTests.m */,
+				070D338D18018AAD0054BA23 /* CDEStoreModificationEventTests.m */,
+			);
+			name = "Unit Tests";
+			sourceTree = "<group>";
+		};
+		070D33CD18018C020054BA23 /* Sync System Tests */ = {
+			isa = PBXGroup;
+			children = (
+				070D339018018AAD0054BA23 /* CDESyncTest.h */,
+				070D339118018AAD0054BA23 /* CDESyncTest.m */,
+				070D338718018AAD0054BA23 /* CDEOneWaySyncTests.m */,
+				070D339218018AAD0054BA23 /* CDETwoWaySyncTests.m */,
+			);
+			name = "Sync System Tests";
+			sourceTree = "<group>";
+		};
 		07BF373C17F184DD00C56F64 = {
 			isa = PBXGroup;
 			children = (
 				07BF374A17F184DD00C56F64 /* Ensembles iOS */,
 				07BF374717F184DD00C56F64 /* Frameworks */,
 				07BF374617F184DD00C56F64 /* Products */,
+				070D337518018AAD0054BA23 /* Tests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -131,6 +331,7 @@
 			isa = PBXGroup;
 			children = (
 				07BF374517F184DD00C56F64 /* libensembles_ios.a */,
+				070D336118018A960054BA23 /* Tests iOS.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -140,6 +341,8 @@
 			children = (
 				07BF37CE17F185DE00C56F64 /* CoreData.framework */,
 				07BF374817F184DD00C56F64 /* Foundation.framework */,
+				070D336218018A960054BA23 /* XCTest.framework */,
+				070D336518018A960054BA23 /* UIKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -275,6 +478,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		070D336018018A960054BA23 /* Tests iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 070D337418018A960054BA23 /* Build configuration list for PBXNativeTarget "Tests iOS" */;
+			buildPhases = (
+				070D335D18018A960054BA23 /* Sources */,
+				070D335E18018A960054BA23 /* Frameworks */,
+				070D335F18018A960054BA23 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				070D337118018A960054BA23 /* PBXTargetDependency */,
+			);
+			name = "Tests iOS";
+			productName = "Tests (iOS)";
+			productReference = 070D336118018A960054BA23 /* Tests iOS.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		07BF374417F184DD00C56F64 /* Ensembles iOS */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 07BF376817F184DD00C56F64 /* Build configuration list for PBXNativeTarget "Ensembles iOS" */;
@@ -300,6 +521,11 @@
 			attributes = {
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "The Mental Faculty B.V.";
+				TargetAttributes = {
+					070D336018018A960054BA23 = {
+						TestTargetID = 07BF374417F184DD00C56F64;
+					};
+				};
 			};
 			buildConfigurationList = 07BF374017F184DD00C56F64 /* Build configuration list for PBXProject "Ensembles iOS" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -314,11 +540,67 @@
 			projectRoot = "";
 			targets = (
 				07BF374417F184DD00C56F64 /* Ensembles iOS */,
+				070D336018018A960054BA23 /* Tests iOS */,
 			);
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		070D335F18018A960054BA23 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				070D33C118018AAD0054BA23 /* UpdateConcurrentWithInsert.json in Resources */,
+				070D33C018018AAD0054BA23 /* InsertFollowingDeletion.json in Resources */,
+				070D33C818018AAD0054BA23 /* Tests-Info.plist in Resources */,
+				070D33C518018AAD0054BA23 /* UpdateToUninserted.json in Resources */,
+				070D33C618018AAD0054BA23 /* IntegratorUpdateTestsFixture1.json in Resources */,
+				070D33C318018AAD0054BA23 /* UpdateRelationshipConcurrently.json in Resources */,
+				070D33C718018AAD0054BA23 /* IntegratorUpdateTestsFixture2.json in Resources */,
+				070D33BD18018AAD0054BA23 /* BasicIntegratorRelationshipTestsFixture.json in Resources */,
+				070D33BF18018AAD0054BA23 /* DoubleInsertFixture.json in Resources */,
+				070D33C218018AAD0054BA23 /* UpdateFollowingDeletion.json in Resources */,
+				070D33BE18018AAD0054BA23 /* DeleteUninserted.json in Resources */,
+				070D33BC18018AAD0054BA23 /* InfoPlist.strings in Resources */,
+				070D33C418018AAD0054BA23 /* UpdateRelationshipConcurrentWithDeletion.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
+		070D335D18018A960054BA23 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				070D33A618018AAD0054BA23 /* CDEDeviceRevisionSetTests.m in Sources */,
+				070D33BB18018AAD0054BA23 /* CDETwoWaySyncTests.m in Sources */,
+				070D33AE18018AAD0054BA23 /* CDEIntegratorTests.m in Sources */,
+				070D33AB18018AAD0054BA23 /* CDEEventStoreTests.m in Sources */,
+				070D33AC18018AAD0054BA23 /* CDEIntegratorCornerCases.m in Sources */,
+				070D33AA18018AAD0054BA23 /* CDEEventStoreTestCase.m in Sources */,
+				070D33A418018AAD0054BA23 /* CDEBasicIntegratorRelationshipTests.m in Sources */,
+				070D33A518018AAD0054BA23 /* CDECloudManagerTests.m in Sources */,
+				070D33B418018AAD0054BA23 /* CDEPropertyChangeValueTests.m in Sources */,
+				070D33B618018AAD0054BA23 /* CDESaveMonitorRelationshipTests.m in Sources */,
+				070D33B318018AAD0054BA23 /* CDEPersistentStoreEnsembleTests.m in Sources */,
+				070D33B818018AAD0054BA23 /* CDEStoreModificationEventTests.m in Sources */,
+				070D33B018018AAD0054BA23 /* CDEMockCloudFileSystem.m in Sources */,
+				070D33A718018AAD0054BA23 /* CDEDeviceRevisionTests.m in Sources */,
+				070D33AF18018AAD0054BA23 /* CDEIntegratorUpdateTests.m in Sources */,
+				070D33B118018AAD0054BA23 /* CDEObjectChangeTests.m in Sources */,
+				070D33B718018AAD0054BA23 /* CDESaveMonitorTests.m in Sources */,
+				070D33A918018AAD0054BA23 /* CDEEventMigratorTests.m in Sources */,
+				070D33BA18018AAD0054BA23 /* CDESyncTest.m in Sources */,
+				070D33B918018AAD0054BA23 /* CDEStoreModificationEventTestsModel.xcdatamodeld in Sources */,
+				070D33A818018AAD0054BA23 /* CDEEventDeviceRevisionTests.m in Sources */,
+				070D33AD18018AAD0054BA23 /* CDEIntegratorTestCase.m in Sources */,
+				070D33CE18018C950054BA23 /* CDEEventStoreModel.xcdatamodeld in Sources */,
+				070D33B518018AAD0054BA23 /* CDERevisionManagerTests.m in Sources */,
+				070D33B218018AAD0054BA23 /* CDEOneWaySyncTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		07BF374117F184DD00C56F64 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -353,7 +635,76 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		070D337118018A960054BA23 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 07BF374417F184DD00C56F64 /* Ensembles iOS */;
+			targetProxy = 070D337018018A960054BA23 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		070D339318018AAD0054BA23 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				070D339418018AAD0054BA23 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
 /* Begin XCBuildConfiguration section */
+		070D337218018A960054BA23 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Tests/Tests-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "Tests/Tests-Info.plist";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					XCTest,
+					"-ObjC",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		070D337318018A960054BA23 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Tests/Tests-Prefix.pch";
+				INFOPLIST_FILE = "Tests/Tests-Info.plist";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					XCTest,
+					"-ObjC",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
 		07BF376617F184DD00C56F64 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -447,6 +798,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		070D337418018A960054BA23 /* Build configuration list for PBXNativeTarget "Tests iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				070D337218018A960054BA23 /* Debug */,
+				070D337318018A960054BA23 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		07BF374017F184DD00C56F64 /* Build configuration list for PBXProject "Ensembles iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -468,6 +827,16 @@
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
+		070D338E18018AAD0054BA23 /* CDEStoreModificationEventTestsModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				070D338F18018AAD0054BA23 /* CDEStoreModificationEventTestsModel.xcdatamodel */,
+			);
+			currentVersion = 070D338F18018AAD0054BA23 /* CDEStoreModificationEventTestsModel.xcdatamodel */;
+			path = CDEStoreModificationEventTestsModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
 		078ABF4C17F191BA008C9B27 /* CDEEventStoreModel.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (

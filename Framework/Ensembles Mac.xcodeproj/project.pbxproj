@@ -148,9 +148,9 @@
 		074B956E17EC3F7E0016F84D /* CDEICloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDEICloudFileSystem.m; path = "Cloud File Systems/CDEICloudFileSystem.m"; sourceTree = SOURCE_ROOT; };
 		074DE61017B779D8009755EB /* CDEDeviceRevisionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEDeviceRevisionTests.m; sourceTree = "<group>"; };
 		07592CA6177F2D1000816034 /* Tests (Mac).xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests (Mac).xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		07592CAA177F2D1000816034 /* Tests (Mac)-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Tests (Mac)-Info.plist"; sourceTree = "<group>"; };
+		07592CAA177F2D1000816034 /* Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Tests-Info.plist"; sourceTree = "<group>"; };
 		07592CAC177F2D1000816034 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		07592CB0177F2D1000816034 /* Tests (Mac)-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tests (Mac)-Prefix.pch"; sourceTree = "<group>"; };
+		07592CB0177F2D1000816034 /* Tests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tests-Prefix.pch"; sourceTree = "<group>"; };
 		07592CB6177F320800816034 /* CDEEventStoreTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEEventStoreTests.m; sourceTree = "<group>"; };
 		07697A7117E0B6C000A9BB63 /* CDECloudManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDECloudManagerTests.m; sourceTree = "<group>"; };
 		07697A7617E0BD0800A9BB63 /* CDEMockCloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEMockCloudFileSystem.h; sourceTree = "<group>"; };
@@ -290,17 +290,16 @@
 				070CF7A717E4C8DB0009AC0B /* Unit Tests */,
 				07592CA9177F2D1000816034 /* Supporting Files */,
 			);
-			name = Tests;
-			path = "Tests (Mac)";
+			path = Tests;
 			sourceTree = "<group>";
 		};
 		07592CA9177F2D1000816034 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
 				07E2042217C8F2EB00ED9AB3 /* Integrator Test Fixtures */,
-				07592CAA177F2D1000816034 /* Tests (Mac)-Info.plist */,
+				07592CAA177F2D1000816034 /* Tests-Info.plist */,
 				07592CAB177F2D1000816034 /* InfoPlist.strings */,
-				07592CB0177F2D1000816034 /* Tests (Mac)-Prefix.pch */,
+				07592CB0177F2D1000816034 /* Tests-Prefix.pch */,
 				073BB0C91780841E0061466E /* CDEStoreModificationEventTestsModel.xcdatamodeld */,
 			);
 			name = "Supporting Files";
@@ -500,9 +499,9 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		07592CA5177F2D1000816034 /* Tests (Mac) */ = {
+		07592CA5177F2D1000816034 /* Tests Mac */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 07592CB5177F2D1000816034 /* Build configuration list for PBXNativeTarget "Tests (Mac)" */;
+			buildConfigurationList = 07592CB5177F2D1000816034 /* Build configuration list for PBXNativeTarget "Tests Mac" */;
 			buildPhases = (
 				07592CA2177F2D1000816034 /* Sources */,
 				07592CA3177F2D1000816034 /* Frameworks */,
@@ -513,7 +512,7 @@
 			dependencies = (
 				07592CB2177F2D1000816034 /* PBXTargetDependency */,
 			);
-			name = "Tests (Mac)";
+			name = "Tests Mac";
 			productName = "Tests (Mac)";
 			productReference = 07592CA6177F2D1000816034 /* Tests (Mac).xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -563,7 +562,7 @@
 			projectRoot = "";
 			targets = (
 				07BF7932177F04B30029D500 /* Ensembles Mac */,
-				07592CA5177F2D1000816034 /* Tests (Mac) */,
+				07592CA5177F2D1000816034 /* Tests Mac */,
 			);
 		};
 /* End PBXProject section */
@@ -691,7 +690,7 @@
 				);
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Tests (Mac)/Tests (Mac)-Prefix.pch";
+				GCC_PREFIX_HEADER = "Tests/Tests-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -700,7 +699,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				INFOPLIST_FILE = "Tests (Mac)/Tests (Mac)-Info.plist";
+				INFOPLIST_FILE = "Tests/Tests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -728,12 +727,12 @@
 				);
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Tests (Mac)/Tests (Mac)-Prefix.pch";
+				GCC_PREFIX_HEADER = "Tests/Tests-Prefix.pch";
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
-				INFOPLIST_FILE = "Tests (Mac)/Tests (Mac)-Info.plist";
+				INFOPLIST_FILE = "Tests/Tests-Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -851,7 +850,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		07592CB5177F2D1000816034 /* Build configuration list for PBXNativeTarget "Tests (Mac)" */ = {
+		07592CB5177F2D1000816034 /* Build configuration list for PBXNativeTarget "Tests Mac" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				07592CB3177F2D1000816034 /* Debug */,
