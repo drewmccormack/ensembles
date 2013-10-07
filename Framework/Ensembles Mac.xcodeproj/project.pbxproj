@@ -92,11 +92,11 @@
 		07CCA9D717E49CA80017B6C4 /* CoreDataEnsembles.h in Headers */ = {isa = PBXBuildFile; fileRef = 07CCA9D617E49CA80017B6C4 /* CoreDataEnsembles.h */; };
 		07CCA9D917E4AF0E0017B6C4 /* CDEOneWaySyncTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07CCA9D417E49B4A0017B6C4 /* CDEOneWaySyncTests.m */; };
 		07DDA7E417C8FE25009C6F94 /* CDEIntegratorUpdateTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07DDA7E317C8FE25009C6F94 /* CDEIntegratorUpdateTests.m */; };
-		07DDA7E717C9ECF6009C6F94 /* CDERevisionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 07DDA7E617C9ECF6009C6F94 /* CDERevisionManager.m */; };
 		07DDA7E917CA256E009C6F94 /* CDERevisionManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07DDA7E817CA256E009C6F94 /* CDERevisionManagerTests.m */; };
 		07DDA7EA17CD1A4A009C6F94 /* libensembles_mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF7933177F04B30029D500 /* libensembles_mac.a */; };
 		07E2042417C8F2EB00ED9AB3 /* BasicIntegratorRelationshipTestsFixture.json in Resources */ = {isa = PBXBuildFile; fileRef = 07E2042317C8F2EB00ED9AB3 /* BasicIntegratorRelationshipTestsFixture.json */; };
 		07E2875417BF8D470008CC4F /* CDESaveMonitorRelationshipTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07E2875317BF8D470008CC4F /* CDESaveMonitorRelationshipTests.m */; };
+		9477ED641800146900C2A419 /* CDERevisionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 07DDA7E617C9ECF6009C6F94 /* CDERevisionManager.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -618,7 +618,6 @@
 				070D33D018019A680054BA23 /* CDEGlobalIdentifierTests.m in Sources */,
 				072E5AEC17EB4332002D9604 /* CDESyncTest.m in Sources */,
 				073BB0CB1780841E0061466E /* CDEStoreModificationEventTestsModel.xcdatamodeld in Sources */,
-				07DDA7E717C9ECF6009C6F94 /* CDERevisionManager.m in Sources */,
 				074DE60F17B7797E009755EB /* CDEEventDeviceRevisionTests.m in Sources */,
 				072BD7BF17F30A1E00D19306 /* CDEPersistentStoreEnsembleTests.m in Sources */,
 				074DE61117B779D8009755EB /* CDEDeviceRevisionTests.m in Sources */,
@@ -635,6 +634,7 @@
 				07BF7A21177F0A9D0029D500 /* CDECloudDirectory.m in Sources */,
 				07BF7A43177F0A9D0029D500 /* CDEPropertyChangeValue.m in Sources */,
 				0722B26C17B76B2400496F4A /* CDERevisionSet.m in Sources */,
+				9477ED641800146900C2A419 /* CDERevisionManager.m in Sources */,
 				07BF7A34177F0A9D0029D500 /* CDEPersistentStoreEnsemble.m in Sources */,
 				07BF7A4F177F0A9D0029D500 /* CDEFoundationAdditions.m in Sources */,
 				078ABF4B17F19195008C9B27 /* CDEEventStoreModel.xcdatamodeld in Sources */,
