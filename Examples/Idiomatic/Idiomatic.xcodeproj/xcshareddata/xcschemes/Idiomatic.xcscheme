@@ -38,6 +38,16 @@
                ReferencedContainer = "container:Idiomatic.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "9477ED4D1800137300C2A419"
+               BuildableName = "IdiomaticMacTests.xctest"
+               BlueprintName = "IdiomaticMacTests"
+               ReferencedContainer = "container:Idiomatic.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
