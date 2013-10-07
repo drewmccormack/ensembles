@@ -28,7 +28,7 @@
 		9477ED3B1800137300C2A419 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9477ED391800137300C2A419 /* InfoPlist.strings */; };
 		9477ED3D1800137300C2A419 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9477ED3C1800137300C2A419 /* main.m */; };
 		9477ED411800137300C2A419 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 9477ED3F1800137300C2A419 /* Credits.rtf */; };
-		9477ED441800137300C2A419 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 9477ED431800137300C2A419 /* AppDelegate.m */; };
+		9477ED441800137300C2A419 /* IDMAppDelegateMac.m in Sources */ = {isa = PBXBuildFile; fileRef = 9477ED431800137300C2A419 /* IDMAppDelegateMac.m */; };
 		9477ED471800137300C2A419 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9477ED451800137300C2A419 /* MainMenu.xib */; };
 		9477ED491800137300C2A419 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9477ED481800137300C2A419 /* Images.xcassets */; };
 		9477ED621800140200C2A419 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9477ED611800140200C2A419 /* CoreData.framework */; };
@@ -105,8 +105,8 @@
 		9477ED3C1800137300C2A419 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		9477ED3E1800137300C2A419 /* IdiomaticMac-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "IdiomaticMac-Prefix.pch"; sourceTree = "<group>"; };
 		9477ED401800137300C2A419 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
-		9477ED421800137300C2A419 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		9477ED431800137300C2A419 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		9477ED421800137300C2A419 /* IDMAppDelegateMac.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IDMAppDelegateMac.h; sourceTree = "<group>"; };
+		9477ED431800137300C2A419 /* IDMAppDelegateMac.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IDMAppDelegateMac.m; sourceTree = "<group>"; };
 		9477ED461800137300C2A419 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		9477ED481800137300C2A419 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		9477ED551800137400C2A419 /* IdiomaticMacTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "IdiomaticMacTests-Info.plist"; sourceTree = "<group>"; };
@@ -259,8 +259,8 @@
 			isa = PBXGroup;
 			children = (
 				9477ED671800168400C2A419 /* IdiomaticMac.entitlements */,
-				9477ED421800137300C2A419 /* AppDelegate.h */,
-				9477ED431800137300C2A419 /* AppDelegate.m */,
+				9477ED421800137300C2A419 /* IDMAppDelegateMac.h */,
+				9477ED431800137300C2A419 /* IDMAppDelegateMac.m */,
 				9477ED451800137300C2A419 /* MainMenu.xib */,
 				9477ED481800137300C2A419 /* Images.xcassets */,
 				9477ED371800137300C2A419 /* Supporting Files */,
@@ -467,7 +467,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9477ED441800137300C2A419 /* AppDelegate.m in Sources */,
+				9477ED441800137300C2A419 /* IDMAppDelegateMac.m in Sources */,
 				9477ED651800158200C2A419 /* CDEEventStoreModel.xcdatamodeld in Sources */,
 				9477ED6B18001B7000C2A419 /* IDMAddNoteViewController.m in Sources */,
 				9477ED711800723D00C2A419 /* IDMCoreDataHelper.m in Sources */,
@@ -751,6 +751,7 @@
 				9477ED5D1800137400C2A419 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 

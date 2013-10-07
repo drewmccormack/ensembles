@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 The Mental Faculty B.V. All rights reserved.
 //
 
-#import "AppDelegate.h"
+#import "IDMAppDelegateMac.h"
 #import <CoreData/CoreData.h>
 
 #import "CoreDataEnsembles.h"
@@ -32,7 +32,7 @@
 NSString * const IDMSyncActivityDidBeginNotification = @"IDMSyncActivityDidBegin";
 NSString * const IDMSyncActivityDidEndNotification = @"IDMSyncActivityDidEnd";
 
-@interface AppDelegate () <CDEPersistentStoreEnsembleDelegate, NSTableViewDataSource, NSTableViewDelegate , NSOutlineViewDelegate, NSOutlineViewDataSource, NSPopoverDelegate, IDMAddNoteDelegate>
+@interface IDMAppDelegateMac () <CDEPersistentStoreEnsembleDelegate, NSTableViewDataSource, NSTableViewDelegate , NSOutlineViewDelegate, NSOutlineViewDataSource, NSPopoverDelegate, IDMAddNoteDelegate>
 {
     NSManagedObjectContext *managedObjectContext;
     CDEPersistentStoreEnsemble *ensemble;
@@ -54,7 +54,7 @@ NSString * const IDMSyncActivityDidEndNotification = @"IDMSyncActivityDidEnd";
 @end
 
 
-@implementation AppDelegate
+@implementation IDMAppDelegateMac
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {

@@ -656,14 +656,14 @@
                 <rect key="frame" x="0.0" y="0.0" width="480" height="390"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <scrollView autohidesScrollers="YES" horizontalLineScroll="43" horizontalPageScroll="10" verticalLineScroll="43" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wg1-gw-R0P">
+                    <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wg1-gw-R0P">
                         <rect key="frame" x="165" y="50" width="295" height="326"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <clipView key="contentView" id="fTl-uy-S6j">
                             <rect key="frame" x="1" y="1" width="293" height="324"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="41" rowSizeStyle="automatic" viewBased="YES" id="o7d-y3-WUa">
+                                <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" viewBased="YES" id="o7d-y3-WUa">
                                     <rect key="frame" x="0.0" y="0.0" width="293" height="324"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <size key="intercellSpacing" width="3" height="2"/>
@@ -875,7 +875,7 @@
                 </constraints>
             </view>
         </window>
-        <customObject id="494" customClass="AppDelegate">
+        <customObject id="494" customClass="IDMAppDelegateMac">
             <connections>
                 <outlet property="addNoteButton" destination="Sp5-C2-hIX" id="RtW-Hf-4jF"/>
                 <outlet property="collectionView" destination="Ohq-dj-okU" id="N7T-9Q-nwy"/>
