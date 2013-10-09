@@ -18,4 +18,7 @@
 @property (nonatomic, strong) NSSet *tags;
 @property (nonatomic, strong) NSString *uniqueIdentifier;
 
++ (NSArray *)notesWithTag:(IDMTag*)tag inManagedObjectContext:(NSManagedObjectContext *)context;
++ (NSArray *)notesInManagedObjectContext:(NSManagedObjectContext *)context;
+
 @end

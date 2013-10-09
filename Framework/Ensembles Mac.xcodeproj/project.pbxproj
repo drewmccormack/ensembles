@@ -149,7 +149,7 @@
 		074B956D17EC3F7E0016F84D /* CDEICloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDEICloudFileSystem.h; path = "Cloud File Systems/CDEICloudFileSystem.h"; sourceTree = SOURCE_ROOT; };
 		074B956E17EC3F7E0016F84D /* CDEICloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDEICloudFileSystem.m; path = "Cloud File Systems/CDEICloudFileSystem.m"; sourceTree = SOURCE_ROOT; };
 		074DE61017B779D8009755EB /* CDEDeviceRevisionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEDeviceRevisionTests.m; sourceTree = "<group>"; };
-		07592CA6177F2D1000816034 /* Tests (Mac).xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests (Mac).xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		07592CA6177F2D1000816034 /* Tests Mac.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests Mac.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		07592CAA177F2D1000816034 /* Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Tests-Info.plist"; sourceTree = "<group>"; };
 		07592CAC177F2D1000816034 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		07592CB0177F2D1000816034 /* Tests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tests-Prefix.pch"; sourceTree = "<group>"; };
@@ -451,7 +451,7 @@
 			isa = PBXGroup;
 			children = (
 				07BF7933177F04B30029D500 /* libensembles_mac.a */,
-				07592CA6177F2D1000816034 /* Tests (Mac).xctest */,
+				07592CA6177F2D1000816034 /* Tests Mac.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -517,7 +517,7 @@
 			);
 			name = "Tests Mac";
 			productName = "Tests (Mac)";
-			productReference = 07592CA6177F2D1000816034 /* Tests (Mac).xctest */;
+			productReference = 07592CA6177F2D1000816034 /* Tests Mac.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		07BF7932177F04B30029D500 /* Ensembles Mac */ = {

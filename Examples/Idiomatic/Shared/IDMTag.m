@@ -29,6 +29,14 @@
     return tag;
 }
 
++ (NSArray *)tagsInManagedObjectContext:(NSManagedObjectContext *)context
+{
+    NSFetchRequest * fetchRequest  = [[NSFetchRequest alloc] initWithEntityName:@"IDMTag"];
+    fetchRequest.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"text" ascending:YES]];
+    NSArray *tags = [context executeFetchRequest:fetchRequest error:nil];
+    return tags;
+}
+
 - (NSString *)uniqueIdentifier
 {
     return self.text;

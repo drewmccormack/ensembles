@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="3389" systemVersion="13A538g" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="3396" systemVersion="13A584" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="Child" syncable="YES">
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="parent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Parent" inverseName="child" inverseEntity="Parent" syncable="YES"/>
@@ -14,7 +14,7 @@
         <relationship name="friends" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Child" inverseName="testFriends" inverseEntity="Child" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Child" positionX="394" positionY="11" width="128" height="103"/>
-        <element name="Parent" positionX="0" positionY="0" width="128" height="118"/>
+        <element name="Child" positionX="0" positionY="0" width="0" height="0"/>
+        <element name="Parent" positionX="0" positionY="0" width="0" height="0"/>
     </elements>
 </model>

@@ -6,50 +6,44 @@
 //  Copyright (c) 2013 The Mental Faculty B.V. All rights reserved.
 //
 
-#import "IDMAppDelegateMac.h"
 #import <CoreData/CoreData.h>
 
+#import "IDMAppDelegateMac.h"
 #import "CoreDataEnsembles.h"
 #import "CDEICloudFileSystem.h"
 #import "IDMAddNoteViewController.h"
 #import "IDMNote.h"
 #import "IDMTag.h"
-#import "IDMCoreDataHelper.h"
 
-@interface TreeItem : NSObject
-@property (nonatomic,strong) NSMutableArray *childs;
+NSString * const IDMSyncActivityDidBeginNotification = @"IDMSyncActivityDidBegin";
+NSString * const IDMSyncActivityDidEndNotification = @"IDMSyncActivityDidEnd";
+
+@interface IDMTreeItem : NSObject
+@property (nonatomic,strong) NSMutableArray *children;
 @property (nonatomic) BOOL header;
 @property (nonatomic,strong) NSString *title;
 @property (nonatomic,strong) id representedObject;
 @end
 
-@implementation TreeItem
-
-
-
+@implementation IDMTreeItem
 @end
 
-NSString * const IDMSyncActivityDidBeginNotification = @"IDMSyncActivityDidBegin";
-NSString * const IDMSyncActivityDidEndNotification = @"IDMSyncActivityDidEnd";
-
-@interface IDMAppDelegateMac () <CDEPersistentStoreEnsembleDelegate, NSTableViewDataSource, NSTableViewDelegate , NSOutlineViewDelegate, NSOutlineViewDataSource, NSPopoverDelegate, IDMAddNoteDelegate>
-{
+@interface IDMAppDelegateMac () <CDEPersistentStoreEnsembleDelegate, NSTableViewDataSource, NSTableViewDelegate , NSOutlineViewDelegate, NSOutlineViewDataSource, NSPopoverDelegate, IDMAddNoteDelegate> {
     NSManagedObjectContext *managedObjectContext;
     CDEPersistentStoreEnsemble *ensemble;
     CDEICloudFileSystem *cloudFileSystem;
     NSUInteger activeMergeCount;
-    TreeItem *allNotes;
-    TreeItem *tags;
-    IDMCoreDataHelper *cdHelper;
+    IDMTreeItem *noteItems;
+    IDMTreeItem *tagItems;
     NSMutableArray *notes;
 }
 
-@property (nonatomic,weak) IBOutlet NSOutlineView *collectionView;
-@property (nonatomic,weak) IBOutlet NSTableView *tableView;
-@property (nonatomic,weak) IBOutlet NSButton *addNoteButton;
-@property (nonatomic,weak) IBOutlet NSButton *deleteNoteButton;
-@property (nonatomic,strong) IDMAddNoteViewController *addNoteViewController;
-@property (nonatomic,strong) NSPopover *popOver;
+@property (nonatomic, weak) IBOutlet NSOutlineView *collectionView;
+@property (nonatomic, weak) IBOutlet NSTableView *tableView;
+@property (nonatomic, weak) IBOutlet NSButton *addNoteButton;
+@property (nonatomic, weak) IBOutlet NSButton *deleteNoteButton;
+@property (nonatomic, strong) IDMAddNoteViewController *addNoteViewController;
+@property (nonatomic, strong) NSPopover *popover;
 
 @end
 
@@ -82,8 +76,6 @@ NSString * const IDMSyncActivityDidEndNotification = @"IDMSyncActivityDidEnd";
     ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"MainStore" persistentStorePath:storeURL.path managedObjectModel:model cloudFileSystem:cloudFileSystem];
     ensemble.delegate = self;
     
-    cdHelper = [[IDMCoreDataHelper alloc] initWithMangedObjectContext:managedObjectContext];
-    
     [self setupTree];
 }
 
@@ -94,22 +86,9 @@ NSString * const IDMSyncActivityDidEndNotification = @"IDMSyncActivityDidEnd";
 
 #pragma mark - Sync Methods
 
-- (void)decrementMergeCount
+-(IBAction)sync:(id)sender
 {
-    activeMergeCount--;
-    if (activeMergeCount == 0) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:IDMSyncActivityDidEndNotification object:nil];
-        [self setupTree];
-        [self reloadTable];
-    }
-}
-
-- (void)incrementMergeCount
-{
-    activeMergeCount++;
-    if (activeMergeCount == 1) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:IDMSyncActivityDidBeginNotification object:nil];
-    }
+    [self synchronize];
 }
 
 - (void)synchronize
@@ -129,29 +108,44 @@ NSString * const IDMSyncActivityDidEndNotification = @"IDMSyncActivityDidEnd";
     }
 }
 
+- (void)decrementMergeCount
+{
+    activeMergeCount--;
+    if (activeMergeCount == 0) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:IDMSyncActivityDidEndNotification object:nil];
+        [self setupTree];
+        [self reloadTable];
+    }
+}
+
+- (void)incrementMergeCount
+{
+    activeMergeCount++;
+    if (activeMergeCount == 1) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:IDMSyncActivityDidBeginNotification object:nil];
+    }
+}
+
+#pragma mark - Outline
 
 -(void)setupTree
 {
-    allNotes  = [[TreeItem alloc] init];
-    allNotes.title = @"All Notes";
-    allNotes.header = YES;
+    noteItems  = [[IDMTreeItem alloc] init];
+    noteItems.title = @"ALL NOTES";
+    noteItems.header = YES;
     
-    tags = [[TreeItem alloc] init];
-    tags.title = @"TAGS";
-    tags.header = YES;
+    tagItems = [[IDMTreeItem alloc] init];
+    tagItems.title = @"TAGS";
+    tagItems.header = YES;
     
-    NSArray *allTags = [cdHelper allTags];
-    
-    if( tags.childs == nil )
-        tags.childs = [[NSMutableArray alloc] init];
-    
-    for( IDMTag *tag in allTags )
-    {
-        TreeItem *item = [TreeItem new];
+    NSArray *allTags = [IDMTag tagsInManagedObjectContext:managedObjectContext];
+    if(!tagItems.children) tagItems.children = [[NSMutableArray alloc] init];
+    for(IDMTag *tag in allTags) {
+        IDMTreeItem *item = [IDMTreeItem new];
         item.title = tag.text;
         item.representedObject = tag;
         item.header = NO;
-        [tags.childs addObject:item];
+        [tagItems.children addObject:item];
     }
     
     [self.collectionView reloadData];
@@ -162,16 +156,99 @@ NSString * const IDMSyncActivityDidEndNotification = @"IDMSyncActivityDidEnd";
 {
     IDMTag *tag;
     NSInteger selectedRow = [self.collectionView selectedRow];
-    if( selectedRow > 0)    // First row is "All Tags"
-    {
-        TreeItem * item = [self.collectionView itemAtRow:selectedRow];
+    if( selectedRow > 0) {   // First row is "All Tags"
+        IDMTreeItem * item = [self.collectionView itemAtRow:selectedRow];
         tag = item.representedObject;
     }
     
-    notes = [[NSMutableArray alloc] initWithArray:[cdHelper notesWithTag:tag ]];
+    notes = [[IDMNote notesWithTag:tag inManagedObjectContext:managedObjectContext] mutableCopy];
     
     [self.tableView reloadData];
     [self.deleteNoteButton setEnabled:NO];
+}
+
+#pragma mark - Adding and Deleting Notes
+
+-(IBAction)newNote:(id)sender
+{
+    [self showAddNoteViewWithText:nil tags:nil];
+}
+
+-(IBAction)deleteNote:(id)sender
+{
+    NSInteger selectedNote = [self.tableView selectedRow];
+    if( selectedNote < 0 ) return;
+    
+    IDMNote *note = notes[selectedNote];
+    [managedObjectContext deleteObject:note];
+    [managedObjectContext save:NULL];
+    
+    [notes removeObject:note];
+    [self reloadTable];
+}
+
+-(void)showAddNoteViewWithText:(NSString*)text tags:(NSArray*)noteTags
+{
+    if( self.popover )
+    {
+        [self.popover performClose:self];
+        self.popover = nil;
+        self.addNoteViewController = nil;
+    }
+    self.popover = [[NSPopover alloc] init];
+    
+    [self.popover setBehavior: NSPopoverBehaviorTransient];
+    [self.popover setDelegate: self];
+    
+    
+    self.addNoteViewController = [[IDMAddNoteViewController alloc] initWithNibName:@"IDMAddNoteViewController" bundle:nil];
+    self.addNoteViewController.note = text;
+    self.addNoteViewController.tags = noteTags;
+    
+    self.addNoteViewController.noteDelegate = self;
+    
+    
+    [self.popover setContentViewController:self.addNoteViewController];
+    [self.popover setContentSize:self.addNoteViewController.view.frame.size];
+    
+    [self.popover showRelativeToRect:NSMakeRect(0, 0, 0, 0) ofView:self.addNoteButton preferredEdge:NSMinYEdge];
+    [self.addNoteButton setEnabled:NO];
+}
+
+-(void)popoverCleanUp
+{
+    self.popover = nil;
+    self.addNoteViewController = nil;
+    [self.addNoteButton setEnabled:YES];
+}
+
+-(void)refreshDeleteButtonState
+{
+    NSInteger selection = [self.tableView selectedRow];
+    BOOL enableButton = (selection >=0);
+    [self.deleteNoteButton setEnabled:enableButton];
+}
+
+- (void)saveNote:(NSString *)text tags:(NSArray *)noteTags
+{
+    NSLog(@"Saving Note: %@. TAGS: %@", text, noteTags);
+    IDMNote *note = [NSEntityDescription insertNewObjectForEntityForName:@"IDMNote" inManagedObjectContext:managedObjectContext];
+    
+    
+    note.attributedText = [[NSAttributedString alloc] initWithString:text];
+    NSMutableSet *cdTags = [NSMutableSet setWithCapacity:noteTags.count];
+    for (NSString *tagText in noteTags) {
+        if (tagText.length == 0) continue;
+        IDMTag *tag = [IDMTag tagWithText:tagText inManagedObjectContext:managedObjectContext];
+        [cdTags addObject:tag];
+    }
+    note.tags = cdTags;
+    
+    NSError *error;
+    [managedObjectContext save:&error];
+    [self.popover performClose:self];
+    [self setupTree];
+    [self reloadTable];
 }
 
 #pragma mark - Persistent Store Ensemble Delegate
@@ -188,122 +265,25 @@ NSString * const IDMSyncActivityDidEndNotification = @"IDMSyncActivityDidEnd";
     return [objects valueForKeyPath:@"uniqueIdentifier"];
 }
 
-
--(void)showAddNoteViewWithText:(NSString*)text tags:(NSArray*)noteTags
-{
-    if( self.popOver )
-    {
-        [self.popOver performClose:self];
-        self.popOver = nil;
-        self.addNoteViewController = nil;
-    }
-    self.popOver = [[NSPopover alloc] init];
-    
-    [self.popOver setBehavior: NSPopoverBehaviorTransient];
-    [self.popOver setDelegate: self];
-    
-    
-    self.addNoteViewController = [[IDMAddNoteViewController alloc] initWithNibName:@"IDMAddNoteViewController" bundle:nil];
-    self.addNoteViewController.note = text;
-    self.addNoteViewController.tags = noteTags;
-    
-    self.addNoteViewController.noteDelegate = self;
-    
-    
-    [self.popOver setContentViewController: self.addNoteViewController];
-    [self.popOver setContentSize: self.addNoteViewController.view.frame.size];
-    
-    [self.popOver showRelativeToRect: NSMakeRect(0, 0, 0,0)
-                         ofView: self.addNoteButton
-                  preferredEdge: NSMinYEdge];
-    [self.addNoteButton setEnabled:NO];
-}
-
--(void)popoverCleanUp
-{
-    
-    self.popOver = nil;
-    self.addNoteViewController = nil;
-    [self.addNoteButton setEnabled:YES];
-}
-
--(void)refreshDeleteButtonState
-{
-    NSInteger selection = [self.tableView selectedRow];
-    BOOL enableButton = (selection >=0);
-    [self.deleteNoteButton setEnabled:enableButton];
-}
-
-#pragma mark - Button Actions
-
--(IBAction)newNote:(id)sender
-{
- 
-    [self showAddNoteViewWithText:nil tags:nil];
-}
-
--(IBAction)deleteNote:(id)sender
-{
-    NSInteger selectedNote = [self.tableView selectedRow];
-    if( selectedNote < 0 )
-        return;
-    IDMNote *note = notes[selectedNote];
-    [managedObjectContext deleteObject:note];
-    [managedObjectContext save:NULL];
-    
-    [notes removeObject:note];
-    [self reloadTable];
-    
-}
-
--(IBAction)sync:(id)sender
-{
-    [self synchronize];
-}
-
-
-#pragma mark - Add Note View Controller Deleagte
--(void)saveNote:(NSString *)text tags:(NSArray *)noteTags
-{
-    NSLog(@"Saving Note: %@. TAGS: %@", text, noteTags);
-        IDMNote *note = [NSEntityDescription insertNewObjectForEntityForName:@"IDMNote" inManagedObjectContext:managedObjectContext];
-    
-    
-    note.attributedText = [[NSAttributedString alloc] initWithString:text];
-    NSMutableSet *cdTags = [NSMutableSet setWithCapacity:noteTags.count];
-    for (NSString *tagText in noteTags) {
-        if (tagText.length == 0) continue;
-        IDMTag *tag = [IDMTag tagWithText:tagText inManagedObjectContext:managedObjectContext];
-        [cdTags addObject:tag];
-    }
-    note.tags = cdTags;
-
-    NSError *error;
-    [managedObjectContext save:&error];
-    [self.popOver performClose:self];
-    [self setupTree];
-    [self reloadTable];
-}
-
 #pragma mark - Popover Delegate
--(void)popoverDidClose:(NSNotification *)notification
-{
 
+- (void)popoverDidClose:(NSNotification *)notification
+{
     [self popoverCleanUp];
 }
 
-
 #pragma mark - Outline View Delegate
--(NSView*)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(NSTableColumn *)tableColumn item:(TreeItem*)item
+
+- (NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(NSTableColumn *)tableColumn item:(IDMTreeItem *)item
 {
-    
     NSString *cellId = @"DataCell";
-    if( item != nil && item.header ==  YES)
-        cellId = @"HeaderCell";
+    if (!item && item.header ==  YES) cellId = @"HeaderCell";
+    
     NSTableCellView *cellView = [outlineView makeViewWithIdentifier:cellId owner:self];
-    TreeItem *treeItem = (TreeItem*)item;
-    [cellView.textField setStringValue:treeItem.title];
-    [cellView.imageView setImage:nil];
+    IDMTreeItem *treeItem = (id)item;
+    cellView.textField.stringValue = treeItem.title;
+    cellView.imageView.image = nil;
+    
     return cellView;
 }
 
@@ -312,69 +292,57 @@ NSString * const IDMSyncActivityDidEndNotification = @"IDMSyncActivityDidEnd";
     [self reloadTable];
 }
 
-
 #pragma mark - Outline View DataSource
+
 -(NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item
 {
-    TreeItem *treeItem = (TreeItem*)item;
-    NSInteger items=4;
-    if( item == nil )
-        items = 2;
-    else
-        items = treeItem.childs.count;
-    return items;
+    IDMTreeItem *treeItem = (id)item;
+    NSInteger numberOfItems = item ? treeItem.children.count : 2;
+    return numberOfItems;
 }
 
--(BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(TreeItem*)item
+-(BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(IDMTreeItem*)item
 {
-    return (item!=nil && item.header  && item.childs.count >0);
+    return (item.header && item.children.count > 0);
 }
 
--(BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(TreeItem*)item
+-(BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(IDMTreeItem*)item
 {
-    return ( item.header == YES);
+    return (item.header == YES);
 }
 
 -(id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item
 {
-    TreeItem *objectvalue = nil;
-    TreeItem *treeItem = (TreeItem*)item;
-    if( treeItem == nil )
-    {
-        objectvalue = index==0?allNotes:tags;
+    IDMTreeItem *objectvalue = nil;
+    IDMTreeItem *treeItem = (id)item;
+    if(treeItem == nil) {
+        objectvalue = index==0?noteItems:tagItems;
     }
-    else
-    {
-        if( index  < treeItem.childs.count && index >=0 )
-            objectvalue = treeItem.childs[index];
+    else if (index < treeItem.children.count && index >= 0) {
+        objectvalue = treeItem.children[index];
     }
     return objectvalue;
 }
 
-#pragma mark - Table View Delegate
+#pragma mark - Table View Data Source and Delegate
+
 -(NSView*)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
     NSTableCellView *cell = [self.tableView makeViewWithIdentifier:@"NoteCell" owner:self];
     
     IDMNote *note = notes[row];
-    [cell.textField setAttributedStringValue:note.attributedText];
+    cell.textField.attributedStringValue = note.attributedText;
     return cell;
 }
 
 -(void)tableViewSelectionDidChange:(NSNotification *)notification
 {
-    
     [self refreshDeleteButtonState];
-    
 }
 
-#pragma mark - Table View DataSource
 -(NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
     return notes.count;
 }
-
-
-
 
 @end

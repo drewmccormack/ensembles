@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		070F46F91805D51400EE36E5 /* IDMNote.m in Sources */ = {isa = PBXBuildFile; fileRef = 070F46F41805D51400EE36E5 /* IDMNote.m */; };
+		070F46FA1805D51400EE36E5 /* IDMTag.m in Sources */ = {isa = PBXBuildFile; fileRef = 070F46F61805D51400EE36E5 /* IDMTag.m */; };
+		070F46FB1805D51400EE36E5 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 070F46F71805D51400EE36E5 /* Model.xcdatamodeld */; };
+		070F46FD1805D6C100EE36E5 /* IDMNote.m in Sources */ = {isa = PBXBuildFile; fileRef = 070F46F41805D51400EE36E5 /* IDMNote.m */; };
+		070F46FE1805D6C400EE36E5 /* IDMTag.m in Sources */ = {isa = PBXBuildFile; fileRef = 070F46F61805D51400EE36E5 /* IDMTag.m */; };
 		074B959C17EC783B0016F84D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 074B959B17EC783B0016F84D /* Foundation.framework */; };
 		074B959E17EC783B0016F84D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 074B959D17EC783B0016F84D /* CoreGraphics.framework */; };
 		074B95A017EC783B0016F84D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 074B959F17EC783B0016F84D /* UIKit.framework */; };
@@ -15,34 +20,34 @@
 		074B95AC17EC783B0016F84D /* IDMAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 074B95AB17EC783B0016F84D /* IDMAppDelegate.m */; };
 		074B95AF17EC783B0016F84D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 074B95AD17EC783B0016F84D /* Main.storyboard */; };
 		074B95B417EC783B0016F84D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 074B95B317EC783B0016F84D /* Images.xcassets */; };
-		074B95D217EC7B0B0016F84D /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 074B95D017EC7B0B0016F84D /* Model.xcdatamodeld */; };
-		074B95D517EC7C570016F84D /* IDMTag.m in Sources */ = {isa = PBXBuildFile; fileRef = 074B95D417EC7C570016F84D /* IDMTag.m */; };
-		074B95D817EC7C570016F84D /* IDMNote.m in Sources */ = {isa = PBXBuildFile; fileRef = 074B95D717EC7C570016F84D /* IDMNote.m */; };
 		074B95DB17EC7DCD0016F84D /* IDMTagsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 074B95DA17EC7DCD0016F84D /* IDMTagsViewController.m */; };
 		074B95DE17EC7DDF0016F84D /* IDMNotesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 074B95DD17EC7DDF0016F84D /* IDMNotesViewController.m */; };
 		074B95E117EC9F470016F84D /* IDMNoteEditingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 074B95E017EC9F470016F84D /* IDMNoteEditingViewController.m */; };
+		075157581805D7FD00C4D4F1 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 070F46F71805D51400EE36E5 /* Model.xcdatamodeld */; };
 		077F114317F70BFC0093A212 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 077F114217F70BFC0093A212 /* CDEEventStoreModel.xcdatamodeld */; };
 		0791BCE317F6F58C00E7C31B /* Ensembles iOS.xcodeproj in Resources */ = {isa = PBXBuildFile; fileRef = 0791BCE217F6F58C00E7C31B /* Ensembles iOS.xcodeproj */; };
 		07BF37D517F189EB00C56F64 /* libensembles_ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF37D417F189EB00C56F64 /* libensembles_ios.a */; };
 		9477ED311800137300C2A419 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9477ED301800137300C2A419 /* Cocoa.framework */; };
 		9477ED3B1800137300C2A419 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9477ED391800137300C2A419 /* InfoPlist.strings */; };
 		9477ED3D1800137300C2A419 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9477ED3C1800137300C2A419 /* main.m */; };
-		9477ED411800137300C2A419 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 9477ED3F1800137300C2A419 /* Credits.rtf */; };
 		9477ED441800137300C2A419 /* IDMAppDelegateMac.m in Sources */ = {isa = PBXBuildFile; fileRef = 9477ED431800137300C2A419 /* IDMAppDelegateMac.m */; };
 		9477ED471800137300C2A419 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9477ED451800137300C2A419 /* MainMenu.xib */; };
 		9477ED491800137300C2A419 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9477ED481800137300C2A419 /* Images.xcassets */; };
 		9477ED621800140200C2A419 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9477ED611800140200C2A419 /* CoreData.framework */; };
 		9477ED631800143200C2A419 /* libensembles_mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9477ED281800132F00C2A419 /* libensembles_mac.a */; };
 		9477ED651800158200C2A419 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 077F114217F70BFC0093A212 /* CDEEventStoreModel.xcdatamodeld */; };
-		9477ED66180015F300C2A419 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 074B95D017EC7B0B0016F84D /* Model.xcdatamodeld */; };
 		9477ED6B18001B7000C2A419 /* IDMAddNoteViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9477ED6918001B7000C2A419 /* IDMAddNoteViewController.m */; };
 		9477ED6C18001B7000C2A419 /* IDMAddNoteViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9477ED6A18001B7000C2A419 /* IDMAddNoteViewController.xib */; };
-		9477ED6D18006FD300C2A419 /* IDMTag.m in Sources */ = {isa = PBXBuildFile; fileRef = 074B95D417EC7C570016F84D /* IDMTag.m */; };
-		9477ED6E180070F300C2A419 /* IDMNote.m in Sources */ = {isa = PBXBuildFile; fileRef = 074B95D717EC7C570016F84D /* IDMNote.m */; };
-		9477ED711800723D00C2A419 /* IDMCoreDataHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9477ED701800723D00C2A419 /* IDMCoreDataHelper.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		070F46EF1805CDCB00EE36E5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0791BCE217F6F58C00E7C31B /* Ensembles iOS.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 070D336118018A960054BA23;
+			remoteInfo = "Tests iOS";
+		};
 		077F113E17F709ED0093A212 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0791BCE217F6F58C00E7C31B /* Ensembles iOS.xcodeproj */;
@@ -67,6 +72,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		070F46F31805D51400EE36E5 /* IDMNote.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IDMNote.h; path = Shared/IDMNote.h; sourceTree = SOURCE_ROOT; };
+		070F46F41805D51400EE36E5 /* IDMNote.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IDMNote.m; path = Shared/IDMNote.m; sourceTree = SOURCE_ROOT; };
+		070F46F51805D51400EE36E5 /* IDMTag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IDMTag.h; path = Shared/IDMTag.h; sourceTree = SOURCE_ROOT; };
+		070F46F61805D51400EE36E5 /* IDMTag.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IDMTag.m; path = Shared/IDMTag.m; sourceTree = SOURCE_ROOT; };
+		070F46F81805D51400EE36E5 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		074B959817EC783B0016F84D /* Idiomatic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Idiomatic.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		074B959B17EC783B0016F84D /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		074B959D17EC783B0016F84D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -80,11 +90,6 @@
 		074B95AE17EC783B0016F84D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		074B95B317EC783B0016F84D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		074B95BA17EC783B0016F84D /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		074B95D117EC7B0B0016F84D /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
-		074B95D317EC7C570016F84D /* IDMTag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IDMTag.h; sourceTree = "<group>"; };
-		074B95D417EC7C570016F84D /* IDMTag.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDMTag.m; sourceTree = "<group>"; };
-		074B95D617EC7C570016F84D /* IDMNote.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IDMNote.h; sourceTree = "<group>"; };
-		074B95D717EC7C570016F84D /* IDMNote.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDMNote.m; sourceTree = "<group>"; };
 		074B95D917EC7DCD0016F84D /* IDMTagsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IDMTagsViewController.h; sourceTree = "<group>"; };
 		074B95DA17EC7DCD0016F84D /* IDMTagsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDMTagsViewController.m; sourceTree = "<group>"; };
 		074B95DC17EC7DDF0016F84D /* IDMNotesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IDMNotesViewController.h; sourceTree = "<group>"; };
@@ -95,7 +100,7 @@
 		07BF372E17F17D4100C56F64 /* Idiomatic.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Idiomatic.entitlements; sourceTree = "<group>"; };
 		07BF37D417F189EB00C56F64 /* libensembles_ios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libensembles_ios.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		9477ED211800132E00C2A419 /* Ensembles Mac.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "Ensembles Mac.xcodeproj"; path = "../../Framework/Ensembles Mac.xcodeproj"; sourceTree = "<group>"; };
-		9477ED2F1800137300C2A419 /* IdiomaticMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IdiomaticMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9477ED2F1800137300C2A419 /* Idiomatic Mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Idiomatic Mac.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9477ED301800137300C2A419 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
 		9477ED331800137300C2A419 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		9477ED341800137300C2A419 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
@@ -104,21 +109,15 @@
 		9477ED3A1800137300C2A419 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		9477ED3C1800137300C2A419 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		9477ED3E1800137300C2A419 /* IdiomaticMac-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "IdiomaticMac-Prefix.pch"; sourceTree = "<group>"; };
-		9477ED401800137300C2A419 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = "<group>"; };
 		9477ED421800137300C2A419 /* IDMAppDelegateMac.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IDMAppDelegateMac.h; sourceTree = "<group>"; };
 		9477ED431800137300C2A419 /* IDMAppDelegateMac.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IDMAppDelegateMac.m; sourceTree = "<group>"; };
 		9477ED461800137300C2A419 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		9477ED481800137300C2A419 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		9477ED551800137400C2A419 /* IdiomaticMacTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "IdiomaticMacTests-Info.plist"; sourceTree = "<group>"; };
-		9477ED571800137400C2A419 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		9477ED591800137400C2A419 /* IdiomaticMacTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IdiomaticMacTests.m; sourceTree = "<group>"; };
 		9477ED611800140200C2A419 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/CoreData.framework; sourceTree = DEVELOPER_DIR; };
 		9477ED671800168400C2A419 /* IdiomaticMac.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = IdiomaticMac.entitlements; sourceTree = "<group>"; };
 		9477ED6818001B7000C2A419 /* IDMAddNoteViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IDMAddNoteViewController.h; sourceTree = "<group>"; };
 		9477ED6918001B7000C2A419 /* IDMAddNoteViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDMAddNoteViewController.m; sourceTree = "<group>"; };
 		9477ED6A18001B7000C2A419 /* IDMAddNoteViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = IDMAddNoteViewController.xib; sourceTree = "<group>"; };
-		9477ED6F1800723D00C2A419 /* IDMCoreDataHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IDMCoreDataHelper.h; sourceTree = "<group>"; };
-		9477ED701800723D00C2A419 /* IDMCoreDataHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDMCoreDataHelper.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -146,14 +145,27 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		070F46FC1805D69E00EE36E5 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				070F46F31805D51400EE36E5 /* IDMNote.h */,
+				070F46F41805D51400EE36E5 /* IDMNote.m */,
+				070F46F51805D51400EE36E5 /* IDMTag.h */,
+				070F46F61805D51400EE36E5 /* IDMTag.m */,
+				070F46F71805D51400EE36E5 /* Model.xcdatamodeld */,
+				078ABF5117F19200008C9B27 /* Ensembles Resources */,
+			);
+			name = Shared;
+			sourceTree = "<group>";
+		};
 		074B958F17EC783B0016F84D = {
 			isa = PBXGroup;
 			children = (
 				9477ED211800132E00C2A419 /* Ensembles Mac.xcodeproj */,
 				0791BCE217F6F58C00E7C31B /* Ensembles iOS.xcodeproj */,
-				074B95A117EC783B0016F84D /* Idiomatic */,
-				9477ED361800137300C2A419 /* IdiomaticMac */,
-				9477ED531800137300C2A419 /* IdiomaticMacTests */,
+				070F46FC1805D69E00EE36E5 /* Shared */,
+				074B95A117EC783B0016F84D /* Idiomatic iOS */,
+				9477ED361800137300C2A419 /* Idiomatic Mac */,
 				074B959A17EC783B0016F84D /* Frameworks */,
 				074B959917EC783B0016F84D /* Products */,
 			);
@@ -163,7 +175,7 @@
 			isa = PBXGroup;
 			children = (
 				074B959817EC783B0016F84D /* Idiomatic.app */,
-				9477ED2F1800137300C2A419 /* IdiomaticMac.app */,
+				9477ED2F1800137300C2A419 /* Idiomatic Mac.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -183,7 +195,7 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		074B95A117EC783B0016F84D /* Idiomatic */ = {
+		074B95A117EC783B0016F84D /* Idiomatic iOS */ = {
 			isa = PBXGroup;
 			children = (
 				074B95AA17EC783B0016F84D /* IDMAppDelegate.h */,
@@ -194,27 +206,22 @@
 				074B95DD17EC7DDF0016F84D /* IDMNotesViewController.m */,
 				074B95DF17EC9F470016F84D /* IDMNoteEditingViewController.h */,
 				074B95E017EC9F470016F84D /* IDMNoteEditingViewController.m */,
-				074B95D617EC7C570016F84D /* IDMNote.h */,
-				074B95D717EC7C570016F84D /* IDMNote.m */,
-				074B95D317EC7C570016F84D /* IDMTag.h */,
-				074B95D417EC7C570016F84D /* IDMTag.m */,
 				074B95A217EC783B0016F84D /* Supporting Files */,
 			);
+			name = "Idiomatic iOS";
 			path = Idiomatic;
 			sourceTree = "<group>";
 		};
 		074B95A217EC783B0016F84D /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				078ABF5117F19200008C9B27 /* Ensembles Resources */,
-				074B95B317EC783B0016F84D /* Images.xcassets */,
 				07BF372E17F17D4100C56F64 /* Idiomatic.entitlements */,
+				074B95B317EC783B0016F84D /* Images.xcassets */,
 				074B95AD17EC783B0016F84D /* Main.storyboard */,
 				074B95A317EC783B0016F84D /* Idiomatic-Info.plist */,
 				074B95A417EC783B0016F84D /* InfoPlist.strings */,
 				074B95A717EC783B0016F84D /* main.m */,
 				074B95A917EC783B0016F84D /* Idiomatic-Prefix.pch */,
-				074B95D017EC7B0B0016F84D /* Model.xcdatamodeld */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -223,6 +230,7 @@
 			isa = PBXGroup;
 			children = (
 				077F113F17F709ED0093A212 /* libensembles_ios.a */,
+				070F46F01805CDCB00EE36E5 /* Tests iOS.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -233,14 +241,14 @@
 				077F114217F70BFC0093A212 /* CDEEventStoreModel.xcdatamodeld */,
 			);
 			name = "Ensembles Resources";
-			path = ../../Framework/Resources;
+			path = ../Framework/Resources;
 			sourceTree = "<group>";
 		};
 		9477ED221800132E00C2A419 /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				9477ED281800132F00C2A419 /* libensembles_mac.a */,
-				9477ED2A1800132F00C2A419 /* Tests (Mac).xctest */,
+				9477ED2A1800132F00C2A419 /* Tests Mac.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -255,50 +263,30 @@
 			name = "Other Frameworks";
 			sourceTree = "<group>";
 		};
-		9477ED361800137300C2A419 /* IdiomaticMac */ = {
+		9477ED361800137300C2A419 /* Idiomatic Mac */ = {
 			isa = PBXGroup;
 			children = (
-				9477ED671800168400C2A419 /* IdiomaticMac.entitlements */,
 				9477ED421800137300C2A419 /* IDMAppDelegateMac.h */,
 				9477ED431800137300C2A419 /* IDMAppDelegateMac.m */,
-				9477ED451800137300C2A419 /* MainMenu.xib */,
-				9477ED481800137300C2A419 /* Images.xcassets */,
-				9477ED371800137300C2A419 /* Supporting Files */,
 				9477ED6818001B7000C2A419 /* IDMAddNoteViewController.h */,
 				9477ED6918001B7000C2A419 /* IDMAddNoteViewController.m */,
 				9477ED6A18001B7000C2A419 /* IDMAddNoteViewController.xib */,
-				9477ED6F1800723D00C2A419 /* IDMCoreDataHelper.h */,
-				9477ED701800723D00C2A419 /* IDMCoreDataHelper.m */,
+				9477ED451800137300C2A419 /* MainMenu.xib */,
+				9477ED481800137300C2A419 /* Images.xcassets */,
+				9477ED371800137300C2A419 /* Supporting Files */,
 			);
+			name = "Idiomatic Mac";
 			path = IdiomaticMac;
 			sourceTree = "<group>";
 		};
 		9477ED371800137300C2A419 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				9477ED671800168400C2A419 /* IdiomaticMac.entitlements */,
 				9477ED381800137300C2A419 /* IdiomaticMac-Info.plist */,
 				9477ED391800137300C2A419 /* InfoPlist.strings */,
 				9477ED3C1800137300C2A419 /* main.m */,
 				9477ED3E1800137300C2A419 /* IdiomaticMac-Prefix.pch */,
-				9477ED3F1800137300C2A419 /* Credits.rtf */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		9477ED531800137300C2A419 /* IdiomaticMacTests */ = {
-			isa = PBXGroup;
-			children = (
-				9477ED591800137400C2A419 /* IdiomaticMacTests.m */,
-				9477ED541800137400C2A419 /* Supporting Files */,
-			);
-			path = IdiomaticMacTests;
-			sourceTree = "<group>";
-		};
-		9477ED541800137400C2A419 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				9477ED551800137400C2A419 /* IdiomaticMacTests-Info.plist */,
-				9477ED561800137400C2A419 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -306,9 +294,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		074B959717EC783B0016F84D /* Idiomatic */ = {
+		074B959717EC783B0016F84D /* Idiomatic iOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 074B95CA17EC783B0016F84D /* Build configuration list for PBXNativeTarget "Idiomatic" */;
+			buildConfigurationList = 074B95CA17EC783B0016F84D /* Build configuration list for PBXNativeTarget "Idiomatic iOS" */;
 			buildPhases = (
 				074B959417EC783B0016F84D /* Sources */,
 				074B959517EC783B0016F84D /* Frameworks */,
@@ -318,14 +306,14 @@
 			);
 			dependencies = (
 			);
-			name = Idiomatic;
+			name = "Idiomatic iOS";
 			productName = Idiomatic;
 			productReference = 074B959817EC783B0016F84D /* Idiomatic.app */;
 			productType = "com.apple.product-type.application";
 		};
-		9477ED2E1800137300C2A419 /* IdiomaticMac */ = {
+		9477ED2E1800137300C2A419 /* Idiomatic Mac */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 9477ED5B1800137400C2A419 /* Build configuration list for PBXNativeTarget "IdiomaticMac" */;
+			buildConfigurationList = 9477ED5B1800137400C2A419 /* Build configuration list for PBXNativeTarget "Idiomatic Mac" */;
 			buildPhases = (
 				9477ED2B1800137300C2A419 /* Sources */,
 				9477ED2C1800137300C2A419 /* Frameworks */,
@@ -335,9 +323,9 @@
 			);
 			dependencies = (
 			);
-			name = IdiomaticMac;
+			name = "Idiomatic Mac";
 			productName = IdiomaticMac;
-			productReference = 9477ED2F1800137300C2A419 /* IdiomaticMac.app */;
+			productReference = 9477ED2F1800137300C2A419 /* Idiomatic Mac.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -359,6 +347,7 @@
 						};
 					};
 					9477ED2E1800137300C2A419 = {
+						DevelopmentTeam = P7BXV6PHLD;
 						SystemCapabilities = {
 							com.apple.iCloud = {
 								enabled = 1;
@@ -390,13 +379,20 @@
 			);
 			projectRoot = "";
 			targets = (
-				074B959717EC783B0016F84D /* Idiomatic */,
-				9477ED2E1800137300C2A419 /* IdiomaticMac */,
+				074B959717EC783B0016F84D /* Idiomatic iOS */,
+				9477ED2E1800137300C2A419 /* Idiomatic Mac */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		070F46F01805CDCB00EE36E5 /* Tests iOS.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "Tests iOS.xctest";
+			remoteRef = 070F46EF1805CDCB00EE36E5 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		077F113F17F709ED0093A212 /* libensembles_ios.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -411,10 +407,10 @@
 			remoteRef = 9477ED271800132F00C2A419 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		9477ED2A1800132F00C2A419 /* Tests (Mac).xctest */ = {
+		9477ED2A1800132F00C2A419 /* Tests Mac.xctest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
-			path = "Tests (Mac).xctest";
+			path = "Tests Mac.xctest";
 			remoteRef = 9477ED291800132F00C2A419 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -439,7 +435,6 @@
 				9477ED6C18001B7000C2A419 /* IDMAddNoteViewController.xib in Resources */,
 				9477ED3B1800137300C2A419 /* InfoPlist.strings in Resources */,
 				9477ED491800137300C2A419 /* Images.xcassets in Resources */,
-				9477ED411800137300C2A419 /* Credits.rtf in Resources */,
 				9477ED471800137300C2A419 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -452,14 +447,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				074B95A817EC783B0016F84D /* main.m in Sources */,
-				074B95D217EC7B0B0016F84D /* Model.xcdatamodeld in Sources */,
+				070F46FA1805D51400EE36E5 /* IDMTag.m in Sources */,
 				074B95DB17EC7DCD0016F84D /* IDMTagsViewController.m in Sources */,
-				074B95D517EC7C570016F84D /* IDMTag.m in Sources */,
 				074B95E117EC9F470016F84D /* IDMNoteEditingViewController.m in Sources */,
+				070F46F91805D51400EE36E5 /* IDMNote.m in Sources */,
 				074B95AC17EC783B0016F84D /* IDMAppDelegate.m in Sources */,
+				070F46FB1805D51400EE36E5 /* Model.xcdatamodeld in Sources */,
 				074B95DE17EC7DDF0016F84D /* IDMNotesViewController.m in Sources */,
 				077F114317F70BFC0093A212 /* CDEEventStoreModel.xcdatamodeld in Sources */,
-				074B95D817EC7C570016F84D /* IDMNote.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -470,11 +465,10 @@
 				9477ED441800137300C2A419 /* IDMAppDelegateMac.m in Sources */,
 				9477ED651800158200C2A419 /* CDEEventStoreModel.xcdatamodeld in Sources */,
 				9477ED6B18001B7000C2A419 /* IDMAddNoteViewController.m in Sources */,
-				9477ED711800723D00C2A419 /* IDMCoreDataHelper.m in Sources */,
-				9477ED6E180070F300C2A419 /* IDMNote.m in Sources */,
+				075157581805D7FD00C4D4F1 /* Model.xcdatamodeld in Sources */,
 				9477ED3D1800137300C2A419 /* main.m in Sources */,
-				9477ED66180015F300C2A419 /* Model.xcdatamodeld in Sources */,
-				9477ED6D18006FD300C2A419 /* IDMTag.m in Sources */,
+				070F46FD1805D6C100EE36E5 /* IDMNote.m in Sources */,
+				070F46FE1805D6C400EE36E5 /* IDMTag.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -505,28 +499,12 @@
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
-		9477ED3F1800137300C2A419 /* Credits.rtf */ = {
-			isa = PBXVariantGroup;
-			children = (
-				9477ED401800137300C2A419 /* en */,
-			);
-			name = Credits.rtf;
-			sourceTree = "<group>";
-		};
 		9477ED451800137300C2A419 /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
 				9477ED461800137300C2A419 /* Base */,
 			);
 			name = MainMenu.xib;
-			sourceTree = "<group>";
-		};
-		9477ED561800137400C2A419 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				9477ED571800137400C2A419 /* en */,
-			);
-			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -632,7 +610,7 @@
 					"$(SRCROOT)/../../Framework/**",
 				);
 				INFOPLIST_FILE = "Idiomatic/Idiomatic-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Idiomatic;
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
@@ -654,7 +632,7 @@
 					"$(SRCROOT)/../../Framework/**",
 				);
 				INFOPLIST_FILE = "Idiomatic/Idiomatic-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Idiomatic;
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
@@ -665,8 +643,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = IdiomaticMac/IdiomaticMac.entitlements;
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
+				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -698,8 +675,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = IdiomaticMac/IdiomaticMac.entitlements;
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
+				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -735,7 +711,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		074B95CA17EC783B0016F84D /* Build configuration list for PBXNativeTarget "Idiomatic" */ = {
+		074B95CA17EC783B0016F84D /* Build configuration list for PBXNativeTarget "Idiomatic iOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				074B95CB17EC783B0016F84D /* Debug */,
@@ -744,7 +720,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		9477ED5B1800137400C2A419 /* Build configuration list for PBXNativeTarget "IdiomaticMac" */ = {
+		9477ED5B1800137400C2A419 /* Build configuration list for PBXNativeTarget "Idiomatic Mac" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				9477ED5C1800137400C2A419 /* Debug */,
@@ -756,13 +732,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		074B95D017EC7B0B0016F84D /* Model.xcdatamodeld */ = {
+		070F46F71805D51400EE36E5 /* Model.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				074B95D117EC7B0B0016F84D /* Model.xcdatamodel */,
+				070F46F81805D51400EE36E5 /* Model.xcdatamodel */,
 			);
-			currentVersion = 074B95D117EC7B0B0016F84D /* Model.xcdatamodel */;
-			path = Model.xcdatamodeld;
+			currentVersion = 070F46F81805D51400EE36E5 /* Model.xcdatamodel */;
+			name = Model.xcdatamodeld;
+			path = Shared/Model.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};

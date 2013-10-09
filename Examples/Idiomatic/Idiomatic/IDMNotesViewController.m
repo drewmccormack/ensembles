@@ -31,7 +31,7 @@
     [notesController performFetch:NULL];
     [self.tableView reloadData];
 
-    self.title = self.tag.text ? : @"All Notes";
+    self.title = self.tag.text ? : @"ALL NOTES";
 }
 
 - (void)viewDidDisappear:(BOOL)animated

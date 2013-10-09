@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "074B959717EC783B0016F84D"
-               BuildableName = "Idiomatic.app"
-               BlueprintName = "Idiomatic"
+               BlueprintIdentifier = "9477ED2E1800137300C2A419"
+               BuildableName = "Idiomatic Mac.app"
+               BlueprintName = "Idiomatic Mac"
                ReferencedContainer = "container:Idiomatic.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -28,33 +28,13 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       buildConfiguration = "Debug">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "074B95B817EC783B0016F84D"
-               BuildableName = "IdiomaticTests.xctest"
-               BlueprintName = "IdiomaticTests"
-               ReferencedContainer = "container:Idiomatic.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "9477ED4D1800137300C2A419"
-               BuildableName = "IdiomaticMacTests.xctest"
-               BlueprintName = "IdiomaticMacTests"
-               ReferencedContainer = "container:Idiomatic.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "074B959717EC783B0016F84D"
-            BuildableName = "Idiomatic.app"
-            BlueprintName = "Idiomatic"
+            BlueprintIdentifier = "9477ED2E1800137300C2A419"
+            BuildableName = "Idiomatic Mac.app"
+            BlueprintName = "Idiomatic Mac"
             ReferencedContainer = "container:Idiomatic.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -71,9 +51,9 @@
       <BuildableProductRunnable>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "074B959717EC783B0016F84D"
-            BuildableName = "Idiomatic.app"
-            BlueprintName = "Idiomatic"
+            BlueprintIdentifier = "9477ED2E1800137300C2A419"
+            BuildableName = "Idiomatic Mac.app"
+            BlueprintName = "Idiomatic Mac"
             ReferencedContainer = "container:Idiomatic.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -89,9 +69,9 @@
       <BuildableProductRunnable>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "074B959717EC783B0016F84D"
-            BuildableName = "Idiomatic.app"
-            BlueprintName = "Idiomatic"
+            BlueprintIdentifier = "9477ED2E1800137300C2A419"
+            BuildableName = "Idiomatic Mac.app"
+            BlueprintName = "Idiomatic Mac"
             ReferencedContainer = "container:Idiomatic.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

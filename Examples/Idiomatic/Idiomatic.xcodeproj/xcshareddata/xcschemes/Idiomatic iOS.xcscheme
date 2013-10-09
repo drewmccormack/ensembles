@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "07BF374417F184DD00C56F64"
-               BuildableName = "libensembles_ios.a"
-               BlueprintName = "Ensembles iOS"
-               ReferencedContainer = "container:Ensembles iOS.xcodeproj">
+               BlueprintIdentifier = "074B959717EC783B0016F84D"
+               BuildableName = "Idiomatic.app"
+               BlueprintName = "Idiomatic iOS"
+               ReferencedContainer = "container:Idiomatic.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -32,23 +32,32 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "07BF375417F184DD00C56F64"
-               BuildableName = "Ensembles iOSTests.xctest"
-               BlueprintName = "Ensembles iOSTests"
-               ReferencedContainer = "container:Ensembles iOS.xcodeproj">
+               BlueprintIdentifier = "074B95B817EC783B0016F84D"
+               BuildableName = "IdiomaticTests.xctest"
+               BlueprintName = "IdiomaticTests"
+               ReferencedContainer = "container:Idiomatic.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "070D336018018A960054BA23"
-               BuildableName = "Tests iOS.xctest"
-               BlueprintName = "Tests iOS"
-               ReferencedContainer = "container:Ensembles iOS.xcodeproj">
+               BlueprintIdentifier = "9477ED4D1800137300C2A419"
+               BuildableName = "IdiomaticMacTests.xctest"
+               BlueprintName = "IdiomaticMacTests"
+               ReferencedContainer = "container:Idiomatic.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "074B959717EC783B0016F84D"
+            BuildableName = "Idiomatic.app"
+            BlueprintName = "Idiomatic iOS"
+            ReferencedContainer = "container:Idiomatic.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </TestAction>
    <LaunchAction
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
@@ -59,6 +68,15 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
+      <BuildableProductRunnable>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "074B959717EC783B0016F84D"
+            BuildableName = "Idiomatic.app"
+            BlueprintName = "Idiomatic iOS"
+            ReferencedContainer = "container:Idiomatic.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -68,6 +86,15 @@
       useCustomWorkingDirectory = "NO"
       buildConfiguration = "Release"
       debugDocumentVersioning = "YES">
+      <BuildableProductRunnable>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "074B959717EC783B0016F84D"
+            BuildableName = "Idiomatic.app"
+            BlueprintName = "Idiomatic iOS"
+            ReferencedContainer = "container:Idiomatic.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
