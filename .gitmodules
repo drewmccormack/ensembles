@@ -1,0 +1,3 @@
+[submodule "Vendor/DropboxSDK"]
+	path = Vendor/DropboxSDK
+	url = https://github.com/drewmccormack/dropbox-sdk-ios.git

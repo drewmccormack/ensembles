@@ -24,6 +24,8 @@
 		074B95DE17EC7DDF0016F84D /* IDMNotesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 074B95DD17EC7DDF0016F84D /* IDMNotesViewController.m */; };
 		074B95E117EC9F470016F84D /* IDMNoteEditingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 074B95E017EC9F470016F84D /* IDMNoteEditingViewController.m */; };
 		075157581805D7FD00C4D4F1 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 070F46F71805D51400EE36E5 /* Model.xcdatamodeld */; };
+		075B3FD118097B1C0089D4D3 /* DropboxSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 075B3FD018097B1C0089D4D3 /* DropboxSDK.framework */; };
+		075B3FD718097B5B0089D4D3 /* DropboxOSX.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 075B3FD618097B5B0089D4D3 /* DropboxOSX.framework */; };
 		077F114317F70BFC0093A212 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 077F114217F70BFC0093A212 /* CDEEventStoreModel.xcdatamodeld */; };
 		0791BCE317F6F58C00E7C31B /* Ensembles iOS.xcodeproj in Resources */ = {isa = PBXBuildFile; fileRef = 0791BCE217F6F58C00E7C31B /* Ensembles iOS.xcodeproj */; };
 		07BF37D517F189EB00C56F64 /* libensembles_ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF37D417F189EB00C56F64 /* libensembles_ios.a */; };
@@ -96,6 +98,8 @@
 		074B95DD17EC7DDF0016F84D /* IDMNotesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDMNotesViewController.m; sourceTree = "<group>"; };
 		074B95DF17EC9F470016F84D /* IDMNoteEditingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IDMNoteEditingViewController.h; sourceTree = "<group>"; };
 		074B95E017EC9F470016F84D /* IDMNoteEditingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDMNoteEditingViewController.m; sourceTree = "<group>"; };
+		075B3FD018097B1C0089D4D3 /* DropboxSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = DropboxSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		075B3FD618097B5B0089D4D3 /* DropboxOSX.framework */ = {isa = PBXFileReference; lastKnownFileType = file; name = DropboxOSX.framework; path = ../../Vendor/DropboxSDK/DropboxSDK/build/Debug/DropboxOSX.framework; sourceTree = "<group>"; };
 		0791BCE217F6F58C00E7C31B /* Ensembles iOS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "Ensembles iOS.xcodeproj"; path = "../../Framework/Ensembles iOS.xcodeproj"; sourceTree = "<group>"; };
 		07BF372E17F17D4100C56F64 /* Idiomatic.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Idiomatic.entitlements; sourceTree = "<group>"; };
 		07BF37D417F189EB00C56F64 /* libensembles_ios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libensembles_ios.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -128,6 +132,7 @@
 				07BF37D517F189EB00C56F64 /* libensembles_ios.a in Frameworks */,
 				074B959E17EC783B0016F84D /* CoreGraphics.framework in Frameworks */,
 				074B95A017EC783B0016F84D /* UIKit.framework in Frameworks */,
+				075B3FD118097B1C0089D4D3 /* DropboxSDK.framework in Frameworks */,
 				074B959C17EC783B0016F84D /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -136,6 +141,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				075B3FD718097B5B0089D4D3 /* DropboxOSX.framework in Frameworks */,
 				9477ED631800143200C2A419 /* libensembles_mac.a in Frameworks */,
 				9477ED621800140200C2A419 /* CoreData.framework in Frameworks */,
 				9477ED311800137300C2A419 /* Cocoa.framework in Frameworks */,
@@ -183,6 +189,8 @@
 		074B959A17EC783B0016F84D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				075B3FD618097B5B0089D4D3 /* DropboxOSX.framework */,
+				075B3FD018097B1C0089D4D3 /* DropboxSDK.framework */,
 				9477ED611800140200C2A419 /* CoreData.framework */,
 				07BF37D417F189EB00C56F64 /* libensembles_ios.a */,
 				074B959B17EC783B0016F84D /* Foundation.framework */,
@@ -602,6 +610,10 @@
 				CODE_SIGN_ENTITLEMENTS = Idiomatic/Idiomatic.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Ensembles-bqnnqguhepfxlkgqvdamggjewche/Build/Products/Debug-iphoneos",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Idiomatic/Idiomatic-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
@@ -624,6 +636,10 @@
 				CODE_SIGN_ENTITLEMENTS = Idiomatic/Idiomatic.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Ensembles-bqnnqguhepfxlkgqvdamggjewche/Build/Products/Debug-iphoneos",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Idiomatic/Idiomatic-Prefix.pch";
 				HEADER_SEARCH_PATHS = (

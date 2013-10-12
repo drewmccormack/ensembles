@@ -10,4 +10,7 @@
    <FileRef
       location = "group:Examples/Idiomatic/Idiomatic.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:Framework/../Vendor/DropboxSDK/DropboxSDK/DropboxSDK.xcodeproj">
+   </FileRef>
 </Workspace>

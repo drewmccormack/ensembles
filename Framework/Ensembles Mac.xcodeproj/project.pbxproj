@@ -51,6 +51,9 @@
 		0754307717F20BEE00FA4946 /* CDECloudManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07697A7117E0B6C000A9BB63 /* CDECloudManagerTests.m */; };
 		07592CA7177F2D1000816034 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF78E9177F03320029D500 /* XCTest.framework */; };
 		07592CAD177F2D1000816034 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 07592CAB177F2D1000816034 /* InfoPlist.strings */; };
+		075B3FB7180972380089D4D3 /* CDEDropboxCloudFileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 075B3FB5180972380089D4D3 /* CDEDropboxCloudFileSystem.h */; };
+		075B3FB8180972380089D4D3 /* CDEDropboxCloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 075B3FB6180972380089D4D3 /* CDEDropboxCloudFileSystem.m */; };
+		075B3FBC1809765B0089D4D3 /* DropboxOSX.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 075B3FBB1809765B0089D4D3 /* DropboxOSX.framework */; };
 		0760274217F8672200329299 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 078ABF4917F19195008C9B27 /* CDEEventStoreModel.xcdatamodeld */; };
 		07697A7817E0BD0800A9BB63 /* CDEMockCloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 07697A7717E0BD0800A9BB63 /* CDEMockCloudFileSystem.m */; };
 		077B555317D1E5A0008AA7F7 /* DoubleInsertFixture.json in Resources */ = {isa = PBXBuildFile; fileRef = 077B555217D1E5A0008AA7F7 /* DoubleInsertFixture.json */; };
@@ -154,6 +157,10 @@
 		07592CAC177F2D1000816034 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		07592CB0177F2D1000816034 /* Tests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tests-Prefix.pch"; sourceTree = "<group>"; };
 		07592CB6177F320800816034 /* CDEEventStoreTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEEventStoreTests.m; sourceTree = "<group>"; };
+		075B3FB5180972380089D4D3 /* CDEDropboxCloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDEDropboxCloudFileSystem.h; path = "Cloud File Systems/CDEDropboxCloudFileSystem.h"; sourceTree = SOURCE_ROOT; };
+		075B3FB6180972380089D4D3 /* CDEDropboxCloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDEDropboxCloudFileSystem.m; path = "Cloud File Systems/CDEDropboxCloudFileSystem.m"; sourceTree = SOURCE_ROOT; };
+		075B3FB91809763B0089D4D3 /* libSDropboxSDK.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libSDropboxSDK.a; path = "../Vendor/DropboxSDK/DropboxSDK/build/Debug-iphoneos/libSDropboxSDK.a"; sourceTree = "<group>"; };
+		075B3FBB1809765B0089D4D3 /* DropboxOSX.framework */ = {isa = PBXFileReference; lastKnownFileType = file; name = DropboxOSX.framework; path = ../Vendor/DropboxSDK/DropboxSDK/build/Debug/DropboxOSX.framework; sourceTree = "<group>"; };
 		07697A7117E0B6C000A9BB63 /* CDECloudManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDECloudManagerTests.m; sourceTree = "<group>"; };
 		07697A7617E0BD0800A9BB63 /* CDEMockCloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEMockCloudFileSystem.h; sourceTree = "<group>"; };
 		07697A7717E0BD0800A9BB63 /* CDEMockCloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEMockCloudFileSystem.m; sourceTree = "<group>"; };
@@ -216,6 +223,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				075B3FBC1809765B0089D4D3 /* DropboxOSX.framework in Frameworks */,
 				07DDA7EA17CD1A4A009C6F94 /* libensembles_mac.a in Frameworks */,
 				07592CA7177F2D1000816034 /* XCTest.framework in Frameworks */,
 			);
@@ -356,6 +364,8 @@
 				072E5AF617EC37C0002D9604 /* CDELocalCloudFileSystem.m */,
 				074B956D17EC3F7E0016F84D /* CDEICloudFileSystem.h */,
 				074B956E17EC3F7E0016F84D /* CDEICloudFileSystem.m */,
+				075B3FB5180972380089D4D3 /* CDEDropboxCloudFileSystem.h */,
+				075B3FB6180972380089D4D3 /* CDEDropboxCloudFileSystem.m */,
 				07BF79E8177F0A9D0029D500 /* CDECloudDirectory.h */,
 				07BF79E9177F0A9D0029D500 /* CDECloudDirectory.m */,
 				07BF79EA177F0A9D0029D500 /* CDECloudFile.h */,
@@ -459,6 +469,8 @@
 		07E492E817172CB200FE81B5 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				075B3FBB1809765B0089D4D3 /* DropboxOSX.framework */,
+				075B3FB91809763B0089D4D3 /* libSDropboxSDK.a */,
 				07BF79B8177F05800029D500 /* Mac */,
 			);
 			name = Frameworks;
@@ -488,6 +500,7 @@
 				07BF7A4A177F0A9D0029D500 /* CDEDefines.h in Headers */,
 				07BF7A32177F0A9D0029D500 /* CDEPersistentStoreEnsemble.h in Headers */,
 				0722B26A17B76B2400496F4A /* CDERevisionSet.h in Headers */,
+				075B3FB7180972380089D4D3 /* CDEDropboxCloudFileSystem.h in Headers */,
 				07BF7A44177F0A9D0029D500 /* NSMapTable+CDEAdditions.h in Headers */,
 				07BF7A35177F0A9D0029D500 /* CDEEventIntegrator.h in Headers */,
 				072A87DB17EDFBB000F8B2CB /* CDEPersistentStoreImporter.h in Headers */,
@@ -640,6 +653,7 @@
 				078ABF4B17F19195008C9B27 /* CDEEventStoreModel.xcdatamodeld in Sources */,
 				072A87E217EEE55600F8B2CB /* CDEEventBuilder.m in Sources */,
 				07BF7A69177F0A9D0029D500 /* CDEStoreModificationEvent.m in Sources */,
+				075B3FB8180972380089D4D3 /* CDEDropboxCloudFileSystem.m in Sources */,
 				07BF7A49177F0A9D0029D500 /* CDEAsynchronousTaskQueue.m in Sources */,
 				07BF7A3A177F0A9D0029D500 /* CDEEventMigrator.m in Sources */,
 				0722B26917B76B2400496F4A /* CDERevision.m in Sources */,
@@ -772,6 +786,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = ensembles_mac;
 				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../Vendor/DropboxSDK/DropboxSDK/Classes/**";
 			};
 			name = Debug;
 		};
@@ -797,6 +812,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = ensembles_mac;
 				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../Vendor/DropboxSDK/DropboxSDK/Classes/**";
 			};
 			name = Release;
 		};
