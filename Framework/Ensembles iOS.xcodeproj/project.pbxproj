@@ -56,6 +56,7 @@
 		075B3FCC18097A140089D4D3 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07C002351809662E0077E204 /* Security.framework */; };
 		075B3FCD18097A260089D4D3 /* libensembles_ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF374517F184DD00C56F64 /* libensembles_ios.a */; };
 		075B3FCF18097A370089D4D3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 075B3FCE18097A370089D4D3 /* UIKit.framework */; };
+		075B3FE718097C710089D4D3 /* DropboxSDK.xcodeproj in Resources */ = {isa = PBXBuildFile; fileRef = 075B3FE618097C710089D4D3 /* DropboxSDK.xcodeproj */; };
 		078ABF4E17F191BA008C9B27 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 078ABF4C17F191BA008C9B27 /* CDEEventStoreModel.xcdatamodeld */; };
 		07BF374917F184DD00C56F64 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF374817F184DD00C56F64 /* Foundation.framework */; };
 		07BF37AA17F1853000C56F64 /* CDECloudDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF377017F1853000C56F64 /* CDECloudDirectory.m */; };
@@ -159,6 +160,7 @@
 		075B3FB218096C720089D4D3 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		075B3FC7180979580089D4D3 /* DropboxSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = DropboxSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		075B3FCE18097A370089D4D3 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		075B3FE618097C710089D4D3 /* DropboxSDK.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = file; name = DropboxSDK.xcodeproj; path = ../Vendor/DropboxSDK/DropboxSDK/DropboxSDK.xcodeproj; sourceTree = "<group>"; };
 		078ABF4D17F191BA008C9B27 /* CDEEventStoreModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel.xcdatamodel; sourceTree = "<group>"; };
 		07BF374517F184DD00C56F64 /* libensembles_ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libensembles_ios.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		07BF374817F184DD00C56F64 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -340,6 +342,7 @@
 		07BF373C17F184DD00C56F64 = {
 			isa = PBXGroup;
 			children = (
+				075B3FE618097C710089D4D3 /* DropboxSDK.xcodeproj */,
 				07BF374A17F184DD00C56F64 /* Source */,
 				07BF374717F184DD00C56F64 /* Frameworks */,
 				07BF374617F184DD00C56F64 /* Products */,
@@ -582,6 +585,7 @@
 				070D33C618018AAD0054BA23 /* IntegratorUpdateTestsFixture1.json in Resources */,
 				070D33C318018AAD0054BA23 /* UpdateRelationshipConcurrently.json in Resources */,
 				070D33C718018AAD0054BA23 /* IntegratorUpdateTestsFixture2.json in Resources */,
+				075B3FE718097C710089D4D3 /* DropboxSDK.xcodeproj in Resources */,
 				070D33BD18018AAD0054BA23 /* BasicIntegratorRelationshipTestsFixture.json in Resources */,
 				070D33BF18018AAD0054BA23 /* DoubleInsertFixture.json in Resources */,
 				070D33C218018AAD0054BA23 /* UpdateFollowingDeletion.json in Resources */,

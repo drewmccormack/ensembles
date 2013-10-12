@@ -54,6 +54,7 @@
 		075B3FB7180972380089D4D3 /* CDEDropboxCloudFileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 075B3FB5180972380089D4D3 /* CDEDropboxCloudFileSystem.h */; };
 		075B3FB8180972380089D4D3 /* CDEDropboxCloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 075B3FB6180972380089D4D3 /* CDEDropboxCloudFileSystem.m */; };
 		075B3FBC1809765B0089D4D3 /* DropboxOSX.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 075B3FBB1809765B0089D4D3 /* DropboxOSX.framework */; };
+		075B3FE518097C690089D4D3 /* DropboxSDK.xcodeproj in Resources */ = {isa = PBXBuildFile; fileRef = 075B3FE418097C690089D4D3 /* DropboxSDK.xcodeproj */; };
 		0760274217F8672200329299 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 078ABF4917F19195008C9B27 /* CDEEventStoreModel.xcdatamodeld */; };
 		07697A7817E0BD0800A9BB63 /* CDEMockCloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 07697A7717E0BD0800A9BB63 /* CDEMockCloudFileSystem.m */; };
 		077B555317D1E5A0008AA7F7 /* DoubleInsertFixture.json in Resources */ = {isa = PBXBuildFile; fileRef = 077B555217D1E5A0008AA7F7 /* DoubleInsertFixture.json */; };
@@ -161,6 +162,7 @@
 		075B3FB6180972380089D4D3 /* CDEDropboxCloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDEDropboxCloudFileSystem.m; path = "Cloud File Systems/CDEDropboxCloudFileSystem.m"; sourceTree = SOURCE_ROOT; };
 		075B3FB91809763B0089D4D3 /* libSDropboxSDK.a */ = {isa = PBXFileReference; lastKnownFileType = file; name = libSDropboxSDK.a; path = "../Vendor/DropboxSDK/DropboxSDK/build/Debug-iphoneos/libSDropboxSDK.a"; sourceTree = "<group>"; };
 		075B3FBB1809765B0089D4D3 /* DropboxOSX.framework */ = {isa = PBXFileReference; lastKnownFileType = file; name = DropboxOSX.framework; path = ../Vendor/DropboxSDK/DropboxSDK/build/Debug/DropboxOSX.framework; sourceTree = "<group>"; };
+		075B3FE418097C690089D4D3 /* DropboxSDK.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = file; name = DropboxSDK.xcodeproj; path = ../Vendor/DropboxSDK/DropboxSDK/DropboxSDK.xcodeproj; sourceTree = "<group>"; };
 		07697A7117E0B6C000A9BB63 /* CDECloudManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDECloudManagerTests.m; sourceTree = "<group>"; };
 		07697A7617E0BD0800A9BB63 /* CDEMockCloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEMockCloudFileSystem.h; sourceTree = "<group>"; };
 		07697A7717E0BD0800A9BB63 /* CDEMockCloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEMockCloudFileSystem.m; sourceTree = "<group>"; };
@@ -450,6 +452,7 @@
 		07E492DD17172CB200FE81B5 = {
 			isa = PBXGroup;
 			children = (
+				075B3FE418097C690089D4D3 /* DropboxSDK.xcodeproj */,
 				0777BF0F17183FD500F1D0D2 /* Source */,
 				07592CA8177F2D1000816034 /* Tests */,
 				07E492E817172CB200FE81B5 /* Frameworks */,
@@ -594,6 +597,7 @@
 				071B9F9717E30ECB00E6977A /* IntegratorUpdateTestsFixture1.json in Resources */,
 				071B9F9817E30ECB00E6977A /* IntegratorUpdateTestsFixture2.json in Resources */,
 				07E2042417C8F2EB00ED9AB3 /* BasicIntegratorRelationshipTestsFixture.json in Resources */,
+				075B3FE518097C690089D4D3 /* DropboxSDK.xcodeproj in Resources */,
 				072F317017D4C9CB00541FED /* UpdateRelationshipConcurrentWithDeletion.json in Resources */,
 				07592CAD177F2D1000816034 /* InfoPlist.strings in Resources */,
 				072F316417D4A72D00541FED /* UpdateFollowingDeletion.json in Resources */,
