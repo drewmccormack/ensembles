@@ -46,8 +46,9 @@
 		070D33C618018AAD0054BA23 /* IntegratorUpdateTestsFixture1.json in Resources */ = {isa = PBXBuildFile; fileRef = 070D33A018018AAD0054BA23 /* IntegratorUpdateTestsFixture1.json */; };
 		070D33C718018AAD0054BA23 /* IntegratorUpdateTestsFixture2.json in Resources */ = {isa = PBXBuildFile; fileRef = 070D33A118018AAD0054BA23 /* IntegratorUpdateTestsFixture2.json */; };
 		070D33C918018B8E0054BA23 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF37CE17F185DE00C56F64 /* CoreData.framework */; };
-		070D33CE18018C950054BA23 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 078ABF4C17F191BA008C9B27 /* CDEEventStoreModel.xcdatamodeld */; };
 		070D33D21801A0770054BA23 /* CDEGlobalIdentifierTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D33D11801A0770054BA23 /* CDEGlobalIdentifierTests.m */; };
+		072BA97F180AACD9003AA94E /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 072BA97C180AACD9003AA94E /* CDEEventStoreModel.xcdatamodeld */; };
+		072BA980180AAD0E003AA94E /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 072BA97C180AACD9003AA94E /* CDEEventStoreModel.xcdatamodeld */; };
 		075B3FB118096B610089D4D3 /* CDEDropboxCloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 075B3FB018096B610089D4D3 /* CDEDropboxCloudFileSystem.m */; };
 		075B3FB318096C720089D4D3 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 075B3FB218096C720089D4D3 /* QuartzCore.framework */; };
 		075B3FC9180979A10089D4D3 /* DropboxSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 075B3FC7180979580089D4D3 /* DropboxSDK.framework */; };
@@ -57,7 +58,6 @@
 		075B3FCD18097A260089D4D3 /* libensembles_ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF374517F184DD00C56F64 /* libensembles_ios.a */; };
 		075B3FCF18097A370089D4D3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 075B3FCE18097A370089D4D3 /* UIKit.framework */; };
 		075B3FE718097C710089D4D3 /* DropboxSDK.xcodeproj in Resources */ = {isa = PBXBuildFile; fileRef = 075B3FE618097C710089D4D3 /* DropboxSDK.xcodeproj */; };
-		078ABF4E17F191BA008C9B27 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 078ABF4C17F191BA008C9B27 /* CDEEventStoreModel.xcdatamodeld */; };
 		07BF374917F184DD00C56F64 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF374817F184DD00C56F64 /* Foundation.framework */; };
 		07BF37AA17F1853000C56F64 /* CDECloudDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF377017F1853000C56F64 /* CDECloudDirectory.m */; };
 		07BF37AB17F1853000C56F64 /* CDECloudFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF377217F1853000C56F64 /* CDECloudFile.m */; };
@@ -94,6 +94,27 @@
 			proxyType = 1;
 			remoteGlobalIDString = 07BF374417F184DD00C56F64;
 			remoteInfo = "Ensembles iOS";
+		};
+		072BA968180AA4A4003AA94E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 075B3FE618097C710089D4D3 /* DropboxSDK.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D3196B831412FE180060E7C6;
+			remoteInfo = DropboxSDK;
+		};
+		072BA96A180AA4A4003AA94E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 075B3FE618097C710089D4D3 /* DropboxSDK.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D3933BE5145F12AD00E15FA7;
+			remoteInfo = SDropboxSDK;
+		};
+		072BA96C180AA4A4003AA94E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 075B3FE618097C710089D4D3 /* DropboxSDK.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = D36931CC15088350003FBA23;
+			remoteInfo = DropboxOSX;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -155,13 +176,14 @@
 		070D33A218018AAD0054BA23 /* Tests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Tests-Info.plist"; sourceTree = "<group>"; };
 		070D33A318018AAD0054BA23 /* Tests-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Tests-Prefix.pch"; sourceTree = "<group>"; };
 		070D33D11801A0770054BA23 /* CDEGlobalIdentifierTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEGlobalIdentifierTests.m; sourceTree = "<group>"; };
+		072BA97D180AACD9003AA94E /* CDEEventStoreModel_0.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_0.xcdatamodel; sourceTree = "<group>"; };
+		072BA97E180AACD9003AA94E /* CDEEventStoreModel_1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_1.xcdatamodel; sourceTree = "<group>"; };
 		075B3FAF18096B610089D4D3 /* CDEDropboxCloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEDropboxCloudFileSystem.h; sourceTree = "<group>"; };
 		075B3FB018096B610089D4D3 /* CDEDropboxCloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEDropboxCloudFileSystem.m; sourceTree = "<group>"; };
 		075B3FB218096C720089D4D3 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		075B3FC7180979580089D4D3 /* DropboxSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = DropboxSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		075B3FCE18097A370089D4D3 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		075B3FE618097C710089D4D3 /* DropboxSDK.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = file; name = DropboxSDK.xcodeproj; path = ../Vendor/DropboxSDK/DropboxSDK/DropboxSDK.xcodeproj; sourceTree = "<group>"; };
-		078ABF4D17F191BA008C9B27 /* CDEEventStoreModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel.xcdatamodel; sourceTree = "<group>"; };
+		075B3FE618097C710089D4D3 /* DropboxSDK.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = DropboxSDK.xcodeproj; path = ../Vendor/DropboxSDK/DropboxSDK/DropboxSDK.xcodeproj; sourceTree = "<group>"; };
 		07BF374517F184DD00C56F64 /* libensembles_ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libensembles_ios.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		07BF374817F184DD00C56F64 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		07BF376F17F1853000C56F64 /* CDECloudDirectory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDECloudDirectory.h; sourceTree = "<group>"; };
@@ -339,6 +361,16 @@
 			name = "Sync System Tests";
 			sourceTree = "<group>";
 		};
+		072BA963180AA4A4003AA94E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				072BA969180AA4A4003AA94E /* DropboxSDK.framework */,
+				072BA96B180AA4A4003AA94E /* libSDropboxSDK.a */,
+				072BA96D180AA4A4003AA94E /* DropboxOSX.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		07BF373C17F184DD00C56F64 = {
 			isa = PBXGroup;
 			children = (
@@ -463,7 +495,7 @@
 		07BF379817F1853000C56F64 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				078ABF4C17F191BA008C9B27 /* CDEEventStoreModel.xcdatamodeld */,
+				072BA97C180AACD9003AA94E /* CDEEventStoreModel.xcdatamodeld */,
 				07BF379917F1853000C56F64 /* CDEEventRevision.h */,
 				07BF379A17F1853000C56F64 /* CDEEventRevision.m */,
 				07BF379D17F1853000C56F64 /* CDEGlobalIdentifier.h */,
@@ -566,6 +598,12 @@
 			mainGroup = 07BF373C17F184DD00C56F64;
 			productRefGroup = 07BF374617F184DD00C56F64 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 072BA963180AA4A4003AA94E /* Products */;
+					ProjectRef = 075B3FE618097C710089D4D3 /* DropboxSDK.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				07BF374417F184DD00C56F64 /* Ensembles iOS */,
@@ -573,6 +611,30 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		072BA969180AA4A4003AA94E /* DropboxSDK.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = DropboxSDK.framework;
+			remoteRef = 072BA968180AA4A4003AA94E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		072BA96B180AA4A4003AA94E /* libSDropboxSDK.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libSDropboxSDK.a;
+			remoteRef = 072BA96A180AA4A4003AA94E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		072BA96D180AA4A4003AA94E /* DropboxOSX.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = DropboxOSX.framework;
+			remoteRef = 072BA96C180AA4A4003AA94E /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		070D335F18018A960054BA23 /* Resources */ = {
@@ -615,6 +677,7 @@
 				070D33B318018AAD0054BA23 /* CDEPersistentStoreEnsembleTests.m in Sources */,
 				070D33B818018AAD0054BA23 /* CDEStoreModificationEventTests.m in Sources */,
 				070D33D21801A0770054BA23 /* CDEGlobalIdentifierTests.m in Sources */,
+				072BA980180AAD0E003AA94E /* CDEEventStoreModel.xcdatamodeld in Sources */,
 				070D33B018018AAD0054BA23 /* CDEMockCloudFileSystem.m in Sources */,
 				070D33A718018AAD0054BA23 /* CDEDeviceRevisionTests.m in Sources */,
 				070D33AF18018AAD0054BA23 /* CDEIntegratorUpdateTests.m in Sources */,
@@ -625,7 +688,6 @@
 				070D33B918018AAD0054BA23 /* CDEStoreModificationEventTestsModel.xcdatamodeld in Sources */,
 				070D33A818018AAD0054BA23 /* CDEEventDeviceRevisionTests.m in Sources */,
 				070D33AD18018AAD0054BA23 /* CDEIntegratorTestCase.m in Sources */,
-				070D33CE18018C950054BA23 /* CDEEventStoreModel.xcdatamodeld in Sources */,
 				070D33B518018AAD0054BA23 /* CDERevisionManagerTests.m in Sources */,
 				070D33B218018AAD0054BA23 /* CDEOneWaySyncTests.m in Sources */,
 			);
@@ -637,7 +699,6 @@
 			files = (
 				07BF37BC17F1853000C56F64 /* CDEEventRevision.m in Sources */,
 				07BF37B917F1853000C56F64 /* CDEDefines.m in Sources */,
-				078ABF4E17F191BA008C9B27 /* CDEEventStoreModel.xcdatamodeld in Sources */,
 				07BF37BF17F1853000C56F64 /* CDEObjectChange.m in Sources */,
 				07BF37CD17F1854F00C56F64 /* CDELocalCloudFileSystem.m in Sources */,
 				07BF37C217F1853000C56F64 /* CDERevisionManager.m in Sources */,
@@ -649,6 +710,7 @@
 				07BF37C017F1853000C56F64 /* CDEStoreModificationEvent.m in Sources */,
 				07BF37B117F1853000C56F64 /* CDEPersistentStoreImporter.m in Sources */,
 				07BF37C117F1853000C56F64 /* CDERevision.m in Sources */,
+				072BA97F180AACD9003AA94E /* CDEEventStoreModel.xcdatamodeld in Sources */,
 				07BF37B717F1853000C56F64 /* CDESaveMonitor.m in Sources */,
 				07BF37B817F1853000C56F64 /* CDEAsynchronousTaskQueue.m in Sources */,
 				07BF37B317F1853000C56F64 /* CDEEventIntegrator.m in Sources */,
@@ -869,12 +931,13 @@
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};
-		078ABF4C17F191BA008C9B27 /* CDEEventStoreModel.xcdatamodeld */ = {
+		072BA97C180AACD9003AA94E /* CDEEventStoreModel.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				078ABF4D17F191BA008C9B27 /* CDEEventStoreModel.xcdatamodel */,
+				072BA97D180AACD9003AA94E /* CDEEventStoreModel_0.xcdatamodel */,
+				072BA97E180AACD9003AA94E /* CDEEventStoreModel_1.xcdatamodel */,
 			);
-			currentVersion = 078ABF4D17F191BA008C9B27 /* CDEEventStoreModel.xcdatamodel */;
+			currentVersion = 072BA97E180AACD9003AA94E /* CDEEventStoreModel_1.xcdatamodel */;
 			name = CDEEventStoreModel.xcdatamodeld;
 			path = ../../Resources/CDEEventStoreModel.xcdatamodeld;
 			sourceTree = "<group>";

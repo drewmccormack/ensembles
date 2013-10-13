@@ -15,6 +15,7 @@
 
 @implementation CDEStoreModificationEvent
 
+@dynamic uniqueIdentifier;
 @dynamic type;
 @dynamic timestamp;
 @dynamic eventRevision;
@@ -22,6 +23,22 @@
 @dynamic modelVersion;
 @dynamic objectChanges;
 @dynamic globalCount;
+
+
+#pragma mark - Awaking
+
+- (void)awakeFromInsert
+{
+    [super awakeFromInsert];
+    self.uniqueIdentifier = [[NSProcessInfo processInfo] globallyUniqueString];
+}
+
+- (void)awakeFromFetch
+{
+    [super awakeFromFetch];
+    if (!self.uniqueIdentifier) self.uniqueIdentifier = [[NSProcessInfo processInfo] globallyUniqueString];
+}
+
 
 #pragma mark - Revisions
 

@@ -83,7 +83,8 @@ static NSString *testStoreFile;
     NSURL *modelURL = [[NSBundle bundleForClass:self.class] URLForResource:@"CDEEventStoreModel" withExtension:@"momd"];
     NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
     NSPersistentStoreCoordinator *psc = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:model];
-    [psc addPersistentStoreWithType:NSInMemoryStoreType configuration:nil URL:nil options:nil error:NULL];
+    NSDictionary *options = @{NSMigratePersistentStoresAutomaticallyOption: @YES, NSInferMappingModelAutomaticallyOption: @YES};
+    [psc addPersistentStoreWithType:NSInMemoryStoreType configuration:nil URL:nil options:options error:NULL];
     
     eventStore = [[CDEMockEventStore alloc] init];
     eventStore.containsEventData = YES;

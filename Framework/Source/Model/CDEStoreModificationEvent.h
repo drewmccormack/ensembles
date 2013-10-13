@@ -14,14 +14,15 @@
 @class CDERevisionSet;
 
 typedef NS_ENUM(int16_t, CDEStoreModificationEventType) {
-    CDEStoreModificationEventTypeBaseline  = 100,
-    CDEStoreModificationEventTypeSave = 200,
-    CDEStoreModificationEventTypeMerge = 300
+    CDEStoreModificationEventTypeBaseline   = 100,
+    CDEStoreModificationEventTypeSave       = 200,
+    CDEStoreModificationEventTypeMerge      = 300
 };
 
 
 @interface CDEStoreModificationEvent : NSManagedObject
 
+@property (nonatomic) NSString *uniqueIdentifier;
 @property (nonatomic) CDEStoreModificationEventType type;
 @property (nonatomic, retain) CDEEventRevision *eventRevision;
 @property (nonatomic, retain) NSSet *eventRevisionsOfOtherStores;
