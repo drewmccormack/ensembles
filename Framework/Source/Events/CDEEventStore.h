@@ -19,6 +19,9 @@
 @property (nonatomic, readonly) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, readonly) BOOL containsEventData;
 
+@property (nonatomic, readonly) NSArray *incompleteEventIdentifiers;
+@property (nonatomic, readonly) NSArray *incompleteMandatoryEventIdentifiers;
+
 @property (nonatomic, readonly) CDERevisionNumber lastSaveRevision;
 @property (nonatomic, readonly) CDERevisionNumber lastMergeRevision;
 @property (nonatomic, readonly) CDERevisionNumber lastRevision;
@@ -32,5 +35,8 @@
 
 - (BOOL)removeEventStore;
 - (BOOL)prepareNewEventStore:(NSError * __autoreleasing *)error;
+
+- (void)registerIncompleteEventIdentifier:(NSString *)identifier isMandatory:(BOOL)mandatory;
+- (void)deregisterIncompleteEventIdentifier:(NSString *)identifier;
 
 @end

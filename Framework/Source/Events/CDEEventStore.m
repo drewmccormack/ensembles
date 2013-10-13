@@ -12,7 +12,8 @@
 
 
 NSString * const kCDEPersistentStoreIdentifierKey = @"persistentStoreIdentifier";
-NSString * const kCDECloudFileSystemIdentity = @"cloudFileSystemIdentity";
+NSString * const kCDECloudFileSystemIdentityKey = @"cloudFileSystemIdentity";
+NSString * const kCDEIncompleteEventIdentifiersKey = @"incompleteEventIdentifiers";
 
 static NSString *defaultPathToEventDataRootDirectory = nil;
 
@@ -31,6 +32,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 
 
 @implementation CDEEventStore {
+    NSMutableDictionary *incompleteEventIdentifiers;
 }
 
 @synthesize ensembleIdentifier = ensembleIdentifier;
@@ -60,18 +62,9 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
         if (!pathToEventDataRootDirectory) pathToEventDataRootDirectory = [self.class defaultPathToEventDataRootDirectory];
         
         ensembleIdentifier = [newIdentifier copy];
+        incompleteEventIdentifiers = nil;
         
-        NSString *path = self.pathToStoreInfoFile;
-        NSDictionary *storeMetadata = [NSDictionary dictionaryWithContentsOfFile:path];
-        if (storeMetadata) {
-            NSData *identityData = storeMetadata[kCDECloudFileSystemIdentity];
-            cloudFileSystemIdentityToken = identityData ? [NSKeyedUnarchiver unarchiveObjectWithData:identityData] : nil;
-            persistentStoreIdentifier = storeMetadata[kCDEPersistentStoreIdentifierKey];
-        }
-        else {
-            cloudFileSystemIdentityToken = nil;
-            persistentStoreIdentifier = nil;
-        }
+        [self restoreStoreMetadata];
 
         NSError *error;
         if (self.persistentStoreIdentifier && ![self setupCoreDataStack:&error] ) {
@@ -88,7 +81,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 }
 
 
-#pragma mark Store Info
+#pragma mark - Store Metadata
 
 - (void)saveStoreMetadata
 {
@@ -97,7 +90,8 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
         NSData *identityData = [NSKeyedArchiver archivedDataWithRootObject:self.cloudFileSystemIdentityToken];
         dictionary = @{
            kCDEPersistentStoreIdentifierKey : self.persistentStoreIdentifier,
-           kCDECloudFileSystemIdentity : identityData
+           kCDECloudFileSystemIdentityKey : identityData,
+           kCDEIncompleteEventIdentifiersKey : incompleteEventIdentifiers
         };
     }
     
@@ -106,8 +100,59 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
     }
 }
 
+- (void)restoreStoreMetadata
+{
+    NSString *path = self.pathToStoreInfoFile;
+    NSDictionary *storeMetadata = [NSDictionary dictionaryWithContentsOfFile:path];
+    if (storeMetadata) {
+        NSData *identityData = storeMetadata[kCDECloudFileSystemIdentityKey];
+        cloudFileSystemIdentityToken = identityData ? [NSKeyedUnarchiver unarchiveObjectWithData:identityData] : nil;
+        persistentStoreIdentifier = storeMetadata[kCDEPersistentStoreIdentifierKey];
+        incompleteEventIdentifiers = [storeMetadata[kCDEIncompleteEventIdentifiersKey] mutableCopy];
+    }
+    else {
+        cloudFileSystemIdentityToken = nil;
+        persistentStoreIdentifier = nil;
+    }
+    
+    if (!incompleteEventIdentifiers) {
+        incompleteEventIdentifiers = [NSMutableDictionary dictionary];
+    }
+}
 
-#pragma mark Revisions
+
+#pragma mark - Incomplete Events
+
+- (void)registerIncompleteEventIdentifier:(NSString *)identifier isMandatory:(BOOL)mandatory
+{
+    [incompleteEventIdentifiers setObject:@(mandatory) forKey:identifier];
+    [self saveStoreMetadata];
+}
+
+- (void)deregisterIncompleteEventIdentifier:(NSString *)identifier
+{
+    [incompleteEventIdentifiers removeObjectForKey:identifier];
+    [self saveStoreMetadata];
+}
+
+- (NSArray *)incompleteEventIdentifiers
+{
+    return [incompleteEventIdentifiers.allKeys copy];
+}
+
+- (NSArray *)incompleteMandatoryEventIdentifiers
+{
+    NSMutableArray *result = [NSMutableArray arrayWithCapacity:incompleteEventIdentifiers.count];
+    for (NSString *identifier in incompleteEventIdentifiers) {
+        if ([incompleteEventIdentifiers[identifier] boolValue]) {
+            [result addObject:identifier];
+        }
+    }
+    return result;
+}
+
+
+#pragma mark - Revisions
 
 - (CDERevisionNumber)lastRevisionNumberForEventRevisionPredicate:(NSPredicate *)predicate
 {
@@ -152,7 +197,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 }
 
 
-#pragma mark Flushing out queued operations
+#pragma mark - Flushing out queued operations
 
 - (void)flush:(NSError * __autoreleasing *)error
 {
@@ -163,7 +208,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 }
 
 
-#pragma mark Removing and Installing
+#pragma mark - Removing and Installing
 
 - (BOOL)prepareNewEventStore:(NSError * __autoreleasing *)error
 {
@@ -197,7 +242,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 }
 
 
-#pragma mark Paths
+#pragma mark - Paths
 
 + (NSString *)defaultPathToEventDataRootDirectory
 {
@@ -248,7 +293,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 }
 
 
-#pragma mark Core Data Stack
+#pragma mark - Core Data Stack
 
 - (BOOL)setupCoreDataStack:(NSError * __autoreleasing *)error
 {
@@ -280,7 +325,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 }
 
 
-#pragma mark Merging Changes
+#pragma mark - Merging Changes
 
 - (void)managedObjectContextDidSave:(NSNotification *)notif
 {
