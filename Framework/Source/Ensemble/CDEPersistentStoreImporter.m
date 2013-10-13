@@ -38,7 +38,7 @@
     context.persistentStoreCoordinator = coordinator;
     
     NSURL *storeURL = [NSURL fileURLWithPath:persistentStorePath];
-    NSDictionary *options = @{NSReadOnlyPersistentStoreOption: @YES};
+    NSDictionary *options = @{NSMigratePersistentStoresAutomaticallyOption: @YES, NSInferMappingModelAutomaticallyOption: @YES};
     [coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:options error:&error];
     
     if (error) {

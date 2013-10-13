@@ -133,12 +133,12 @@ static NSString *kCDEDefaultStoreType;
                 @autoreleasepool {
                     NSURL *fileURL = [NSURL fileURLWithPath:path];
                     
-                    NSDictionary *options = @{NSReadOnlyPersistentStoreOption: @YES};
                     NSDictionary *metadata = [NSPersistentStoreCoordinator metadataForPersistentStoreOfType:nil URL:fileURL error:&error];
                     NSString *storeType = metadata[NSStoreTypeKey];
                     if (!storeType) @throw [[NSException alloc] initWithName:CDEException reason:@"" userInfo:nil];
                     
                     [importContext.persistentStoreCoordinator lock];
+                    NSDictionary *options = @{NSMigratePersistentStoresAutomaticallyOption: @YES, NSInferMappingModelAutomaticallyOption: @YES};
                     fileStore = [importContext.persistentStoreCoordinator addPersistentStoreWithType:storeType configuration:nil URL:fileURL options:options error:&error];
                     [importContext.persistentStoreCoordinator unlock];
                     if (!fileStore) @throw [[NSException alloc] initWithName:CDEException reason:@"" userInfo:nil];
