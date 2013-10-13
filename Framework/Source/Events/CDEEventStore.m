@@ -113,6 +113,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
     else {
         cloudFileSystemIdentityToken = nil;
         persistentStoreIdentifier = nil;
+        incompleteEventIdentifiers = nil;
     }
     
     if (!incompleteEventIdentifiers) {
@@ -224,6 +225,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
     
     // Store store info
     persistentStoreIdentifier = [[NSProcessInfo processInfo] globallyUniqueString];
+    incompleteEventIdentifiers = [NSMutableDictionary dictionary];
     [self saveStoreMetadata];
     
     return YES;
@@ -232,6 +234,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 - (BOOL)removeEventStore
 {
     self.persistentStoreIdentifier = nil;
+    incompleteEventIdentifiers = nil;
     [self tearDownCoreDataStack];
     return [[NSFileManager defaultManager] removeItemAtPath:self.pathToEventStoreRootDirectory error:NULL];
 }

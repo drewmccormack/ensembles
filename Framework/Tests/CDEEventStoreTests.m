@@ -52,9 +52,17 @@ static NSString *rootTestDirectory;
     XCTAssertEqualObjects(store.ensembleIdentifier, @"test", @"Wrong ensembled identifier");
 }
 
-- (void)testHasNopersistentStoreIdentifierBeforeInstall
+- (void)testHasNoPersistentStoreIdentifierBeforeInstall
 {
     XCTAssertNil(store.persistentStoreIdentifier, @"Should not have store id");
+}
+
+- (void)testHasNoIncompleteEventsBeforeInstall
+{
+    XCTAssertNotNil(store.incompleteEventIdentifiers, @"Should return empty array for ids");
+    XCTAssertNotNil(store.incompleteMandatoryEventIdentifiers, @"Should return empty array for mandatory ids");
+    XCTAssertEqual(store.incompleteEventIdentifiers.count, (NSUInteger)0, @"Should have no ids");
+    XCTAssertEqual(store.incompleteMandatoryEventIdentifiers.count, (NSUInteger)0, @"Should have no mandatory ids");
 }
 
 - (void)testInstallingEventStore
@@ -62,10 +70,53 @@ static NSString *rootTestDirectory;
     XCTAssertTrue([store prepareNewEventStore:NULL], @"Install failed");
 }
 
-- (void)testHaspersistentStoreIdentifierAfterInstall
+- (void)testHasPersistentStoreIdentifierAfterInstall
 {
     [store prepareNewEventStore:NULL];
     XCTAssertNotNil(store.persistentStoreIdentifier, @"Should have store id");
+}
+
+- (void)testRegisteringIncompleteEvent
+{
+    [store prepareNewEventStore:NULL];
+    [store registerIncompleteEventIdentifier:@"TestID" isMandatory:NO];
+    XCTAssertEqual(store.incompleteEventIdentifiers.count, (NSUInteger)1, @"Should have one incomplete");
+    XCTAssertEqualObjects(store.incompleteEventIdentifiers[0], @"TestID", @"Wrong id");
+    XCTAssertEqual(store.incompleteMandatoryEventIdentifiers.count, (NSUInteger)0, @"Should have no mandatory");
+}
+
+- (void)testRegisteringIncompleteMandatoryEvent
+{
+    [store prepareNewEventStore:NULL];
+    [store registerIncompleteEventIdentifier:@"TestID" isMandatory:YES];
+    XCTAssertEqual(store.incompleteEventIdentifiers.count, (NSUInteger)1, @"Should have one incomplete");
+    XCTAssertEqualObjects(store.incompleteEventIdentifiers[0], @"TestID", @"Wrong id");
+    XCTAssertEqual(store.incompleteMandatoryEventIdentifiers.count, (NSUInteger)1, @"Should have no mandatory");
+}
+
+- (void)testDeregisteringIncompleteEvent
+{
+    [store prepareNewEventStore:NULL];
+    [store registerIncompleteEventIdentifier:@"TestID" isMandatory:NO];
+    [store deregisterIncompleteEventIdentifier:@"TestID"];
+    XCTAssertEqual(store.incompleteEventIdentifiers.count, (NSUInteger)0, @"Should have one incomplete");
+}
+
+- (void)testDeregisteringIncompleteMandatoryEvent
+{
+    [store prepareNewEventStore:NULL];
+    [store registerIncompleteEventIdentifier:@"TestID" isMandatory:YES];
+    [store deregisterIncompleteEventIdentifier:@"TestID"];
+    XCTAssertEqual(store.incompleteEventIdentifiers.count, (NSUInteger)0, @"Should have one incomplete");
+}
+
+- (void)testPersistenceOfIncompleteEvents
+{
+    [store prepareNewEventStore:NULL];
+    [store registerIncompleteEventIdentifier:@"TestID" isMandatory:NO];
+    
+    CDEEventStore *newStore = [[CDEEventStore alloc] initWithEnsembleIdentifier:@"test" pathToEventDataRootDirectory:nil];
+    XCTAssertEqual(newStore.incompleteEventIdentifiers.count, (NSUInteger)1, @"Should have one incomplete");
 }
 
 - (void)testManagedObjectContextNilBeforeInstall
