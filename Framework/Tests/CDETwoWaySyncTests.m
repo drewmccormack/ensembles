@@ -105,4 +105,70 @@
     XCTAssertEqualObjects([newParentOnDevice1 valueForKey:@"name"], @"newdad", @"Wrong name for new parent");
 }
 
+- (void)testUpdateOrderedRelationship
+{
+    [self leechStores];
+    
+    id parent = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context1];
+
+    id child1OnDevice1 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context1];
+    id child2OnDevice1 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context1];
+    id child3OnDevice1 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context1];
+    
+    [child1OnDevice1 setName:@"child1"];
+    [child2OnDevice1 setName:@"child2"];
+    [child3OnDevice1 setName:@"child3"];
+    
+    NSOrderedSet *set = [NSOrderedSet orderedSetWithArray:@[ child1OnDevice1, child2OnDevice1, child3OnDevice1]];
+    
+    [parent setValue:set forKey:@"orderedChildren"];
+
+    XCTAssertTrue([context1 save:NULL], @"Could not save");
+
+    [context1 refreshObject:parent mergeChanges:NO];
+    
+    set = [parent valueForKey:@"orderedChildren"];
+    for (int idx = 0; idx<3; idx++) {
+        id obj = [set objectAtIndex:idx];
+        NSLog(@"in test 2: %@", [obj valueForKey:@"name"]);
+    }
+
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
+    NSArray *parents = [context2 executeFetchRequest:fetch error:NULL];
+    id parentOnDevice2 = parents.lastObject;
+    XCTAssertNil(parentOnDevice2, @"Expected no Parent entities");
+
+    // This sync will move the object into the second context
+    XCTAssertNil([self syncChanges], @"Sync failed");
+
+    fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
+    parents = [context2 executeFetchRequest:fetch error:NULL];
+    parentOnDevice2 = parents.lastObject;
+
+    NSMutableOrderedSet *childrenOnDevice2 = [[parentOnDevice2 valueForKey:@"orderedChildren"] mutableCopy];
+    XCTAssert(childrenOnDevice2.count == 3, @"Expected 3 children");
+
+    // Reorder the children on device 2
+    [childrenOnDevice2 moveObjectsAtIndexes:[NSIndexSet indexSetWithIndex:2] toIndex:1];
+
+    [parentOnDevice2 setValue:childrenOnDevice2 forKey:@"orderedChildren"];
+
+    XCTAssertTrue([context2 save:NULL], @"Could not save");
+    
+    XCTAssertNil([self syncChanges], @"Sync failed");
+
+    [context1 refreshObject:parent mergeChanges:NO];
+
+    id parentOnDevice1 = [child1OnDevice1 valueForKey:@"orderedParent"];
+    [context1 refreshObject:parentOnDevice1 mergeChanges:NO];
+
+    NSOrderedSet *orderedChildrenOnDevice1 = [parentOnDevice1 valueForKey:@"orderedChildren"];
+    XCTAssert(orderedChildrenOnDevice1.count == 3, @"Expected 3 children");
+    XCTAssertNotNil(parentOnDevice1, @"No parent");
+
+    XCTAssertTrue(orderedChildrenOnDevice1.array[0] == child1OnDevice1, @"Incorrect order");
+    XCTAssertTrue(orderedChildrenOnDevice1.array[1] == child3OnDevice1, @"Incorrect order");
+    XCTAssertTrue(orderedChildrenOnDevice1.array[2] == child2OnDevice1, @"Incorrect order");
+}
+
 @end

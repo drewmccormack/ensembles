@@ -47,12 +47,19 @@
             [self storeAttributeChangeForDescription:(id)propertyDesc newValue:newValue];
         }
         else if ([propertyDesc isKindOfClass:[NSRelationshipDescription class]] && [(NSRelationshipDescription *)propertyDesc isToMany]) {
-            NSSet *committed = nil;
+            id committed = nil;
             if (object.changedValues.count != 0) {
                 NSDictionary *committedValues = [object committedValuesForKeys:@[propertyDesc.name]];
                 committed = committedValues[propertyDesc.name];
+
             }
-            [self storeToManyRelationshipChangeForDescription:(id)propertyDesc committedValue:committed newValue:newValue];
+
+            NSRelationshipDescription *relationshipDescription = (NSRelationshipDescription *)propertyDesc;
+            if (relationshipDescription.isOrdered) {
+                [self storeOrderedToManyRelationshipChangeForDescription:relationshipDescription committedValue:committed newValue:newValue];
+            } else {
+                [self storeToManyRelationshipChangeForDescription:(id)propertyDesc committedValue:committed newValue:newValue];
+            }
         }
         else if ([propertyDesc isKindOfClass:[NSRelationshipDescription class]] && ![(NSRelationshipDescription *)propertyDesc isToMany]) {
             [self storeToOneRelationshipChangeForDescription:(id)propertyDesc newValue:newValue];
@@ -72,6 +79,7 @@
         self.relatedIdentifier = nil;
         self.addedIdentifiers = nil;
         self.removedIdentifiers = nil;
+        self.movedIdentifiers = nil;
     }
     return self;
 }
@@ -88,6 +96,7 @@
         self.relatedIdentifier = [aDecoder decodeObjectForKey:@"relatedIdentifier"];
         self.addedIdentifiers = [aDecoder decodeObjectForKey:@"addedIdentifiers"];
         self.removedIdentifiers = [aDecoder decodeObjectForKey:@"removedIdentifiers"];
+        self.movedIdentifiers = [aDecoder decodeObjectForKey:@"movedIdentifiers"];
         self.type = [aDecoder decodeIntegerForKey:@"type"];
     }
     return self;
@@ -102,6 +111,7 @@
     [aCoder encodeObject:self.relatedIdentifier forKey:@"relatedIdentifier"];
     [aCoder encodeObject:self.addedIdentifiers forKey:@"addedIdentifiers"];
     [aCoder encodeObject:self.removedIdentifiers forKey:@"removedIdentifiers"];
+    [aCoder encodeObject:self.movedIdentifiers forKey:@"movedIdentifiers"];
     [aCoder encodeInteger:self.type forKey:@"type"];
 }
 
@@ -133,6 +143,7 @@
 
 - (void)storeToManyRelationshipChangeForDescription:(NSPropertyDescription *)propertyDesc committedValue:(NSSet *)committedValue newValue:(id)newValue
 {
+    NSAssert(committedValue == nil || [committedValue isKindOfClass:[NSSet class]], @"Expected a set");
     NSSet *newRelatedObjects = newValue;
     NSSet *addedObjects, *removedObjects;
     if (committedValue) {
@@ -161,6 +172,77 @@
     context = [removedObjects.anyObject managedObjectContext];
     if (context && ![context obtainPermanentIDsForObjects:removedObjects.allObjects error:&error]) {
         NSLog(@"Failed to get permanent ids: %@", error);
+    }
+    
+    self.addedIdentifiers = [addedObjects valueForKeyPath:@"objectID"];
+    self.removedIdentifiers = [removedObjects valueForKeyPath:@"objectID"];
+    self.movedIdentifiers = nil;
+    self.type = CDEPropertyChangeTypeToManyRelationship;
+}
+
+- (void)storeOrderedToManyRelationshipChangeForDescription:(NSRelationshipDescription *)propertyDesc committedValue:(NSOrderedSet *)committedValue newValue:(id)newValue
+{
+    NSAssert(committedValue == nil || [committedValue isKindOfClass:[NSOrderedSet class]], @"Expected an ordered set");
+    NSOrderedSet *newRelatedObjects = newValue;
+    
+    NSSet *addedObjects, *removedObjects;
+    if (committedValue) {
+        // Determine the added and removed by comparing with committed values
+        NSMutableSet *mutableAdded = [NSMutableSet setWithSet:[newRelatedObjects set]];
+        [mutableAdded minusSet:[committedValue set]];
+        addedObjects = mutableAdded;
+        
+         NSMutableSet *mutableRemoved = [NSMutableSet setWithSet:[committedValue set]];
+        [mutableRemoved minusSet:[newRelatedObjects set]];
+        removedObjects = mutableRemoved;
+    }
+    else {
+        addedObjects = [newRelatedObjects set];
+        removedObjects = [NSSet set];
+    }
+    
+    NSError *error;
+    NSManagedObjectContext *context = nil;
+    
+    context = [addedObjects.anyObject managedObjectContext];
+    if (context && ![context obtainPermanentIDsForObjects:addedObjects.allObjects error:&error]) {
+        NSLog(@"Failed to get permanent ids: %@", error);
+    }
+    
+    context = [removedObjects.anyObject managedObjectContext];
+    if (context && ![context obtainPermanentIDsForObjects:removedObjects.allObjects error:&error]) {
+        NSLog(@"Failed to get permanent ids: %@", error);
+    }
+    
+    // Store indexes for any new entries or entries whose index has changed
+    NSMutableDictionary *movedObjects = [NSMutableDictionary dictionary];
+    for (NSInteger idx = 0; idx < newRelatedObjects.count; idx++) {
+        NSManagedObject *newObjectAtIdx = [newRelatedObjects objectAtIndex:idx];
+        BOOL shouldStore = NO;
+        if (idx > committedValue.count) {
+            shouldStore = YES;
+        } else {
+            shouldStore = !([[committedValue objectAtIndex:idx] isEqual:newObjectAtIdx]);
+        }
+        
+        if (shouldStore) {
+            [movedObjects setObject:newObjectAtIdx forKey:@(idx)];
+        }
+    }
+
+    // Turn moved objects into objectIDs
+    if (movedObjects.count > 0) {
+        NSManagedObjectContext *context = [[movedObjects.allValues lastObject] managedObjectContext];
+        if (context && ![context obtainPermanentIDsForObjects:movedObjects.allValues error:&error]) {
+            NSLog(@"Failed to get permanent ids: %@", error);
+        }
+
+        NSMutableDictionary *finalMovedObjects = [NSMutableDictionary dictionary];
+        [movedObjects enumerateKeysAndObjectsUsingBlock:^(NSNumber *index, NSManagedObject *obj, BOOL *stop) {
+            [finalMovedObjects setObject:obj.objectID forKey:index];
+        }];
+
+        self.movedIdentifiers = finalMovedObjects;
     }
     
     self.addedIdentifiers = [addedObjects valueForKeyPath:@"objectID"];

@@ -292,6 +292,7 @@
         if (propertyChange.relatedIdentifier) [objectIDs addObject:propertyChange.relatedIdentifier];
         if (propertyChange.addedIdentifiers) [objectIDs unionSet:propertyChange.addedIdentifiers];
         if (propertyChange.removedIdentifiers) [objectIDs unionSet:propertyChange.removedIdentifiers];
+        if (propertyChange.movedIdentifiers) [objectIDs addObjectsFromArray:propertyChange.movedIdentifiers.allValues];
     }
     [objectIDs removeObject:[NSNull null]];
     NSArray *orderedObjectIDs = objectIDs.allObjects;
@@ -335,6 +336,18 @@
             
             propertyChange.addedIdentifiers = [NSSet setWithArray:[addedGlobalIdentifiers valueForKeyPath:@"globalIdentifier"]];
             propertyChange.removedIdentifiers = [NSSet setWithArray:[removedGlobalIdentifiers valueForKeyPath:@"globalIdentifier"]];
+
+            if (propertyChange.movedIdentifiers.count > 0) {
+                NSMutableDictionary *newMovedIdentifiers = [NSMutableDictionary dictionary];
+                for (NSNumber *idx in propertyChange.movedIdentifiers.allKeys) {
+                    id objectID = propertyChange.movedIdentifiers[idx];
+                    id globalIdentifier = [[globalIdentifiersByObjectID objectForKey:objectID] globalIdentifier];
+                    NSAssert(globalIdentifier != nil, @"Expected a global ID for object");
+                    newMovedIdentifiers[idx] = globalIdentifier;
+                }
+                
+                propertyChange.movedIdentifiers = newMovedIdentifiers;
+            }
         }
             break;
             

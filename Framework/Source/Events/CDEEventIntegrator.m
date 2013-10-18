@@ -446,8 +446,13 @@
                 
                 NSRelationshipDescription *description = entity.relationshipsByName[relationshipName];
                 if (description.isToMany && [related count] > 0) {
-                    related = [object mutableSetValueForKey:relationshipName];
-                    [related removeAllObjects];
+                    if (description.isOrdered) {
+                        related = [object mutableOrderedSetValueForKey:relationshipName];
+                        [related removeAllObjects];
+                    } else {
+                        related = [object mutableSetValueForKey:relationshipName];
+                        [related removeAllObjects];
+                    }
                 }
                 else {
                     [self setValue:nil forKey:relationshipName inObject:object];
@@ -567,24 +572,61 @@
             continue;
         }
         
-        NSMutableSet *relatedObjects = [object mutableSetValueForKey:relationshipChange.propertyName];
-        for (NSString *identifier in relationshipChange.addedIdentifiers) {
-            id newRelatedObject = [objectsByGlobalId objectForKey:identifier];
-            if (newRelatedObject)
-                [relatedObjects addObject:newRelatedObject];
-            else
-                CDELog(CDELoggingLevelWarning, @"Could not find object with identifier while adding to relationship. Skipping: %@", identifier);
-        }
-        
-        for (NSString *identifier in relationshipChange.removedIdentifiers) {
-            id removedObject = [objectsByGlobalId objectForKey:identifier];
-            if (removedObject)
-                [relatedObjects removeObject:removedObject];
-            else
-                CDELog(CDELoggingLevelWarning, @"Could not find object with identifier to remove from relationship. Skipping: %@", identifier);
+        if (relationship.isOrdered) {
+            // The current set
+            NSMutableOrderedSet *relatedObjects = [object mutableOrderedSetValueForKey:relationshipChange.propertyName];
+
+            for (NSString *identifier in relationshipChange.addedIdentifiers) {
+                id newRelatedObject = [objectsByGlobalId objectForKey:identifier];
+                if (newRelatedObject)
+                    [relatedObjects addObject:newRelatedObject];
+                else
+                    CDELog(CDELoggingLevelWarning, @"Could not find object with identifier while adding to relationship. Skipping: %@", identifier);
+            }
+            
+            for (NSString *identifier in relationshipChange.removedIdentifiers) {
+                id removedObject = [objectsByGlobalId objectForKey:identifier];
+                if (removedObject)
+                    [relatedObjects removeObject:removedObject];
+                else
+                    CDELog(CDELoggingLevelWarning, @"Could not find object with identifier to remove from relationship. Skipping: %@", identifier);
+            }
+
+            // Apply the ordering in movedIdentifiers
+            NSDictionary *movedIdentifiers = relationshipChange.movedIdentifiers;
+            if (movedIdentifiers != nil) {
+                NSArray *sortedIndices = [movedIdentifiers.allKeys sortedArrayUsingSelector:@selector(compare:)];
+                NSMutableOrderedSet *newRelatedObjects = [relatedObjects mutableCopy];
+                for (NSNumber *idx in sortedIndices) {
+                    id globalID = movedIdentifiers[idx];
+                    NSManagedObject *objectToMove = [objectsByGlobalId objectForKey:globalID];
+                    NSUInteger srcIdx = [newRelatedObjects indexOfObject:objectToMove];
+                    [newRelatedObjects moveObjectsAtIndexes:[NSIndexSet indexSetWithIndex:srcIdx] toIndex:idx.unsignedIntegerValue];
+                }
+
+                [self setValue:newRelatedObjects forKey:relationshipChange.propertyName inObject:object];
+            }
+        } else {
+            NSMutableSet *relatedObjects = [object mutableSetValueForKey:relationshipChange.propertyName];
+            for (NSString *identifier in relationshipChange.addedIdentifiers) {
+                id newRelatedObject = [objectsByGlobalId objectForKey:identifier];
+                if (newRelatedObject)
+                    [relatedObjects addObject:newRelatedObject];
+                else
+                    CDELog(CDELoggingLevelWarning, @"Could not find object with identifier while adding to relationship. Skipping: %@", identifier);
+            }
+            
+            for (NSString *identifier in relationshipChange.removedIdentifiers) {
+                id removedObject = [objectsByGlobalId objectForKey:identifier];
+                if (removedObject)
+                    [relatedObjects removeObject:removedObject];
+                else
+                    CDELog(CDELoggingLevelWarning, @"Could not find object with identifier to remove from relationship. Skipping: %@", identifier);
+            }
         }
     }
 }
+
 
 #pragma mark Repairing (Conflict Resolution)
 
@@ -725,6 +767,7 @@
             if (value.relatedIdentifier) [globalIdStrings addObject:value.relatedIdentifier];
             if (value.addedIdentifiers) [globalIdStrings unionSet:value.addedIdentifiers];
             if (value.removedIdentifiers) [globalIdStrings unionSet:value.removedIdentifiers];
+            if (value.movedIdentifiers) [globalIdStrings addObjectsFromArray:value.movedIdentifiers.allValues];
         }
     }
     
