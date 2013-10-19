@@ -219,7 +219,7 @@
     for (NSInteger idx = 0; idx < newRelatedObjects.count; idx++) {
         NSManagedObject *newObjectAtIdx = [newRelatedObjects objectAtIndex:idx];
         BOOL shouldStore = NO;
-        if (idx > committedValue.count) {
+        if (idx >= committedValue.count) {
             shouldStore = YES;
         } else {
             shouldStore = !([[committedValue objectAtIndex:idx] isEqual:newObjectAtIdx]);
