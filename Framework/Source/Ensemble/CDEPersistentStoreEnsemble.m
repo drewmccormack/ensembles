@@ -131,12 +131,14 @@ static NSString * const kCDEIdentityTokenContext = @"kCDEIdentityTokenContext";
 
 - (void)performInitialChecks
 {
-    if (![self checkIncompleteEvents]) return;
-    [self checkCloudFileSystemIdentityWithCompletion:^(NSError *error) {
-        if (!error) {
-            [(id)self.cloudFileSystem addObserver:self forKeyPath:@"identityToken" options:0 context:(__bridge void *)kCDEIdentityTokenContext];
-        }
-    }];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (![self checkIncompleteEvents]) return;
+        [self checkCloudFileSystemIdentityWithCompletion:^(NSError *error) {
+            if (!error) {
+                [(id)self.cloudFileSystem addObserver:self forKeyPath:@"identityToken" options:0 context:(__bridge void *)kCDEIdentityTokenContext];
+            }
+        }];
+    });
 }
 
 - (BOOL)checkIncompleteEvents
@@ -161,6 +163,8 @@ static NSString * const kCDEIdentityTokenContext = @"kCDEIdentityTokenContext";
         for (NSString *eventId in eventStore.incompleteEventIdentifiers) {
             [context performBlock:^{
                 CDEStoreModificationEvent *event = [CDEStoreModificationEvent fetchStoreModificationEventWithUniqueIdentifier:eventId inManagedObjectContext:context];
+                if (!event) return;
+                
                 [context deleteObject:event];
                 
                 NSError *error;

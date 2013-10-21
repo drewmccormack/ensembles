@@ -7,6 +7,7 @@
 //
 
 #import <XCTest/XCTest.h>
+#import "CDEEventStore.h"
 #import "CDEPersistentStoreEnsemble.h"
 #import "CDELocalCloudFileSystem.h"
 
@@ -33,6 +34,13 @@
 @end
 
 
+@interface CDEPersistentStoreEnsemble (CDETestMethods)
+
+- (CDEEventStore *)eventStore;
+
+@end
+
+
 @interface CDEPersistentStoreEnsembleTests : XCTestCase <CDEPersistentStoreEnsembleDelegate>
 
 @end
@@ -43,6 +51,7 @@
     NSString *cloudDir;
     NSURL *storeURL;
     BOOL tokenChangeCausedDeleech;
+    BOOL finishedAsync;
 }
 
 - (void)setUp
@@ -89,11 +98,13 @@
 
 - (void)waitForAsync
 {
-    CFRunLoopRun();
+    finishedAsync = NO;
+    while (!finishedAsync) CFRunLoopRun();
 }
 
 - (void)finishAsync
 {
+    finishedAsync = YES;
     CFRunLoopStop(CFRunLoopGetCurrent());
 }
 
@@ -141,6 +152,54 @@
         [self performSelector:@selector(checkForDeleech) withObject:nil afterDelay:0.05];
     }];
     [self waitForAsync];
+}
+
+- (void)testInitWithIncompleteMandatoryEventsCausesDeleech
+{
+    [ensemble leechPersistentStoreWithCompletion:^(NSError *error) {
+        XCTAssertNil(error, @"Error occurred while leeching");
+        [[ensemble eventStore] registerIncompleteEventIdentifier:@"123" isMandatory:YES];
+        [self finishAsync];
+    }];
+    [self waitForAsync];
+    
+    [ensemble processPendingChangesWithCompletion:^(NSError *error) {
+        [self finishAsync];
+    }];
+    [self waitForAsync];
+    
+    ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"testensemble" persistentStorePath:ensemble.storePath managedObjectModel:ensemble.managedObjectModel cloudFileSystem:(id)cloudFileSystem];
+    ensemble.delegate = self;
+    
+    [self performSelector:@selector(checkForDeleech) withObject:nil afterDelay:0.05];
+    [self waitForAsync];
+}
+
+- (void)testInitWithIncompleteNonMandatoryEventsDoesNotCauseDeleech
+{
+    [ensemble leechPersistentStoreWithCompletion:^(NSError *error) {
+        XCTAssertNil(error, @"Error occurred while leeching");
+        [[ensemble eventStore] registerIncompleteEventIdentifier:@"123" isMandatory:NO];
+        [self finishAsync];
+    }];
+    [self waitForAsync];
+    
+    ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"testensemble" persistentStorePath:ensemble.storePath managedObjectModel:ensemble.managedObjectModel cloudFileSystem:(id)cloudFileSystem];
+    ensemble.delegate = self;
+    
+    [self performSelector:@selector(checkForLeech) withObject:nil afterDelay:0.05];
+    [self waitForAsync];
+    
+    [ensemble deleechPersistentStoreWithCompletion:^(NSError *error) {
+        [self finishAsync];
+    }];
+    [self waitForAsync];
+}
+
+- (void)checkForLeech
+{
+    XCTAssert(!tokenChangeCausedDeleech, @"A deleech occurred when it shouldn't have");
+    [self finishAsync];
 }
 
 - (void)checkForDeleech
