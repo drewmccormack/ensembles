@@ -81,11 +81,7 @@ static NSString * const kCDEIdentityTokenContext = @"kCDEIdentityTokenContext";
         
         self.cloudManager = [[CDECloudManager alloc] initWithEventStore:self.eventStore cloudFileSystem:self.cloudFileSystem];
         
-        [self checkCloudFileSystemIdentityWithCompletion:^(NSError *error) {
-            if (!error) {
-                [(id)self.cloudFileSystem addObserver:self forKeyPath:@"identityToken" options:0 context:(__bridge void *)kCDEIdentityTokenContext];
-            }
-        }];
+        [self performInitialChecks];
     }
     return self;
 }
@@ -129,6 +125,57 @@ static NSString * const kCDEIdentityTokenContext = @"kCDEIdentityTokenContext";
 - (void)dealloc
 {
     [saveMonitor stopMonitoring];
+}
+
+#pragma mark - Initial Checks
+
+- (void)performInitialChecks
+{
+    if (![self checkIncompleteEvents]) return;
+    [self checkCloudFileSystemIdentityWithCompletion:^(NSError *error) {
+        if (!error) {
+            [(id)self.cloudFileSystem addObserver:self forKeyPath:@"identityToken" options:0 context:(__bridge void *)kCDEIdentityTokenContext];
+        }
+    }];
+}
+
+- (BOOL)checkIncompleteEvents
+{
+    BOOL succeeded = YES;
+    if (eventStore.incompleteMandatoryEventIdentifiers.count > 0) {
+        succeeded = NO;
+        [self deleechPersistentStoreWithCompletion:^(NSError *error) {
+            if (!error) {
+                if ([self.delegate respondsToSelector:@selector(persistentStoreEnsemble:didDeleechWithError:)]) {
+                    NSError *deleechError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeDataCorruptionDetected userInfo:nil];
+                    [self.delegate persistentStoreEnsemble:self didDeleechWithError:deleechError];
+                }
+            }
+            else {
+                CDELog(CDELoggingLevelError, @"Could not deleech after failing incomplete event check: %@", error);
+            }
+        }];
+    }
+    else {
+        NSManagedObjectContext *context = eventStore.managedObjectContext;
+        for (NSString *eventId in eventStore.incompleteEventIdentifiers) {
+            [context performBlock:^{
+                CDEStoreModificationEvent *event = [CDEStoreModificationEvent fetchStoreModificationEventWithUniqueIdentifier:eventId inManagedObjectContext:context];
+                [context deleteObject:event];
+                
+                NSError *error;
+                if ([context save:&error]) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [eventStore deregisterIncompleteEventIdentifier:eventId];
+                    });
+                }
+                else {
+                    CDELog(CDELoggingLevelError, @"Could not save after deleting incomplete event: %@", error);
+                }
+            }];
+        }
+    }
+    return succeeded;
 }
 
 #pragma mark - Completing Operations
@@ -247,9 +294,8 @@ static NSString * const kCDEIdentityTokenContext = @"kCDEIdentityTokenContext";
             if (!error) {
                 NSError *deleechError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeCloudIdentityChanged userInfo:nil];
                 if (completion) completion(deleechError);
-                
-                if ([self.delegate respondsToSelector:@selector(persistentStoreEnsembleDidDeleechDueToCloudIdentityTokenChange:)]) {
-                    [self.delegate persistentStoreEnsembleDidDeleechDueToCloudIdentityTokenChange:self];
+                if ([self.delegate respondsToSelector:@selector(persistentStoreEnsemble:didDeleechWithError:)]) {
+                    [self.delegate persistentStoreEnsemble:self didDeleechWithError:deleechError];
                 }
             }
             else {

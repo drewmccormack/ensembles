@@ -149,7 +149,7 @@
     [self finishAsync];
 }
 
-- (void)persistentStoreEnsembleDidDeleechDueToCloudIdentityTokenChange:(CDEPersistentStoreEnsemble *)ensemble
+- (void)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didDeleechWithError:(NSError *)error
 {
     tokenChangeCausedDeleech = YES;
 }

@@ -67,6 +67,15 @@
 
 #pragma mark - Fetching
 
++ (instancetype)fetchStoreModificationEventWithUniqueIdentifier:(NSString *)uniqueId inManagedObjectContext:(NSManagedObjectContext *)context
+{
+    NSFetchRequest *fetch = [[NSFetchRequest alloc] initWithEntityName:@"CDEStoreModificationEvent"];
+    fetch.predicate = [NSPredicate predicateWithFormat:@"uniqueIdentifier = %@", uniqueId];
+    NSArray *events = [context executeFetchRequest:fetch error:NULL];
+    NSAssert(events.count < 2, @"CDEStoreModificationEvent is not unique in fetchStoreModification...");
+    return events.lastObject;
+}
+
 + (instancetype)fetchStoreModificationEventForPersistentStoreIdentifier:(NSString *)persistentStoreId revisionNumber:(CDERevisionNumber)revision inManagedObjectContext:(NSManagedObjectContext *)context
 {
     if (persistentStoreId == nil || revision < 0) return nil;

@@ -23,18 +23,19 @@ typedef int64_t CDEGlobalCount;
 #pragma mark Errors
 
 typedef NS_ENUM(NSInteger, CDEErrorCode) {
-    CDEErrorCodeUnknown                = -1,
-    CDEErrorCodeCancelled              = 101,
-    CDEErrorCodeMultipleErrors         = 102,
-    CDEErrorCodeDisallowedStateChange  = 103,
-    CDEErrorCodeDiscontinuousRevisions = 200,
-    CDEErrorCodeMissingDependencies    = 201,
-    CDEErrorCodeCloudIdentityChanged   = 202,
-    CDEErrorCodeNetworkError           = 1000,
-    CDEErrorCodeServerError            = 1001,
-    CDEErrorConnectionError            = 1002,
-    CDEErrorCodeAuthenticationFailure  = 1003,
-    CDEErrorCodeSyncDataWasReset       = 2000,
+    CDEErrorCodeUnknown                     = -1,
+    CDEErrorCodeCancelled                   = 101,
+    CDEErrorCodeMultipleErrors              = 102,
+    CDEErrorCodeDisallowedStateChange       = 103,
+    CDEErrorCodeDiscontinuousRevisions      = 200,
+    CDEErrorCodeMissingDependencies         = 201,
+    CDEErrorCodeCloudIdentityChanged        = 202,
+    CDEErrorCodeDataCorruptionDetected      = 203,
+    CDEErrorCodeNetworkError                = 1000,
+    CDEErrorCodeServerError                 = 1001,
+    CDEErrorConnectionError                 = 1002,
+    CDEErrorCodeAuthenticationFailure       = 1003,
+    CDEErrorCodeSyncDataWasReset            = 2000,
 };
 
 
