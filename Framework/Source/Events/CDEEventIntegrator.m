@@ -249,10 +249,16 @@
         if (storeModEvents.count == 0) return;
         
         // Add any modification events concurrent with the new events. Results are ordered.
-        storeModEvents = [revisionManager fetchStoreModificationEventsConcurrentWithEvents:storeModEvents error:error];
-        if (!storeModEvents) {
-            success = NO;
-            return;
+        // We repeat this until there is no change in the set. This will be when there are
+        // no events existing outside the set that are concurrent with the events in the set.
+        NSUInteger eventCount = 0;
+        while (storeModEvents.count != eventCount) {
+            eventCount = storeModEvents.count;
+            storeModEvents = [revisionManager fetchStoreModificationEventsConcurrentWithEvents:storeModEvents error:error];
+            if (!storeModEvents) {
+                success = NO;
+                return;
+            }
         }
         if (storeModEvents.count == 0) return;
         
