@@ -215,30 +215,21 @@
     }
     
     // Store indexes for any new entries or entries whose index has changed
-    NSMutableDictionary *movedObjects = [NSMutableDictionary dictionary];
+    NSMutableDictionary *orderedIndices = [NSMutableDictionary dictionary];
     for (NSInteger idx = 0; idx < newRelatedObjects.count; idx++) {
         NSManagedObject *newObjectAtIdx = [newRelatedObjects objectAtIndex:idx];
-        BOOL shouldStore = NO;
-        if (idx >= committedValue.count) {
-            shouldStore = YES;
-        } else {
-            shouldStore = !([[committedValue objectAtIndex:idx] isEqual:newObjectAtIdx]);
-        }
-        
-        if (shouldStore) {
-            [movedObjects setObject:newObjectAtIdx forKey:@(idx)];
-        }
+        [orderedIndices setObject:newObjectAtIdx forKey:@(idx)];
     }
 
     // Turn moved objects into objectIDs
-    if (movedObjects.count > 0) {
-        NSManagedObjectContext *context = [[movedObjects.allValues lastObject] managedObjectContext];
-        if (context && ![context obtainPermanentIDsForObjects:movedObjects.allValues error:&error]) {
+    if (orderedIndices.count > 0) {
+        NSManagedObjectContext *context = [[orderedIndices.allValues lastObject] managedObjectContext];
+        if (context && ![context obtainPermanentIDsForObjects:orderedIndices.allValues error:&error]) {
             NSLog(@"Failed to get permanent ids: %@", error);
         }
 
         NSMutableDictionary *finalMovedObjects = [NSMutableDictionary dictionary];
-        [movedObjects enumerateKeysAndObjectsUsingBlock:^(NSNumber *index, NSManagedObject *obj, BOOL *stop) {
+        [orderedIndices enumerateKeysAndObjectsUsingBlock:^(NSNumber *index, NSManagedObject *obj, BOOL *stop) {
             [finalMovedObjects setObject:obj.objectID forKey:index];
         }];
 

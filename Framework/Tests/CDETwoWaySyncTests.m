@@ -220,7 +220,7 @@
 
     NSString *set1Items = [[finalDevice1Set.array valueForKey:@"name"] componentsJoinedByString:@","];
     NSString *set2Items = [[finalDevice2Set.array valueForKey:@"name"] componentsJoinedByString:@","];
-    XCTAssertEqual(set1Items, set2Items, @"Expected consistent merge results");
+    XCTAssert([set1Items isEqualToString:set2Items], @"Expected consistent merge results");
 }
 
 @end
