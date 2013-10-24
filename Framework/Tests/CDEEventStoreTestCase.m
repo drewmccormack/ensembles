@@ -49,6 +49,14 @@ static NSString *testStoreFile;
     return @"ensemble1";
 }
 
+- (void)registerIncompleteEventIdentifier:(NSString *)identifier isMandatory:(BOOL)mandatory
+{
+}
+
+- (void)deregisterIncompleteEventIdentifier:(NSString *)identifier
+{
+}
+
 @end
 
 

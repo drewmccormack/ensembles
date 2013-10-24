@@ -170,6 +170,9 @@
             eventBuilder.ensemble = self.ensemble;
             [eventBuilder makeNewEventOfType:CDEStoreModificationEventTypeMerge];
             
+            // Register event in case of crashes
+            [self.eventStore registerIncompleteEventIdentifier:eventBuilder.event.uniqueIdentifier isMandatory:NO];
+            
             // Repair inconsistencies caused by integration
             BOOL repairSucceeded = [self repairWithMergeEventBuilder:eventBuilder error:&error];
             if (!repairSucceeded) {
@@ -207,6 +210,9 @@
                 [self failWithError:error];
                 return;
             }
+            
+            // Deregister event
+            [self.eventStore deregisterIncompleteEventIdentifier:eventBuilder.event.uniqueIdentifier];
             
             // Notify of save
             [managedObjectContext performBlockAndWait:^{

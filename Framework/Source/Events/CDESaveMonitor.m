@@ -159,7 +159,9 @@
     CDEEventBuilder *eventBuilder = [[CDEEventBuilder alloc] initWithEventStore:self.eventStore];
     eventBuilder.ensemble = self.ensemble;
     [eventBuilder makeNewEventOfType:CDEStoreModificationEventTypeSave];
-    [self saveEventStore];
+    
+    // Register event, so if there is a crash, we can detect it and clean up
+    [self.eventStore registerIncompleteEventIdentifier:eventBuilder.event.uniqueIdentifier isMandatory:YES];
     
     // Inserted Objects. Do inserts before updates to make sure each object has a global identifier.
     NSSet *insertedObjects = [notif.userInfo objectForKey:NSInsertedObjectsKey];
@@ -180,6 +182,9 @@
     NSDictionary *changedValuesByObjectID = [changedValuesByContext objectForKey:contextValue];
     [eventBuilder addChangesForUpdatedObjects:updatedObjects inManagedObjectContext:context changedValuesByObjectID:changedValuesByObjectID];
     [self saveEventStore];
+    
+    // Deregister event, and clean up
+    [self.eventStore deregisterIncompleteEventIdentifier:eventBuilder.event.uniqueIdentifier];
     [changedValuesByContext removeObjectForKey:contextValue];
 }
 

@@ -194,7 +194,9 @@ static NSString *kCDEDefaultStoreType;
     [toStoreObjectsByFromStoreObject cde_addEntriesFromMapTable:toStoreIdsByFromStoreId];
     @try {
         for (CDEStoreModificationEvent *fromStoreModEvent in storeModEventsToMigrate) {
+            [self.eventStore registerIncompleteEventIdentifier:fromStoreModEvent.uniqueIdentifier isMandatory:NO];
             [self migrateObject:fromStoreModEvent andRelatedObjectsToStore:toStore withMigratedObjectsMap:toStoreObjectsByFromStoreObject];
+            [self.eventStore deregisterIncompleteEventIdentifier:fromStoreModEvent.uniqueIdentifier];
         }
     }
     @catch (NSException *exception) {

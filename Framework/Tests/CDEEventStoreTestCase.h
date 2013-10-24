@@ -27,6 +27,9 @@
 - (void)updateRevisionsForSave;
 - (void)updateRevisionsForMerge;
 
+- (void)registerIncompleteEventIdentifier:(NSString *)identifier isMandatory:(BOOL)mandatory;
+- (void)deregisterIncompleteEventIdentifier:(NSString *)identifier;
+
 @end
 
 
