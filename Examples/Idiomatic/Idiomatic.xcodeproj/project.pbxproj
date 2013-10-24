@@ -390,7 +390,7 @@
 						};
 					};
 					9477ED2E1800137300C2A419 = {
-						DevelopmentTeam = P7BXV6PHLD;
+						DevelopmentTeam = FN4Q2985YR;
 						SystemCapabilities = {
 							com.apple.iCloud = {
 								enabled = 1;
