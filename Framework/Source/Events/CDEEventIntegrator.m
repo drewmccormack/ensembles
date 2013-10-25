@@ -361,6 +361,7 @@
     return @[countDesc, timestampDesc, storeDesc, typeDesc];
 }
 
+
 #pragma mark Applying Insertions
 
 // Called on event child context queue
@@ -431,6 +432,7 @@
     return YES;
 }
 
+
 #pragma mark Applying Deletion Changes
 
 // Called on event child context queue
@@ -477,6 +479,7 @@
     
     return YES;
 }
+
 
 #pragma mark Applying Property Changes
 
