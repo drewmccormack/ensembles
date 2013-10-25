@@ -12,7 +12,8 @@
 typedef NS_ENUM(NSInteger, CDEPropertyChangeType) {
     CDEPropertyChangeTypeAttribute,
     CDEPropertyChangeTypeToOneRelationship,
-    CDEPropertyChangeTypeToManyRelationship
+    CDEPropertyChangeTypeToManyRelationship,
+    CDEPropertyChangeTypeOrderedToManyRelationship
 };
 
 @interface CDEPropertyChangeValue : NSObject <NSCoding>
@@ -27,7 +28,7 @@ typedef NS_ENUM(NSInteger, CDEPropertyChangeType) {
 @property (nonatomic, readwrite) id value; // for attributes
 @property (nonatomic, readwrite) id relatedIdentifier; // for to-one relationships
 @property (nonatomic, readwrite) NSSet *addedIdentifiers, *removedIdentifiers; // for to-many relationships
-@property (nonatomic, readwrite) NSDictionary *movedIdentifiers; // for ordered to-many relationships
+@property (nonatomic, readwrite) NSDictionary *movedIdentifiersByIndex; // for ordered to-many relationships
 
 + (NSArray *)propertyChangesForObject:(NSManagedObject *)object propertyNames:(id)names;
 

@@ -24,6 +24,8 @@
 
 + (NSArray *)fetchGlobalIdentifiersForObjectIDs:(NSArray *)objectIDs inManagedObjectContext:(NSManagedObjectContext *)context
 {
+    if (objectIDs.count == 0) return @[];
+    
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEGlobalIdentifier"];
     NSArray *uriStrings = [objectIDs valueForKeyPath:@"URIRepresentation.absoluteString"];
     fetch.predicate = [NSPredicate predicateWithFormat:@"storeURI IN %@", uriStrings];

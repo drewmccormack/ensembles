@@ -486,10 +486,17 @@
     NSMapTable *objectsByGlobalId = [self fetchObjectsByGlobalIdentifierForObjectChanges:changes error:error];
     if (!objectsByGlobalId) return NO;
     
+    NSMapTable *globalIdsByObject = [NSMapTable strongToStrongObjectsMapTable];
+    for (CDEGlobalIdentifier *globalId in objectsByGlobalId) {
+        id object = [objectsByGlobalId objectForKey:globalId];
+        [globalIdsByObject setObject:globalId forKey:object];
+    }
+    
     @try {
         NSPredicate *attributePredicate = [NSPredicate predicateWithFormat:@"type = %d", CDEPropertyChangeTypeAttribute];
         NSPredicate *toOneRelationshipPredicate = [NSPredicate predicateWithFormat:@"type = %d", CDEPropertyChangeTypeToOneRelationship];
         NSPredicate *toManyRelationshipPredicate = [NSPredicate predicateWithFormat:@"type = %d", CDEPropertyChangeTypeToManyRelationship];
+        NSPredicate *orderedToManyRelationshipPredicate = [NSPredicate predicateWithFormat:@"type = %d", CDEPropertyChangeTypeOrderedToManyRelationship];
         
         for (CDEObjectChange *change in changes) {
             @autoreleasepool {
@@ -509,6 +516,10 @@
                     // To-many relationship changes
                     NSArray *toManyChanges = [propertyChangeValues filteredArrayUsingPredicate:toManyRelationshipPredicate];
                     [self applyToManyRelationshipChanges:toManyChanges toObject:object withObjectsByGlobalId:objectsByGlobalId];
+                    
+                    // Ordered to-many relationship changes
+                    NSArray *orderedToManyChanges = [propertyChangeValues filteredArrayUsingPredicate:orderedToManyRelationshipPredicate];
+                    [self applyOrderedToManyRelationshipChanges:orderedToManyChanges toObject:object withObjectsByGlobalId:objectsByGlobalId andGlobalIdsByObject:globalIdsByObject];
                 }];
             }
         }
@@ -584,126 +595,83 @@
             continue;
         }
         
-        if (relationship.isOrdered) {
-            NSMutableOrderedSet *relatedObjects = [object mutableOrderedSetValueForKey:relationshipChange.propertyName];
-
-            // Merge the current ordering and the ordering stored in the property change:
-            //  - Create a dictionary mapping the current object IDs to their current index
-            //  - Update this dictionary mapping the moved objects to their new index
-            //  - Sort this dictionary by index value.  Where there is more than one object for a given
-            //    index, sort those by the globalID.
-            
-            // Record the ordering of the existing relationship before we mutate it.  The objects in the
-            // relationship now may not have been saved and so may not have permanent identifiers yet.
-            NSMutableDictionary *relatedGlobalIdentifiers = [NSMutableDictionary dictionary];
-            NSDictionary *movedIdentifiers = relationshipChange.movedIdentifiers;
-            NSMutableDictionary *mergedObjectIndex = [NSMutableDictionary dictionary];
-            if (movedIdentifiers != nil) {
-                NSArray *relatedObjectsArray = relatedObjects.array;
-                
-                __block NSArray *globalIDs;
-                
-                if (relatedObjectsArray.count > 0) {
-                    id obj = [relatedObjectsArray lastObject];
-                    NSManagedObjectContext *context = [obj managedObjectContext];
-                    
-                    NSError *error = nil;
-                    if (![context obtainPermanentIDsForObjects:relatedObjectsArray error:&error]) {
-                        NSLog(@"Failed to get permanent ids: %@", error);
-                    }
-                    
-                    NSArray *orderedObjectIDs = [relatedObjectsArray valueForKey:@"objectID"];
-                    
-                    [context performBlockAndWait:^{
-                        globalIDs = [CDEGlobalIdentifier fetchGlobalIdentifiersForObjectIDs:orderedObjectIDs inManagedObjectContext:eventStoreChildContext];
-                    }];
-                }
-                
-                for (NSUInteger index = 0; index < relatedObjects.array.count; index++) {
-                    CDEGlobalIdentifier *identifier = [globalIDs objectAtIndex:index];
-                    [mergedObjectIndex setValue:@(index) forKey:identifier.globalIdentifier];
-                    
-                    NSManagedObject *object = [relatedObjects objectAtIndex:index];
-                    [relatedGlobalIdentifiers setObject:object forKey:identifier.globalIdentifier];
-                }
-            }
-
-            // Add any added objects
-            for (NSString *identifier in relationshipChange.addedIdentifiers) {
-                id newRelatedObject = [objectsByGlobalId objectForKey:identifier];
-                if (newRelatedObject)
-                    [relatedObjects addObject:newRelatedObject];
-                else
-                    CDELog(CDELoggingLevelWarning, @"Could not find object with identifier while adding to relationship. Skipping: %@", identifier);
-            }
-            
-            // Delete any removed objects
-            for (NSString *identifier in relationshipChange.removedIdentifiers) {
-                id removedObject = [objectsByGlobalId objectForKey:identifier];
-                if (removedObject)
-                    [relatedObjects removeObject:removedObject];
-                else
-                    CDELog(CDELoggingLevelWarning, @"Could not find object with identifier to remove from relationship. Skipping: %@", identifier);
-            }
-
-            // Apply the new ordering
-            if (movedIdentifiers != nil) {
-                // Merge the existing items and moved items into one dictionary
-                for (NSNumber *index in movedIdentifiers.allKeys) {
-                    NSString *objid = [movedIdentifiers objectForKey:index];
-                    [mergedObjectIndex setValue:index forKey:objid];
-                }
-
-                NSMutableOrderedSet *newSet = [NSMutableOrderedSet orderedSet];
-                NSSet *values = [NSSet setWithArray:mergedObjectIndex.allValues];
-                NSArray *sortedValues = [values.allObjects sortedArrayUsingSelector:@selector(compare:)];
-                
-                // Create a dictionary of index values to arrays of objectIDs, for predictable lookup time
-                NSMutableDictionary *indicesToObjectIDArrays = [NSMutableDictionary dictionary];
-                for (NSString *objid in mergedObjectIndex.allKeys) {
-                    NSNumber *index = [mergedObjectIndex objectForKey:objid];
-                    NSMutableArray *array = [indicesToObjectIDArrays objectForKey:index];
-                    if (array == nil) {
-                        [indicesToObjectIDArrays setObject:[NSMutableArray arrayWithObject:objid] forKey:index];
-                    } else {
-                        [array addObject:objid];
-                    }
-                }
-                
-                // Build the new set
-                for (NSNumber *index in sortedValues) {
-                    NSArray *objectsAtThisIndex = [indicesToObjectIDArrays objectForKey:index];
-                    NSArray *sorted = [objectsAtThisIndex sortedArrayUsingSelector:@selector(compare:)];
-                    
-                    for (NSString *globalID in sorted) {
-                        NSManagedObject *object = [objectsByGlobalId objectForKey:globalID];
-                        if (object == nil) {
-                            object = [relatedGlobalIdentifiers objectForKey:globalID];
-                        }
-                        [newSet addObject:object];
-                    }
-                }
-                
-                [self setValue:newSet forKey:relationshipChange.propertyName inObject:object];
-            }
-        } else {
-            NSMutableSet *relatedObjects = [object mutableSetValueForKey:relationshipChange.propertyName];
-            for (NSString *identifier in relationshipChange.addedIdentifiers) {
-                id newRelatedObject = [objectsByGlobalId objectForKey:identifier];
-                if (newRelatedObject)
-                    [relatedObjects addObject:newRelatedObject];
-                else
-                    CDELog(CDELoggingLevelWarning, @"Could not find object with identifier while adding to relationship. Skipping: %@", identifier);
-            }
-            
-            for (NSString *identifier in relationshipChange.removedIdentifiers) {
-                id removedObject = [objectsByGlobalId objectForKey:identifier];
-                if (removedObject)
-                    [relatedObjects removeObject:removedObject];
-                else
-                    CDELog(CDELoggingLevelWarning, @"Could not find object with identifier to remove from relationship. Skipping: %@", identifier);
-            }
+        NSMutableSet *relatedObjects = [object mutableSetValueForKey:relationshipChange.propertyName];
+        for (NSString *identifier in relationshipChange.addedIdentifiers) {
+            id newRelatedObject = [objectsByGlobalId objectForKey:identifier];
+            if (newRelatedObject)
+                [relatedObjects addObject:newRelatedObject];
+            else
+                CDELog(CDELoggingLevelWarning, @"Could not find object with identifier while adding to relationship. Skipping: %@", identifier);
         }
+        
+        for (NSString *identifier in relationshipChange.removedIdentifiers) {
+            id removedObject = [objectsByGlobalId objectForKey:identifier];
+            if (removedObject)
+                [relatedObjects removeObject:removedObject];
+            else
+                CDELog(CDELoggingLevelWarning, @"Could not find object with identifier to remove from relationship. Skipping: %@", identifier);
+        }
+    }
+}
+
+// Called on main context queue
+- (void)applyOrderedToManyRelationshipChanges:(NSArray *)changes toObject:(NSManagedObject *)object withObjectsByGlobalId:(NSMapTable *)objectsByGlobalId andGlobalIdsByObject:(NSMapTable *)globalIdsByObject
+{
+    NSEntityDescription *entity = object.entity;
+    for (CDEPropertyChangeValue *relationshipChange in changes) {
+        NSRelationshipDescription *relationship = entity.relationshipsByName[relationshipChange.propertyName];
+        if (!relationship || !relationship.isToMany || !relationship.isOrdered) {
+            CDELog(CDELoggingLevelWarning, @"Could not find relationship in entity, or found the wrong type of relationship. Skipping: %@ %@", relationshipChange.propertyName, relationshipChange.relatedIdentifier);
+            continue;
+        }
+        
+        // Merge indexes for global ids
+        NSMutableOrderedSet *relatedObjects = [object mutableOrderedSetValueForKey:relationshipChange.propertyName];
+        NSMapTable *finalIndexesByObject = [NSMapTable strongToStrongObjectsMapTable];
+        for (NSUInteger index = 0; index < relatedObjects.count; index++) {
+            [finalIndexesByObject setObject:@(index) forKey:relatedObjects[index]];
+        }
+        
+        // Added objects
+        for (NSString *identifier in relationshipChange.addedIdentifiers) {
+            id newRelatedObject = [objectsByGlobalId objectForKey:identifier];
+            if (newRelatedObject)
+                [relatedObjects addObject:newRelatedObject];
+            else
+                CDELog(CDELoggingLevelWarning, @"Could not find object with identifier while adding to relationship. Skipping: %@", identifier);
+        }
+        
+        // Delete removed objects
+        for (NSString *identifier in relationshipChange.removedIdentifiers) {
+            id removedObject = [objectsByGlobalId objectForKey:identifier];
+            if (removedObject)
+                [relatedObjects removeObject:removedObject];
+            else
+                CDELog(CDELoggingLevelWarning, @"Could not find object with identifier to remove from relationship. Skipping: %@", identifier);
+        }
+        
+        // Determine indexes for objects in the moved identifiers
+        NSDictionary *movedIdentifiersByIndex = relationshipChange.movedIdentifiersByIndex;
+        for (NSNumber *index in movedIdentifiersByIndex.allKeys) {
+            NSString *globalId = movedIdentifiersByIndex[index];
+            id relatedObject = [objectsByGlobalId objectForKey:globalId];
+            [finalIndexesByObject setObject:(index) forKey:relatedObject];
+        }
+        
+        // Apply new ordering. Sort first on index, and use global id to resolve conflicts.
+        [relatedObjects sortUsingComparator:^NSComparisonResult(id object1, id object2) {
+            NSNumber *index1 = [finalIndexesByObject objectForKey:object1];
+            NSNumber *index2 = [finalIndexesByObject objectForKey:object2];
+            NSComparisonResult indexResult = [index1 compare:index2];
+            
+            if (indexResult != NSOrderedSame) return indexResult;
+            
+            NSString *globalId1 = [globalIdsByObject objectForKey:object1];
+            NSString *globalId2 = [globalIdsByObject objectForKey:object2];
+            NSComparisonResult globalIdResult = [globalId1 compare:globalId2];
+            
+            return globalIdResult;
+        }];
     }
 }
 
@@ -847,7 +815,7 @@
             if (value.relatedIdentifier) [globalIdStrings addObject:value.relatedIdentifier];
             if (value.addedIdentifiers) [globalIdStrings unionSet:value.addedIdentifiers];
             if (value.removedIdentifiers) [globalIdStrings unionSet:value.removedIdentifiers];
-            if (value.movedIdentifiers) [globalIdStrings addObjectsFromArray:value.movedIdentifiers.allValues];
+            if (value.movedIdentifiersByIndex) [globalIdStrings addObjectsFromArray:value.movedIdentifiersByIndex.allValues];
         }
     }
     
