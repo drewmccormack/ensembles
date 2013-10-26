@@ -176,10 +176,17 @@
     
     __block NSArray *orderedObjectIDs = nil;
     NSManagedObjectContext *deletedObjectsContext = context;
-    [deletedObjectsContext performBlockAndWait:^{
+    
+    CDECodeBlock block = ^{
         NSSet *deletedObjectIds = [deletedObjects valueForKeyPath:@"objectID"];
         orderedObjectIDs = deletedObjectIds.allObjects;
-    }];
+    };
+    
+    // Execute the block on the context's thread
+    if (deletedObjectsContext.concurrencyType == NSPrivateQueueConcurrencyType)
+        [deletedObjectsContext performBlockAndWait:block];
+    else
+        block();
     
     [eventManagedObjectContext performBlockAndWait:^{
         NSArray *globalIds = [CDEGlobalIdentifier fetchGlobalIdentifiersForObjectIDs:orderedObjectIDs inManagedObjectContext:eventManagedObjectContext];
