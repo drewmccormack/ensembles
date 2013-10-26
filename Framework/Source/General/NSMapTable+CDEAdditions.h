@@ -11,6 +11,7 @@
 @interface NSMapTable (CDEAdditions)
 
 @property (readonly) NSArray *cde_allValues;
+@property (readonly) NSArray *cde_allKeys;
 
 - (void)cde_addEntriesFromMapTable:(NSMapTable *)otherTable;
 

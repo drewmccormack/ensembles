@@ -7,6 +7,7 @@
 //
 
 #import "CDEEventIntegrator.h"
+#import "NSMapTable+CDEAdditions.h"
 #import "CDEEventBuilder.h"
 #import "NSMapTable+CDEAdditions.h"
 #import "CDEEventStore.h"
@@ -486,6 +487,8 @@
 // Called on event child context queue
 - (BOOL)applyObjectPropertyChanges:(NSArray *)changes error:(NSError * __autoreleasing *)error
 {
+    if (changes.count == 0) return YES;
+    
     NSMapTable *objectsByGlobalId = [self fetchObjectsByGlobalIdentifierForObjectChanges:changes error:error];
     if (!objectsByGlobalId) return NO;
     
@@ -808,7 +811,102 @@
 // Called on event store child context
 - (NSMapTable *)fetchObjectsByGlobalIdentifierForObjectChanges:(id)objectChanges error:(NSError * __autoreleasing *)error
 {
-    // Gather global id strings of changed objects, including related objects
+    // Get ids for objects directly involved in the change
+    NSSet *globalIdStrings = [self globalIdentifierStringsInObjectChanges:objectChanges];
+    NSArray *globalIds = [self fetchGlobalIdentifiersForIdentifierStrings:globalIdStrings];
+    NSMapTable *changeObjectsByIdString = [self fetchObjectsByIdStringForGlobalIdentifiers:globalIds];
+
+    // We need to get ids for existing related objects in ordered relationships.
+    // The existing objects are needed, because we always need
+    // to sort an ordered relationship, and this involves all objects, whether they are new or not.
+    NSMapTable *relatedOrderedObjectsByIdString = [self fetchObjectsByIdStringForRelatedObjectsInOrderedRelationshipsOfObjectChanges:objectChanges];
+    
+    NSMapTable *result = [NSMapTable strongToStrongObjectsMapTable];
+    [result cde_addEntriesFromMapTable:changeObjectsByIdString];
+    [result cde_addEntriesFromMapTable:relatedOrderedObjectsByIdString];
+    
+    return result;
+}
+
+- (NSMapTable *)fetchObjectsByIdStringForRelatedObjectsInOrderedRelationshipsOfObjectChanges:(id)objectChanges
+{
+    NSMapTable *changedOrderedPropertiesByGlobalId = [NSMapTable strongToStrongObjectsMapTable];
+    for (CDEObjectChange *change in objectChanges) {
+        NSArray *propertyChangeValues = change.propertyChangeValues;
+        for (CDEPropertyChangeValue *value in propertyChangeValues) {
+            if (value.movedIdentifiersByIndex.count > 0) {
+                // Store the property name, so we can add existing related objects below
+                CDEGlobalIdentifier *globalId = change.globalIdentifier;
+                NSMutableSet *propertyNames = [changedOrderedPropertiesByGlobalId objectForKey:globalId];
+                if (!propertyNames) propertyNames = [[NSMutableSet alloc] initWithCapacity:3];
+                [propertyNames addObject:value.propertyName];
+                [changedOrderedPropertiesByGlobalId setObject:propertyNames forKey:globalId];
+            }
+        }
+    }
+    
+    NSArray *allGlobalIds = changedOrderedPropertiesByGlobalId.cde_allKeys;
+    NSDictionary *globalIdsByEntity = [self entityGroupedGlobalIdentifiersForIdentifiers:allGlobalIds];
+    NSMutableArray *relatedObjects = [[NSMutableArray alloc] init];
+    for (NSString *entityName in globalIdsByEntity) {
+        NSError *error;
+        NSArray *globalIds = globalIdsByEntity[entityName];
+        NSMapTable *objectsByGlobalId = [self fetchObjectsByGlobalIdentifierForEntityName:entityName globalIdentifiers:globalIds error:&error];
+        for (CDEGlobalIdentifier *globalId in globalIds) {
+            NSSet *changedOrderedProperties = [changedOrderedPropertiesByGlobalId objectForKey:globalId];
+            NSManagedObject *object = [objectsByGlobalId objectForKey:globalId];
+            for (NSString *propertyName in changedOrderedProperties) {
+                NSOrderedSet *relatedSet = [object valueForKey:propertyName];
+                [relatedObjects addObjectsFromArray:relatedSet.array];
+            }
+        }
+    }
+    
+    NSArray *objectIDs = [relatedObjects valueForKeyPath:@"objectID"];
+    NSArray *globalIds = [CDEGlobalIdentifier fetchGlobalIdentifiersForObjectIDs:objectIDs inManagedObjectContext:eventStoreChildContext];
+
+    NSMapTable *relatedObjectsByGlobalId = [NSMapTable strongToStrongObjectsMapTable];
+    [relatedObjects enumerateObjectsUsingBlock:^(id object, NSUInteger index, BOOL *stop) {
+        CDEGlobalIdentifier *globalId = globalIds[index];
+        if (globalId == (id)[NSNull null]) {
+            CDELog(CDELoggingLevelError, @"A global identifier was not found for an ordered-relationship object");
+            return;
+        }
+        [relatedObjectsByGlobalId setObject:object forKey:globalId.globalIdentifier];
+    }];
+    
+    return relatedObjectsByGlobalId;
+}
+
+- (NSMapTable *)fetchObjectsByIdStringForGlobalIdentifiers:(NSArray *)globalIds
+{
+    NSDictionary *globalIdsByEntityName = [self entityGroupedGlobalIdentifiersForIdentifiers:globalIds];
+    NSMapTable *results = [NSMapTable strongToStrongObjectsMapTable];
+    for (NSString *entityName in globalIdsByEntityName) {
+        NSSet *entityGlobalIds = globalIdsByEntityName[entityName];
+        NSError *error;
+        NSMapTable *resultsForEntity = [self fetchObjectsByGlobalIdentifierForEntityName:entityName globalIdentifiers:entityGlobalIds error:&error];
+        if (!resultsForEntity) return nil;
+        
+        for (CDEGlobalIdentifier *globalId in resultsForEntity) {
+            [results setObject:[resultsForEntity objectForKey:globalId] forKey:globalId.globalIdentifier];
+        }
+    }
+    return results;
+}
+
+- (NSArray *)fetchGlobalIdentifiersForIdentifierStrings:(id)idStrings
+{
+    NSError *error;
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEGlobalIdentifier"];
+    fetch.predicate = [NSPredicate predicateWithFormat:@"globalIdentifier IN %@", idStrings];
+    NSArray *globalIds = [eventStoreChildContext executeFetchRequest:fetch error:&error];
+    if (!globalIds) NSLog(@"Error fetching ids: %@", error);
+    return globalIds;
+}
+
+- (NSSet *)globalIdentifierStringsInObjectChanges:(id)objectChanges
+{
     NSMutableSet *globalIdStrings = [NSMutableSet setWithCapacity:[objectChanges count]*3];
     for (CDEObjectChange *change in objectChanges) {
         [globalIdStrings addObject:change.globalIdentifier.globalIdentifier];
@@ -821,15 +919,12 @@
             if (value.movedIdentifiersByIndex) [globalIdStrings addObjectsFromArray:value.movedIdentifiersByIndex.allValues];
         }
     }
-    
-    // Fetch the CDEGlobalIdentifier objects
-    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEGlobalIdentifier"];
-    fetch.predicate = [NSPredicate predicateWithFormat:@"globalIdentifier IN %@", globalIdStrings];
-    NSArray *globalIds = [eventStoreChildContext executeFetchRequest:fetch error:error];
-    if (!globalIds) return nil;
-    
-    // Group ids by entity name
-    NSMutableDictionary *globalIdsByEntityName = [NSMutableDictionary dictionaryWithCapacity:globalIdStrings.count];
+    return globalIdStrings;
+}
+
+- (NSDictionary *)entityGroupedGlobalIdentifiersForIdentifiers:(NSArray *)globalIds
+{
+    NSMutableDictionary *globalIdsByEntityName = [NSMutableDictionary dictionaryWithCapacity:globalIds.count];
     for (CDEGlobalIdentifier *globalId in globalIds) {
         NSMutableSet *idsForEntity = globalIdsByEntityName[globalId.nameOfEntity];
         if (!idsForEntity) {
@@ -838,19 +933,7 @@
         }
         [idsForEntity addObject:globalId];
     }
-    
-    // Perform a fetch for each entity, and gather results
-    NSMapTable *results = [NSMapTable strongToStrongObjectsMapTable];
-    for (NSString *entityName in globalIdsByEntityName) {
-        NSSet *entityGlobalIds = globalIdsByEntityName[entityName];
-        NSMapTable *resultsForEntity = [self fetchObjectsByGlobalIdentifierForEntityName:entityName globalIdentifiers:entityGlobalIds error:error];
-        if (!resultsForEntity) return nil;
-        for (CDEGlobalIdentifier *globalId in resultsForEntity) {
-            [results setObject:[resultsForEntity objectForKey:globalId] forKey:globalId.globalIdentifier];
-        }
-    }
-    
-    return results;
+    return globalIdsByEntityName;
 }
 
 

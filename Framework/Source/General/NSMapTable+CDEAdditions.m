@@ -26,4 +26,14 @@
     return result;
 }
 
+- (NSArray *)cde_allKeys
+{
+    NSMutableArray *result = [NSMutableArray arrayWithCapacity:self.count];
+    for (id key in self) {
+        [result addObject:key];
+    }
+    return result;
+}
+
+
 @end

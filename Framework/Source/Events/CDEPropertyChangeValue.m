@@ -210,7 +210,7 @@
 
 - (NSString *)description
 {
-    NSString *result = [NSString stringWithFormat:@"Name: %@\rType: %d\rObjectID: %@\rValue: %@\rRelated: %@\rAdded: %@\rRemoved: %@", self.propertyName, (int)self.type, self.objectID, self.value, self.relatedIdentifier, self.addedIdentifiers, self.removedIdentifiers];
+    NSString *result = [NSString stringWithFormat:@"Name: %@\rType: %d\rObjectID: %@\rValue: %@\rRelated: %@\rAdded: %@\rRemoved: %@\nMoved: %@", self.propertyName, (int)self.type, self.objectID, self.value, self.relatedIdentifier, self.addedIdentifiers, self.removedIdentifiers, self.movedIdentifiersByIndex];
     return result;
 }
 
