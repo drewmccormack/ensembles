@@ -220,4 +220,78 @@
     XCTAssert([set1Items isEqualToString:set2Items], @"Expected consistent merge results");
 }
 
+- (void)testUpdateOrderedRelationshipWithDeletions
+{
+    [self leechStores];
+    
+    // Put parent on both devices
+    id P1 = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context1];
+    
+    XCTAssertTrue([context1 save:NULL], @"Could not save");
+    XCTAssertNil([self syncChanges], @"Sync failed");
+
+    [context1 refreshObject:P1 mergeChanges:NO];
+    
+    // Device 1
+    id A1 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context1];
+    [A1 setName:@"A"];
+    
+    NSOrderedSet *set = [NSOrderedSet orderedSetWithArray:@[A1]];
+    [P1 setValue:set forKey:@"orderedChildren"];
+    
+    XCTAssertTrue([context1 save:NULL], @"Could not save");
+
+    // Device 2
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
+    NSArray *parents = [context2 executeFetchRequest:fetch error:NULL];
+    id P2 = [parents lastObject];
+    
+    id F2 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context2];
+    id G2 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context2];
+    id H2 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context2];
+
+    [F2 setName:@"F"];
+    [G2 setName:@"G"];
+    [H2 setName:@"H"];
+    
+    set = [NSOrderedSet orderedSetWithArray:@[F2, G2, H2]];
+    [P2 setValue:set forKey:@"orderedChildren"];
+    
+    XCTAssertTrue([context2 save:NULL], @"Could not save");
+
+    // Device 1
+    id B1 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context1];
+    id C1 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context1];
+    id D1 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context1];
+    id E1 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context1];
+
+    [B1 setName:@"B"];
+    [C1 setName:@"C"];
+    [D1 setName:@"D"];
+    [E1 setName:@"E"];
+    
+    set = [NSOrderedSet orderedSetWithArray:@[A1, B1, C1, D1, E1]];
+    [P1 setValue:set forKey:@"orderedChildren"];
+    
+    XCTAssertTrue([context1 save:NULL], @"Could not save");
+
+    [context1 deleteObject:B1];
+    [context1 deleteObject:C1];
+    [context1 deleteObject:D1];
+    
+    XCTAssertTrue([context1 save:NULL], @"Could not save");
+
+    XCTAssertNil([self syncChanges], @"Sync failed");
+    
+    [context1 refreshObject:P1 mergeChanges:NO];
+    [context2 refreshObject:P2 mergeChanges:NO];
+    
+    NSOrderedSet *finalDevice1Set = [P1 valueForKey:@"orderedChildren"];
+    NSOrderedSet *finalDevice2Set = [P2 valueForKey:@"orderedChildren"];
+    
+    NSString *set1Items = [[finalDevice1Set.array valueForKeyPath:@"name"] componentsJoinedByString:@","];
+    NSString *set2Items = [[finalDevice2Set.array valueForKeyPath:@"name"] componentsJoinedByString:@","];
+    XCTAssert([set1Items isEqualToString:set2Items], @"Expected consistent merge results");
+}
+
 @end
