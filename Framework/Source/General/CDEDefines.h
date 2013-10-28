@@ -27,6 +27,7 @@ typedef NS_ENUM(NSInteger, CDEErrorCode) {
     CDEErrorCodeCancelled                   = 101,
     CDEErrorCodeMultipleErrors              = 102,
     CDEErrorCodeDisallowedStateChange       = 103,
+    CDEErrorCodeExceptionRaised             = 104,
     CDEErrorCodeDiscontinuousRevisions      = 200,
     CDEErrorCodeMissingDependencies         = 201,
     CDEErrorCodeCloudIdentityChanged        = 202,
