@@ -310,8 +310,10 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
     if (!store) return NO;
     
     managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
-    managedObjectContext.persistentStoreCoordinator = coordinator;
-    managedObjectContext.undoManager = nil;
+    [managedObjectContext performBlockAndWait:^{
+        managedObjectContext.persistentStoreCoordinator = coordinator;
+        managedObjectContext.undoManager = nil;
+    }];
     
     BOOL success = managedObjectContext != nil;
     if (success) [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(managedObjectContextDidSave:) name:NSManagedObjectContextDidSaveNotification object:nil];

@@ -34,12 +34,15 @@
     __block NSError *error = nil;
     
     NSManagedObjectContext *context = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
-    NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:managedObjectModel];
-    context.persistentStoreCoordinator = coordinator;
-    
-    NSURL *storeURL = [NSURL fileURLWithPath:persistentStorePath];
-    NSDictionary *options = @{NSMigratePersistentStoresAutomaticallyOption: @YES, NSInferMappingModelAutomaticallyOption: @YES};
-    [coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:options error:&error];
+    [context performBlockAndWait:^{
+        NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:managedObjectModel];
+        context.persistentStoreCoordinator = coordinator;
+        context.undoManager = nil;
+        
+        NSURL *storeURL = [NSURL fileURLWithPath:persistentStorePath];
+        NSDictionary *options = @{NSMigratePersistentStoresAutomaticallyOption: @YES, NSInferMappingModelAutomaticallyOption: @YES};
+        [coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:options error:&error];
+    }];
     
     if (error) {
         dispatch_async(dispatch_get_main_queue(), ^{
