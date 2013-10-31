@@ -105,6 +105,40 @@
     XCTAssertEqualObjects([newParentOnDevice1 valueForKey:@"name"], @"newdad", @"Wrong name for new parent");
 }
 
+- (void)testUpdateToManyRelationship
+{
+    [self leechStores];
+    
+    id parent = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context1];
+    
+    id child1OnDevice1 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context1];
+    [child1OnDevice1 setName:@"child1"];
+    [child1OnDevice1 setValue:parent forKey:@"parentWithSiblings"];
+
+    id child2OnDevice1 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context1];
+    [child2OnDevice1 setName:@"child2"];
+    [child2OnDevice1 setValue:parent forKey:@"parentWithSiblings"];
+    
+    XCTAssertTrue([context1 save:NULL], @"Could not save");
+    XCTAssertNil([self syncChanges], @"Sync failed");
+    
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Child"];
+    NSArray *children = [context2 executeFetchRequest:fetch error:NULL];
+    id child1OnDevice2 = [children filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"name = 'child1'"]][0];
+    [context2 deleteObject:child1OnDevice2];
+    
+    XCTAssertTrue([context2 save:NULL], @"Could not save");
+    XCTAssertNil([self syncChanges], @"Sync failed");
+    
+    [context1 refreshObject:parent mergeChanges:NO];
+    [context1 refreshObject:child2OnDevice1 mergeChanges:NO];
+
+    NSSet *childrenOnDevice1 = [parent valueForKey:@"children"];
+    XCTAssertEqualObjects([child2OnDevice1 valueForKey:@"name"], @"child2", @"Wrong name for child");
+    XCTAssertEqual(childrenOnDevice1.count, (NSUInteger)1, @"Wrong number of children");
+    XCTAssertEqualObjects(parent, [child2OnDevice1 valueForKey:@"parentWithSiblings"], @"Wrong child");
+}
+
 - (void)testUpdateOrderedRelationship
 {
     [self leechStores];
