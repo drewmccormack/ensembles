@@ -23,7 +23,7 @@
 
 
 @implementation CDESaveMonitor {
-    NSMutableDictionary *changedValuesByContext;
+    NSMapTable *changedValuesByContext;
 }
 
 - (instancetype)initWithStorePath:(NSString *)newPath
@@ -32,7 +32,7 @@
     if (self) {
         self.storePath = [newPath copy];
         
-        changedValuesByContext = [[NSMutableDictionary alloc] initWithCapacity:10];
+        changedValuesByContext = [NSMapTable weakToStrongObjectsMapTable];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contextDidSave:) name:NSManagedObjectContextDidSaveNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contextWillSave:) name:NSManagedObjectContextWillSaveNotification object:nil];
     }
@@ -129,8 +129,7 @@
     }];
     
     NSManagedObjectContext *context = [objects.anyObject managedObjectContext];
-    NSValue *contextPointer = [NSValue valueWithNonretainedObject:context];
-    changedValuesByContext[contextPointer] = changedValuesByObjectID;
+    [changedValuesByContext setObject:changedValuesByObjectID forKey:context];
 }
 
 
@@ -178,14 +177,13 @@
     // Updated Objects
     NSSet *updatedObjects = [notif.userInfo objectForKey:NSUpdatedObjectsKey];
     updatedObjects = [self monitoredManagedObjectsInSet:updatedObjects];
-    NSValue *contextValue = [NSValue valueWithNonretainedObject:context];
-    NSDictionary *changedValuesByObjectID = [changedValuesByContext objectForKey:contextValue];
+    NSDictionary *changedValuesByObjectID = [changedValuesByContext objectForKey:context];
     [eventBuilder addChangesForUpdatedObjects:updatedObjects inManagedObjectContext:context changedValuesByObjectID:changedValuesByObjectID];
     [self saveEventStore];
     
     // Deregister event, and clean up
     [self.eventStore deregisterIncompleteEventIdentifier:eventBuilder.event.uniqueIdentifier];
-    [changedValuesByContext removeObjectForKey:contextValue];
+    [changedValuesByContext removeObjectForKey:context];
 }
 
 @end
