@@ -22,9 +22,14 @@
     
     self.textView.attributedText = self.note.attributedText;
     
-    NSArray *sortDescs = @[[NSSortDescriptor sortDescriptorWithKey:@"text" ascending:YES]];
-    NSArray *tags = [self.note.tags sortedArrayUsingDescriptors:sortDescs];
-    self.tagsTextField.text = [[tags valueForKeyPath:@"text"] componentsJoinedByString:@" "];
+    if (self.note) {
+        NSArray *sortDescs = @[[NSSortDescriptor sortDescriptorWithKey:@"text" ascending:YES]];
+        NSArray *tags = [self.note.tags sortedArrayUsingDescriptors:sortDescs];
+        self.tagsTextField.text = [[tags valueForKeyPath:@"text"] componentsJoinedByString:@" "];
+    }
+    else {
+        self.tagsTextField.text = self.selectedTag.text;
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated
