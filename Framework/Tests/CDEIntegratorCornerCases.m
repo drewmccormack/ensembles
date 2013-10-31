@@ -62,7 +62,7 @@
     [self mergeEventsSinceRevision:-1];
     
     NSArray *parents = [self fetchParents];
-    XCTAssertEqual(parents.count, (NSUInteger)0, @"Deletion should trump insert and there should be no parents left");
+    XCTAssertEqual(parents.count, (NSUInteger)1, @"New insert should trump deletion");
 }
 
 - (void)testUpdateConcurrentWithInsert
