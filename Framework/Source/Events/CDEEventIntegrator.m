@@ -424,11 +424,10 @@
     if (!success) return NO;
     
     // Update the global ids with the store object ids
-    NSUInteger i = 0;
-    for (CDEGlobalIdentifier *globalId in globalIds) {
-        NSString *uri = uris[i++];
+    [globalIds enumerateObjectsUsingBlock:^(CDEGlobalIdentifier *globalId, NSUInteger i, BOOL *stop) {
+        NSString *uri = uris[i];
         globalId.storeURI = uri;
-    }
+    }];
     
     return YES;
 }
