@@ -387,8 +387,8 @@
             __block BOOL objectAlreadyExists = NO;
             [managedObjectContext performBlockAndWait:^{
                 NSManagedObjectID *objectID = [managedObjectContext.persistentStoreCoordinator managedObjectIDForURIRepresentation:url];
-                id object = [managedObjectContext existingObjectWithID:objectID error:NULL];
-                objectAlreadyExists = object != nil;
+                NSManagedObject *object = [managedObjectContext existingObjectWithID:objectID error:NULL];
+                objectAlreadyExists = object && !object.isDeleted && object.managedObjectContext;
             }];
             if (objectAlreadyExists) continue; // Object does exist. Don't create again, but we do apply property changes later.
         }
