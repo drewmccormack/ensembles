@@ -190,13 +190,12 @@
     
     [eventManagedObjectContext performBlockAndWait:^{
         NSArray *globalIds = [CDEGlobalIdentifier fetchGlobalIdentifiersForObjectIDs:orderedObjectIDs inManagedObjectContext:eventManagedObjectContext];
-        NSEnumerator *objectIDEnum = [orderedObjectIDs objectEnumerator];
-        for (id globalId in globalIds) {
-            NSManagedObjectID *objectID = [objectIDEnum nextObject];
+        [globalIds enumerateObjectsUsingBlock:^(CDEGlobalIdentifier *globalId, NSUInteger i, BOOL *stop) {
+            NSManagedObjectID *objectID = orderedObjectIDs[i];
             
-            if (globalId == [NSNull null]) {
+            if (globalId == (id)[NSNull null]) {
                 CDELog(CDELoggingLevelWarning, @"Deleted object with no global identifier. Skipping.");
-                continue;
+                return;
             }
             
             CDEObjectChange *change = [NSEntityDescription insertNewObjectForEntityForName:@"CDEObjectChange" inManagedObjectContext:eventManagedObjectContext];
@@ -204,7 +203,7 @@
             change.type = CDEObjectChangeTypeDelete;
             change.nameOfEntity = objectID.entity.name;
             change.globalIdentifier = globalId;
-        }
+        }];
     }];
 }
 
