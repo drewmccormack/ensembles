@@ -123,7 +123,7 @@
     
     NSMutableDictionary *changedValuesByObjectID = [NSMutableDictionary dictionaryWithCapacity:monitoredObjects.count];
     [monitoredObjects.allObjects cde_enumerateObjectsDrainingEveryIterations:50 usingBlock:^(NSManagedObject *object, NSUInteger index, BOOL *stop) {
-        NSArray *propertyChanges = [CDEPropertyChangeValue propertyChangesForObject:object propertyNames:object.changedValues.allKeys];
+        NSArray *propertyChanges = [CDEPropertyChangeValue propertyChangesForObject:object propertyNames:object.changedValues.allKeys isPreSave:YES];
         NSManagedObjectID *objectID = object.objectID;
         changedValuesByObjectID[objectID] = propertyChanges;
     }];
@@ -165,7 +165,7 @@
     // Inserted Objects. Do inserts before updates to make sure each object has a global identifier.
     NSSet *insertedObjects = [notif.userInfo objectForKey:NSInsertedObjectsKey];
     insertedObjects = [self monitoredManagedObjectsInSet:insertedObjects];
-    [eventBuilder addChangesForInsertedObjects:insertedObjects inManagedObjectContext:context];
+    [eventBuilder addChangesForInsertedObjects:insertedObjects saved:YES inManagedObjectContext:context];
     [self saveEventStore];
     
     // Deleted Objects
@@ -178,7 +178,7 @@
     NSSet *updatedObjects = [notif.userInfo objectForKey:NSUpdatedObjectsKey];
     updatedObjects = [self monitoredManagedObjectsInSet:updatedObjects];
     NSDictionary *changedValuesByObjectID = [changedValuesByContext objectForKey:context];
-    [eventBuilder addChangesForUpdatedObjects:updatedObjects inManagedObjectContext:context changedValuesByObjectID:changedValuesByObjectID];
+    [eventBuilder addChangesForSavedUpdatedObjects:updatedObjects inManagedObjectContext:context changedValuesByObjectID:changedValuesByObjectID];
     [self saveEventStore];
     
     // Deregister event, and clean up

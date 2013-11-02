@@ -20,50 +20,28 @@
 
 @implementation CDEPropertyChangeValue
 
-+ (NSArray *)propertyChangesForObject:(NSManagedObject *)object propertyNames:(id)names
++ (NSArray *)propertyChangesForObject:(NSManagedObject *)object propertyNames:(id)names isPreSave:(BOOL)isPreSave
 {
     NSMutableArray *propertyChanges = [[NSMutableArray alloc] initWithCapacity:[names count]];
     NSEntityDescription *entity = object.entity;
     
     for (NSString *propertyName in names) {
         NSPropertyDescription *propertyDesc = entity.propertiesByName[propertyName];
-        CDEPropertyChangeValue *change = [[CDEPropertyChangeValue alloc] initWithObject:object propertyDescription:propertyDesc];
+        CDEPropertyChangeValue *change = [[CDEPropertyChangeValue alloc] initWithObject:object propertyDescription:propertyDesc isPreSave:isPreSave];
         [propertyChanges addObject:change];
     }
     
     return propertyChanges;
 }
 
-- (instancetype)initWithObject:(NSManagedObject *)object propertyDescription:(NSPropertyDescription *)propertyDesc
+- (instancetype)initWithObject:(NSManagedObject *)object propertyDescription:(NSPropertyDescription *)propertyDesc isPreSave:(BOOL)isPreSave
 {
     NSAssert(!object.objectID.isTemporaryID, @"Object has a temporary id in initWithObject: of CDEPropertyChangeValue");
     
     self = [self initWithType:CDEPropertyChangeTypeAttribute propertyName:propertyDesc.name];
     if (self) {
         self.objectID = object.objectID;
-        
-        id newValue = [object valueForKey:propertyDesc.name];
-        if ([propertyDesc isKindOfClass:[NSAttributeDescription class]]) {
-            [self storeAttributeChangeForDescription:(id)propertyDesc newValue:newValue];
-        }
-        else if ([propertyDesc isKindOfClass:[NSRelationshipDescription class]] && [(NSRelationshipDescription *)propertyDesc isToMany]) {
-            id committed = nil;
-            if (object.changedValues.count != 0) {
-                NSDictionary *committedValues = [object committedValuesForKeys:@[propertyDesc.name]];
-                committed = committedValues[propertyDesc.name];
-
-            }
-
-            NSRelationshipDescription *relationshipDescription = (NSRelationshipDescription *)propertyDesc;
-            if (relationshipDescription.isOrdered) {
-                [self storeOrderedToManyRelationshipChangeForDescription:relationshipDescription committedValue:committed newValue:newValue];
-            } else {
-                [self storeToManyRelationshipChangeForDescription:(id)propertyDesc committedValue:committed newValue:newValue];
-            }
-        }
-        else if ([propertyDesc isKindOfClass:[NSRelationshipDescription class]] && ![(NSRelationshipDescription *)propertyDesc isToMany]) {
-            [self storeToOneRelationshipChangeForDescription:(id)propertyDesc newValue:newValue];
-        }
+        [self updateWithObject:object isPreSave:isPreSave];
     }
     return self;
 }
@@ -83,7 +61,6 @@
     }
     return self;
 }
-
 
 #pragma mark NSCoding
 
@@ -116,6 +93,51 @@
 }
 
 
+#pragma mark Storing Values
+
+- (void)updateWithObject:(NSManagedObject *)object isPreSave:(BOOL)isPreSave
+{
+    NSPropertyDescription *propertyDesc = object.entity.propertiesByName[self.propertyName];
+    
+    // Get the new value
+    id newValue;
+    if (isPreSave) {
+        newValue = object.changedValues[self.propertyName];
+    }
+    else {
+        NSDictionary *committedValues = [object committedValuesForKeys:@[self.propertyName]];
+        newValue = committedValues[self.propertyName];
+    }
+    newValue = CDENSNullToNil(newValue);
+    
+    // Store the new value
+    if ([propertyDesc isKindOfClass:[NSAttributeDescription class]]) {
+        [self storeAttributeChangeForDescription:(id)propertyDesc newValue:newValue];
+    }
+    else if ([propertyDesc isKindOfClass:[NSRelationshipDescription class]] && [(NSRelationshipDescription *)propertyDesc isToMany]) {
+        NSRelationshipDescription *relationshipDescription = (NSRelationshipDescription *)propertyDesc;
+
+        if (isPreSave) {
+            // Store object ids for related objects. These are used post-save to determine
+            // added and removed identifiers
+            NSDictionary *committedValues = [object committedValuesForKeys:@[propertyDesc.name]];
+            id committed = committedValues[propertyDesc.name];
+            id objectIDs = [committed valueForKeyPath:@"objectID"];
+            self.relatedObjectIDs = relationshipDescription.isOrdered ? [objectIDs set] : objectIDs;
+        }
+        
+        if (relationshipDescription.isOrdered) {
+            [self storeOrderedToManyRelationshipChangeForDescription:relationshipDescription newValue:newValue];
+        } else {
+            [self storeToManyRelationshipChangeForDescription:(id)propertyDesc newValue:newValue];
+        }
+    }
+    else if ([propertyDesc isKindOfClass:[NSRelationshipDescription class]] && ![(NSRelationshipDescription *)propertyDesc isToMany]) {
+        [self storeToOneRelationshipChangeForDescription:(id)propertyDesc newValue:newValue];
+    }
+}
+
+
 #pragma mark Storing Changes
 
 - (void)storeAttributeChangeForDescription:(NSAttributeDescription *)propertyDesc newValue:(id)newValue
@@ -141,48 +163,44 @@
     self.type = CDEPropertyChangeTypeToOneRelationship;
 }
 
-- (void)storeToManyRelationshipChangeForDescription:(NSPropertyDescription *)propertyDesc committedValue:(NSSet *)committedValue newValue:(NSSet *)newValue
+- (void)storeToManyRelationshipChangeForDescription:(NSPropertyDescription *)propertyDesc newValue:(NSSet *)newValue
 {
-    NSSet *newRelatedObjects = newValue;
-    NSSet *addedObjects, *removedObjects;
-    if (committedValue) {
-        // Determine the added and removed by comparing with committed values        
-        NSMutableSet *mutableAdded = [newRelatedObjects mutableCopy];
-        [mutableAdded minusSet:committedValue];
-        addedObjects = mutableAdded;
-        
-        NSMutableSet *mutableRemoved = [committedValue mutableCopy];
-        [mutableRemoved minusSet:newRelatedObjects];
-        removedObjects = mutableRemoved;
-    }
-    else {
-        addedObjects = newRelatedObjects;
-        removedObjects = [NSSet set];
-    }
+    NSSet *originalObjectIDs = self.relatedObjectIDs;
     
     NSError *error;
-    NSManagedObjectContext *context = nil;
-    
-    context = [addedObjects.anyObject managedObjectContext];
-    if (context && ![context obtainPermanentIDsForObjects:addedObjects.allObjects error:&error]) {
+    NSSet *newRelatedObjects = newValue;
+    NSManagedObjectContext *context = [newRelatedObjects.anyObject managedObjectContext];
+    if (context && ![context obtainPermanentIDsForObjects:newRelatedObjects.allObjects error:&error]) {
         NSLog(@"Failed to get permanent ids: %@", error);
     }
+    NSSet *newRelatedObjectIDs = [newValue valueForKeyPath:@"objectID"];
     
-    context = [removedObjects.anyObject managedObjectContext];
-    if (context && ![context obtainPermanentIDsForObjects:removedObjects.allObjects error:&error]) {
-        NSLog(@"Failed to get permanent ids: %@", error);
+    NSSet *addedObjectIDs, *removedObjectIDs;
+    if (originalObjectIDs) {
+        // Determine the added and removed by comparing with original values
+        NSMutableSet *mutableAdded = [newRelatedObjectIDs mutableCopy];
+        [mutableAdded minusSet:originalObjectIDs];
+        addedObjectIDs = mutableAdded;
+        
+        NSMutableSet *mutableRemoved = [originalObjectIDs mutableCopy];
+        [mutableRemoved minusSet:newRelatedObjectIDs];
+        removedObjectIDs = mutableRemoved;
+    }
+    else {
+        addedObjectIDs = newRelatedObjectIDs;
+        removedObjectIDs = [NSSet set];
     }
     
-    self.addedIdentifiers = [addedObjects valueForKeyPath:@"objectID"];
-    self.removedIdentifiers = [removedObjects valueForKeyPath:@"objectID"];
+    self.addedIdentifiers = addedObjectIDs;
+    self.removedIdentifiers = removedObjectIDs;
     self.movedIdentifiersByIndex = nil;
     self.type = CDEPropertyChangeTypeToManyRelationship;
 }
 
-- (void)storeOrderedToManyRelationshipChangeForDescription:(NSRelationshipDescription *)propertyDesc committedValue:(NSOrderedSet *)committedValue newValue:(NSOrderedSet *)newValue
+- (void)storeOrderedToManyRelationshipChangeForDescription:(NSRelationshipDescription *)propertyDesc newValue:(NSOrderedSet *)newValue
 {
     // Store the added and removed identifiers, just as for a standard unordered to-many relationships
-    [self storeToManyRelationshipChangeForDescription:propertyDesc committedValue:committedValue.set newValue:newValue.set];
+    [self storeToManyRelationshipChangeForDescription:propertyDesc newValue:newValue.set];
     
     // Set property change type
     self.type = CDEPropertyChangeTypeOrderedToManyRelationship;

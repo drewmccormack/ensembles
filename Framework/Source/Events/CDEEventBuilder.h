@@ -31,9 +31,9 @@
 - (void)performBlockAndWait:(CDECodeBlock)block; // Executes in eventManagedObjectContext queue
 
 // These are call from thread of synced-store context
-- (void)addChangesForInsertedObjects:(NSSet *)inserted inManagedObjectContext:(NSManagedObjectContext *)context;
+- (void)addChangesForInsertedObjects:(NSSet *)insertedObjects saved:(BOOL)saved inManagedObjectContext:(NSManagedObjectContext *)context;
 - (void)addChangesForDeletedObjects:(NSSet *)deleted inManagedObjectContext:(NSManagedObjectContext *)context;
-- (void)addChangesForUpdatedObjects:(NSSet *)updated inManagedObjectContext:(NSManagedObjectContext *)context changedValuesByObjectID:(NSDictionary *)changedValuesByObjectID;
+- (void)addChangesForSavedUpdatedObjects:(NSSet *)updated inManagedObjectContext:(NSManagedObjectContext *)context changedValuesByObjectID:(NSDictionary *)changedValuesByObjectID;
 - (void)addChangesForUnsavedUpdatedObjects:(NSSet *)updated inManagedObjectContext:(NSManagedObjectContext *)context; // Only use pre-save. Requires changedValues to be available.
 
 - (BOOL)addChangesForUnsavedManagedObjectContext:(NSManagedObjectContext *)contextWithChanges error:(NSError * __autoreleasing *)error;

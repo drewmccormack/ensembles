@@ -44,7 +44,7 @@
 
 - (void)testFactoryMethod
 {
-    NSArray *propertyChanges = [CDEPropertyChangeValue propertyChangesForObject:parent propertyNames:parent.entity.propertiesByName.allKeys];
+    NSArray *propertyChanges = [CDEPropertyChangeValue propertyChangesForObject:parent propertyNames:parent.entity.propertiesByName.allKeys isPreSave:YES];
     NSUInteger expectedPropertyCount = [[parent entity] properties].count;
     XCTAssertEqual(propertyChanges.count, expectedPropertyCount, @"Wrong number of property changes");
 }
@@ -55,7 +55,7 @@
     [parent setValue:newValue forKey:@"date"];
 
     NSPropertyDescription *propertyDesc = parent.entity.propertiesByName[@"date"];
-    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:parent propertyDescription:propertyDesc];
+    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:parent propertyDescription:propertyDesc isPreSave:YES];
     XCTAssertEqual(changeValue.type, CDEPropertyChangeTypeAttribute, @"Wrong type for change value");
     XCTAssertEqualObjects(changeValue.value, newValue, @"Wrong value in change value");
 }
@@ -64,7 +64,7 @@
 {
     NSPropertyDescription *propertyDesc = child.entity.propertiesByName[@"parent"];
     
-    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:child propertyDescription:propertyDesc];
+    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:child propertyDescription:propertyDesc isPreSave:YES];
     XCTAssertEqual(changeValue.type, CDEPropertyChangeTypeToOneRelationship, @"Wrong type for change value");
     XCTAssertEqualObjects(changeValue.propertyName, propertyDesc.name, @"Wrong property name for relationship");
     XCTAssertEqualObjects(changeValue.relatedIdentifier, parent.objectID, @"Wrong related identifier");
@@ -75,7 +75,7 @@
     [child setValue:nil forKey:@"parent"];
     NSPropertyDescription *propertyDesc = child.entity.propertiesByName[@"parent"];
     
-    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:child propertyDescription:propertyDesc];
+    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:child propertyDescription:propertyDesc isPreSave:YES];
     XCTAssertNil(changeValue.relatedIdentifier, @"Wrong related identifier");
 }
 
@@ -83,7 +83,7 @@
 {
     NSPropertyDescription *propertyDesc = parent.entity.propertiesByName[@"children"];
     
-    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:parent propertyDescription:propertyDesc];
+    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:parent propertyDescription:propertyDesc isPreSave:YES];
     XCTAssertEqual(changeValue.type, CDEPropertyChangeTypeToManyRelationship, @"Wrong type for change value");
     XCTAssertEqualObjects(changeValue.propertyName, propertyDesc.name, @"Wrong property name for relationship");
     
@@ -101,7 +101,7 @@
     [parent setValue:newChildrenSet forKey:@"children"];
     
     NSPropertyDescription *propertyDesc = parent.entity.propertiesByName[@"children"];
-    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:parent propertyDescription:propertyDesc];
+    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:parent propertyDescription:propertyDesc isPreSave:YES];
 
     NSMutableSet *removedChildren = [siblingChildren mutableCopy];
     [removedChildren minusSet:newChildrenSet];
@@ -113,7 +113,7 @@
 - (void)testArchiving
 {
     NSPropertyDescription *propertyDesc = parent.entity.propertiesByName[@"children"];
-    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:parent propertyDescription:propertyDesc];
+    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:parent propertyDescription:propertyDesc isPreSave:YES];
     
     NSSet *childSet = [siblingChildren valueForKeyPath:@"objectID.URIRepresentation"]; // Pretend global ids
     changeValue.addedIdentifiers = childSet;

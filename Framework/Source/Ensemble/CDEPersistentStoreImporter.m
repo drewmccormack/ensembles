@@ -76,7 +76,7 @@
             [allObjects addObjectsFromArray:objects];
         }
         
-        [eventBuilder addChangesForInsertedObjects:allObjects inManagedObjectContext:context];
+        [eventBuilder addChangesForInsertedObjects:allObjects saved:YES inManagedObjectContext:context];
     }];
         
     [eventContext performBlockAndWait:^{

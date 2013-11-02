@@ -18,21 +18,25 @@ typedef NS_ENUM(NSInteger, CDEPropertyChangeType) {
 
 @interface CDEPropertyChangeValue : NSObject <NSCoding>
 
-@property (nonatomic, readonly) NSManagedObjectID *objectID; // Transient
-
 @property (nonatomic, readonly) CDEPropertyChangeType type;
 @property (nonatomic, readonly) NSString *propertyName;
 
 // Relationship identifiers may be local object ids or global ids,
-// depending on the context. When saved to the store, they are global ids.
+// depending on the context. When saved to the event store, they are global ids.
 @property (nonatomic, readwrite) id value; // for attributes
 @property (nonatomic, readwrite) id relatedIdentifier; // for to-one relationships
 @property (nonatomic, readwrite) NSSet *addedIdentifiers, *removedIdentifiers; // for to-many relationships
 @property (nonatomic, readwrite) NSDictionary *movedIdentifiersByIndex; // for ordered to-many relationships
 
-+ (NSArray *)propertyChangesForObject:(NSManagedObject *)object propertyNames:(id)names;
+// Transient properties
+@property (nonatomic, readonly) NSManagedObjectID *objectID;
+@property (nonatomic, readwrite) id relatedObjectIDs; // Used to determine to-many deltas
 
-- (instancetype)initWithObject:(NSManagedObject *)object propertyDescription:(NSPropertyDescription *)propertyDesc;
++ (NSArray *)propertyChangesForObject:(NSManagedObject *)object propertyNames:(id)names isPreSave:(BOOL)isPreSave;
+
+- (instancetype)initWithObject:(NSManagedObject *)object propertyDescription:(NSPropertyDescription *)propertyDesc isPreSave:(BOOL)isPreSave;
 - (instancetype)initWithType:(CDEPropertyChangeType)type propertyName:(NSString *)name;
+
+- (void)updateWithObject:(NSManagedObject *)object isPreSave:(BOOL)isPreSave;
 
 @end
