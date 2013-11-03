@@ -112,10 +112,10 @@
     if (!monitoredStore) return;
     
     // Store changed values for updates, because they aren't accessible after the save
-    [self storeChangesFromUpdatedObjects:context.updatedObjects];
+    [self storePreSaveChangesFromUpdatedObjects:context.updatedObjects];
 }
 
-- (void)storeChangesFromUpdatedObjects:(NSSet *)objects
+- (void)storePreSaveChangesFromUpdatedObjects:(NSSet *)objects
 {
     if (objects.count == 0) return;
     
@@ -123,7 +123,7 @@
     
     NSMutableDictionary *changedValuesByObjectID = [NSMutableDictionary dictionaryWithCapacity:monitoredObjects.count];
     [monitoredObjects.allObjects cde_enumerateObjectsDrainingEveryIterations:50 usingBlock:^(NSManagedObject *object, NSUInteger index, BOOL *stop) {
-        NSArray *propertyChanges = [CDEPropertyChangeValue propertyChangesForObject:object propertyNames:object.changedValues.allKeys isPreSave:YES];
+        NSArray *propertyChanges = [CDEPropertyChangeValue propertyChangesForObject:object propertyNames:object.changedValues.allKeys isPreSave:YES storeValues:NO];
         NSManagedObjectID *objectID = object.objectID;
         changedValuesByObjectID[objectID] = propertyChanges;
     }];
@@ -165,7 +165,7 @@
     // Inserted Objects. Do inserts before updates to make sure each object has a global identifier.
     NSSet *insertedObjects = [notif.userInfo objectForKey:NSInsertedObjectsKey];
     insertedObjects = [self monitoredManagedObjectsInSet:insertedObjects];
-    [eventBuilder addChangesForInsertedObjects:insertedObjects saved:YES inManagedObjectContext:context];
+    [eventBuilder addChangesForInsertedObjects:insertedObjects objectsAreSaved:YES inManagedObjectContext:context];
     [self saveEventStore];
     
     // Deleted Objects
@@ -178,7 +178,7 @@
     NSSet *updatedObjects = [notif.userInfo objectForKey:NSUpdatedObjectsKey];
     updatedObjects = [self monitoredManagedObjectsInSet:updatedObjects];
     NSDictionary *changedValuesByObjectID = [changedValuesByContext objectForKey:context];
-    [eventBuilder addChangesForSavedUpdatedObjects:updatedObjects inManagedObjectContext:context changedValuesByObjectID:changedValuesByObjectID];
+    [eventBuilder addChangesForSavedUpdatedObjects:updatedObjects inManagedObjectContext:context propertyChangeValuesByObjectID:changedValuesByObjectID];
     [self saveEventStore];
     
     // Deregister event, and clean up

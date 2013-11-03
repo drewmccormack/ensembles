@@ -90,7 +90,7 @@
 
 #pragma mark - Adding Object Changes
 
-- (void)addChangesForInsertedObjects:(NSSet *)insertedObjects saved:(BOOL)saved inManagedObjectContext:(NSManagedObjectContext *)context
+- (void)addChangesForInsertedObjects:(NSSet *)insertedObjects objectsAreSaved:(BOOL)saved inManagedObjectContext:(NSManagedObjectContext *)context
 {
     if (insertedObjects.count == 0) return;
     
@@ -109,7 +109,7 @@
             
             NSArray *orderedInsertedObjects = insertedObjects.allObjects;
             [orderedInsertedObjects cde_enumerateObjectsDrainingEveryIterations:50 usingBlock:^(NSManagedObject *object, NSUInteger index, BOOL *stop) {
-                NSArray *propertyChanges = [CDEPropertyChangeValue propertyChangesForObject:object propertyNames:object.entity.propertiesByName.allKeys isPreSave:!saved];
+                NSArray *propertyChanges = [CDEPropertyChangeValue propertyChangesForObject:object propertyNames:object.entity.propertiesByName.allKeys isPreSave:!saved storeValues:YES];
                 if (!propertyChanges) return;
                 
                 [changeArrays addObject:propertyChanges];
@@ -207,7 +207,7 @@
     }];
 }
 
-- (void)addChangesForSavedUpdatedObjects:(NSSet *)updatedObjects inManagedObjectContext:(NSManagedObjectContext *)context changedValuesByObjectID:(NSDictionary *)changedValuesByObjectID
+- (void)addChangesForSavedUpdatedObjects:(NSSet *)updatedObjects inManagedObjectContext:(NSManagedObjectContext *)context propertyChangeValuesByObjectID:(NSDictionary *)propertyChangeValuesByObjectID
 {
     if (updatedObjects.count == 0) return;
     
@@ -215,8 +215,22 @@
     __block NSArray *objectIDs = nil;
     NSManagedObjectContext *updatedObjectsContext = context;
     CDECodeBlock block = ^{
-        objectIDs = [[updatedObjects valueForKeyPath:@"objectID"] allObjects];
+        NSArray *objects = [updatedObjects allObjects];
+        
+        // Update property changes with saved values
+        NSMutableArray *newObjectIDs = [[NSMutableArray alloc] initWithCapacity:objects.count];
+        for (NSManagedObject *object in objects) {
+            NSManagedObjectID *objectID = object.objectID;
+            [newObjectIDs addObject:objectID];
+            
+            NSArray *propertyChanges = [propertyChangeValuesByObjectID objectForKey:objectID];
+            for (CDEPropertyChangeValue *propertyChangeValue in propertyChanges) {
+                [propertyChangeValue updateWithObject:object isPreSave:NO storeValues:YES];
+            }
+        }
+        objectIDs = newObjectIDs;
     };
+    
     if (updatedObjectsContext.concurrencyType != NSConfinementConcurrencyType)
         [updatedObjectsContext performBlockAndWait:block];
     else
@@ -233,7 +247,7 @@
             
             NSURL *uri = [NSURL URLWithString:globalId.storeURI];
             NSManagedObjectID *objectID = [coordinator managedObjectIDForURIRepresentation:uri];
-            NSArray *propertyChanges = [changedValuesByObjectID objectForKey:objectID];
+            NSArray *propertyChanges = [propertyChangeValuesByObjectID objectForKey:objectID];
             if (!propertyChanges) return;
             
             [self addObjectChangeOfType:CDEObjectChangeTypeUpdate forGlobalIdentifier:globalId entityName:objectID.entity.name propertyChanges:propertyChanges];
@@ -250,13 +264,13 @@
     [updatedObjectsContext performBlockAndWait:^{
         changedValuesByObjectID = [NSMutableDictionary dictionaryWithCapacity:updatedObjects.count];
         [updatedObjects.allObjects cde_enumerateObjectsDrainingEveryIterations:50 usingBlock:^(NSManagedObject *object, NSUInteger index, BOOL *stop) {
-            NSArray *propertyChanges = [CDEPropertyChangeValue propertyChangesForObject:object propertyNames:object.changedValues.allKeys isPreSave:YES];
+            NSArray *propertyChanges = [CDEPropertyChangeValue propertyChangesForObject:object propertyNames:object.changedValues.allKeys isPreSave:YES storeValues:YES];
             NSManagedObjectID *objectID = object.objectID;
             changedValuesByObjectID[objectID] = propertyChanges;
         }];
     }];
     
-    [self addChangesForSavedUpdatedObjects:updatedObjects inManagedObjectContext:context changedValuesByObjectID:changedValuesByObjectID];
+    [self addChangesForSavedUpdatedObjects:updatedObjects inManagedObjectContext:context propertyChangeValuesByObjectID:changedValuesByObjectID];
 }
 
 - (BOOL)addChangesForUnsavedManagedObjectContext:(NSManagedObjectContext *)contextWithChanges error:(NSError * __autoreleasing *)error
@@ -265,7 +279,7 @@
     success = [contextWithChanges obtainPermanentIDsForObjects:contextWithChanges.insertedObjects.allObjects error:error];
     if (!success) return NO;
 
-    [self addChangesForInsertedObjects:contextWithChanges.insertedObjects saved:NO inManagedObjectContext:contextWithChanges];
+    [self addChangesForInsertedObjects:contextWithChanges.insertedObjects objectsAreSaved:NO inManagedObjectContext:contextWithChanges];
     [self addChangesForDeletedObjects:contextWithChanges.deletedObjects inManagedObjectContext:contextWithChanges];
     [self addChangesForUnsavedUpdatedObjects:contextWithChanges.updatedObjects inManagedObjectContext:contextWithChanges];
     
