@@ -45,7 +45,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 {
     if ([CDEEventStore class] == self) {
         NSArray *urls = [[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask];
-        NSString *appSupportDir = [urls.lastObject path];
+        NSString *appSupportDir = [(NSURL *)urls.lastObject path];
         NSString *path = [appSupportDir stringByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]];
         path = [path stringByAppendingPathComponent:@"com.mentalfaculty.ensembles.eventdata"];
         [self setDefaultPathToEventDataRootDirectory:path];
