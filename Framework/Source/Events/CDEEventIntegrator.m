@@ -278,7 +278,7 @@
             @autoreleasepool {
                 // Insertions are split into two parts: first, we perform an insert without applying property changes,
                 // and later, we do an update to set the properties.
-                // This is because the object inserts must be carried out before trying to set relationships, because
+                // This is because the object inserts must be carried out before trying to set relationships,
                 // otherwise related objects may not exist. So we create objects first, and only
                 // set relationships in the next phase.
                 NSMutableDictionary *appliedInsertsByEntity = [NSMutableDictionary dictionary];
