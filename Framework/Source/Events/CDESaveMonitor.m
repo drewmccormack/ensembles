@@ -7,6 +7,7 @@
 //
 
 #import "CDESaveMonitor.h"
+#import "CDEPersistentStoreEnsemble.h"
 #import "CDEEventBuilder.h"
 #import "CDEEventIntegrator.h"
 #import "CDERevisionManager.h"
@@ -111,6 +112,10 @@
     NSPersistentStore *monitoredStore = [self monitoredPersistentStoreInManagedObjectContext:context];
     if (!monitoredStore) return;
     
+    // Give user code chance to make changes before preparing
+    NSDictionary *userInfo = self.ensemble ? @{@"persistentStoreEnsemble" : self.ensemble} : nil;
+    [[NSNotificationCenter defaultCenter] postNotificationName:CDEMonitoredManagedObjectContextWillSaveNotification object:context userInfo:userInfo];
+    
     // Store changed values for updates, because they aren't accessible after the save
     [self storePreSaveChangesFromUpdatedObjects:context.updatedObjects];
 }
@@ -184,6 +189,10 @@
     // Deregister event, and clean up
     [self.eventStore deregisterIncompleteEventIdentifier:eventBuilder.event.uniqueIdentifier];
     [changedValuesByContext removeObjectForKey:context];
+    
+    // Notification
+    NSDictionary *userInfo = self.ensemble ? @{@"persistentStoreEnsemble" : self.ensemble} : nil;
+    [[NSNotificationCenter defaultCenter] postNotificationName:CDEMonitoredManagedObjectContextDidSaveNotification object:context userInfo:userInfo];
 }
 
 @end

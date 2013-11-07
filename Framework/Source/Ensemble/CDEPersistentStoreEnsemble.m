@@ -21,6 +21,11 @@
 
 static NSString * const kCDEIdentityTokenContext = @"kCDEIdentityTokenContext";
 
+
+NSString * const CDEMonitoredManagedObjectContextWillSaveNotification = @"CDEMonitoredManagedObjectContextWillSaveNotification";
+NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMonitoredManagedObjectContextDidSaveNotification";
+
+
 @interface CDEPersistentStoreEnsemble ()
 
 @property (nonatomic, readwrite) CDECloudManager *cloudManager;
