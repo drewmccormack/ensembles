@@ -85,6 +85,8 @@
 		07BF37CD17F1854F00C56F64 /* CDELocalCloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF37CA17F1854F00C56F64 /* CDELocalCloudFileSystem.m */; };
 		07BF37CF17F185DE00C56F64 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF37CE17F185DE00C56F64 /* CoreData.framework */; };
 		07C002361809662E0077E204 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07C002351809662E0077E204 /* Security.framework */; };
+		07D2D63B182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 07D2D63A182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.m */; };
+		07D2D640182D6887001D24BC /* CDEManagedObjectModelTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07D2D63F182D6887001D24BC /* CDEManagedObjectModelTests.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -238,6 +240,9 @@
 		07BF37CA17F1854F00C56F64 /* CDELocalCloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDELocalCloudFileSystem.m; sourceTree = "<group>"; };
 		07BF37CE17F185DE00C56F64 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		07C002351809662E0077E204 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		07D2D639182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSManagedObjectModel+CDEAdditions.h"; sourceTree = "<group>"; };
+		07D2D63A182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSManagedObjectModel+CDEAdditions.m"; sourceTree = "<group>"; };
+		07D2D63F182D6887001D24BC /* CDEManagedObjectModelTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEManagedObjectModelTests.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -346,6 +351,7 @@
 				070D338C18018AAD0054BA23 /* CDESaveMonitorTests.m */,
 				070D338D18018AAD0054BA23 /* CDEStoreModificationEventTests.m */,
 				070D33D11801A0770054BA23 /* CDEGlobalIdentifierTests.m */,
+				07D2D63F182D6887001D24BC /* CDEManagedObjectModelTests.m */,
 			);
 			name = "Unit Tests";
 			sourceTree = "<group>";
@@ -487,6 +493,8 @@
 				07BF379517F1853000C56F64 /* CoreDataEnsembles.h */,
 				07BF379617F1853000C56F64 /* NSMapTable+CDEAdditions.h */,
 				07BF379717F1853000C56F64 /* NSMapTable+CDEAdditions.m */,
+				07D2D639182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.h */,
+				07D2D63A182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.m */,
 			);
 			name = General;
 			path = Source/General;
@@ -664,6 +672,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				07D2D640182D6887001D24BC /* CDEManagedObjectModelTests.m in Sources */,
 				070D33A618018AAD0054BA23 /* CDEDeviceRevisionSetTests.m in Sources */,
 				070D33BB18018AAD0054BA23 /* CDETwoWaySyncTests.m in Sources */,
 				070D33AE18018AAD0054BA23 /* CDEIntegratorTests.m in Sources */,
@@ -700,6 +709,7 @@
 				07BF37BC17F1853000C56F64 /* CDEEventRevision.m in Sources */,
 				07BF37B917F1853000C56F64 /* CDEDefines.m in Sources */,
 				07BF37BF17F1853000C56F64 /* CDEObjectChange.m in Sources */,
+				07D2D63B182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.m in Sources */,
 				07BF37CD17F1854F00C56F64 /* CDELocalCloudFileSystem.m in Sources */,
 				07BF37C217F1853000C56F64 /* CDERevisionManager.m in Sources */,
 				07BF37B517F1853000C56F64 /* CDEEventStore.m in Sources */,

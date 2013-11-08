@@ -282,7 +282,7 @@
                 // otherwise related objects may not exist. So we create objects first, and only
                 // set relationships in the next phase.
                 NSMutableDictionary *appliedInsertsByEntity = [NSMutableDictionary dictionary];
-                for (NSEntityDescription *entity in managedObjectModel.entities) {
+                for (NSEntityDescription *entity in managedObjectModel) {
                     NSArray *appliedInsertChanges = [self insertObjectsForStoreModificationEvents:@[storeModEvent] entity:entity error:error];
                     if (!appliedInsertChanges) {
                         success = NO;
@@ -293,14 +293,14 @@
                 
                 // Now that all objects exist, we can apply property changes.
                 // We treat insertions on a par with updates here.
-                for (NSEntityDescription *entity in managedObjectModel.entities) {
+                for (NSEntityDescription *entity in managedObjectModel) {
                     NSArray *inserts = appliedInsertsByEntity[entity.name];
                     success = [self updateObjectsForStoreModificationEvents:@[storeModEvent] entity:entity includingInsertedObjects:inserts error:error];
                     if (!success) return;
                 }
                 
                 // Finally deletions
-                for (NSEntityDescription *entity in managedObjectModel.entities) {
+                for (NSEntityDescription *entity in managedObjectModel) {
                     success = [self deleteObjectsForStoreModificationEvents:@[storeModEvent] entity:entity error:error];
                     if (!success) return;
                 }
