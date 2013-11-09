@@ -7,8 +7,8 @@
 //
 
 #import "CDEEventIntegrator.h"
-#import "NSMapTable+CDEAdditions.h"
 #import "CDEEventBuilder.h"
+#import "CDEPersistentStoreEnsemble.h"
 #import "NSMapTable+CDEAdditions.h"
 #import "CDEEventStore.h"
 #import "CDEStoreModificationEvent.h"
@@ -239,6 +239,7 @@
 - (BOOL)integrate:(NSError * __autoreleasing *)error
 {
     CDERevisionManager *revisionManager = [[CDERevisionManager alloc] initWithEventStore:self.eventStore eventManagedObjectContext:eventStoreChildContext];
+    revisionManager.managedObjectModelURL = self.ensemble.managedObjectModelURL;
     
     // Check prerequisites
     BOOL canIntegrate = [revisionManager checkIntegrationPrequisites:error];
@@ -258,15 +259,8 @@
         // Add any modification events concurrent with the new events. Results are ordered.
         // We repeat this until there is no change in the set. This will be when there are
         // no events existing outside the set that are concurrent with the events in the set.
-        NSUInteger eventCount = 0;
-        while (storeModEvents.count != eventCount) {
-            eventCount = storeModEvents.count;
-            storeModEvents = [revisionManager fetchStoreModificationEventsConcurrentWithEvents:storeModEvents error:error];
-            if (!storeModEvents) {
-                success = NO;
-                return;
-            }
-        }
+        storeModEvents = [revisionManager recursivelyFetchStoreModificationEventsConcurrentWithEvents:storeModEvents error:error];
+        if (storeModEvents == nil) success = NO;
         if (storeModEvents.count == 0) return;
         
         // If all events are from this device, don't merge

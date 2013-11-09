@@ -52,7 +52,7 @@ NSString * const IDMSyncActivityDidEndNotification = @"IDMSyncActivityDidEnd";
     
     // Setup Ensemble
     cloudFileSystem = [[CDEICloudFileSystem alloc] initWithUbiquityContainerIdentifier:@"P7BXV6PHLD.com.mentalfaculty.idiomatic"];
-    ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"MainStore" persistentStorePath:storeURL.path managedObjectModel:model cloudFileSystem:cloudFileSystem];
+    ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"MainStore" persistentStorePath:storeURL.path managedObjectModelURL:modelURL cloudFileSystem:cloudFileSystem];
     ensemble.delegate = self;
     
     // Setup UI

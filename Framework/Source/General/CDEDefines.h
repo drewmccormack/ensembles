@@ -32,6 +32,7 @@ typedef NS_ENUM(NSInteger, CDEErrorCode) {
     CDEErrorCodeMissingDependencies         = 201,
     CDEErrorCodeCloudIdentityChanged        = 202,
     CDEErrorCodeDataCorruptionDetected      = 203,
+    CDEErrorCodeUnknownModelVersion         = 204,
     CDEErrorCodeNetworkError                = 1000,
     CDEErrorCodeServerError                 = 1001,
     CDEErrorConnectionError                 = 1002,

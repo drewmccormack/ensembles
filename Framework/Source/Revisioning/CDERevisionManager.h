@@ -18,12 +18,14 @@
 
 @property (nonatomic, strong, readonly) CDEEventStore *eventStore;
 @property (nonatomic, strong, readonly) NSManagedObjectContext *eventManagedObjectContext;
+@property (nonatomic, strong, readwrite) NSURL *managedObjectModelURL; 
 
 - (instancetype)initWithEventStore:(CDEEventStore *)eventStore eventManagedObjectContext:(NSManagedObjectContext *)context;
 - (instancetype)initWithEventStore:(CDEEventStore *)eventStore;
 
 - (NSArray *)fetchUncommittedStoreModificationEvents:(NSError * __autoreleasing *)error;
 - (NSArray *)fetchStoreModificationEventsConcurrentWithEvents:(NSArray *)events error:(NSError * __autoreleasing *)error;
+- (NSArray *)recursivelyFetchStoreModificationEventsConcurrentWithEvents:(NSArray *)events error:(NSError *__autoreleasing *)error;
 
 - (BOOL)checkIntegrationPrequisites:(NSError * __autoreleasing *)error;
 - (BOOL)checkModelVersionsOfStoreModificationEvents:(NSArray *)events;

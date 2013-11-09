@@ -38,7 +38,7 @@
     
     cloudFileSystem1 = [[CDELocalCloudFileSystem alloc] initWithRootDirectory:cloudRootDir];
     eventDataRoot1 = [testRootDirectory stringByAppendingPathComponent:@"eventData1"];
-    ensemble1 = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"com.onewaytest" persistentStorePath:testStoreURL1.path managedObjectModel:model cloudFileSystem:cloudFileSystem1 localDataRootDirectory:eventDataRoot1];
+    ensemble1 = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"com.onewaytest" persistentStorePath:testStoreURL1.path managedObjectModelURL:testModelURL cloudFileSystem:cloudFileSystem1 localDataRootDirectory:eventDataRoot1];
     
     // Second store
     testStoreFile2 = [testRootDirectory stringByAppendingPathComponent:@"store2.sql"];
@@ -54,7 +54,7 @@
     cloudRootDir = [testRootDirectory stringByAppendingPathComponent:@"cloudfiles"];
     cloudFileSystem2 = [[CDELocalCloudFileSystem alloc] initWithRootDirectory:cloudRootDir];
     eventDataRoot2 = [testRootDirectory stringByAppendingPathComponent:@"eventData2"];
-    ensemble2 = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"com.onewaytest" persistentStorePath:testStoreURL2.path managedObjectModel:model cloudFileSystem:cloudFileSystem2 localDataRootDirectory:eventDataRoot2];
+    ensemble2 = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"com.onewaytest" persistentStorePath:testStoreURL2.path managedObjectModelURL:testModelURL cloudFileSystem:cloudFileSystem2 localDataRootDirectory:eventDataRoot2];
 }
 
 - (void)tearDown

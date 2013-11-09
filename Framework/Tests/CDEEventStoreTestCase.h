@@ -38,6 +38,7 @@
 @property (strong) CDEMockEventStore *eventStore;
 @property (strong) NSManagedObjectContext *testManagedObjectContext;
 @property (readonly) NSURL *testStoreURL; // Only set for a disk store
+@property (readonly) NSURL *testModelURL;
 
 + (void)setUseDiskStore:(BOOL)yn;
 

@@ -52,7 +52,9 @@
         CDERevisionNumber lastRevision = eventStore.lastRevision;
         CDERevisionNumber lastMergeRevision = eventStore.lastMergeRevision;
         NSString *persistentStoreId = self.eventStore.persistentStoreIdentifier;
+        
         CDERevisionManager *revisionManager = [[CDERevisionManager alloc] initWithEventStore:eventStore];
+        revisionManager.managedObjectModelURL = self.ensemble.managedObjectModelURL;
         CDEGlobalCount globalCountBeforeMerge = [revisionManager maximumGlobalCount];
 
         event = [NSEntityDescription insertNewObjectForEntityForName:@"CDEStoreModificationEvent" inManagedObjectContext:eventManagedObjectContext];

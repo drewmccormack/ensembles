@@ -39,14 +39,13 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification;
 @property (nonatomic, strong, readonly) NSString *localDataRootDirectory;
 @property (nonatomic, strong, readonly) NSString *ensembleIdentifier;
 @property (nonatomic, strong, readonly) NSString *storePath;
+@property (nonatomic, strong, readonly) NSURL *managedObjectModelURL;
 @property (nonatomic, strong, readonly) NSManagedObjectModel *managedObjectModel;
 @property (nonatomic, assign, readonly, getter = isLeeched) BOOL leeched;
 @property (nonatomic, assign, readonly, getter = isMerging) BOOL merging;
 
-+ (instancetype)persistentStoreEnsembleForPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator ensembleIdentifier:(NSString *)identifier cloudFileSystem:(id <CDECloudFileSystem>)cloudFileSystem;
-
-- (instancetype)initWithEnsembleIdentifier:(NSString *)identifier persistentStorePath:(NSString *)path managedObjectModel:(NSManagedObjectModel *)model cloudFileSystem:(id <CDECloudFileSystem>)newCloudFileSystem;
-- (instancetype)initWithEnsembleIdentifier:(NSString *)identifier persistentStorePath:(NSString *)path managedObjectModel:(NSManagedObjectModel *)model cloudFileSystem:(id <CDECloudFileSystem>)newCloudFileSystem localDataRootDirectory:(NSString *)dataRoot;
+- (instancetype)initWithEnsembleIdentifier:(NSString *)identifier persistentStorePath:(NSString *)path managedObjectModelURL:(NSURL *)modelURL cloudFileSystem:(id <CDECloudFileSystem>)newCloudFileSystem;
+- (instancetype)initWithEnsembleIdentifier:(NSString *)identifier persistentStorePath:(NSString *)path managedObjectModelURL:(NSURL *)modelURL cloudFileSystem:(id <CDECloudFileSystem>)newCloudFileSystem localDataRootDirectory:(NSString *)dataRoot;
 
 - (void)leechPersistentStoreWithCompletion:(CDECompletionBlock)completion;
 - (void)deleechPersistentStoreWithCompletion:(CDECompletionBlock)completion;

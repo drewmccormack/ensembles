@@ -10,7 +10,6 @@
 #import "CDEPersistentStoreEnsemble.h"
 #import "CDEEventBuilder.h"
 #import "CDEEventIntegrator.h"
-#import "CDERevisionManager.h"
 #import "CDEDefines.h"
 #import "CDEEventRevision.h"
 #import "CDERevision.h"

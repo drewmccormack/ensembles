@@ -33,6 +33,7 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
 @property (nonatomic, strong, readwrite) NSString *ensembleIdentifier;
 @property (nonatomic, strong, readwrite) NSString *storePath;
 @property (nonatomic, strong, readwrite) NSManagedObjectModel *managedObjectModel;
+@property (nonatomic, strong, readwrite) NSURL *managedObjectModelURL;
 @property (nonatomic, assign, readwrite, getter = isLeeched) BOOL leeched;
 @property (nonatomic, assign, readwrite, getter = isMerging) BOOL merging;
 @property (nonatomic, strong, readwrite) CDEEventStore *eventStore;
@@ -54,24 +55,18 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
 @synthesize saveMonitor = saveMonitor;
 @synthesize eventIntegrator = eventIntegrator;
 @synthesize managedObjectModel = managedObjectModel;
+@synthesize managedObjectModelURL = managedObjectModelURL;
 
 #pragma mark - Initialization and Deallocation
 
-+ (instancetype)persistentStoreEnsembleForPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator ensembleIdentifier:(NSString *)identifier cloudFileSystem:(id <CDECloudFileSystem>)cloudFileSystem
-{
-    NSAssert(coordinator.persistentStores.count == 1, @"Cannot use +persistentStoreEnsembleWithEnsembleIdentifier... if there are more than one stores");
-    NSPersistentStore *store = coordinator.persistentStores.lastObject;
-    id ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:identifier persistentStorePath:store.URL.path managedObjectModel:coordinator.managedObjectModel cloudFileSystem:cloudFileSystem];
-    return ensemble;
-}
-
-- (instancetype)initWithEnsembleIdentifier:(NSString *)identifier persistentStorePath:(NSString *)path managedObjectModel:(NSManagedObjectModel *)model cloudFileSystem:(id <CDECloudFileSystem>)newCloudFileSystem localDataRootDirectory:(NSString *)eventDataRoot
+- (instancetype)initWithEnsembleIdentifier:(NSString *)identifier persistentStorePath:(NSString *)path managedObjectModelURL:(NSURL *)modelURL cloudFileSystem:(id <CDECloudFileSystem>)newCloudFileSystem localDataRootDirectory:(NSString *)eventDataRoot
 {
     self = [super init];
     if (self) {
         self.ensembleIdentifier = identifier;
         self.storePath = path;
-        self.managedObjectModel = model;
+        self.managedObjectModelURL = modelURL;
+        self.managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
         self.cloudFileSystem = newCloudFileSystem;
     
         self.eventStore = [[CDEEventStore alloc] initWithEnsembleIdentifier:self.ensembleIdentifier pathToEventDataRootDirectory:eventDataRoot];
@@ -91,9 +86,9 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
     return self;
 }
 
-- (instancetype)initWithEnsembleIdentifier:(NSString *)identifier persistentStorePath:(NSString *)path managedObjectModel:(NSManagedObjectModel *)model cloudFileSystem:(id <CDECloudFileSystem>)newCloudFileSystem
+- (instancetype)initWithEnsembleIdentifier:(NSString *)identifier persistentStorePath:(NSString *)path managedObjectModelURL:(NSURL *)modelURL cloudFileSystem:(id <CDECloudFileSystem>)newCloudFileSystem
 {
-    return [self initWithEnsembleIdentifier:identifier persistentStorePath:path managedObjectModel:model cloudFileSystem:newCloudFileSystem localDataRootDirectory:nil];
+    return [self initWithEnsembleIdentifier:identifier persistentStorePath:path managedObjectModelURL:modelURL cloudFileSystem:newCloudFileSystem localDataRootDirectory:nil];
 }
 
 - (void)initializeEventIntegrator

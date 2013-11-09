@@ -78,7 +78,7 @@
     [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context];
     [context save:NULL];
     
-    ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"testensemble" persistentStorePath:storePath managedObjectModel:model cloudFileSystem:(id)cloudFileSystem];
+    ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"testensemble" persistentStorePath:storePath managedObjectModelURL:testModelURL cloudFileSystem:(id)cloudFileSystem];
     ensemble.delegate = self;
     
     tokenChangeCausedDeleech = NO;
@@ -168,7 +168,7 @@
     }];
     [self waitForAsync];
     
-    ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"testensemble" persistentStorePath:ensemble.storePath managedObjectModel:ensemble.managedObjectModel cloudFileSystem:(id)cloudFileSystem];
+    ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"testensemble" persistentStorePath:ensemble.storePath managedObjectModelURL:ensemble.managedObjectModelURL cloudFileSystem:(id)cloudFileSystem];
     ensemble.delegate = self;
     
     [self performSelector:@selector(checkForDeleech) withObject:nil afterDelay:0.05];
@@ -184,7 +184,7 @@
     }];
     [self waitForAsync];
     
-    ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"testensemble" persistentStorePath:ensemble.storePath managedObjectModel:ensemble.managedObjectModel cloudFileSystem:(id)cloudFileSystem];
+    ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"testensemble" persistentStorePath:ensemble.storePath managedObjectModelURL:ensemble.managedObjectModelURL cloudFileSystem:(id)cloudFileSystem];
     ensemble.delegate = self;
     
     [self performSelector:@selector(checkForLeech) withObject:nil afterDelay:0.05];

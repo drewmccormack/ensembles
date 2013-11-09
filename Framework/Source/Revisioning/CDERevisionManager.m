@@ -7,6 +7,7 @@
 //
 
 #import "CDERevisionManager.h"
+#import "NSManagedObjectModel+CDEAdditions.h"
 #import "CDEEventStore.h"
 #import "CDERevision.h"
 #import "CDERevisionSet.h"
@@ -115,6 +116,18 @@
     return result;
 }
 
+- (NSArray *)recursivelyFetchStoreModificationEventsConcurrentWithEvents:(NSArray *)events error:(NSError *__autoreleasing *)error
+{
+    NSArray *resultEvents = events;
+    NSUInteger eventCount = 0;
+    while (resultEvents.count != eventCount) {
+        eventCount = resultEvents.count;
+        resultEvents = [self fetchStoreModificationEventsConcurrentWithEvents:resultEvents error:error];
+        if (!resultEvents) return nil;
+    }
+    return resultEvents;
+}
+
 #pragma mark Checks
 
 - (BOOL)checkIntegrationPrequisites:(NSError * __autoreleasing *)error
@@ -133,7 +146,7 @@
             return;
         }
         
-        NSArray *concurrentEvents = [self fetchStoreModificationEventsConcurrentWithEvents:uncommittedEvents error:error];
+        NSArray *concurrentEvents = [self recursivelyFetchStoreModificationEventsConcurrentWithEvents:uncommittedEvents error:error];
         if (!concurrentEvents) {
             result = NO;
             return;
@@ -144,14 +157,53 @@
             result = NO;
             return;
         }
+        
+        if (![self checkModelVersionsOfStoreModificationEvents:concurrentEvents]) {
+            if (error) *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeUnknownModelVersion userInfo:nil];
+            result = NO;
+            return;
+        }
     }];
     
     return result;
 }
 
+- (NSArray *)entityHashesByNameForAllVersionsInModelAtURL:(NSURL *)url
+{
+    NSMutableArray *entityHashDictionaries = [[NSMutableArray alloc] initWithCapacity:10];
+    NSFileManager *fileManager = [[NSFileManager alloc] init];
+    NSDirectoryEnumerator *dirEnum = [fileManager enumeratorAtURL:url includingPropertiesForKeys:nil options:(NSDirectoryEnumerationSkipsSubdirectoryDescendants | NSDirectoryEnumerationSkipsHiddenFiles) errorHandler:NULL];
+    for (NSURL *fileURL in dirEnum) {
+        if ([[fileURL pathExtension] isEqualToString:@"mom"]) {
+            NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:fileURL];
+            NSDictionary *entityHashesByName = model.entityVersionHashesByName;
+            if (entityHashesByName) [entityHashDictionaries addObject:entityHashesByName];
+        }
+    }
+    return entityHashDictionaries;
+}
+
 - (BOOL)checkModelVersionsOfStoreModificationEvents:(NSArray *)events
 {
-    // TODO: Need to implement model version checking
+    if (!self.managedObjectModelURL) return YES;
+    
+    NSArray *localEntityHashDictionaries = [self entityHashesByNameForAllVersionsInModelAtURL:self.managedObjectModelURL];
+    for (CDEStoreModificationEvent *event in events) {
+        NSString *modelVersion = event.modelVersion;
+        if (!modelVersion) continue;
+        
+        NSDictionary *eventEntityHashes = [NSManagedObjectModel cde_entityHashesByNameFromPropertyList:modelVersion];
+        if (!eventEntityHashes) continue;
+        
+        BOOL eventModelIsInLocalModel = NO;
+        for (NSDictionary *localEntityHashes in localEntityHashDictionaries) {
+            eventModelIsInLocalModel = [localEntityHashes isEqualToDictionary:eventEntityHashes];
+            if (eventModelIsInLocalModel) break;
+        }
+        
+        if (!eventModelIsInLocalModel) return NO;
+    }
+    
     return YES;
 }
 

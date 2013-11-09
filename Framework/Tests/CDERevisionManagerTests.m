@@ -34,6 +34,7 @@
     }];
     
     revisionManager = [[CDERevisionManager alloc] initWithEventStore:(id)self.eventStore eventManagedObjectContext:childMOC];
+    revisionManager.managedObjectModelURL = self.testModelURL;
     
     NSManagedObjectContext *moc = self.eventStore.managedObjectContext;
     [moc performBlockAndWait:^{
@@ -278,6 +279,31 @@
     passedCheck = [revisionManager checkIntegrationPrequisites:&error];
     XCTAssertFalse(passedCheck, @"Integration prerequisites should fail");
     XCTAssertEqual(error.code, CDEErrorCodeMissingDependencies, @"Wrong error code");
+}
+
+- (void)testPrerequisitesWithUnknownModelVersion
+{
+    NSManagedObjectContext *moc = self.eventStore.managedObjectContext;
+    [moc performBlockAndWait:^{
+        CDEStoreModificationEvent *event = [self addModEventForStore:@"other" revision:0 globalCount:0 timestamp:1234.0];
+        event.modelVersion =
+            @"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+            @"<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">"
+            @"<plist version=\"1.0\">"
+            @"  <dict>"
+            @"      <key>Child</key>"
+            @"      <string>4567</string>"
+            @"  </dict>"
+            @"</plist>";
+    }];
+    
+    NSArray *events = [revisionManager fetchUncommittedStoreModificationEvents:NULL];
+    BOOL passedCheck = [revisionManager checkModelVersionsOfStoreModificationEvents:events];
+    XCTAssertFalse(passedCheck, @"Integration prerequisites should fail");
+    
+    NSError *error;
+    passedCheck = [revisionManager checkIntegrationPrequisites:&error];
+    XCTAssertEqual(error.code, CDEErrorCodeUnknownModelVersion, @"Wrong error code");
 }
 
 @end

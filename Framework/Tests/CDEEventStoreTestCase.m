@@ -65,6 +65,7 @@ static NSString *testStoreFile;
 @synthesize eventStore = eventStore;
 @synthesize testManagedObjectContext = testManagedObjectContext;
 @synthesize testStoreURL = testStoreURL;
+@synthesize testModelURL = testModelURL;
 
 + (void)initialize
 {
@@ -102,7 +103,7 @@ static NSString *testStoreFile;
     }];
     
     // Test Coordinator
-    NSURL *testModelURL = [[NSBundle bundleForClass:self.class] URLForResource:@"CDEStoreModificationEventTestsModel" withExtension:@"momd"];
+    testModelURL = [[NSBundle bundleForClass:self.class] URLForResource:@"CDEStoreModificationEventTestsModel" withExtension:@"momd"];
     NSManagedObjectModel *testModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:testModelURL];
     NSPersistentStoreCoordinator *testPSC = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:testModel];
     
