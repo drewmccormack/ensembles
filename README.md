@@ -6,6 +6,20 @@ _Date:_ 29th September, 2013
 
 Ensembles extends Apple's Core Data framework to add peer-to-peer synchronization for Mac OS and iOS. Multiple SQLite persistent stores can be coupled together via a file synchronization platform like iCloud or Dropbox. The framework can be readily extended to support any service capable of moving files between devices, including custom servers.
 
+#### Downloading Ensembles
+
+To clone Ensembles to your local drive, use the command
+
+	git clone https://github.com/drewmccormack/ensembles.git
+
+Ensembles makes use of Git submodules. To retrieve these, change to the `ensembles` root directory
+	
+	cd ensembles
+	
+and issue this command
+
+	git submodule update --init
+
 #### Incorporating Ensembles in an iOS Project
 
 To add Ensembles to your App's Xcode Project with CocoaPods...
