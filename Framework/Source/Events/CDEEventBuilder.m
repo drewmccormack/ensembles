@@ -60,7 +60,7 @@
         event.type = type;
         event.timestamp = [NSDate timeIntervalSinceReferenceDate];
         event.globalCount = globalCountBeforeMerge+1;
-        event.modelVersion = [self.ensemble.managedObjectModel cde_modelHash];
+        event.modelVersion = [self.ensemble.managedObjectModel cde_entityHashesPropertyList];
         
         CDEEventRevision *revision = [NSEntityDescription insertNewObjectForEntityForName:@"CDEEventRevision" inManagedObjectContext:eventManagedObjectContext];
         revision.persistentStoreIdentifier = self.eventStore.persistentStoreIdentifier;
