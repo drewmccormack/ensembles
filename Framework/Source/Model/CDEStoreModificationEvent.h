@@ -22,17 +22,17 @@ typedef NS_ENUM(int16_t, CDEStoreModificationEventType) {
 
 @interface CDEStoreModificationEvent : NSManagedObject
 
-@property (nonatomic) NSString *uniqueIdentifier;
-@property (nonatomic) CDEStoreModificationEventType type;
-@property (nonatomic, retain) CDEEventRevision *eventRevision;
-@property (nonatomic, retain) NSSet *eventRevisionsOfOtherStores;
-@property (nonatomic) CDEGlobalCount globalCount;
-@property (nonatomic) NSTimeInterval timestamp;
-@property (nonatomic, retain) NSString *modelVersion;
-@property (nonatomic, retain) NSSet *objectChanges;
+@property (nonatomic, strong, readwrite) NSString *uniqueIdentifier;
+@property (nonatomic, assign, readwrite) CDEStoreModificationEventType type;
+@property (nonatomic, strong, readwrite) CDEEventRevision *eventRevision;
+@property (nonatomic, strong, readwrite) NSSet *eventRevisionsOfOtherStores;
+@property (nonatomic, assign, readwrite) CDEGlobalCount globalCount;
+@property (nonatomic, assign, readwrite) NSTimeInterval timestamp;
+@property (nonatomic, strong, readwrite) NSString *modelVersion;
+@property (nonatomic, strong, readwrite) NSSet *objectChanges;
 
-@property (nonatomic, copy) CDERevisionSet *revisionSetOfOtherStoresAtCreation;
-@property (nonatomic, readonly) CDERevisionSet *revisionSet;
+@property (nonatomic, copy, readwrite) CDERevisionSet *revisionSetOfOtherStoresAtCreation;
+@property (nonatomic, strong, readonly) CDERevisionSet *revisionSet;
 
 + (instancetype)fetchStoreModificationEventWithUniqueIdentifier:(NSString *)uniqueId inManagedObjectContext:(NSManagedObjectContext *)context;
 + (instancetype)fetchStoreModificationEventForPersistentStoreIdentifier:(NSString *)persistentStoreId revisionNumber:(CDERevisionNumber)revision inManagedObjectContext:(NSManagedObjectContext *)context;

@@ -18,10 +18,10 @@
 
 @interface CDEEventBuilder : NSObject
 
-@property (nonatomic, readonly) CDEEventStore *eventStore;
-@property (nonatomic, readonly) NSManagedObjectContext *eventManagedObjectContext;
-@property (nonatomic, readonly) CDEStoreModificationEvent *event;
-@property (nonatomic, readwrite, weak) CDEPersistentStoreEnsemble *ensemble;
+@property (nonatomic, strong, readonly) CDEEventStore *eventStore;
+@property (nonatomic, strong, readonly) NSManagedObjectContext *eventManagedObjectContext;
+@property (nonatomic, strong, readonly) CDEStoreModificationEvent *event;
+@property (nonatomic, weak, readwrite) CDEPersistentStoreEnsemble *ensemble;
 
 - (id)initWithEventStore:(CDEEventStore *)eventStore;
 - (id)initWithEventStore:(CDEEventStore *)eventStore eventManagedObjectContext:(NSManagedObjectContext *)context;

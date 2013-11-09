@@ -18,19 +18,19 @@ typedef NS_ENUM(NSInteger, CDEPropertyChangeType) {
 
 @interface CDEPropertyChangeValue : NSObject <NSCoding>
 
-@property (nonatomic, readonly) CDEPropertyChangeType type;
-@property (nonatomic, readonly) NSString *propertyName;
+@property (nonatomic, assign, readonly) CDEPropertyChangeType type;
+@property (nonatomic, strong, readonly) NSString *propertyName;
 
 // Relationship identifiers may be local object ids or global ids,
 // depending on the context. When saved to the event store, they are global ids.
-@property (nonatomic, readwrite) id value; // for attributes
-@property (nonatomic, readwrite) id relatedIdentifier; // for to-one relationships
-@property (nonatomic, readwrite) NSSet *addedIdentifiers, *removedIdentifiers; // for to-many relationships
-@property (nonatomic, readwrite) NSDictionary *movedIdentifiersByIndex; // for ordered to-many relationships
+@property (nonatomic, strong, readwrite) id value; // for attributes
+@property (nonatomic, strong, readwrite) id relatedIdentifier; // for to-one relationships
+@property (nonatomic, strong, readwrite) NSSet *addedIdentifiers, *removedIdentifiers; // for to-many relationships
+@property (nonatomic, strong, readwrite) NSDictionary *movedIdentifiersByIndex; // for ordered to-many relationships
 
 // Transient properties
-@property (nonatomic, readonly) NSManagedObjectID *objectID;
-@property (nonatomic, readwrite) id relatedObjectIDs; // Used to determine to-many deltas
+@property (nonatomic, strong, readonly) NSManagedObjectID *objectID;
+@property (nonatomic, strong, readwrite) id relatedObjectIDs; // Used to determine to-many deltas
 
 + (NSArray *)propertyChangesForObject:(NSManagedObject *)object propertyNames:(id)names isPreSave:(BOOL)isPreSave storeValues:(BOOL)storeValues;
 

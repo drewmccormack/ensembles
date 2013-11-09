@@ -11,9 +11,9 @@
 
 @interface CDEPropertyChangeValue ()
 
-@property (nonatomic, readwrite) NSManagedObjectID *objectID;
-@property (nonatomic, readwrite) NSString *propertyName;
-@property (nonatomic, readwrite) CDEPropertyChangeType type;
+@property (nonatomic, strong, readwrite) NSManagedObjectID *objectID;
+@property (nonatomic, strong, readwrite) NSString *propertyName;
+@property (nonatomic, assign, readwrite) CDEPropertyChangeType type;
 
 @end
 

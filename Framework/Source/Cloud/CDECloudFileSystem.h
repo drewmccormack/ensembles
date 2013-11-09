@@ -12,8 +12,8 @@
 @protocol CDECloudFileSystem <NSObject>
 
 @required
-@property (nonatomic, readonly) BOOL isConnected;
-@property (nonatomic, readonly) id <NSObject, NSCopying, NSCoding> identityToken; // Must fire KVO Notifications
+@property (nonatomic, assign, readonly) BOOL isConnected;
+@property (nonatomic, strong, readonly) id <NSObject, NSCopying, NSCoding> identityToken; // Must fire KVO Notifications
 
 - (void)connect:(CDECompletionBlock)completion;
 

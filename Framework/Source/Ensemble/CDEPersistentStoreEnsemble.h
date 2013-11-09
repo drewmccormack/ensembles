@@ -34,14 +34,14 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification;
 
 @interface CDEPersistentStoreEnsemble : NSObject
 
-@property (nonatomic, readwrite, weak) id <CDEPersistentStoreEnsembleDelegate> delegate;
-@property (nonatomic, readonly) id <CDECloudFileSystem> cloudFileSystem;
-@property (nonatomic, readonly) NSString *localDataRootDirectory;
-@property (nonatomic, readonly) NSString *ensembleIdentifier;
-@property (nonatomic, readonly) NSString *storePath;
-@property (nonatomic, readonly) NSManagedObjectModel *managedObjectModel;
-@property (nonatomic, readonly, getter = isLeeched) BOOL leeched;
-@property (nonatomic, readonly, getter = isMerging) BOOL merging;
+@property (nonatomic, weak, readwrite) id <CDEPersistentStoreEnsembleDelegate> delegate;
+@property (nonatomic, strong, readonly) id <CDECloudFileSystem> cloudFileSystem;
+@property (nonatomic, strong, readonly) NSString *localDataRootDirectory;
+@property (nonatomic, strong, readonly) NSString *ensembleIdentifier;
+@property (nonatomic, strong, readonly) NSString *storePath;
+@property (nonatomic, strong, readonly) NSManagedObjectModel *managedObjectModel;
+@property (nonatomic, assign, readonly, getter = isLeeched) BOOL leeched;
+@property (nonatomic, assign, readonly, getter = isMerging) BOOL merging;
 
 + (instancetype)persistentStoreEnsembleForPersistentStoreCoordinator:(NSPersistentStoreCoordinator *)coordinator ensembleIdentifier:(NSString *)identifier cloudFileSystem:(id <CDECloudFileSystem>)cloudFileSystem;
 

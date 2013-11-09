@@ -16,11 +16,11 @@
 
 @interface CDEEventRevision : NSManagedObject
 
-@property (nonatomic) CDERevisionNumber revisionNumber;
-@property (nonatomic, retain) NSString *persistentStoreIdentifier;
-@property (nonatomic, retain) CDEStoreModificationEvent *storeModificationEvent;
-@property (nonatomic, retain) CDEStoreModificationEvent *storeModificationEventForOtherStores;
-@property (nonatomic, readonly) CDERevision *revision;
+@property (nonatomic, assign, readwrite) CDERevisionNumber revisionNumber;
+@property (nonatomic, strong, readwrite) NSString *persistentStoreIdentifier;
+@property (nonatomic, strong, readwrite) CDEStoreModificationEvent *storeModificationEvent;
+@property (nonatomic, strong, readwrite) CDEStoreModificationEvent *storeModificationEventForOtherStores;
+@property (nonatomic, strong, readonly) CDERevision *revision;
 
 + (instancetype)makeEventRevisionForPersistentStoreIdentifier:(NSString *)identifier revisionNumber:(CDERevisionNumber)revision inManagedObjectContext:(NSManagedObjectContext *)context;
 + (NSSet *)fetchPersistentStoreIdentifiersInManagedObjectContext:(NSManagedObjectContext *)context;

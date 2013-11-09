@@ -12,19 +12,19 @@
 
 @interface CDEEventStore : NSObject
 
-@property (nonatomic, readonly) NSString *ensembleIdentifier;
-@property (nonatomic, readwrite) id <NSObject, NSCopying, NSCoding> cloudFileSystemIdentityToken;
-@property (nonatomic, readonly, copy) NSString *pathToEventDataRootDirectory;
-@property (nonatomic, readonly, copy) NSString *persistentStoreIdentifier;
-@property (nonatomic, readonly) NSManagedObjectContext *managedObjectContext;
-@property (nonatomic, readonly) BOOL containsEventData;
+@property (nonatomic, strong, readonly) NSString *ensembleIdentifier;
+@property (nonatomic, strong, readwrite) id <NSObject, NSCopying, NSCoding> cloudFileSystemIdentityToken;
+@property (nonatomic, copy, readonly) NSString *pathToEventDataRootDirectory;
+@property (nonatomic, copy, readonly) NSString *persistentStoreIdentifier;
+@property (nonatomic, strong, readonly) NSManagedObjectContext *managedObjectContext;
+@property (nonatomic, assign, readonly) BOOL containsEventData;
 
-@property (nonatomic, readonly) NSArray *incompleteEventIdentifiers;
-@property (nonatomic, readonly) NSArray *incompleteMandatoryEventIdentifiers;
+@property (nonatomic, strong, readonly) NSArray *incompleteEventIdentifiers;
+@property (nonatomic, strong, readonly) NSArray *incompleteMandatoryEventIdentifiers;
 
-@property (nonatomic, readonly) CDERevisionNumber lastSaveRevision;
-@property (nonatomic, readonly) CDERevisionNumber lastMergeRevision;
-@property (nonatomic, readonly) CDERevisionNumber lastRevision;
+@property (nonatomic, assign, readonly) CDERevisionNumber lastSaveRevision;
+@property (nonatomic, assign, readonly) CDERevisionNumber lastMergeRevision;
+@property (nonatomic, assign, readonly) CDERevisionNumber lastRevision;
 
 +(void)setDefaultPathToEventDataRootDirectory:(NSString *)newPath;
 +(NSString *)defaultPathToEventDataRootDirectory;

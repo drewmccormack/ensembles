@@ -13,9 +13,9 @@
 
 @interface CDERevisionSet : NSObject
 
-@property (nonatomic, readonly) NSUInteger numberOfRevisions;
-@property (nonatomic, readonly) NSSet *revisions;
-@property (nonatomic, readonly) NSSet *persistentStoreIdentifiers;
+@property (nonatomic, assign, readonly) NSUInteger numberOfRevisions;
+@property (nonatomic, strong, readonly) NSSet *revisions;
+@property (nonatomic, strong, readonly) NSSet *persistentStoreIdentifiers;
 
 - (CDERevision *)revisionForPersistentStoreIdentifier:(NSString *)identifier;
 

@@ -16,9 +16,9 @@
 
 @interface CDEEventMigrator : NSObject
 
-@property (readonly) CDEEventStore *eventStore;
-@property (readwrite, nonatomic) NSString *storeTypeForNewFiles;
-@property (nonatomic, readwrite, weak) CDEPersistentStoreEnsemble *ensemble;
+@property (nonatomic, strong, readonly) CDEEventStore *eventStore;
+@property (nonatomic, strong, readwrite) NSString *storeTypeForNewFiles;
+@property (nonatomic, weak, readwrite) CDEPersistentStoreEnsemble *ensemble;
 
 - (instancetype)initWithEventStore:(CDEEventStore *)newStore;
 

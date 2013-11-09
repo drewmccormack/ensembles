@@ -21,12 +21,12 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 @interface CDEEventStore ()
 
 @property (nonatomic, copy, readwrite) NSString *pathToEventStoreRootDirectory;
-@property (nonatomic, readonly) NSString *pathToEventStore;
-@property (nonatomic, readonly) NSString *pathToBlobsDirectory;
-@property (nonatomic, readonly) NSString *pathToStoreInfoFile;
-@property (nonatomic, readwrite, copy) NSString *persistentStoreIdentifier;
-@property (nonatomic, readwrite) CDERevisionNumber lastSaveRevision;
-@property (nonatomic, readwrite) CDERevisionNumber lastMergeRevision;
+@property (nonatomic, strong, readonly) NSString *pathToEventStore;
+@property (nonatomic, strong, readonly) NSString *pathToBlobsDirectory;
+@property (nonatomic, strong, readonly) NSString *pathToStoreInfoFile;
+@property (nonatomic, copy, readwrite) NSString *persistentStoreIdentifier;
+@property (nonatomic, assign, readwrite) CDERevisionNumber lastSaveRevision;
+@property (nonatomic, assign, readwrite) CDERevisionNumber lastMergeRevision;
 
 @end
 

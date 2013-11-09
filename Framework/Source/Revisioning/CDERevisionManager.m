@@ -149,7 +149,7 @@
     return result;
 }
 
-- (BOOL)checkModelVersionIsCurrent
+- (BOOL)checkModelVersionsOfStoreModificationEvents:(NSArray *)events
 {
     // TODO: Need to implement model version checking
     return YES;

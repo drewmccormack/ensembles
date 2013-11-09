@@ -15,10 +15,10 @@
 
 @interface CDESaveMonitor : NSObject
 
-@property (strong) CDEEventStore *eventStore;
-@property (strong) NSString *storePath;
-@property (weak) CDEEventIntegrator *eventIntegrator;
-@property (nonatomic, readwrite, weak) CDEPersistentStoreEnsemble *ensemble;
+@property (nonatomic, strong, readwrite) CDEEventStore *eventStore;
+@property (nonatomic, strong, readwrite) NSString *storePath;
+@property (nonatomic, weak, readwrite) CDEEventIntegrator *eventIntegrator;
+@property (nonatomic, weak, readwrite) CDEPersistentStoreEnsemble *ensemble;
 
 - (id)initWithStorePath:(NSString *)storePath;
 

@@ -28,16 +28,16 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
 
 @interface CDEPersistentStoreEnsemble ()
 
-@property (nonatomic, readwrite) CDECloudManager *cloudManager;
-@property (nonatomic, readwrite) id <CDECloudFileSystem> cloudFileSystem;
-@property (nonatomic, readwrite) NSString *ensembleIdentifier;
-@property (nonatomic, readwrite) NSString *storePath;
-@property (nonatomic, readwrite) NSManagedObjectModel *managedObjectModel;
-@property (nonatomic, readwrite, getter = isLeeched) BOOL leeched;
-@property (nonatomic, readwrite, getter = isMerging) BOOL merging;
-@property (nonatomic, readwrite) CDEEventStore *eventStore;
-@property (nonatomic, readwrite) CDESaveMonitor *saveMonitor;
-@property (nonatomic, readwrite) CDEEventIntegrator *eventIntegrator;
+@property (nonatomic, strong, readwrite) CDECloudManager *cloudManager;
+@property (nonatomic, strong, readwrite) id <CDECloudFileSystem> cloudFileSystem;
+@property (nonatomic, strong, readwrite) NSString *ensembleIdentifier;
+@property (nonatomic, strong, readwrite) NSString *storePath;
+@property (nonatomic, strong, readwrite) NSManagedObjectModel *managedObjectModel;
+@property (nonatomic, assign, readwrite, getter = isLeeched) BOOL leeched;
+@property (nonatomic, assign, readwrite, getter = isMerging) BOOL merging;
+@property (nonatomic, strong, readwrite) CDEEventStore *eventStore;
+@property (nonatomic, strong, readwrite) CDESaveMonitor *saveMonitor;
+@property (nonatomic, strong, readwrite) CDEEventIntegrator *eventIntegrator;
 
 @end
 

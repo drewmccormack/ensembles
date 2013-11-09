@@ -16,8 +16,8 @@
 
 @interface CDERevisionManager : NSObject
 
-@property (nonatomic, readonly) CDEEventStore *eventStore;
-@property (nonatomic, readonly) NSManagedObjectContext *eventManagedObjectContext;
+@property (nonatomic, strong, readonly) CDEEventStore *eventStore;
+@property (nonatomic, strong, readonly) NSManagedObjectContext *eventManagedObjectContext;
 
 - (instancetype)initWithEventStore:(CDEEventStore *)eventStore eventManagedObjectContext:(NSManagedObjectContext *)context;
 - (instancetype)initWithEventStore:(CDEEventStore *)eventStore;
@@ -26,7 +26,7 @@
 - (NSArray *)fetchStoreModificationEventsConcurrentWithEvents:(NSArray *)events error:(NSError * __autoreleasing *)error;
 
 - (BOOL)checkIntegrationPrequisites:(NSError * __autoreleasing *)error;
-- (BOOL)checkModelVersionIsCurrent;
+- (BOOL)checkModelVersionsOfStoreModificationEvents:(NSArray *)events;
 - (BOOL)checkAllDependenciesExistForStoreModificationEvents:(NSArray *)events;
 - (BOOL)checkContinuityOfStoreModificationEvents:(NSArray *)events;
 

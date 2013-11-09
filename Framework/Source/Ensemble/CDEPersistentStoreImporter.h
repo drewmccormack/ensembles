@@ -15,10 +15,10 @@
 
 @interface CDEPersistentStoreImporter : NSObject
 
-@property (nonatomic, readonly) NSString *persistentStorePath;
-@property (nonatomic, readonly) CDEEventStore *eventStore;
-@property (nonatomic, readwrite, weak) CDEPersistentStoreEnsemble *ensemble;
-@property (nonatomic, readonly) NSManagedObjectModel *managedObjectModel;
+@property (nonatomic, strong, readonly) NSString *persistentStorePath;
+@property (nonatomic, strong, readonly) CDEEventStore *eventStore;
+@property (nonatomic, weak, readwrite) CDEPersistentStoreEnsemble *ensemble;
+@property (nonatomic, strong, readonly) NSManagedObjectModel *managedObjectModel;
 
 - (id)initWithPersistentStoreAtPath:(NSString *)path managedObjectModel:(NSManagedObjectModel *)model eventStore:(CDEEventStore *)eventStore;
 

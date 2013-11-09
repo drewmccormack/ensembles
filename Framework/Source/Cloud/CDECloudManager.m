@@ -17,19 +17,19 @@
 
 @interface CDECloudManager ()
 
-@property (nonatomic, readonly) NSString *localEnsembleDirectory;
+@property (nonatomic, strong, readonly) NSString *localEnsembleDirectory;
 
-@property (nonatomic, readonly) NSString *localDownloadRoot;
-@property (nonatomic, readonly) NSString *localStoresDownloadDirectory;
-@property (nonatomic, readonly) NSString *localEventsDownloadDirectory;
+@property (nonatomic, strong, readonly) NSString *localDownloadRoot;
+@property (nonatomic, strong, readonly) NSString *localStoresDownloadDirectory;
+@property (nonatomic, strong, readonly) NSString *localEventsDownloadDirectory;
 
-@property (nonatomic, readonly) NSString *localUploadRoot;
-@property (nonatomic, readonly) NSString *localStoresUploadDirectory;
-@property (nonatomic, readonly) NSString *localEventsUploadDirectory;
+@property (nonatomic, strong, readonly) NSString *localUploadRoot;
+@property (nonatomic, strong, readonly) NSString *localStoresUploadDirectory;
+@property (nonatomic, strong, readonly) NSString *localEventsUploadDirectory;
 
-@property (nonatomic, readonly) NSString *remoteEnsembleDirectory;
-@property (nonatomic, readonly) NSString *remoteStoresDirectory;
-@property (nonatomic, readonly) NSString *remoteEventsDirectory;
+@property (nonatomic, strong, readonly) NSString *remoteEnsembleDirectory;
+@property (nonatomic, strong, readonly) NSString *remoteStoresDirectory;
+@property (nonatomic, strong, readonly) NSString *remoteEventsDirectory;
 
 @end
 

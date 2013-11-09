@@ -19,13 +19,13 @@ typedef void (^CDEEventIntegratorDidSaveBlock)(NSManagedObjectContext *context, 
 
 @interface CDEEventIntegrator : NSObject
 
-@property (nonatomic, readonly) NSURL *storeURL;
-@property (nonatomic, readonly) NSManagedObjectModel *managedObjectModel;
-@property (nonatomic, readonly) CDEEventStore *eventStore;
-@property (nonatomic, readwrite, weak) CDEPersistentStoreEnsemble *ensemble;
-@property (nonatomic, copy) CDEEventIntegratorWillSaveBlock willSaveBlock;
-@property (nonatomic, copy) CDEEventIntegratorFailedSaveBlock failedSaveBlock;
-@property (nonatomic, copy) CDEEventIntegratorDidSaveBlock didSaveBlock;
+@property (nonatomic, strong, readonly) NSURL *storeURL;
+@property (nonatomic, strong, readonly) NSManagedObjectModel *managedObjectModel;
+@property (nonatomic, strong, readonly) CDEEventStore *eventStore;
+@property (nonatomic, weak, readwrite) CDEPersistentStoreEnsemble *ensemble;
+@property (nonatomic, copy, readwrite) CDEEventIntegratorWillSaveBlock willSaveBlock;
+@property (nonatomic, copy, readwrite) CDEEventIntegratorFailedSaveBlock failedSaveBlock;
+@property (nonatomic, copy, readwrite) CDEEventIntegratorDidSaveBlock didSaveBlock;
 
 @property (readonly) NSManagedObjectContext *managedObjectContext;
 
