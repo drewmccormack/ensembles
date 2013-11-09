@@ -12,4 +12,7 @@
 
 - (NSString *)cde_modelHash;
 
+- (NSString *)cde_entityHashesPropertyList; // XML Dictionary
++ (NSDictionary *)cde_entityHashesByNameFromPropertyList:(NSString *)propertyList; 
+
 @end

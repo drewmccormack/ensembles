@@ -44,4 +44,17 @@
     XCTAssertEqualObjects(hash, expectedHash, @"Hash wrong");
 }
 
+- (void)testEntityHashesPropertyList
+{
+    NSString *propertyList = [model cde_entityHashesPropertyList];
+    NSDictionary *dictionary = [NSManagedObjectModel cde_entityHashesByNameFromPropertyList:propertyList];
+    XCTAssertNotNil(dictionary, @"Property list was nil");
+}
+
+- (void)testEntityHashesPropertyListWithNilString
+{
+    NSDictionary *dictionary = [NSManagedObjectModel cde_entityHashesByNameFromPropertyList:nil];
+    XCTAssertNil(dictionary, @"Property list was not nil");
+}
+
 @end
