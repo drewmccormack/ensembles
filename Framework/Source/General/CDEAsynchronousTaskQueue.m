@@ -8,6 +8,13 @@
 
 #import "CDEAsynchronousTaskQueue.h"
 
+@interface CDEAsynchronousTaskQueue ()
+
+@property (readwrite, atomic, assign) NSUInteger currentTaskIndex;
+
+@end
+
+
 @implementation CDEAsynchronousTaskQueue {
     NSArray *tasks;
     NSEnumerator *taskEnumerator;
@@ -84,6 +91,7 @@
         // and we don't want to have the block released when it is on the stack.
         // So we let the stack unwind first.
         CDEAsynchronousTaskBlock block = [taskEnumerator nextObject];
+        self.currentTaskIndex = [tasks indexOfObject:block];
         if (block) {
             CDEAsynchronousTaskCallbackBlock next = [^(NSError *error, BOOL stop) {
                 BOOL shouldStop = NO;
@@ -170,6 +178,13 @@
     @synchronized (self) {
         return isFinished;
     }
+}
+
+#pragma mark - Task Count Getter
+
+- (NSUInteger)tasksCount
+{
+    return [tasks count];
 }
 
 @end
