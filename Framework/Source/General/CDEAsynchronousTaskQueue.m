@@ -10,19 +10,22 @@
 
 @interface CDEAsynchronousTaskQueue ()
 
-@property (readwrite, atomic, assign) NSUInteger currentTaskIndex;
+@property (readwrite, atomic, assign) NSUInteger numberOfTasksCompleted;
+@property (readwrite, atomic, assign) CDETaskQueueTerminationPolicy terminationPolicy;
 
 @end
 
 
 @implementation CDEAsynchronousTaskQueue {
-    NSArray *tasks;
     NSEnumerator *taskEnumerator;
     CDECompletionBlock completion;
-    CDETaskQueueTerminationPolicy terminationPolicy;
     NSMutableArray *errors;
     BOOL isExecuting, isFinished;
 }
+
+@synthesize tasks = tasks;
+@synthesize numberOfTasksCompleted = numberOfTasksCompleted;
+@synthesize terminationPolicy = terminationPolicy;
 
 - (instancetype)initWithTasks:(NSArray *)newTasks terminationPolicy:(CDETaskQueueTerminationPolicy)policy completion:(CDECompletionBlock)newCompletion
 {
@@ -32,6 +35,7 @@
         terminationPolicy = policy;
         tasks = [newTasks copy];
         completion = [newCompletion copy];
+        numberOfTasksCompleted = 0;
     }
     return self;
 }
@@ -61,6 +65,8 @@
         [self didChangeValueForKey:@"isFinished"];
     }
     
+    self.numberOfTasksCompleted = 0;
+
     taskEnumerator = [tasks objectEnumerator];
     [self performSelector:@selector(startNextTask) withObject:nil afterDelay:0.0];
     
@@ -91,7 +97,7 @@
         // and we don't want to have the block released when it is on the stack.
         // So we let the stack unwind first.
         CDEAsynchronousTaskBlock block = [taskEnumerator nextObject];
-        self.currentTaskIndex = [tasks indexOfObject:block];
+        self.numberOfTasksCompleted = block ? [tasks indexOfObject:block] : tasks.count;
         if (block) {
             CDEAsynchronousTaskCallbackBlock next = [^(NSError *error, BOOL stop) {
                 BOOL shouldStop = NO;
@@ -180,11 +186,9 @@
     }
 }
 
-#pragma mark - Task Count Getter
-
-- (NSUInteger)tasksCount
+- (NSUInteger)numberOfTasks
 {
-    return [tasks count];
+    return tasks.count;
 }
 
 @end

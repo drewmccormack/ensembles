@@ -20,11 +20,13 @@ typedef enum {
 
 @interface CDEAsynchronousTaskQueue : NSOperation
 
+@property (atomic, copy, readonly) NSArray *tasks;
+@property (atomic, assign, readonly) NSUInteger numberOfTasks;
+@property (atomic, assign, readonly) NSUInteger numberOfTasksCompleted;
+@property (atomic, assign, readonly) CDETaskQueueTerminationPolicy terminationPolicy;
+
 - (instancetype)initWithTasks:(NSArray *)tasks terminationPolicy:(CDETaskQueueTerminationPolicy)policy completion:(CDECompletionBlock)completion; // Designated
 - (instancetype)initWithTasks:(NSArray *)tasks completion:(CDECompletionBlock)completion;
 - (instancetype)initWithTask:(CDEAsynchronousTaskBlock)task repeatCount:(NSUInteger)count terminationPolicy:(CDETaskQueueTerminationPolicy)policy completion:(CDECompletionBlock)completion;
-
-@property (readonly) NSUInteger tasksCount;
-@property (readonly) NSUInteger currentTaskIndex;
 
 @end
