@@ -24,4 +24,7 @@ typedef enum {
 - (instancetype)initWithTasks:(NSArray *)tasks completion:(CDECompletionBlock)completion;
 - (instancetype)initWithTask:(CDEAsynchronousTaskBlock)task repeatCount:(NSUInteger)count terminationPolicy:(CDETaskQueueTerminationPolicy)policy completion:(CDECompletionBlock)completion;
 
+@property (readonly) NSUInteger tasksCount;
+@property (readonly) NSUInteger currentTaskIndex;
+
 @end
