@@ -449,4 +449,64 @@
     [operationQueue addOperation:taskQueue];
 }
 
+#pragma mark Store Registration Info
+
+- (void)retrieveRegistrationInfoForStoreWithIdentifier:(NSString *)identifier completion:(void(^)(NSDictionary *info, NSError *error))completion
+{
+    // Remove any existing files in the cache first
+    NSError *error = nil;
+    BOOL success = [self removeFilesInDirectory:self.localStoresDownloadDirectory error:&error];
+    if (!success) {
+        if (completion) completion(nil, error);
+        return;
+    }
+    
+    NSString *remotePath = [self.remoteStoresDirectory stringByAppendingPathComponent:identifier];
+    NSString *localPath = [self.localStoresDownloadDirectory stringByAppendingPathComponent:identifier];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.cloudFileSystem fileExistsAtPath:remotePath completion:^(BOOL exists, BOOL isDirectory, NSError *error) {
+            if (error || !exists) {
+                if (completion) completion(nil, error);
+                return;
+            }
+            
+            [self.cloudFileSystem downloadFromPath:remotePath toLocalFile:localPath completion:^(NSError *error) {
+                NSDictionary *info = nil;
+                if (!error) {
+                    info = [NSDictionary dictionaryWithContentsOfFile:localPath];
+                    [fileManager removeItemAtPath:localPath error:NULL];
+                }
+                if (completion) completion(info, error);
+            }];
+        }];
+    });
+}
+
+- (void)setRegistrationInfo:(NSDictionary *)info forStoreWithIdentifier:(NSString *)identifier completion:(CDECompletionBlock)completion
+{
+    // Remove any existing files in the cache first
+    NSError *error = nil;
+    BOOL success = [self removeFilesInDirectory:self.localStoresUploadDirectory error:&error];
+    if (!success) {
+        if (completion) completion(error);
+        return;
+    }
+    
+    NSString *localPath = [self.localStoresUploadDirectory stringByAppendingPathComponent:identifier];
+    success = [info writeToFile:localPath atomically:YES];
+    if (!success) {
+        error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFailedToWriteFile userInfo:nil];
+        if (completion) completion(error);
+        return;
+    }
+
+    NSString *remotePath = [self.remoteStoresDirectory stringByAppendingPathComponent:identifier];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.cloudFileSystem uploadLocalFile:localPath toPath:remotePath completion:^(NSError *error) {
+            [fileManager removeItemAtPath:localPath error:NULL];
+            if (completion) completion(error);
+        }];
+    });
+}
+
 @end

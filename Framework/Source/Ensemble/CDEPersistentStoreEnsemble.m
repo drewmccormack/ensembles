@@ -21,6 +21,8 @@
 
 static NSString * const kCDEIdentityTokenContext = @"kCDEIdentityTokenContext";
 
+static NSString * const kCDEStoreIdentifierKey = @"storeIdentifier";
+static NSString * const kCDELeechDate = @"leechDate";
 
 NSString * const CDEMonitoredManagedObjectContextWillSaveNotification = @"CDEMonitoredManagedObjectContextWillSaveNotification";
 NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMonitoredManagedObjectContextDidSaveNotification";
@@ -236,7 +238,16 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
                     
                     CDEPersistentStoreImporter *importer = [[CDEPersistentStoreImporter alloc] initWithPersistentStoreAtPath:self.storePath managedObjectModel:self.managedObjectModel eventStore:self.eventStore];
                     importer.ensemble = self;
-                    [importer importWithCompletion:completion];
+                    [importer importWithCompletion:^(NSError *error) {
+                        if (error) {
+                            if (completion) completion(error);
+                            return;
+                        }
+                        
+                        // Register in cloud
+                        NSDictionary *info = @{kCDEStoreIdentifierKey: self.eventStore.persistentStoreIdentifier, kCDELeechDate: [NSDate date]};
+                        [self.cloudManager setRegistrationInfo:info forStoreWithIdentifier:self.eventStore.persistentStoreIdentifier completion:completion];
+                    }];
                 }];
             }];
         };
@@ -290,27 +301,55 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
     });
 }
 
+#pragma mark Checks
+
+- (void)forceDeleechDueToError:(NSError *)deleechError informCompletion:(CDECompletionBlock)completion
+{
+    [self deleechPersistentStoreWithCompletion:^(NSError *error) {
+        if (!error) {
+            if (completion) completion(deleechError);
+            if ([self.delegate respondsToSelector:@selector(persistentStoreEnsemble:didDeleechWithError:)]) {
+                [self.delegate persistentStoreEnsemble:self didDeleechWithError:deleechError];
+            }
+        }
+        else {
+            CDELog(CDELoggingLevelError, @"Could not force deleech");
+            if (completion) completion(nil);
+        }
+    }];
+}
+
 - (void)checkCloudFileSystemIdentityWithCompletion:(CDECompletionBlock)completion
 {
     BOOL identityValid = [self.cloudFileSystem.identityToken isEqual:self.eventStore.cloudFileSystemIdentityToken];
     if (self.leeched && !identityValid) {
-        [self deleechPersistentStoreWithCompletion:^(NSError *error) {
-            if (!error) {
-                NSError *deleechError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeCloudIdentityChanged userInfo:nil];
-                if (completion) completion(deleechError);
-                if ([self.delegate respondsToSelector:@selector(persistentStoreEnsemble:didDeleechWithError:)]) {
-                    [self.delegate persistentStoreEnsemble:self didDeleechWithError:deleechError];
-                }
-            }
-            else {
-                CDELog(CDELoggingLevelError, @"Could not deleech in identity check");
-                if (completion) completion(nil);
-            }
-        }];
+        NSError *deleechError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeCloudIdentityChanged userInfo:nil];
+        [self forceDeleechDueToError:deleechError informCompletion:completion];
     }
     else {
         [self dispatchCompletion:completion withError:nil];
     }
+}
+
+- (void)checkStoreRegistrationInCloudWithCompletion:(CDECompletionBlock)completion
+{
+    if (!self.eventStore.verifiesStoreRegistrationInCloud) {
+        [self dispatchCompletion:completion withError:nil];
+        return;
+    }
+    
+    NSString *storeId = self.eventStore.persistentStoreIdentifier;
+    [self.cloudManager retrieveRegistrationInfoForStoreWithIdentifier:storeId completion:^(NSDictionary *info, NSError *error) {
+        if (!error && !info) {
+            NSError *unregisteredError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeStoreUnregistered userInfo:nil];
+            [self forceDeleechDueToError:unregisteredError informCompletion:completion];
+        }
+        else {
+            // If there was an error, can't conclude anything about registration state. Assume registered.
+            // Don't want to deleech for no good reason.
+            [self dispatchCompletion:completion withError:nil];
+        }
+    }];
 }
 
 #pragma mark Accessors
@@ -346,6 +385,12 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
         }];
     };
     
+    CDEAsynchronousTaskBlock checkRegistrationTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self checkStoreRegistrationInCloudWithCompletion:^(NSError *error) {
+            next(error, NO);
+        }];
+    };
+    
     CDEAsynchronousTaskBlock processChangesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self processPendingChangesWithCompletion:^(NSError *error) {
             next(error, NO);
@@ -371,7 +416,7 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
         }];
     };
     
-    NSArray *tasks = @[checkIdentityTask, processChangesTask, importRemoteEventsTask, mergeEventsTask, exportEventsTask];
+    NSArray *tasks = @[checkIdentityTask, checkRegistrationTask, processChangesTask, importRemoteEventsTask, mergeEventsTask, exportEventsTask];
     CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:tasks terminationPolicy:CDETaskQueueTerminationPolicyStopOnError completion:^(NSError *error) {
         if (completion) completion(error);
         self.merging = NO;

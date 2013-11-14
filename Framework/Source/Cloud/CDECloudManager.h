@@ -29,4 +29,7 @@
 - (void)migrateNewLocalEventsToTransitCacheWithCompletion:(CDECompletionBlock)completion;
 - (void)transferFilesInTransitCacheToCloudWithCompletion:(CDECompletionBlock)completion;
 
+- (void)retrieveRegistrationInfoForStoreWithIdentifier:(NSString *)identifier completion:(void(^)(NSDictionary *info, NSError *error))completion;
+- (void)setRegistrationInfo:(NSDictionary *)info forStoreWithIdentifier:(NSString *)identifier completion:(CDECompletionBlock)completion;
+
 @end

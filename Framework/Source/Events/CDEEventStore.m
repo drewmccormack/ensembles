@@ -14,7 +14,7 @@
 NSString * const kCDEPersistentStoreIdentifierKey = @"persistentStoreIdentifier";
 NSString * const kCDECloudFileSystemIdentityKey = @"cloudFileSystemIdentity";
 NSString * const kCDEIncompleteEventIdentifiersKey = @"incompleteEventIdentifiers";
-NSString * const kCDEShouldVerifyStoreRegistrationInCloudKey = @"shouldVerifyStoreRegistrationInCloud";
+NSString * const kCDEVerifiesStoreRegistrationInCloudKey = @"verifiesStoreRegistrationInCloud";
 
 static NSString *defaultPathToEventDataRootDirectory = nil;
 
@@ -41,7 +41,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 @synthesize persistentStoreIdentifier = persistentStoreIdentifier;
 @synthesize pathToEventDataRootDirectory = pathToEventDataRootDirectory;
 @synthesize cloudFileSystemIdentityToken = cloudFileSystemIdentityToken;
-@synthesize shouldVerifyStoreRegistrationInCloud = shouldVerifyStoreRegistrationInCloud;
+@synthesize verifiesStoreRegistrationInCloud = verifiesStoreRegistrationInCloud;
 
 + (void)initialize
 {
@@ -94,7 +94,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
            kCDEPersistentStoreIdentifierKey : self.persistentStoreIdentifier,
            kCDECloudFileSystemIdentityKey : identityData,
            kCDEIncompleteEventIdentifiersKey : incompleteEventIdentifiers,
-           kCDEShouldVerifyStoreRegistrationInCloudKey : @(self.shouldVerifyStoreRegistrationInCloud)
+           kCDEVerifiesStoreRegistrationInCloudKey : @(self.verifiesStoreRegistrationInCloud)
         };
     }
     
@@ -113,14 +113,14 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
         persistentStoreIdentifier = storeMetadata[kCDEPersistentStoreIdentifierKey];
         incompleteEventIdentifiers = [storeMetadata[kCDEIncompleteEventIdentifiersKey] mutableCopy];
         
-        NSNumber *value = storeMetadata[kCDEShouldVerifyStoreRegistrationInCloudKey];
-        shouldVerifyStoreRegistrationInCloud = value ? value.boolValue : NO;
+        NSNumber *value = storeMetadata[kCDEVerifiesStoreRegistrationInCloudKey];
+        verifiesStoreRegistrationInCloud = value ? value.boolValue : NO;
     }
     else {
         cloudFileSystemIdentityToken = nil;
         persistentStoreIdentifier = nil;
         incompleteEventIdentifiers = nil;
-        shouldVerifyStoreRegistrationInCloud = YES;
+        verifiesStoreRegistrationInCloud = YES;
     }
     
     if (!incompleteEventIdentifiers) {

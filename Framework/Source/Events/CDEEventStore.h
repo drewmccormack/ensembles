@@ -18,7 +18,7 @@
 @property (nonatomic, copy, readonly) NSString *persistentStoreIdentifier;
 @property (nonatomic, strong, readonly) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, assign, readonly) BOOL containsEventData;
-@property (nonatomic, assign, readonly) BOOL shouldVerifyStoreRegistrationInCloud;
+@property (nonatomic, assign, readonly) BOOL verifiesStoreRegistrationInCloud;
 
 @property (nonatomic, strong, readonly) NSArray *incompleteEventIdentifiers;
 @property (nonatomic, strong, readonly) NSArray *incompleteMandatoryEventIdentifiers;
