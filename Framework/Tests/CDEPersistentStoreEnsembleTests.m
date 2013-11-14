@@ -50,7 +50,7 @@
     CDEMockLocalFileSystem *cloudFileSystem;
     NSString *cloudDir;
     NSURL *storeURL;
-    BOOL tokenChangeCausedDeleech;
+    BOOL deleechOccurred;
     BOOL finishedAsync;
 }
 
@@ -81,15 +81,13 @@
     ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"testensemble" persistentStorePath:storePath managedObjectModelURL:testModelURL cloudFileSystem:(id)cloudFileSystem];
     ensemble.delegate = self;
     
-    tokenChangeCausedDeleech = NO;
+    deleechOccurred = NO;
 }
 
 - (void)tearDown
 {
     NSArray *urls = [[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask];
-    NSString *appSupportDir = [urls.lastObject path];
-    NSString *eventStoreRoot = [appSupportDir stringByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]];
-    eventStoreRoot = [eventStoreRoot stringByAppendingPathComponent:@"com.mentalfaculty.ensembles.eventdata"];
+    NSString *eventStoreRoot = [ensemble.eventStore pathToEventDataRootDirectory];
     [[NSFileManager defaultManager] removeItemAtPath:eventStoreRoot error:NULL];
     [[NSFileManager defaultManager] removeItemAtPath:cloudDir error:NULL];
     [[NSFileManager defaultManager] removeItemAtURL:storeURL error:NULL];
@@ -115,8 +113,10 @@
 
 - (void)testLeech
 {
+    XCTAssertFalse(ensemble.isLeeched, @"Should not be leeched");
     [ensemble leechPersistentStoreWithCompletion:^(NSError *error) {
         XCTAssertNil(error, @"Error occurred while leeching");
+        XCTAssertTrue(ensemble.isLeeched, @"Should be leeched");
         [self finishAsync];
     }];
     [self waitForAsync];
@@ -145,11 +145,29 @@
 
 - (void)testChangingIdentityTokenCausesDeleech
 {
-    XCTAssertFalse(tokenChangeCausedDeleech, @"Should be NO");
+    XCTAssertFalse(deleechOccurred, @"Should be NO");
     [ensemble leechPersistentStoreWithCompletion:^(NSError *error) {
         XCTAssertNil(error, @"Error occurred while leeching");
         cloudFileSystem.identityToken = @"second";
         [self performSelector:@selector(checkForDeleech) withObject:nil afterDelay:0.05];
+    }];
+    [self waitForAsync];
+}
+
+- (void)testRemovingRegistrationInfoCausesDeleech
+{
+    XCTAssertFalse(deleechOccurred, @"Should be NO");
+    [ensemble leechPersistentStoreWithCompletion:^(NSError *error) {
+        XCTAssertNil(error, @"Error occurred while leeching");
+        
+        NSString *path = [cloudDir stringByAppendingPathComponent:@"testensemble/stores"];
+        path = [path stringByAppendingPathComponent:ensemble.eventStore.persistentStoreIdentifier];
+        [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
+        
+        [ensemble mergeWithCompletion:^(NSError *error) {
+            XCTAssertNotNil(error, @"Merge should fail due to missing store info");
+            [self checkForDeleech];
+        }];
     }];
     [self waitForAsync];
 }
@@ -189,28 +207,23 @@
     
     [self performSelector:@selector(checkForLeech) withObject:nil afterDelay:0.05];
     [self waitForAsync];
-    
-    [ensemble deleechPersistentStoreWithCompletion:^(NSError *error) {
-        [self finishAsync];
-    }];
-    [self waitForAsync];
 }
 
 - (void)checkForLeech
 {
-    XCTAssert(!tokenChangeCausedDeleech, @"A deleech occurred when it shouldn't have");
+    XCTAssert(!deleechOccurred, @"A deleech occurred when it shouldn't have");
     [self finishAsync];
 }
 
 - (void)checkForDeleech
 {
-    XCTAssert(tokenChangeCausedDeleech, @"No deleech occurred");
+    XCTAssert(deleechOccurred, @"No deleech occurred");
     [self finishAsync];
 }
 
 - (void)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didDeleechWithError:(NSError *)error
 {
-    tokenChangeCausedDeleech = YES;
+    deleechOccurred = YES;
 }
 
 @end

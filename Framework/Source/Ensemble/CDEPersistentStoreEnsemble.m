@@ -281,7 +281,9 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
 
 - (void)deleechPersistentStoreWithCompletion:(CDECompletionBlock)completion
 {
-    NSAssert([NSThread isMainThread], @"Remove store method called off main thread");
+    NSAssert([NSThread isMainThread], @"Deleech method called off main thread");
+    
+    BOOL removedStore = [eventStore removeEventStore];
     
     if (!self.isLeeched) {
         NSError *error = [[NSError alloc] initWithDomain:CDEErrorDomain code:CDEErrorCodeDisallowedStateChange userInfo:nil];
@@ -291,11 +293,10 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
         return;
     }
 
-    BOOL success = [eventStore removeEventStore];
     self.leeched = eventStore.containsEventData;
     
     NSError *error = nil;
-    if (!success) error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeUnknown userInfo:nil];
+    if (!removedStore) error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeUnknown userInfo:nil];
     dispatch_async(dispatch_get_main_queue(), ^{
         if (completion) completion(error);
     });
