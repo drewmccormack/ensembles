@@ -14,6 +14,7 @@
 NSString * const kCDEPersistentStoreIdentifierKey = @"persistentStoreIdentifier";
 NSString * const kCDECloudFileSystemIdentityKey = @"cloudFileSystemIdentity";
 NSString * const kCDEIncompleteEventIdentifiersKey = @"incompleteEventIdentifiers";
+NSString * const kCDEShouldVerifyStoreRegistrationInCloudKey = @"shouldVerifyStoreRegistrationInCloud";
 
 static NSString *defaultPathToEventDataRootDirectory = nil;
 
@@ -40,6 +41,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 @synthesize persistentStoreIdentifier = persistentStoreIdentifier;
 @synthesize pathToEventDataRootDirectory = pathToEventDataRootDirectory;
 @synthesize cloudFileSystemIdentityToken = cloudFileSystemIdentityToken;
+@synthesize shouldVerifyStoreRegistrationInCloud = shouldVerifyStoreRegistrationInCloud;
 
 + (void)initialize
 {
@@ -91,7 +93,8 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
         dictionary = @{
            kCDEPersistentStoreIdentifierKey : self.persistentStoreIdentifier,
            kCDECloudFileSystemIdentityKey : identityData,
-           kCDEIncompleteEventIdentifiersKey : incompleteEventIdentifiers
+           kCDEIncompleteEventIdentifiersKey : incompleteEventIdentifiers,
+           kCDEShouldVerifyStoreRegistrationInCloudKey : @(self.shouldVerifyStoreRegistrationInCloud)
         };
     }
     
@@ -109,11 +112,15 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
         cloudFileSystemIdentityToken = identityData ? [NSKeyedUnarchiver unarchiveObjectWithData:identityData] : nil;
         persistentStoreIdentifier = storeMetadata[kCDEPersistentStoreIdentifierKey];
         incompleteEventIdentifiers = [storeMetadata[kCDEIncompleteEventIdentifiersKey] mutableCopy];
+        
+        NSNumber *value = storeMetadata[kCDEShouldVerifyStoreRegistrationInCloudKey];
+        shouldVerifyStoreRegistrationInCloud = value ? value.boolValue : NO;
     }
     else {
         cloudFileSystemIdentityToken = nil;
         persistentStoreIdentifier = nil;
         incompleteEventIdentifiers = nil;
+        shouldVerifyStoreRegistrationInCloud = YES;
     }
     
     if (!incompleteEventIdentifiers) {
