@@ -86,7 +86,6 @@
 
 - (void)tearDown
 {
-    NSArray *urls = [[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask];
     NSString *eventStoreRoot = [ensemble.eventStore pathToEventDataRootDirectory];
     [[NSFileManager defaultManager] removeItemAtPath:eventStoreRoot error:NULL];
     [[NSFileManager defaultManager] removeItemAtPath:cloudDir error:NULL];
