@@ -147,7 +147,7 @@
         XCTAssertEqualObjects(insert.nameOfEntity, @"Child", @"Wrong entity for insert");
         
         NSArray *propertyChanges = insert.propertyChangeValues;
-        XCTAssertEqual(propertyChanges.count, (NSUInteger)5, @"Wrong number of property changes for insert");
+        XCTAssertEqual(propertyChanges.count, (NSUInteger)6, @"Wrong number of property changes for insert");
         
         CDEPropertyChangeValue *parentChangeValue = [insert propertyChangeValueForPropertyName:@"parent"];
         XCTAssertNotNil(parentChangeValue, @"Should be a change value for the parent");
@@ -183,7 +183,7 @@
         XCTAssertEqualObjects(insert.nameOfEntity, @"Child", @"Wrong entity for insert");
         
         NSArray *propertyChanges = insert.propertyChangeValues;
-        XCTAssertEqual(propertyChanges.count, (NSUInteger)5, @"Wrong number of property changes for insert");
+        XCTAssertEqual(propertyChanges.count, (NSUInteger)6, @"Wrong number of property changes for insert");
         
         CDEPropertyChangeValue *parentChangeValue = [insert propertyChangeValueForPropertyName:@"parentWithSiblings"];
         XCTAssertNotNil(parentChangeValue, @"Should be a change value for the parent");
@@ -224,7 +224,7 @@
         XCTAssertEqualObjects(childInsert.nameOfEntity, @"Child", @"Wrong entity for insert");
         
         NSArray *propertyChanges = childInsert.propertyChangeValues;
-        XCTAssertEqual(propertyChanges.count, (NSUInteger)5, @"Wrong number of property changes for insert");
+        XCTAssertEqual(propertyChanges.count, (NSUInteger)6, @"Wrong number of property changes for insert");
         
         CDEPropertyChangeValue *changeValue = [childInsert propertyChangeValueForPropertyName:@"testFriends"];
         XCTAssertNotNil(changeValue, @"Should be a change value for the testFriends");

@@ -27,13 +27,19 @@
     NSString *rootTestDir;
     NSString *cloudDir;
     NSDictionary *willSaveInfo, *didSaveInfo;
+    NSInteger failedSaveErrorCode;
     BOOL didSaveRepairMethodWasCalled, willSaveRepairMethodWasCalled, failedSaveRepairMethodWasCalled;
     BOOL finishedAsync;
+    BOOL testingDidFail;
 }
 
 - (void)setUp
 {
     [super setUp];
+    
+    didSaveRepairMethodWasCalled = NO;
+    willSaveRepairMethodWasCalled = NO;
+    failedSaveRepairMethodWasCalled = NO;
     
     rootTestDir = [NSTemporaryDirectory() stringByAppendingPathComponent:@"CDEPersistentStoreEnsembleMergeTests"];
     [[NSFileManager defaultManager] removeItemAtPath:rootTestDir error:NULL];
@@ -86,10 +92,14 @@
         [self finishAsync];
     }];
     [self waitForAsync];
+    
+    testingDidFail = NO;
 }
 
 - (void)tearDown
 {
+    willSaveInfo = nil;
+    didSaveInfo = nil;
     [[NSFileManager defaultManager] removeItemAtPath:rootTestDir error:NULL];
     [super tearDown];
 }
@@ -106,7 +116,7 @@
     CFRunLoopStop(CFRunLoopGetCurrent());
 }
 
-- (void)testWillSaveMergeRepairMethodGetsInvoked
+- (void)testWillSaveMergeRepairMethod
 {
     [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:managedObjectContext2];
     [managedObjectContext2 save:NULL];
@@ -124,7 +134,7 @@
     [self waitForAsync];
 }
 
-- (void)testDidSaveMergeRepairMethodGetsInvoked
+- (void)testDidSaveMergeRepairMethod
 {
     [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:managedObjectContext2];
     [managedObjectContext2 save:NULL];
@@ -142,6 +152,47 @@
     [self waitForAsync];
 }
 
+- (void)testDidFailMergeRepairMethod
+{
+    id parentInContext2 = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:managedObjectContext2];
+    [managedObjectContext2 save:NULL];
+    [ensemble2 mergeWithCompletion:^(NSError *error) {
+        XCTAssertNil(error, @"Merge failed");
+        [self finishAsync];
+    }];
+    [self waitForAsync];
+    
+    [ensemble1 mergeWithCompletion:^(NSError *error) {
+        [self finishAsync];
+    }];
+    [self waitForAsync];
+    
+    // Add conflicting changes, adding up to too many children for the relationship
+    id child3 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:managedObjectContext2];
+    [parentInContext2 setValue:[NSSet setWithObjects:child3, nil] forKey:@"maxedChildren"];
+    [managedObjectContext2 save:NULL];
+    
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
+    id parentInContext1 = [[managedObjectContext1 executeFetchRequest:fetch error:NULL] lastObject];
+    id child1 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:managedObjectContext1];
+    id child2 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:managedObjectContext1];
+    [parentInContext1 setValue:[NSSet setWithObjects:child1, child2, nil] forKey:@"maxedChildren"];
+    [managedObjectContext1 save:NULL];
+    
+    // Merge
+    [ensemble2 mergeWithCompletion:^(NSError *error) {
+        [self finishAsync];
+    }];
+    [self waitForAsync];
+    
+    testingDidFail = YES;
+    ensemble1.delegate = self;
+    [ensemble1 mergeWithCompletion:^(NSError *error) {
+        [self performSelector:@selector(checkForDidFailRepair) withObject:nil afterDelay:0.05];
+    }];
+    [self waitForAsync];
+}
+
 - (void)checkForWillSaveRepair
 {
     XCTAssert(willSaveRepairMethodWasCalled, @"No will-save method invocation occurred");
@@ -154,6 +205,15 @@
 - (void)checkForDidSaveRepair
 {
     XCTAssert(didSaveRepairMethodWasCalled, @"No did-save method invocation occurred");
+    XCTAssert([willSaveInfo[NSInsertedObjectsKey] count] == 1, @"Wrong count for inserted objects");
+    XCTAssert([willSaveInfo[NSUpdatedObjectsKey] count] == 0, @"Wrong count for updated objects");
+    [self finishAsync];
+}
+
+- (void)checkForDidFailRepair
+{
+    XCTAssert(failedSaveRepairMethodWasCalled, @"No did-fail method invocation occurred");
+    XCTAssertEqual(failedSaveErrorCode, (NSInteger)NSValidationRelationshipExceedsMaximumCountError, @"Wrong error code");
     [self finishAsync];
 }
 
@@ -166,11 +226,13 @@
 - (BOOL)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didFailToSaveMergedChangesInManagedObjectContext:(NSManagedObjectContext *)context error:(NSError *)error
 {
     failedSaveRepairMethodWasCalled = YES;
+    failedSaveErrorCode = error.code;
     return NO;
 }
 
 - (void)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didSaveMergeChangesWithNotification:(NSNotification *)notification
 {
+    didSaveInfo = notification.userInfo;
     didSaveRepairMethodWasCalled = YES;
 }
 
