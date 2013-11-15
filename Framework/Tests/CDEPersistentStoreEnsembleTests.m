@@ -32,6 +32,7 @@
     NSURL *storeURL;
     BOOL deleechOccurred;
     BOOL finishedAsync;
+    BOOL testingSavingDuringLeeching;
 }
 
 - (void)setUp
@@ -64,9 +65,9 @@
     [managedObjectContext save:NULL];
     
     ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"testensemble" persistentStorePath:storePath managedObjectModelURL:testModelURL cloudFileSystem:(id)cloudFileSystem];
-    ensemble.delegate = self;
     
     deleechOccurred = NO;
+    testingSavingDuringLeeching = NO;
 }
 
 - (void)tearDown
@@ -127,6 +128,7 @@
 - (void)testChangingIdentityTokenCausesDeleech
 {
     XCTAssertFalse(deleechOccurred, @"Should be NO");
+    ensemble.delegate = self;
     [ensemble leechPersistentStoreWithCompletion:^(NSError *error) {
         XCTAssertNil(error, @"Error occurred while leeching");
         cloudFileSystem.identityToken = @"second";
@@ -138,6 +140,7 @@
 - (void)testRemovingRegistrationInfoCausesDeleech
 {
     XCTAssertFalse(deleechOccurred, @"Should be NO");
+    ensemble.delegate = self;
     [ensemble leechPersistentStoreWithCompletion:^(NSError *error) {
         XCTAssertNil(error, @"Error occurred while leeching");
         
@@ -190,6 +193,17 @@
     [self waitForAsync];
 }
 
+- (void)testSavingDuringLeechingCausesError
+{
+    ensemble.delegate = self;
+    testingSavingDuringLeeching = YES;
+    [ensemble leechPersistentStoreWithCompletion:^(NSError *error) {
+        XCTAssertNotNil(error, @"Error should have occurred while leeching");
+        [self finishAsync];
+    }];
+    [self waitForAsync];
+}
+
 #pragma mark Flag Checks
 
 - (void)checkForLeech
@@ -209,6 +223,15 @@
 - (void)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didDeleechWithError:(NSError *)error
 {
     deleechOccurred = YES;
+}
+
+- (void)persistentStoreEnsembleWillImportStore:(CDEPersistentStoreEnsemble *)ensemble
+{
+    if (!testingSavingDuringLeeching) return;
+    
+    // Save here to cause leech to fail
+    [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:managedObjectContext];
+    [managedObjectContext save:NULL];
 }
 
 @end

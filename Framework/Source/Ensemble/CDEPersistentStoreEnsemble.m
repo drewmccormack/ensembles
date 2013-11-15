@@ -45,7 +45,9 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
 @end
 
 
-@implementation CDEPersistentStoreEnsemble
+@implementation CDEPersistentStoreEnsemble {
+    BOOL saveOccurredDuringImport;
+}
 
 @synthesize cloudFileSystem = cloudFileSystem;
 @synthesize ensembleIdentifier = ensembleIdentifier;
@@ -126,6 +128,7 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
 
 - (void)dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [saveMonitor stopMonitoring];
 }
 
@@ -236,11 +239,34 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
                         return;
                     }
                     
+                    // Listen for save notifications, and fail if a save to the store happens
+                    // during the import
+                    saveOccurredDuringImport = NO;
+                    [self beginObservingSaveNotifications];
+                    
+                    // Inform delegate of import
+                    if ([self.delegate respondsToSelector:@selector(persistentStoreEnsembleWillImportStore:)]) {
+                        [self.delegate persistentStoreEnsembleWillImportStore:self];
+                    }
+                    
                     CDEPersistentStoreImporter *importer = [[CDEPersistentStoreImporter alloc] initWithPersistentStoreAtPath:self.storePath managedObjectModel:self.managedObjectModel eventStore:self.eventStore];
                     importer.ensemble = self;
                     [importer importWithCompletion:^(NSError *error) {
+                        [self endObservingSaveNotifications];
+                        
                         if (error) {
                             if (completion) completion(error);
+                            return;
+                        }
+                        
+                        if ([self.delegate respondsToSelector:@selector(persistentStoreEnsembleDidImportStore:)]) {
+                            [self.delegate persistentStoreEnsembleDidImportStore:self];
+                        }
+                        
+                        // Deleech if a save occurred during import
+                        if (saveOccurredDuringImport) {
+                            error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorSaveOccurredDuringLeeching userInfo:nil];
+                            [self forceDeleechDueToError:error informCompletion:completion];
                             return;
                         }
                         
@@ -300,6 +326,30 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
     dispatch_async(dispatch_get_main_queue(), ^{
         if (completion) completion(error);
     });
+}
+
+#pragma mark Observing saves during import
+
+- (void)beginObservingSaveNotifications
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(managedObjectContextWillSave:) name:NSManagedObjectContextWillSaveNotification object:nil];
+}
+
+- (void)endObservingSaveNotifications
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextWillSaveNotification object:nil];
+}
+
+- (void)managedObjectContextWillSave:(NSNotification *)notif
+{
+    NSManagedObjectContext *context = notif.object;
+    NSArray *stores = context.persistentStoreCoordinator.persistentStores;
+    for (NSPersistentStore *store in stores) {
+        if ([self.storePath isEqualToString:store.URL.path]) {
+            saveOccurredDuringImport = YES;
+            break;
+        }
+    }
 }
 
 #pragma mark Checks

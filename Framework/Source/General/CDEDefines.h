@@ -35,6 +35,7 @@ typedef NS_ENUM(NSInteger, CDEErrorCode) {
     CDEErrorCodeDataCorruptionDetected      = 203,
     CDEErrorCodeUnknownModelVersion         = 204,
     CDEErrorCodeStoreUnregistered           = 205,
+    CDEErrorSaveOccurredDuringLeeching      = 206,
     CDEErrorCodeNetworkError                = 1000,
     CDEErrorCodeServerError                 = 1001,
     CDEErrorConnectionError                 = 1002,
