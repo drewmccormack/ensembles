@@ -10,29 +10,7 @@
 #import "CDEEventStore.h"
 #import "CDEPersistentStoreEnsemble.h"
 #import "CDELocalCloudFileSystem.h"
-
-@interface CDEMockLocalFileSystem : CDELocalCloudFileSystem
-
-@property (nonatomic, readwrite) id <NSObject, NSCoding, NSCopying> identityToken;
-
-@end
-
-@implementation CDEMockLocalFileSystem {
-    id <NSObject, NSCopying, NSCoding> _identityToken;
-}
-
-- (id <NSObject, NSCopying, NSCoding>)identityToken
-{
-    return _identityToken;
-}
-
-- (void)setIdentityToken:(id <NSObject, NSCopying, NSCoding>)newToken
-{
-    _identityToken = newToken;
-}
-
-@end
-
+#import "CDEMockLocalFileSystem.h"
 
 @interface CDEPersistentStoreEnsemble (CDETestMethods)
 
@@ -48,6 +26,8 @@
 @implementation CDEPersistentStoreEnsembleTests {
     CDEPersistentStoreEnsemble *ensemble;
     CDEMockLocalFileSystem *cloudFileSystem;
+    NSManagedObjectContext *managedObjectContext;
+    NSString *rootDir;
     NSString *cloudDir;
     NSURL *storeURL;
     BOOL deleechOccurred;
@@ -58,14 +38,19 @@
 {
     [super setUp];
     
-    cloudDir = [NSTemporaryDirectory() stringByAppendingString:@"CDEPersistentStoreEnsembleTests"];
-    [[NSFileManager defaultManager] removeItemAtPath:cloudDir error:NULL];
+    rootDir = [NSTemporaryDirectory() stringByAppendingPathComponent:@"CDEPersistentStoreEnsembleTests"];
+    [[NSFileManager defaultManager] removeItemAtPath:rootDir error:NULL];
+    [[NSFileManager defaultManager] createDirectoryAtPath:rootDir withIntermediateDirectories:YES attributes:nil error:NULL];
+    
+    [CDEEventStore setDefaultPathToEventDataRootDirectory:[rootDir stringByAppendingPathComponent:@"eventStore"]];
+    
+    cloudDir = [rootDir stringByAppendingPathComponent:@"cloud"];
     [[NSFileManager defaultManager] createDirectoryAtPath:cloudDir withIntermediateDirectories:YES attributes:nil error:NULL];
 
     cloudFileSystem = (id)[[CDEMockLocalFileSystem alloc] initWithRootDirectory:cloudDir];
     cloudFileSystem.identityToken = @"first";
     
-    NSString *storePath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"teststore.sqlite"];
+    NSString *storePath = [rootDir stringByAppendingPathComponent:@"teststore.sqlite"];
     storeURL = [NSURL fileURLWithPath:storePath];
     [[NSFileManager defaultManager] removeItemAtURL:storeURL error:NULL];
     
@@ -73,10 +58,10 @@
     NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:testModelURL];
     NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:model];
     [coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:nil error:NULL];
-    NSManagedObjectContext *context = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
-    context.persistentStoreCoordinator = coordinator;
-    [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context];
-    [context save:NULL];
+    managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
+    managedObjectContext.persistentStoreCoordinator = coordinator;
+    [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:managedObjectContext];
+    [managedObjectContext save:NULL];
     
     ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"testensemble" persistentStorePath:storePath managedObjectModelURL:testModelURL cloudFileSystem:(id)cloudFileSystem];
     ensemble.delegate = self;
@@ -86,10 +71,7 @@
 
 - (void)tearDown
 {
-    NSString *eventStoreRoot = [ensemble.eventStore pathToEventDataRootDirectory];
-    [[NSFileManager defaultManager] removeItemAtPath:eventStoreRoot error:NULL];
-    [[NSFileManager defaultManager] removeItemAtPath:cloudDir error:NULL];
-    [[NSFileManager defaultManager] removeItemAtURL:storeURL error:NULL];
+    [[NSFileManager defaultManager] removeItemAtPath:rootDir error:NULL];
     [super tearDown];
 }
 
@@ -208,6 +190,8 @@
     [self waitForAsync];
 }
 
+#pragma mark Flag Checks
+
 - (void)checkForLeech
 {
     XCTAssert(!deleechOccurred, @"A deleech occurred when it shouldn't have");
@@ -219,6 +203,8 @@
     XCTAssert(deleechOccurred, @"No deleech occurred");
     [self finishAsync];
 }
+
+#pragma mark Ensemble Delegate Methods
 
 - (void)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didDeleechWithError:(NSError *)error
 {

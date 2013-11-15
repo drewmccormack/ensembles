@@ -58,6 +58,10 @@
 		075B3FCD18097A260089D4D3 /* libensembles_ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF374517F184DD00C56F64 /* libensembles_ios.a */; };
 		075B3FCF18097A370089D4D3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 075B3FCE18097A370089D4D3 /* UIKit.framework */; };
 		075B3FE718097C710089D4D3 /* DropboxSDK.xcodeproj in Resources */ = {isa = PBXBuildFile; fileRef = 075B3FE618097C710089D4D3 /* DropboxSDK.xcodeproj */; };
+		075FDCE5183628F90020E1C9 /* CDEIntegratorMergeRepairTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 075FDCDF183628F90020E1C9 /* CDEIntegratorMergeRepairTests.m */; };
+		075FDCE6183628F90020E1C9 /* CDEMockLocalFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 075FDCE1183628F90020E1C9 /* CDEMockLocalFileSystem.m */; };
+		075FDCE7183628F90020E1C9 /* CDEPersistentStoreEnsembleMergeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 075FDCE2183628F90020E1C9 /* CDEPersistentStoreEnsembleMergeTests.m */; };
+		075FDCE8183628F90020E1C9 /* CDEStoreModificationEventTestsModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 075FDCE3183628F90020E1C9 /* CDEStoreModificationEventTestsModel.xcdatamodeld */; };
 		07BF374917F184DD00C56F64 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF374817F184DD00C56F64 /* Foundation.framework */; };
 		07BF37AA17F1853000C56F64 /* CDECloudDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF377017F1853000C56F64 /* CDECloudDirectory.m */; };
 		07BF37AB17F1853000C56F64 /* CDECloudFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF377217F1853000C56F64 /* CDECloudFile.m */; };
@@ -186,6 +190,11 @@
 		075B3FC7180979580089D4D3 /* DropboxSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = DropboxSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		075B3FCE18097A370089D4D3 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		075B3FE618097C710089D4D3 /* DropboxSDK.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = DropboxSDK.xcodeproj; path = ../Vendor/DropboxSDK/DropboxSDK/DropboxSDK.xcodeproj; sourceTree = "<group>"; };
+		075FDCDF183628F90020E1C9 /* CDEIntegratorMergeRepairTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEIntegratorMergeRepairTests.m; sourceTree = "<group>"; };
+		075FDCE0183628F90020E1C9 /* CDEMockLocalFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEMockLocalFileSystem.h; sourceTree = "<group>"; };
+		075FDCE1183628F90020E1C9 /* CDEMockLocalFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEMockLocalFileSystem.m; sourceTree = "<group>"; };
+		075FDCE2183628F90020E1C9 /* CDEPersistentStoreEnsembleMergeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEPersistentStoreEnsembleMergeTests.m; sourceTree = "<group>"; };
+		075FDCE4183628F90020E1C9 /* CDEStoreModificationEventTestsModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEStoreModificationEventTestsModel.xcdatamodel; sourceTree = "<group>"; };
 		07BF374517F184DD00C56F64 /* libensembles_ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libensembles_ios.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		07BF374817F184DD00C56F64 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		07BF376F17F1853000C56F64 /* CDECloudDirectory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDECloudDirectory.h; sourceTree = "<group>"; };
@@ -327,6 +336,7 @@
 		070D33CC18018BF80054BA23 /* Unit Tests */ = {
 			isa = PBXGroup;
 			children = (
+				075FDCE3183628F90020E1C9 /* CDEStoreModificationEventTestsModel.xcdatamodeld */,
 				070D337618018AAD0054BA23 /* CDEBasicIntegratorRelationshipTests.m */,
 				070D337718018AAD0054BA23 /* CDECloudManagerTests.m */,
 				070D337818018AAD0054BA23 /* CDEDeviceRevisionSetTests.m */,
@@ -341,10 +351,12 @@
 				070D338118018AAD0054BA23 /* CDEIntegratorTestCase.m */,
 				070D338218018AAD0054BA23 /* CDEIntegratorTests.m */,
 				070D338318018AAD0054BA23 /* CDEIntegratorUpdateTests.m */,
+				075FDCDF183628F90020E1C9 /* CDEIntegratorMergeRepairTests.m */,
 				070D338418018AAD0054BA23 /* CDEMockCloudFileSystem.h */,
 				070D338518018AAD0054BA23 /* CDEMockCloudFileSystem.m */,
 				070D338618018AAD0054BA23 /* CDEObjectChangeTests.m */,
 				070D338818018AAD0054BA23 /* CDEPersistentStoreEnsembleTests.m */,
+				075FDCE2183628F90020E1C9 /* CDEPersistentStoreEnsembleMergeTests.m */,
 				070D338918018AAD0054BA23 /* CDEPropertyChangeValueTests.m */,
 				070D338A18018AAD0054BA23 /* CDERevisionManagerTests.m */,
 				070D338B18018AAD0054BA23 /* CDESaveMonitorRelationshipTests.m */,
@@ -352,6 +364,8 @@
 				070D338D18018AAD0054BA23 /* CDEStoreModificationEventTests.m */,
 				070D33D11801A0770054BA23 /* CDEGlobalIdentifierTests.m */,
 				07D2D63F182D6887001D24BC /* CDEManagedObjectModelTests.m */,
+				075FDCE0183628F90020E1C9 /* CDEMockLocalFileSystem.h */,
+				075FDCE1183628F90020E1C9 /* CDEMockLocalFileSystem.m */,
 			);
 			name = "Unit Tests";
 			sourceTree = "<group>";
@@ -675,6 +689,7 @@
 				07D2D640182D6887001D24BC /* CDEManagedObjectModelTests.m in Sources */,
 				070D33A618018AAD0054BA23 /* CDEDeviceRevisionSetTests.m in Sources */,
 				070D33BB18018AAD0054BA23 /* CDETwoWaySyncTests.m in Sources */,
+				075FDCE6183628F90020E1C9 /* CDEMockLocalFileSystem.m in Sources */,
 				070D33AE18018AAD0054BA23 /* CDEIntegratorTests.m in Sources */,
 				070D33AB18018AAD0054BA23 /* CDEEventStoreTests.m in Sources */,
 				070D33AC18018AAD0054BA23 /* CDEIntegratorCornerCases.m in Sources */,
@@ -688,9 +703,12 @@
 				070D33D21801A0770054BA23 /* CDEGlobalIdentifierTests.m in Sources */,
 				072BA980180AAD0E003AA94E /* CDEEventStoreModel.xcdatamodeld in Sources */,
 				070D33B018018AAD0054BA23 /* CDEMockCloudFileSystem.m in Sources */,
+				075FDCE7183628F90020E1C9 /* CDEPersistentStoreEnsembleMergeTests.m in Sources */,
 				070D33A718018AAD0054BA23 /* CDEDeviceRevisionTests.m in Sources */,
 				070D33AF18018AAD0054BA23 /* CDEIntegratorUpdateTests.m in Sources */,
 				070D33B118018AAD0054BA23 /* CDEObjectChangeTests.m in Sources */,
+				075FDCE8183628F90020E1C9 /* CDEStoreModificationEventTestsModel.xcdatamodeld in Sources */,
+				075FDCE5183628F90020E1C9 /* CDEIntegratorMergeRepairTests.m in Sources */,
 				070D33B718018AAD0054BA23 /* CDESaveMonitorTests.m in Sources */,
 				070D33A918018AAD0054BA23 /* CDEEventMigratorTests.m in Sources */,
 				070D33BA18018AAD0054BA23 /* CDESyncTest.m in Sources */,
@@ -945,6 +963,16 @@
 			currentVersion = 072BA97E180AACD9003AA94E /* CDEEventStoreModel_1.xcdatamodel */;
 			name = CDEEventStoreModel.xcdatamodeld;
 			path = ../../Resources/CDEEventStoreModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+		075FDCE3183628F90020E1C9 /* CDEStoreModificationEventTestsModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				075FDCE4183628F90020E1C9 /* CDEStoreModificationEventTestsModel.xcdatamodel */,
+			);
+			currentVersion = 075FDCE4183628F90020E1C9 /* CDEStoreModificationEventTestsModel.xcdatamodel */;
+			path = CDEStoreModificationEventTestsModel.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};

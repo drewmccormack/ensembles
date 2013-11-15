@@ -55,6 +55,10 @@
 		075B3FB8180972380089D4D3 /* CDEDropboxCloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 075B3FB6180972380089D4D3 /* CDEDropboxCloudFileSystem.m */; };
 		075B3FBC1809765B0089D4D3 /* DropboxOSX.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 075B3FBB1809765B0089D4D3 /* DropboxOSX.framework */; };
 		075B3FE518097C690089D4D3 /* DropboxSDK.xcodeproj in Resources */ = {isa = PBXBuildFile; fileRef = 075B3FE418097C690089D4D3 /* DropboxSDK.xcodeproj */; };
+		075FDCD518360B0E0020E1C9 /* CDEIntegratorMergeRepairTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 075FDCD418360B0E0020E1C9 /* CDEIntegratorMergeRepairTests.m */; };
+		075FDCDA183611680020E1C9 /* CDEPersistentStoreEnsembleMergeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 075FDCD9183611680020E1C9 /* CDEPersistentStoreEnsembleMergeTests.m */; };
+		075FDCDD183615C60020E1C9 /* CDEMockLocalFileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 075FDCDB183615C60020E1C9 /* CDEMockLocalFileSystem.h */; };
+		075FDCDE183615C60020E1C9 /* CDEMockLocalFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 075FDCDC183615C60020E1C9 /* CDEMockLocalFileSystem.m */; };
 		0760274217F8672200329299 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 078ABF4917F19195008C9B27 /* CDEEventStoreModel.xcdatamodeld */; };
 		07697A7817E0BD0800A9BB63 /* CDEMockCloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 07697A7717E0BD0800A9BB63 /* CDEMockCloudFileSystem.m */; };
 		077B555317D1E5A0008AA7F7 /* DoubleInsertFixture.json in Resources */ = {isa = PBXBuildFile; fileRef = 077B555217D1E5A0008AA7F7 /* DoubleInsertFixture.json */; };
@@ -188,6 +192,10 @@
 		075B3FB91809763B0089D4D3 /* libSDropboxSDK.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDropboxSDK.a; path = "../Vendor/DropboxSDK/DropboxSDK/build/Debug-iphoneos/libSDropboxSDK.a"; sourceTree = "<group>"; };
 		075B3FBB1809765B0089D4D3 /* DropboxOSX.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DropboxOSX.framework; path = ../Vendor/DropboxSDK/DropboxSDK/build/Debug/DropboxOSX.framework; sourceTree = "<group>"; };
 		075B3FE418097C690089D4D3 /* DropboxSDK.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = DropboxSDK.xcodeproj; path = ../Vendor/DropboxSDK/DropboxSDK/DropboxSDK.xcodeproj; sourceTree = "<group>"; };
+		075FDCD418360B0E0020E1C9 /* CDEIntegratorMergeRepairTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEIntegratorMergeRepairTests.m; sourceTree = "<group>"; };
+		075FDCD9183611680020E1C9 /* CDEPersistentStoreEnsembleMergeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEPersistentStoreEnsembleMergeTests.m; sourceTree = "<group>"; };
+		075FDCDB183615C60020E1C9 /* CDEMockLocalFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEMockLocalFileSystem.h; sourceTree = "<group>"; };
+		075FDCDC183615C60020E1C9 /* CDEMockLocalFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEMockLocalFileSystem.m; sourceTree = "<group>"; };
 		07697A7117E0B6C000A9BB63 /* CDECloudManagerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDECloudManagerTests.m; sourceTree = "<group>"; };
 		07697A7617E0BD0800A9BB63 /* CDEMockCloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEMockCloudFileSystem.h; sourceTree = "<group>"; };
 		07697A7717E0BD0800A9BB63 /* CDEMockCloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEMockCloudFileSystem.m; sourceTree = "<group>"; };
@@ -295,8 +303,12 @@
 				07697A7117E0B6C000A9BB63 /* CDECloudManagerTests.m */,
 				07697A7617E0BD0800A9BB63 /* CDEMockCloudFileSystem.h */,
 				07697A7717E0BD0800A9BB63 /* CDEMockCloudFileSystem.m */,
+				075FDCDB183615C60020E1C9 /* CDEMockLocalFileSystem.h */,
+				075FDCDC183615C60020E1C9 /* CDEMockLocalFileSystem.m */,
 				072BD7BE17F30A1E00D19306 /* CDEPersistentStoreEnsembleTests.m */,
+				075FDCD9183611680020E1C9 /* CDEPersistentStoreEnsembleMergeTests.m */,
 				07D2D637182D65FB001D24BC /* CDEManagedObjectModelTests.m */,
+				075FDCD418360B0E0020E1C9 /* CDEIntegratorMergeRepairTests.m */,
 			);
 			name = "Unit Tests";
 			sourceTree = "<group>";
@@ -539,6 +551,7 @@
 				07BF7A61177F0A9D0029D500 /* CDEObjectChange.h in Headers */,
 				07BF7A67177F0A9D0029D500 /* CDEStoreModificationEvent.h in Headers */,
 				07BF7A41177F0A9D0029D500 /* CDEPropertyChangeValue.h in Headers */,
+				075FDCDD183615C60020E1C9 /* CDEMockLocalFileSystem.h in Headers */,
 				07D2D632182D627E001D24BC /* NSManagedObjectModel+CDEAdditions.h in Headers */,
 				07BF7A5B177F0A9D0029D500 /* CDEGlobalIdentifier.h in Headers */,
 				07BF7A1F177F0A9D0029D500 /* CDECloudDirectory.h in Headers */,
@@ -688,6 +701,7 @@
 			files = (
 				07D2D638182D65FB001D24BC /* CDEManagedObjectModelTests.m in Sources */,
 				0722B27117B770A600496F4A /* CDEObjectChangeTests.m in Sources */,
+				075FDCDA183611680020E1C9 /* CDEPersistentStoreEnsembleMergeTests.m in Sources */,
 				072E5AEE17EB44C3002D9604 /* CDETwoWaySyncTests.m in Sources */,
 				0722B27017B770A000496F4A /* CDEEventStoreTests.m in Sources */,
 				07E2875417BF8D470008CC4F /* CDESaveMonitorRelationshipTests.m in Sources */,
@@ -708,6 +722,7 @@
 				070D33D018019A680054BA23 /* CDEGlobalIdentifierTests.m in Sources */,
 				072E5AEC17EB4332002D9604 /* CDESyncTest.m in Sources */,
 				073BB0CB1780841E0061466E /* CDEStoreModificationEventTestsModel.xcdatamodeld in Sources */,
+				075FDCD518360B0E0020E1C9 /* CDEIntegratorMergeRepairTests.m in Sources */,
 				074DE60F17B7797E009755EB /* CDEEventDeviceRevisionTests.m in Sources */,
 				072BD7BF17F30A1E00D19306 /* CDEPersistentStoreEnsembleTests.m in Sources */,
 				074DE61117B779D8009755EB /* CDEDeviceRevisionTests.m in Sources */,
@@ -721,6 +736,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				074B957217EC45660016F84D /* CDEICloudFileSystem.m in Sources */,
+				075FDCDE183615C60020E1C9 /* CDEMockLocalFileSystem.m in Sources */,
 				07BF7A21177F0A9D0029D500 /* CDECloudDirectory.m in Sources */,
 				07BF7A43177F0A9D0029D500 /* CDEPropertyChangeValue.m in Sources */,
 				07D2D633182D627E001D24BC /* NSManagedObjectModel+CDEAdditions.m in Sources */,
