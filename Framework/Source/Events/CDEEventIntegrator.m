@@ -707,6 +707,7 @@
                     return;
                 }
                 merged = [self saveUserMergeContext:userMergeContext error:error];
+                if (!merged) CDELog(CDELoggingLevelError, @"Saving merge context after willSave changes failed: %@", error);
             }
         }];
     }
