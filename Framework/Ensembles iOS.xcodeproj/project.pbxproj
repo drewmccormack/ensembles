@@ -49,19 +49,17 @@
 		070D33D21801A0770054BA23 /* CDEGlobalIdentifierTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D33D11801A0770054BA23 /* CDEGlobalIdentifierTests.m */; };
 		072BA97F180AACD9003AA94E /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 072BA97C180AACD9003AA94E /* CDEEventStoreModel.xcdatamodeld */; };
 		072BA980180AAD0E003AA94E /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 072BA97C180AACD9003AA94E /* CDEEventStoreModel.xcdatamodeld */; };
-		075B3FB118096B610089D4D3 /* CDEDropboxCloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 075B3FB018096B610089D4D3 /* CDEDropboxCloudFileSystem.m */; };
 		075B3FB318096C720089D4D3 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 075B3FB218096C720089D4D3 /* QuartzCore.framework */; };
-		075B3FC9180979A10089D4D3 /* DropboxSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 075B3FC7180979580089D4D3 /* DropboxSDK.framework */; };
-		075B3FCA180979BA0089D4D3 /* DropboxSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 075B3FC7180979580089D4D3 /* DropboxSDK.framework */; };
 		075B3FCB18097A080089D4D3 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 075B3FB218096C720089D4D3 /* QuartzCore.framework */; };
 		075B3FCC18097A140089D4D3 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07C002351809662E0077E204 /* Security.framework */; };
 		075B3FCD18097A260089D4D3 /* libensembles_ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF374517F184DD00C56F64 /* libensembles_ios.a */; };
 		075B3FCF18097A370089D4D3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 075B3FCE18097A370089D4D3 /* UIKit.framework */; };
-		075B3FE718097C710089D4D3 /* DropboxSDK.xcodeproj in Resources */ = {isa = PBXBuildFile; fileRef = 075B3FE618097C710089D4D3 /* DropboxSDK.xcodeproj */; };
 		075FDCE5183628F90020E1C9 /* CDEIntegratorMergeRepairTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 075FDCDF183628F90020E1C9 /* CDEIntegratorMergeRepairTests.m */; };
 		075FDCE6183628F90020E1C9 /* CDEMockLocalFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 075FDCE1183628F90020E1C9 /* CDEMockLocalFileSystem.m */; };
 		075FDCE7183628F90020E1C9 /* CDEPersistentStoreEnsembleMergeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 075FDCE2183628F90020E1C9 /* CDEPersistentStoreEnsembleMergeTests.m */; };
 		075FDCE8183628F90020E1C9 /* CDEStoreModificationEventTestsModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 075FDCE3183628F90020E1C9 /* CDEStoreModificationEventTestsModel.xcdatamodeld */; };
+		07973EFE183BE40A007F48CA /* CDEICloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 07973EFB183BE40A007F48CA /* CDEICloudFileSystem.m */; };
+		07973EFF183BE40A007F48CA /* CDELocalCloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 07973EFD183BE40A007F48CA /* CDELocalCloudFileSystem.m */; };
 		07BF374917F184DD00C56F64 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF374817F184DD00C56F64 /* Foundation.framework */; };
 		07BF37AA17F1853000C56F64 /* CDECloudDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF377017F1853000C56F64 /* CDECloudDirectory.m */; };
 		07BF37AB17F1853000C56F64 /* CDECloudFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF377217F1853000C56F64 /* CDECloudFile.m */; };
@@ -85,8 +83,6 @@
 		07BF37C117F1853000C56F64 /* CDERevision.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF37A517F1853000C56F64 /* CDERevision.m */; };
 		07BF37C217F1853000C56F64 /* CDERevisionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF37A717F1853000C56F64 /* CDERevisionManager.m */; };
 		07BF37C317F1853000C56F64 /* CDERevisionSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF37A917F1853000C56F64 /* CDERevisionSet.m */; };
-		07BF37CC17F1854F00C56F64 /* CDEICloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF37C817F1854F00C56F64 /* CDEICloudFileSystem.m */; };
-		07BF37CD17F1854F00C56F64 /* CDELocalCloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF37CA17F1854F00C56F64 /* CDELocalCloudFileSystem.m */; };
 		07BF37CF17F185DE00C56F64 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF37CE17F185DE00C56F64 /* CoreData.framework */; };
 		07C002361809662E0077E204 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07C002351809662E0077E204 /* Security.framework */; };
 		07D2D63B182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 07D2D63A182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.m */; };
@@ -100,27 +96,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = 07BF374417F184DD00C56F64;
 			remoteInfo = "Ensembles iOS";
-		};
-		072BA968180AA4A4003AA94E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 075B3FE618097C710089D4D3 /* DropboxSDK.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = D3196B831412FE180060E7C6;
-			remoteInfo = DropboxSDK;
-		};
-		072BA96A180AA4A4003AA94E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 075B3FE618097C710089D4D3 /* DropboxSDK.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = D3933BE5145F12AD00E15FA7;
-			remoteInfo = SDropboxSDK;
-		};
-		072BA96C180AA4A4003AA94E /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 075B3FE618097C710089D4D3 /* DropboxSDK.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = D36931CC15088350003FBA23;
-			remoteInfo = DropboxOSX;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -184,17 +159,17 @@
 		070D33D11801A0770054BA23 /* CDEGlobalIdentifierTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEGlobalIdentifierTests.m; sourceTree = "<group>"; };
 		072BA97D180AACD9003AA94E /* CDEEventStoreModel_0.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_0.xcdatamodel; sourceTree = "<group>"; };
 		072BA97E180AACD9003AA94E /* CDEEventStoreModel_1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_1.xcdatamodel; sourceTree = "<group>"; };
-		075B3FAF18096B610089D4D3 /* CDEDropboxCloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEDropboxCloudFileSystem.h; sourceTree = "<group>"; };
-		075B3FB018096B610089D4D3 /* CDEDropboxCloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEDropboxCloudFileSystem.m; sourceTree = "<group>"; };
 		075B3FB218096C720089D4D3 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
-		075B3FC7180979580089D4D3 /* DropboxSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = DropboxSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		075B3FCE18097A370089D4D3 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		075B3FE618097C710089D4D3 /* DropboxSDK.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = DropboxSDK.xcodeproj; path = ../Vendor/DropboxSDK/DropboxSDK/DropboxSDK.xcodeproj; sourceTree = "<group>"; };
 		075FDCDF183628F90020E1C9 /* CDEIntegratorMergeRepairTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEIntegratorMergeRepairTests.m; sourceTree = "<group>"; };
 		075FDCE0183628F90020E1C9 /* CDEMockLocalFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEMockLocalFileSystem.h; sourceTree = "<group>"; };
 		075FDCE1183628F90020E1C9 /* CDEMockLocalFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEMockLocalFileSystem.m; sourceTree = "<group>"; };
 		075FDCE2183628F90020E1C9 /* CDEPersistentStoreEnsembleMergeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEPersistentStoreEnsembleMergeTests.m; sourceTree = "<group>"; };
 		075FDCE4183628F90020E1C9 /* CDEStoreModificationEventTestsModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEStoreModificationEventTestsModel.xcdatamodel; sourceTree = "<group>"; };
+		07973EFA183BE40A007F48CA /* CDEICloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDEICloudFileSystem.h; path = "Source/Cloud File Systems/CDEICloudFileSystem.h"; sourceTree = SOURCE_ROOT; };
+		07973EFB183BE40A007F48CA /* CDEICloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDEICloudFileSystem.m; path = "Source/Cloud File Systems/CDEICloudFileSystem.m"; sourceTree = SOURCE_ROOT; };
+		07973EFC183BE40A007F48CA /* CDELocalCloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDELocalCloudFileSystem.h; path = "Source/Cloud File Systems/CDELocalCloudFileSystem.h"; sourceTree = SOURCE_ROOT; };
+		07973EFD183BE40A007F48CA /* CDELocalCloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDELocalCloudFileSystem.m; path = "Source/Cloud File Systems/CDELocalCloudFileSystem.m"; sourceTree = SOURCE_ROOT; };
 		07BF374517F184DD00C56F64 /* libensembles_ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libensembles_ios.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		07BF374817F184DD00C56F64 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		07BF376F17F1853000C56F64 /* CDECloudDirectory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDECloudDirectory.h; sourceTree = "<group>"; };
@@ -243,10 +218,6 @@
 		07BF37A717F1853000C56F64 /* CDERevisionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDERevisionManager.m; sourceTree = "<group>"; };
 		07BF37A817F1853000C56F64 /* CDERevisionSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDERevisionSet.h; sourceTree = "<group>"; };
 		07BF37A917F1853000C56F64 /* CDERevisionSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDERevisionSet.m; sourceTree = "<group>"; };
-		07BF37C717F1854F00C56F64 /* CDEICloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEICloudFileSystem.h; sourceTree = "<group>"; };
-		07BF37C817F1854F00C56F64 /* CDEICloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEICloudFileSystem.m; sourceTree = "<group>"; };
-		07BF37C917F1854F00C56F64 /* CDELocalCloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDELocalCloudFileSystem.h; sourceTree = "<group>"; };
-		07BF37CA17F1854F00C56F64 /* CDELocalCloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDELocalCloudFileSystem.m; sourceTree = "<group>"; };
 		07BF37CE17F185DE00C56F64 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		07C002351809662E0077E204 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		07D2D639182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSManagedObjectModel+CDEAdditions.h"; sourceTree = "<group>"; };
@@ -263,7 +234,6 @@
 				075B3FCD18097A260089D4D3 /* libensembles_ios.a in Frameworks */,
 				075B3FCC18097A140089D4D3 /* Security.framework in Frameworks */,
 				075B3FCB18097A080089D4D3 /* QuartzCore.framework in Frameworks */,
-				075B3FCA180979BA0089D4D3 /* DropboxSDK.framework in Frameworks */,
 				070D33C918018B8E0054BA23 /* CoreData.framework in Frameworks */,
 				070D336318018A960054BA23 /* XCTest.framework in Frameworks */,
 				070D336418018A960054BA23 /* Foundation.framework in Frameworks */,
@@ -277,7 +247,6 @@
 				075B3FB318096C720089D4D3 /* QuartzCore.framework in Frameworks */,
 				07C002361809662E0077E204 /* Security.framework in Frameworks */,
 				07BF37CF17F185DE00C56F64 /* CoreData.framework in Frameworks */,
-				075B3FC9180979A10089D4D3 /* DropboxSDK.framework in Frameworks */,
 				07BF374917F184DD00C56F64 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -381,20 +350,9 @@
 			name = "Sync System Tests";
 			sourceTree = "<group>";
 		};
-		072BA963180AA4A4003AA94E /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				072BA969180AA4A4003AA94E /* DropboxSDK.framework */,
-				072BA96B180AA4A4003AA94E /* libSDropboxSDK.a */,
-				072BA96D180AA4A4003AA94E /* DropboxOSX.framework */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		07BF373C17F184DD00C56F64 = {
 			isa = PBXGroup;
 			children = (
-				075B3FE618097C710089D4D3 /* DropboxSDK.xcodeproj */,
 				07BF374A17F184DD00C56F64 /* Source */,
 				07BF374717F184DD00C56F64 /* Frameworks */,
 				07BF374617F184DD00C56F64 /* Products */,
@@ -415,7 +373,6 @@
 			isa = PBXGroup;
 			children = (
 				075B3FCE18097A370089D4D3 /* UIKit.framework */,
-				075B3FC7180979580089D4D3 /* DropboxSDK.framework */,
 				075B3FB218096C720089D4D3 /* QuartzCore.framework */,
 				07C002351809662E0077E204 /* Security.framework */,
 				07BF37CE17F185DE00C56F64 /* CoreData.framework */,
@@ -548,12 +505,10 @@
 		07BF37C417F1854F00C56F64 /* Cloud File Systems */ = {
 			isa = PBXGroup;
 			children = (
-				075B3FAF18096B610089D4D3 /* CDEDropboxCloudFileSystem.h */,
-				075B3FB018096B610089D4D3 /* CDEDropboxCloudFileSystem.m */,
-				07BF37C717F1854F00C56F64 /* CDEICloudFileSystem.h */,
-				07BF37C817F1854F00C56F64 /* CDEICloudFileSystem.m */,
-				07BF37C917F1854F00C56F64 /* CDELocalCloudFileSystem.h */,
-				07BF37CA17F1854F00C56F64 /* CDELocalCloudFileSystem.m */,
+				07973EFA183BE40A007F48CA /* CDEICloudFileSystem.h */,
+				07973EFB183BE40A007F48CA /* CDEICloudFileSystem.m */,
+				07973EFC183BE40A007F48CA /* CDELocalCloudFileSystem.h */,
+				07973EFD183BE40A007F48CA /* CDELocalCloudFileSystem.m */,
 			);
 			path = "Cloud File Systems";
 			sourceTree = SOURCE_ROOT;
@@ -620,12 +575,6 @@
 			mainGroup = 07BF373C17F184DD00C56F64;
 			productRefGroup = 07BF374617F184DD00C56F64 /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = 072BA963180AA4A4003AA94E /* Products */;
-					ProjectRef = 075B3FE618097C710089D4D3 /* DropboxSDK.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				07BF374417F184DD00C56F64 /* Ensembles iOS */,
@@ -633,30 +582,6 @@
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		072BA969180AA4A4003AA94E /* DropboxSDK.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = DropboxSDK.framework;
-			remoteRef = 072BA968180AA4A4003AA94E /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		072BA96B180AA4A4003AA94E /* libSDropboxSDK.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libSDropboxSDK.a;
-			remoteRef = 072BA96A180AA4A4003AA94E /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		072BA96D180AA4A4003AA94E /* DropboxOSX.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = DropboxOSX.framework;
-			remoteRef = 072BA96C180AA4A4003AA94E /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		070D335F18018A960054BA23 /* Resources */ = {
@@ -669,7 +594,6 @@
 				070D33C618018AAD0054BA23 /* IntegratorUpdateTestsFixture1.json in Resources */,
 				070D33C318018AAD0054BA23 /* UpdateRelationshipConcurrently.json in Resources */,
 				070D33C718018AAD0054BA23 /* IntegratorUpdateTestsFixture2.json in Resources */,
-				075B3FE718097C710089D4D3 /* DropboxSDK.xcodeproj in Resources */,
 				070D33BD18018AAD0054BA23 /* BasicIntegratorRelationshipTestsFixture.json in Resources */,
 				070D33BF18018AAD0054BA23 /* DoubleInsertFixture.json in Resources */,
 				070D33C218018AAD0054BA23 /* UpdateFollowingDeletion.json in Resources */,
@@ -725,16 +649,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				07BF37BC17F1853000C56F64 /* CDEEventRevision.m in Sources */,
+				07973EFE183BE40A007F48CA /* CDEICloudFileSystem.m in Sources */,
 				07BF37B917F1853000C56F64 /* CDEDefines.m in Sources */,
 				07BF37BF17F1853000C56F64 /* CDEObjectChange.m in Sources */,
 				07D2D63B182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.m in Sources */,
-				07BF37CD17F1854F00C56F64 /* CDELocalCloudFileSystem.m in Sources */,
 				07BF37C217F1853000C56F64 /* CDERevisionManager.m in Sources */,
 				07BF37B517F1853000C56F64 /* CDEEventStore.m in Sources */,
 				07BF37AB17F1853000C56F64 /* CDECloudFile.m in Sources */,
 				07BF37B017F1853000C56F64 /* CDEPersistentStoreEnsemble.m in Sources */,
 				07BF37B617F1853000C56F64 /* CDEPropertyChangeValue.m in Sources */,
-				075B3FB118096B610089D4D3 /* CDEDropboxCloudFileSystem.m in Sources */,
 				07BF37C017F1853000C56F64 /* CDEStoreModificationEvent.m in Sources */,
 				07BF37B117F1853000C56F64 /* CDEPersistentStoreImporter.m in Sources */,
 				07BF37C117F1853000C56F64 /* CDERevision.m in Sources */,
@@ -748,7 +671,7 @@
 				07BF37AC17F1853000C56F64 /* CDECloudManager.m in Sources */,
 				07BF37AA17F1853000C56F64 /* CDECloudDirectory.m in Sources */,
 				07BF37BE17F1853000C56F64 /* CDEGlobalIdentifier.m in Sources */,
-				07BF37CC17F1854F00C56F64 /* CDEICloudFileSystem.m in Sources */,
+				07973EFF183BE40A007F48CA /* CDELocalCloudFileSystem.m in Sources */,
 				07BF37C317F1853000C56F64 /* CDERevisionSet.m in Sources */,
 				07BF37BA17F1853000C56F64 /* CDEFoundationAdditions.m in Sources */,
 			);

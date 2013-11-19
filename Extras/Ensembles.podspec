@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "Ensembles"
-  s.version      = "0.1.0"
+  s.version      = "0.2.0"
   s.summary      = "A peer-to-peer synchronization framework for Core Data."
 
   s.description  =  <<-DESC
@@ -22,11 +22,21 @@ Pod::Spec.new do |s|
   s.osx.deployment_target = '10.7'
 
   s.source        = { :git => 'https://github.com/drewmccormack/ensembles.git', :tag => s.version.to_s }
-  s.source_files  = 'Framework/**/*.{h,m}'
-  s.exclude_files = 'Framework/Tests (Mac)'
-  
-  s.resources     = 'Framework/Resources/*'
   
   s.requires_arc  = true
+  
+  s.subspec 'Core' do |ss|
+    ss.source_files = 'Framework/**/*.{h,m}'
+    ss.exclude_files = 'Framework/Tests', 'Framework/Extensions/**/*.{h,m}'
+    ss.resources = 'Framework/Resources/*'
+    ss.frameworks = 'CoreData'
+  end
+  
+  s.subspec 'Dropbox' do |ss|
+    ss.dependency 'Ensembles/Core'
+    ss.ios.dependency 'Dropbox-iOS-SDK'
+    ss.osx.dependency 'Dropbox-OSX-SDK'
+    ss.source_files = 'Framework/Extensions/CDEDropboxCloudFileSystem.{h,m}'
+  end
 
 end

@@ -26,9 +26,8 @@
 		074B95DE17EC7DDF0016F84D /* IDMNotesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 074B95DD17EC7DDF0016F84D /* IDMNotesViewController.m */; };
 		074B95E117EC9F470016F84D /* IDMNoteEditingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 074B95E017EC9F470016F84D /* IDMNoteEditingViewController.m */; };
 		075157581805D7FD00C4D4F1 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 070F46F71805D51400EE36E5 /* Model.xcdatamodeld */; };
-		075B3FD118097B1C0089D4D3 /* DropboxSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 075B3FD018097B1C0089D4D3 /* DropboxSDK.framework */; };
-		075B3FD718097B5B0089D4D3 /* DropboxOSX.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 075B3FD618097B5B0089D4D3 /* DropboxOSX.framework */; };
 		0791BCE317F6F58C00E7C31B /* Ensembles iOS.xcodeproj in Resources */ = {isa = PBXBuildFile; fileRef = 0791BCE217F6F58C00E7C31B /* Ensembles iOS.xcodeproj */; };
+		07973EF9183BE32C007F48CA /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07973EF8183BE32C007F48CA /* CoreData.framework */; };
 		07BF37D517F189EB00C56F64 /* libensembles_ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF37D417F189EB00C56F64 /* libensembles_ios.a */; };
 		9477ED311800137300C2A419 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9477ED301800137300C2A419 /* Cocoa.framework */; };
 		9477ED3B1800137300C2A419 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9477ED391800137300C2A419 /* InfoPlist.strings */; };
@@ -49,27 +48,6 @@
 			proxyType = 2;
 			remoteGlobalIDString = 070D336118018A960054BA23;
 			remoteInfo = "Tests iOS";
-		};
-		075B3FDE18097C5B0089D4D3 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 075B3FD818097C5B0089D4D3 /* DropboxSDK.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = D3196B831412FE180060E7C6;
-			remoteInfo = DropboxSDK;
-		};
-		075B3FE018097C5B0089D4D3 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 075B3FD818097C5B0089D4D3 /* DropboxSDK.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = D3933BE5145F12AD00E15FA7;
-			remoteInfo = SDropboxSDK;
-		};
-		075B3FE218097C5B0089D4D3 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 075B3FD818097C5B0089D4D3 /* DropboxSDK.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = D36931CC15088350003FBA23;
-			remoteInfo = DropboxOSX;
 		};
 		077F113E17F709ED0093A212 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -121,10 +99,8 @@
 		074B95DD17EC7DDF0016F84D /* IDMNotesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDMNotesViewController.m; sourceTree = "<group>"; };
 		074B95DF17EC9F470016F84D /* IDMNoteEditingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IDMNoteEditingViewController.h; sourceTree = "<group>"; };
 		074B95E017EC9F470016F84D /* IDMNoteEditingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDMNoteEditingViewController.m; sourceTree = "<group>"; };
-		075B3FD018097B1C0089D4D3 /* DropboxSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = DropboxSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		075B3FD618097B5B0089D4D3 /* DropboxOSX.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DropboxOSX.framework; path = ../../Vendor/DropboxSDK/DropboxSDK/build/Debug/DropboxOSX.framework; sourceTree = "<group>"; };
-		075B3FD818097C5B0089D4D3 /* DropboxSDK.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = DropboxSDK.xcodeproj; path = /Users/cormack/CocoaPrograms/EnsemblesBasic/Framework/../Vendor/DropboxSDK/DropboxSDK/DropboxSDK.xcodeproj; sourceTree = "<absolute>"; };
 		0791BCE217F6F58C00E7C31B /* Ensembles iOS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "Ensembles iOS.xcodeproj"; path = "../../Framework/Ensembles iOS.xcodeproj"; sourceTree = "<group>"; };
+		07973EF8183BE32C007F48CA /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		07BF372E17F17D4100C56F64 /* Idiomatic.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Idiomatic.entitlements; sourceTree = "<group>"; };
 		07BF37D417F189EB00C56F64 /* libensembles_ios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libensembles_ios.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		9477ED211800132E00C2A419 /* Ensembles Mac.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "Ensembles Mac.xcodeproj"; path = "../../Framework/Ensembles Mac.xcodeproj"; sourceTree = "<group>"; };
@@ -153,10 +129,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				07973EF9183BE32C007F48CA /* CoreData.framework in Frameworks */,
 				07BF37D517F189EB00C56F64 /* libensembles_ios.a in Frameworks */,
 				074B959E17EC783B0016F84D /* CoreGraphics.framework in Frameworks */,
 				074B95A017EC783B0016F84D /* UIKit.framework in Frameworks */,
-				075B3FD118097B1C0089D4D3 /* DropboxSDK.framework in Frameworks */,
 				074B959C17EC783B0016F84D /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -165,7 +141,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				075B3FD718097B5B0089D4D3 /* DropboxOSX.framework in Frameworks */,
 				9477ED631800143200C2A419 /* libensembles_mac.a in Frameworks */,
 				9477ED621800140200C2A419 /* CoreData.framework in Frameworks */,
 				9477ED311800137300C2A419 /* Cocoa.framework in Frameworks */,
@@ -199,7 +174,6 @@
 		074B958F17EC783B0016F84D = {
 			isa = PBXGroup;
 			children = (
-				075B3FD818097C5B0089D4D3 /* DropboxSDK.xcodeproj */,
 				9477ED211800132E00C2A419 /* Ensembles Mac.xcodeproj */,
 				0791BCE217F6F58C00E7C31B /* Ensembles iOS.xcodeproj */,
 				070F46FC1805D69E00EE36E5 /* Shared */,
@@ -223,8 +197,7 @@
 		074B959A17EC783B0016F84D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				075B3FD618097B5B0089D4D3 /* DropboxOSX.framework */,
-				075B3FD018097B1C0089D4D3 /* DropboxSDK.framework */,
+				07973EF8183BE32C007F48CA /* CoreData.framework */,
 				9477ED611800140200C2A419 /* CoreData.framework */,
 				07BF37D417F189EB00C56F64 /* libensembles_ios.a */,
 				074B959B17EC783B0016F84D /* Foundation.framework */,
@@ -266,16 +239,6 @@
 				074B95A917EC783B0016F84D /* Idiomatic-Prefix.pch */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		075B3FD918097C5B0089D4D3 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				075B3FDF18097C5B0089D4D3 /* DropboxSDK.framework */,
-				075B3FE118097C5B0089D4D3 /* libSDropboxSDK.a */,
-				075B3FE318097C5B0089D4D3 /* DropboxOSX.framework */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		077F113B17F709ED0093A212 /* Products */ = {
@@ -412,10 +375,6 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 075B3FD918097C5B0089D4D3 /* Products */;
-					ProjectRef = 075B3FD818097C5B0089D4D3 /* DropboxSDK.xcodeproj */;
-				},
-				{
 					ProductGroup = 077F113B17F709ED0093A212 /* Products */;
 					ProjectRef = 0791BCE217F6F58C00E7C31B /* Ensembles iOS.xcodeproj */;
 				},
@@ -438,27 +397,6 @@
 			fileType = wrapper.cfbundle;
 			path = "Tests iOS.xctest";
 			remoteRef = 070F46EF1805CDCB00EE36E5 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		075B3FDF18097C5B0089D4D3 /* DropboxSDK.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = DropboxSDK.framework;
-			remoteRef = 075B3FDE18097C5B0089D4D3 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		075B3FE118097C5B0089D4D3 /* libSDropboxSDK.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libSDropboxSDK.a;
-			remoteRef = 075B3FE018097C5B0089D4D3 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		075B3FE318097C5B0089D4D3 /* DropboxOSX.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = DropboxOSX.framework;
-			remoteRef = 075B3FE218097C5B0089D4D3 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		077F113F17F709ED0093A212 /* libensembles_ios.a */ = {
