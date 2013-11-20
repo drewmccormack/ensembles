@@ -1,0 +1,21 @@
+[
+    {
+        "store": "246",
+        "otherstores": [],
+        "revision": 0,
+        "timestamp": 13450.0,
+        "globalCount": 0,
+        "changes": [
+            {
+                "entity": "Parent",
+                "id": "parent1",
+                "type": "insert",
+                "properties": {
+	                "date": 58472395723.0,
+                    "name": "parent1",
+                    "invalidatingAttribute": -1
+                }
+            }
+        ]
+    }
+]

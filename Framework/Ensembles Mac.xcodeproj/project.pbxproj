@@ -68,6 +68,7 @@
 		07973F15183BE466007F48CA /* CDECloudFileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 07973F0E183BE466007F48CA /* CDECloudFileSystem.h */; };
 		07973F16183BE466007F48CA /* CDECloudManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 07973F0F183BE466007F48CA /* CDECloudManager.h */; };
 		07973F17183BE466007F48CA /* CDECloudManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 07973F10183BE466007F48CA /* CDECloudManager.m */; };
+		07973F19183D308D007F48CA /* IntegratorMergeTestsFixture.json in Resources */ = {isa = PBXBuildFile; fileRef = 07973F18183D3082007F48CA /* IntegratorMergeTestsFixture.json */; };
 		07BF7A32177F0A9D0029D500 /* CDEPersistentStoreEnsemble.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF79F6177F0A9D0029D500 /* CDEPersistentStoreEnsemble.h */; };
 		07BF7A34177F0A9D0029D500 /* CDEPersistentStoreEnsemble.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF79F7177F0A9D0029D500 /* CDEPersistentStoreEnsemble.m */; };
 		07BF7A35177F0A9D0029D500 /* CDEEventIntegrator.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF79F9177F0A9D0029D500 /* CDEEventIntegrator.h */; };
@@ -182,6 +183,7 @@
 		07973F0E183BE466007F48CA /* CDECloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDECloudFileSystem.h; sourceTree = "<group>"; };
 		07973F0F183BE466007F48CA /* CDECloudManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDECloudManager.h; sourceTree = "<group>"; };
 		07973F10183BE466007F48CA /* CDECloudManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDECloudManager.m; sourceTree = "<group>"; };
+		07973F18183D3082007F48CA /* IntegratorMergeTestsFixture.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = IntegratorMergeTestsFixture.json; sourceTree = "<group>"; };
 		07BAE701178D65D00036E743 /* CDESaveMonitorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDESaveMonitorTests.m; sourceTree = "<group>"; };
 		07BF78E9177F03320029D500 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		07BF7933177F04B30029D500 /* libensembles_mac.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libensembles_mac.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -269,6 +271,7 @@
 				0747CDA117C3DCE300221ED7 /* CDEBasicIntegratorRelationshipTests.m */,
 				07DDA7E317C8FE25009C6F94 /* CDEIntegratorUpdateTests.m */,
 				077B555417D1E5CF008AA7F7 /* CDEIntegratorCornerCases.m */,
+				075FDCD418360B0E0020E1C9 /* CDEIntegratorMergeRepairTests.m */,
 				07697A7117E0B6C000A9BB63 /* CDECloudManagerTests.m */,
 				07697A7617E0BD0800A9BB63 /* CDEMockCloudFileSystem.h */,
 				07697A7717E0BD0800A9BB63 /* CDEMockCloudFileSystem.m */,
@@ -277,7 +280,6 @@
 				072BD7BE17F30A1E00D19306 /* CDEPersistentStoreEnsembleTests.m */,
 				075FDCD9183611680020E1C9 /* CDEPersistentStoreEnsembleMergeTests.m */,
 				07D2D637182D65FB001D24BC /* CDEManagedObjectModelTests.m */,
-				075FDCD418360B0E0020E1C9 /* CDEIntegratorMergeRepairTests.m */,
 			);
 			name = "Unit Tests";
 			sourceTree = "<group>";
@@ -460,6 +462,7 @@
 			isa = PBXGroup;
 			children = (
 				077B555117D1E3DC008AA7F7 /* Corner Cases */,
+				07973F18183D3082007F48CA /* IntegratorMergeTestsFixture.json */,
 				071B9F9517E30ECB00E6977A /* IntegratorUpdateTestsFixture1.json */,
 				071B9F9617E30ECB00E6977A /* IntegratorUpdateTestsFixture2.json */,
 				07E2042317C8F2EB00ED9AB3 /* BasicIntegratorRelationshipTestsFixture.json */,
@@ -607,6 +610,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				07973F19183D308D007F48CA /* IntegratorMergeTestsFixture.json in Resources */,
 				072F316E17D4C72C00541FED /* UpdateRelationshipConcurrently.json in Resources */,
 				072F316817D4AAD900541FED /* UpdateConcurrentWithInsert.json in Resources */,
 				072F316617D4AA0A00541FED /* InsertFollowingDeletion.json in Resources */,

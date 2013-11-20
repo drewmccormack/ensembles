@@ -20,6 +20,7 @@
 @property (strong) CDEEventIntegrator *integrator;
 
 - (void)waitForAsyncOpToFinish;
+- (void)stopAsyncOp;
 
 - (void)mergeEventsSinceRevision:(CDERevisionNumber)revision;
     
