@@ -182,7 +182,7 @@
     NSSet *updatedObjects = [notif.userInfo objectForKey:NSUpdatedObjectsKey];
     updatedObjects = [self monitoredManagedObjectsInSet:updatedObjects];
     NSDictionary *changedValuesByObjectID = [changedValuesByContext objectForKey:context];
-    [eventBuilder addChangesForSavedUpdatedObjects:updatedObjects inManagedObjectContext:context propertyChangeValuesByObjectID:changedValuesByObjectID];
+    [eventBuilder addChangesForUpdatedObjects:updatedObjects inManagedObjectContext:context options:CDEUpdateStoreOptionSavedValue propertyChangeValuesByObjectID:changedValuesByObjectID];
     [self saveEventStore];
     
     // Deregister event, and clean up

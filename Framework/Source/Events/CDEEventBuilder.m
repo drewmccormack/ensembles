@@ -211,25 +211,34 @@
     }];
 }
 
-- (void)addChangesForSavedUpdatedObjects:(NSSet *)updatedObjects inManagedObjectContext:(NSManagedObjectContext *)context propertyChangeValuesByObjectID:(NSDictionary *)propertyChangeValuesByObjectID
+- (void)addChangesForUpdatedObjects:(NSSet *)updatedObjects inManagedObjectContext:(NSManagedObjectContext *)context options:(CDEUpdateStoreOption)options propertyChangeValuesByObjectID:(NSDictionary *)propertyChangeValuesByObjectID
 {
     if (updatedObjects.count == 0) return;
     
+    // Determine what needs to be stored
+    BOOL storePreSaveInfo = (CDEUpdateStoreOptionPreSaveInfo & options);
+    BOOL storeUnsavedValues = (CDEUpdateStoreOptionUnsavedValue & options);
+    BOOL storeSavedValues = (CDEUpdateStoreOptionSavedValue & options);
+    NSAssert(!(storePreSaveInfo && storeSavedValues), @"Cannot store pre-save info and saved values");
+    NSAssert(!(storeUnsavedValues && storeSavedValues), @"Cannot store unsaved values and saved values");
+
     // Can't access objects in background, so just pass ids
     __block NSArray *objectIDs = nil;
     NSManagedObjectContext *updatedObjectsContext = context;
     CDECodeBlock block = ^{
         NSArray *objects = [updatedObjects allObjects];
-        
+    
         // Update property changes with saved values
+        BOOL isPreSave = storePreSaveInfo || storeUnsavedValues;
+        BOOL storeValues = storeUnsavedValues || storeSavedValues;
         NSMutableArray *newObjectIDs = [[NSMutableArray alloc] initWithCapacity:objects.count];
         for (NSManagedObject *object in objects) {
             NSManagedObjectID *objectID = object.objectID;
             [newObjectIDs addObject:objectID];
             
-            NSArray *propertyChanges = [propertyChangeValuesByObjectID objectForKey:objectID];
+            NSArray *propertyChanges = propertyChangeValuesByObjectID[objectID];
             for (CDEPropertyChangeValue *propertyChangeValue in propertyChanges) {
-                [propertyChangeValue updateWithObject:object isPreSave:NO storeValues:YES];
+                [propertyChangeValue updateWithObject:object isPreSave:isPreSave storeValues:storeValues];
             }
         }
         objectIDs = newObjectIDs;
@@ -274,7 +283,7 @@
         }];
     }];
     
-    [self addChangesForSavedUpdatedObjects:updatedObjects inManagedObjectContext:context propertyChangeValuesByObjectID:changedValuesByObjectID];
+    [self addChangesForUpdatedObjects:updatedObjects inManagedObjectContext:context options:(CDEUpdateStoreOptionPreSaveInfo | CDEUpdateStoreOptionUnsavedValue) propertyChangeValuesByObjectID:changedValuesByObjectID];
 }
 
 - (BOOL)addChangesForUnsavedManagedObjectContext:(NSManagedObjectContext *)contextWithChanges error:(NSError * __autoreleasing *)error
@@ -287,11 +296,7 @@
     [self addChangesForDeletedObjects:contextWithChanges.deletedObjects inManagedObjectContext:contextWithChanges];
     [self addChangesForUnsavedUpdatedObjects:contextWithChanges.updatedObjects inManagedObjectContext:contextWithChanges];
     
-    [eventManagedObjectContext performBlockAndWait:^{
-        success = [eventManagedObjectContext save:error];
-    }];
-    
-    return success;
+    return YES;
 }
 
 #pragma mark Converting property changes for storage in event store

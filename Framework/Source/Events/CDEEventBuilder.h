@@ -16,6 +16,13 @@
 @class CDEEventBuilder;
 @class CDEPersistentStoreEnsemble;
 
+typedef NS_ENUM(uint16_t, CDEUpdateStoreOption) {
+    CDEUpdateStoreOptionNone = 0,
+    CDEUpdateStoreOptionPreSaveInfo = 1 << 1,
+    CDEUpdateStoreOptionUnsavedValue = 1 << 2,
+    CDEUpdateStoreOptionSavedValue = 1 << 3
+};
+
 @interface CDEEventBuilder : NSObject
 
 @property (nonatomic, strong, readonly) CDEEventStore *eventStore;
@@ -33,8 +40,7 @@
 // These are call from thread of synced-store context
 - (void)addChangesForInsertedObjects:(NSSet *)insertedObjects objectsAreSaved:(BOOL)saved inManagedObjectContext:(NSManagedObjectContext *)context;
 - (void)addChangesForDeletedObjects:(NSSet *)deleted inManagedObjectContext:(NSManagedObjectContext *)context;
-- (void)addChangesForSavedUpdatedObjects:(NSSet *)updated inManagedObjectContext:(NSManagedObjectContext *)context propertyChangeValuesByObjectID:(NSDictionary *)changedValuesByObjectID;
-- (void)addChangesForUnsavedUpdatedObjects:(NSSet *)updated inManagedObjectContext:(NSManagedObjectContext *)context; // Only use pre-save. Requires changedValues to be available.
+- (void)addChangesForUpdatedObjects:(NSSet *)updated inManagedObjectContext:(NSManagedObjectContext *)context options:(CDEUpdateStoreOption)options propertyChangeValuesByObjectID:(NSDictionary *)changedValuesByObjectID;
 
 - (BOOL)addChangesForUnsavedManagedObjectContext:(NSManagedObjectContext *)contextWithChanges error:(NSError * __autoreleasing *)error;
 
