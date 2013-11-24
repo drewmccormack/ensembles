@@ -135,10 +135,13 @@
 - (void)addUbiquityContainerNotificationObservers
 {
     [self removeUbiquityContainerNotificationObservers];
+    
+    __weak typeof(self) weakSelf = self;
     ubiquityIdentityObserver = [[NSNotificationCenter defaultCenter] addObserverForName:NSUbiquityIdentityDidChangeNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *note) {
-        [self stopMonitoring];
-        [self willChangeValueForKey:@"identityToken"];
-        [self didChangeValueForKey:@"identityToken"];
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        [strongSelf stopMonitoring];
+        [strongSelf willChangeValueForKey:@"identityToken"];
+        [strongSelf didChangeValueForKey:@"identityToken"];
     }];
 }
 

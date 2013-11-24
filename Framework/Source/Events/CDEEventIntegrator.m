@@ -122,10 +122,12 @@
         eventStoreChildContext.undoManager = nil;
     }];
     
+    __weak typeof(self) weakSelf = self;
     [[NSNotificationCenter defaultCenter] removeObserver:eventStoreChildContextSaveObserver];
     eventStoreChildContextSaveObserver = [[NSNotificationCenter defaultCenter] addObserverForName:NSManagedObjectContextDidSaveNotification object:eventStoreChildContext queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *note) {
-        [self.eventStore.managedObjectContext performBlockAndWait:^{
-            [self.eventStore.managedObjectContext mergeChangesFromContextDidSaveNotification:note];
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        [strongSelf.eventStore.managedObjectContext performBlockAndWait:^{
+            [strongSelf.eventStore.managedObjectContext mergeChangesFromContextDidSaveNotification:note];
         }];
     }];
     
