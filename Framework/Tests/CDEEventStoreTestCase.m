@@ -160,6 +160,7 @@ static NSString *testStoreFile;
 {
     NSManagedObjectContext *moc = self.eventStore.managedObjectContext;
     CDEStoreModificationEvent *event = [NSEntityDescription insertNewObjectForEntityForName:@"CDEStoreModificationEvent" inManagedObjectContext:moc];
+    event.type = CDEStoreModificationEventTypeSave;
     event.timestamp = timestamp;
     event.eventRevision = [self addEventRevisionForStore:store revision:rev];
     event.globalCount = globalCount;

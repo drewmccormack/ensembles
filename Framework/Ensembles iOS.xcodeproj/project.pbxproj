@@ -87,6 +87,7 @@
 		07C002361809662E0077E204 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07C002351809662E0077E204 /* Security.framework */; };
 		07D2D63B182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 07D2D63A182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.m */; };
 		07D2D640182D6887001D24BC /* CDEManagedObjectModelTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07D2D63F182D6887001D24BC /* CDEManagedObjectModelTests.m */; };
+		07F001BE18427645001A0504 /* IntegratorMergeTestsFixture.json in Resources */ = {isa = PBXBuildFile; fileRef = 07F001BD18427645001A0504 /* IntegratorMergeTestsFixture.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -223,6 +224,7 @@
 		07D2D639182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSManagedObjectModel+CDEAdditions.h"; sourceTree = "<group>"; };
 		07D2D63A182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSManagedObjectModel+CDEAdditions.m"; sourceTree = "<group>"; };
 		07D2D63F182D6887001D24BC /* CDEManagedObjectModelTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEManagedObjectModelTests.m; sourceTree = "<group>"; };
+		07F001BD18427645001A0504 /* IntegratorMergeTestsFixture.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = IntegratorMergeTestsFixture.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -267,8 +269,9 @@
 		070D339518018AAD0054BA23 /* Integrator Test Fixtures */ = {
 			isa = PBXGroup;
 			children = (
-				070D339618018AAD0054BA23 /* BasicIntegratorRelationshipTestsFixture.json */,
 				070D339718018AAD0054BA23 /* Corner Cases */,
+				070D339618018AAD0054BA23 /* BasicIntegratorRelationshipTestsFixture.json */,
+				07F001BD18427645001A0504 /* IntegratorMergeTestsFixture.json */,
 				070D33A018018AAD0054BA23 /* IntegratorUpdateTestsFixture1.json */,
 				070D33A118018AAD0054BA23 /* IntegratorUpdateTestsFixture2.json */,
 			);
@@ -588,6 +591,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				07F001BE18427645001A0504 /* IntegratorMergeTestsFixture.json in Resources */,
 				070D33C118018AAD0054BA23 /* UpdateConcurrentWithInsert.json in Resources */,
 				070D33C018018AAD0054BA23 /* InsertFollowingDeletion.json in Resources */,
 				070D33C518018AAD0054BA23 /* UpdateToUninserted.json in Resources */,
