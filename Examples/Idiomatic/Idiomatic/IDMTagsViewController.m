@@ -18,6 +18,7 @@
 @implementation IDMTagsViewController {
     NSFetchedResultsController *tagsController;
     IBOutlet UIBarButtonItem *syncButtonItem;
+    id syncDidBeginNotif, syncDidEndNotif;
 }
 
 - (void)viewDidLoad
@@ -33,12 +34,22 @@
     
     [tagsController performFetch:NULL];
     
-    [[NSNotificationCenter defaultCenter] addObserverForName:IDMSyncActivityDidBeginNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *note) {
-        syncButtonItem.enabled = NO;
+    __weak typeof(self) weakSelf = self;
+    syncDidBeginNotif = [[NSNotificationCenter defaultCenter] addObserverForName:IDMSyncActivityDidBeginNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        strongSelf->syncButtonItem.enabled = NO;
     }];
-    [[NSNotificationCenter defaultCenter] addObserverForName:IDMSyncActivityDidEndNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *note) {
-        syncButtonItem.enabled = YES;
+    syncDidEndNotif = [[NSNotificationCenter defaultCenter] addObserverForName:IDMSyncActivityDidEndNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        strongSelf->syncButtonItem.enabled = YES;
     }];
+}
+
+- (void)viewDidUnload
+{
+    [super viewDidUnload];
+    [[NSNotificationCenter defaultCenter] removeObserver:syncDidBeginNotif];
+    [[NSNotificationCenter defaultCenter] removeObserver:syncDidEndNotif];
 }
 
 - (IBAction)sync:(id)sender
