@@ -24,8 +24,8 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification;
 - (void)persistentStoreEnsembleWillImportStore:(CDEPersistentStoreEnsemble *)ensemble;
 - (void)persistentStoreEnsembleDidImportStore:(CDEPersistentStoreEnsemble *)ensemble;
 
-- (void)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble willSaveMergedChangesInManagedObjectContext:(NSManagedObjectContext *)context info:(NSDictionary *)infoDict;
-- (BOOL)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didFailToSaveMergedChangesInManagedObjectContext:(NSManagedObjectContext *)context error:(NSError *)error;
+- (void)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble willSaveMergedChangesInManagedObjectContext:(NSManagedObjectContext *)savingContext reparationManagedObjectContext:(NSManagedObjectContext *)reparationContext;
+- (BOOL)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didFailToSaveMergedChangesInManagedObjectContext:(NSManagedObjectContext *)savingContext error:(NSError *)error reparationManagedObjectContext:(NSManagedObjectContext *)reparationContext;
 - (void)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didSaveMergeChangesWithNotification:(NSNotification *)notification;
 
 - (void)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didDeleechWithError:(NSError *)error;

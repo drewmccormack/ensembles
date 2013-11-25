@@ -26,10 +26,17 @@
     [self addEventsFromJSONFile:path];
     
     // Handle failed save
-    self.integrator.failedSaveBlock = ^(NSManagedObjectContext *context, NSError *error) {
-        NSManagedObjectID *parentID = [error.userInfo[@"NSValidationErrorObject"] objectID];
-        NSManagedObject *parent = [context existingObjectWithID:parentID error:NULL];
-        [parent setValue:@(0) forKey:@"invalidatingAttribute"];
+    self.integrator.failedSaveBlock = ^(NSManagedObjectContext *context, NSError *error, NSManagedObjectContext *reparationContext) {
+        __block NSManagedObjectID *parentID;
+        [context performBlockAndWait:^{
+            parentID = [error.userInfo[@"NSValidationErrorObject"] objectID];
+        }];
+        
+        [reparationContext performBlockAndWait:^{
+            NSManagedObject *parent = [reparationContext existingObjectWithID:parentID error:NULL];
+            [parent setValue:@(0) forKey:@"invalidatingAttribute"];
+        }];
+
         return YES;
     };
 }
@@ -43,7 +50,7 @@
 {
     __block BOOL failBlockInvoked = NO;
     __block NSError *failError = nil;
-    self.integrator.failedSaveBlock = ^(NSManagedObjectContext *context, NSError *error) {
+    self.integrator.failedSaveBlock = ^(NSManagedObjectContext *context, NSError *error, NSManagedObjectContext *reparationContext) {
         failBlockInvoked = YES;
         failError = error;
         return NO;
@@ -86,15 +93,22 @@
 
 - (void)testRepairInWillSaveBlockAvoidsFail
 {
-    self.integrator.willSaveBlock = ^(NSManagedObjectContext *context, NSDictionary *info) {
-        NSManagedObjectID *parentID = [info[NSInsertedObjectsKey] anyObject];
-        NSManagedObject *parent = [context existingObjectWithID:parentID error:NULL];
-        [parent setValue:@(0) forKey:@"invalidatingAttribute"];
+    self.integrator.willSaveBlock = ^(NSManagedObjectContext *context, NSManagedObjectContext *reparationContext) {
+        __block NSManagedObjectID *parentID;
+        [reparationContext performBlockAndWait:^{
+            NSManagedObject *parent = context.insertedObjects.anyObject;
+            parentID = parent.objectID;
+        }];
+
+        [reparationContext performBlockAndWait:^{
+            NSManagedObject *repairParent = [reparationContext existingObjectWithID:parentID error:NULL];
+            [repairParent setValue:@(0) forKey:@"invalidatingAttribute"];
+        }];
     };
     
     __block BOOL failBlockInvoked = NO;
     __block NSError *failError = nil;
-    self.integrator.failedSaveBlock = ^(NSManagedObjectContext *context, NSError *error) {
+    self.integrator.failedSaveBlock = ^(NSManagedObjectContext *context, NSError *error, NSManagedObjectContext *reparationContext) {
         failBlockInvoked = YES;
         failError = error;
         return NO;
@@ -106,12 +120,21 @@
 
 - (void)testRelationshipUpdateGeneratesObjectChange
 {
-    self.integrator.willSaveBlock = ^(NSManagedObjectContext *context, NSDictionary *info) {
-        NSManagedObjectID *parentID = [info[NSInsertedObjectsKey] anyObject];
-        NSManagedObject *parent = [context existingObjectWithID:parentID error:NULL];
-        id child = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context];
-        [parent setValue:child forKey:@"child"];
-        [parent setValue:@(0) forKey:@"invalidatingAttribute"];
+    self.integrator.willSaveBlock = ^(NSManagedObjectContext *context, NSManagedObjectContext *reparationContext) {
+        __block NSManagedObjectID *parentID;
+        [reparationContext performBlockAndWait:^{
+            NSManagedObject *parent = context.insertedObjects.anyObject;
+            parentID = parent.objectID;
+        }];
+        
+        [reparationContext performBlockAndWait:^{
+            NSManagedObject *repairParent = [reparationContext existingObjectWithID:parentID error:NULL];
+            [repairParent setValue:@(0) forKey:@"invalidatingAttribute"];
+            
+            id child = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:reparationContext];
+            [repairParent setValue:child forKey:@"child"];
+            [repairParent setValue:@(0) forKey:@"invalidatingAttribute"];
+        }];
     };
     
     [self mergeEventsSinceRevision:-1];

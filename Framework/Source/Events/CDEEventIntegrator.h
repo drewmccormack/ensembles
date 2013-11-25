@@ -13,9 +13,9 @@
 @class CDEEventStore;
 @class CDEPersistentStoreEnsemble;
 
-typedef void (^CDEEventIntegratorWillSaveBlock)(NSManagedObjectContext *context, NSDictionary *info);
-typedef BOOL (^CDEEventIntegratorFailedSaveBlock)(NSManagedObjectContext *context, NSError *error);
-typedef void (^CDEEventIntegratorDidSaveBlock)(NSManagedObjectContext *context, NSDictionary *info);
+typedef void (^CDEEventIntegratorWillSaveBlock)(NSManagedObjectContext *savingContext, NSManagedObjectContext *reparationContext);
+typedef BOOL (^CDEEventIntegratorFailedSaveBlock)(NSManagedObjectContext *savingContext, NSError *error, NSManagedObjectContext *reparationContext);
+typedef void (^CDEEventIntegratorDidSaveBlock)(NSManagedObjectContext *savingContext, NSDictionary *info);
 
 @interface CDEEventIntegrator : NSObject
 

@@ -102,17 +102,17 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
     self.eventIntegrator.ensemble = self;
     
     __weak CDEPersistentStoreEnsemble *weakSelf = self;
-    self.eventIntegrator.willSaveBlock = ^(NSManagedObjectContext *context, NSDictionary *info) {
+    self.eventIntegrator.willSaveBlock = ^(NSManagedObjectContext *savingContext, NSManagedObjectContext *reparationContext) {
         CDEPersistentStoreEnsemble *strongSelf = weakSelf;
-        if ([strongSelf.delegate respondsToSelector:@selector(persistentStoreEnsemble:willSaveMergedChangesInManagedObjectContext:info:)]) {
-            [strongSelf.delegate persistentStoreEnsemble:strongSelf willSaveMergedChangesInManagedObjectContext:context info:info];
+        if ([strongSelf.delegate respondsToSelector:@selector(persistentStoreEnsemble:willSaveMergedChangesInManagedObjectContext:reparationManagedObjectContext:)]) {
+            [strongSelf.delegate persistentStoreEnsemble:strongSelf willSaveMergedChangesInManagedObjectContext:savingContext reparationManagedObjectContext:reparationContext];
         }
     };
     
-    self.eventIntegrator.failedSaveBlock = ^(NSManagedObjectContext *context, NSError *error) {
+    self.eventIntegrator.failedSaveBlock = ^(NSManagedObjectContext *savingContext, NSError *error, NSManagedObjectContext *reparationContext) {
         CDEPersistentStoreEnsemble *strongSelf = weakSelf;
-        if ([strongSelf.delegate respondsToSelector:@selector(persistentStoreEnsemble:didFailToSaveMergedChangesInManagedObjectContext:error:)]) {
-            return [strongSelf.delegate persistentStoreEnsemble:strongSelf didFailToSaveMergedChangesInManagedObjectContext:context error:error];
+        if ([strongSelf.delegate respondsToSelector:@selector(persistentStoreEnsemble:didFailToSaveMergedChangesInManagedObjectContext:error:reparationManagedObjectContext:)]) {
+            return [strongSelf.delegate persistentStoreEnsemble:strongSelf didFailToSaveMergedChangesInManagedObjectContext:savingContext error:error reparationManagedObjectContext:reparationContext];
         }
         return NO;
     };

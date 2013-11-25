@@ -692,58 +692,32 @@
     }];
     
     if (contextHasChanges && willSaveBlock) {
-        __block NSDictionary *info = nil;
-        [managedObjectContext performBlockAndWait:^{
-            info = [self infoDictionaryForChangesInContext:managedObjectContext];
+        // Setup a context to store repairs
+        NSManagedObjectContext *reparationContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
+        [reparationContext performBlockAndWait:^{
+            reparationContext.parentContext = managedObjectContext;
         }];
         
-        NSManagedObjectContext *userMergeContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
-        [userMergeContext performBlockAndWait:^{
-            userMergeContext.parentContext = managedObjectContext;
-            willSaveBlock(userMergeContext, info);
-            
-            if (userMergeContext.hasChanges) {
-                BOOL success = [eventBuilder addChangesForUnsavedManagedObjectContext:userMergeContext error:error];
+        // Call block on the saving context queue
+        willSaveBlock(managedObjectContext, reparationContext);
+        
+        // Capture changes in the reparation context in the merge event.
+        // Save any changes made in the reparation context.
+        [reparationContext performBlockAndWait:^{
+            if (reparationContext.hasChanges) {
+                BOOL success = [eventBuilder addChangesForUnsavedManagedObjectContext:reparationContext error:error];
                 if (!success) {
                     merged = NO;
                     return;
                 }
-                merged = [self saveUserMergeContext:userMergeContext error:error];
+
+                merged = [reparationContext save:error];
                 if (!merged) CDELog(CDELoggingLevelError, @"Saving merge context after willSave changes failed: %@", error);
             }
         }];
     }
+    
     return merged;
-}
-
-- (void)mergeChangesFromUserMergeContextDidSaveNotification:(NSNotification *)notif
-{
-    [managedObjectContext performBlockAndWait:^{
-        [managedObjectContext mergeChangesFromContextDidSaveNotification:notif];
-    }];
-}
-
-// Call on user merge context queue
-- (BOOL)saveUserMergeContext:(NSManagedObjectContext *)userMergeContext error:(NSError * __autoreleasing *)error
-{
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(mergeChangesFromUserMergeContextDidSaveNotification:) name:NSManagedObjectContextDidSaveNotification object:userMergeContext];
-    
-    __block BOOL saved;
-    saved = [userMergeContext save:error];
-    [userMergeContext reset];
-
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:userMergeContext];
-    
-    return saved;
-}
-
-- (NSDictionary *)infoDictionaryForChangesInContext:(NSManagedObjectContext *)aContext
-{
-    NSSet *insertedObjectIDs = [aContext.insertedObjects valueForKeyPath:@"objectID"];
-    NSSet *updatedObjectIDs = [aContext.updatedObjects valueForKeyPath:@"objectID"];
-    NSSet *deletedObjectIDs = [aContext.deletedObjects valueForKeyPath:@"objectID"];
-    NSDictionary *result = @{NSInsertedObjectsKey: insertedObjectIDs, NSUpdatedObjectsKey: updatedObjectIDs, NSDeletedObjectsKey: deletedObjectIDs};
-    return result;
 }
 
 // Call on event child context queue
@@ -941,21 +915,27 @@
     __block BOOL saved = [self saveContext:error];
     if (!saved) {
         if ((*error).code != NSManagedObjectMergeError && failedSaveBlock) {
-            NSManagedObjectContext *userMergeContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
+            // Setup a child reparation context
+            NSManagedObjectContext *reparationContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
+            [reparationContext performBlockAndWait:^{
+                reparationContext.parentContext = managedObjectContext;
+            }];
             
+            // Inform of failure, and give chance to repair
+            BOOL retry = failedSaveBlock(managedObjectContext, *error, reparationContext);
+            
+            // If repairs were carried out, add changes to the merge event, and save
+            // reparation context
             __block BOOL needExtraSave = NO;
-            [userMergeContext performBlockAndWait:^{
-                BOOL retry;
-                userMergeContext.parentContext = managedObjectContext;
-                retry = failedSaveBlock(userMergeContext, *error);
-            
-                if (retry && userMergeContext.hasChanges) {
-                    BOOL success = [eventBuilder addChangesForUnsavedManagedObjectContext:userMergeContext error:error];
-                    success = success && [self saveUserMergeContext:userMergeContext error:error];
+            [reparationContext performBlockAndWait:^{
+                if (retry && reparationContext.hasChanges) {
+                    BOOL success = [eventBuilder addChangesForUnsavedManagedObjectContext:reparationContext error:error];
+                    success = success && [reparationContext save:error];
                     if (success) needExtraSave = YES;
                 }
             }];
             
+            // Retry save if necessary
             if (needExtraSave) saved = [self saveContext:error];
         }
     }

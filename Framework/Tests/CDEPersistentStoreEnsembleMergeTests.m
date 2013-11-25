@@ -26,7 +26,8 @@
     NSManagedObjectContext *managedObjectContext1, *managedObjectContext2;
     NSString *rootTestDir;
     NSString *cloudDir;
-    NSDictionary *willSaveInfo, *didSaveInfo;
+    NSSet *inserted, *updated, *deleted;
+    NSDictionary *didSaveInfo;
     NSInteger failedSaveErrorCode;
     BOOL didSaveRepairMethodWasCalled, willSaveRepairMethodWasCalled, failedSaveRepairMethodWasCalled;
     BOOL finishedAsync;
@@ -98,7 +99,6 @@
 
 - (void)tearDown
 {
-    willSaveInfo = nil;
     didSaveInfo = nil;
     [[NSFileManager defaultManager] removeItemAtPath:rootTestDir error:NULL];
     [super tearDown];
@@ -196,17 +196,17 @@
 - (void)checkForWillSaveRepair
 {
     XCTAssert(willSaveRepairMethodWasCalled, @"No will-save method invocation occurred");
-    XCTAssert([willSaveInfo[NSInsertedObjectsKey] count] == 1, @"Wrong count for inserted object ids");
-    XCTAssert([willSaveInfo[NSUpdatedObjectsKey] count] == 0, @"Wrong count for updated object ids");
-    XCTAssert([willSaveInfo[NSDeletedObjectsKey] count] == 0, @"Wrong count for deleted object ids");
+    XCTAssert(inserted.count == 1, @"Wrong count for inserted object ids");
+    XCTAssert(updated.count == 0, @"Wrong count for updated object ids");
+    XCTAssert(deleted.count == 0, @"Wrong count for deleted object ids");
     [self finishAsync];
 }
 
 - (void)checkForDidSaveRepair
 {
     XCTAssert(didSaveRepairMethodWasCalled, @"No did-save method invocation occurred");
-    XCTAssert([willSaveInfo[NSInsertedObjectsKey] count] == 1, @"Wrong count for inserted objects");
-    XCTAssert([willSaveInfo[NSUpdatedObjectsKey] count] == 0, @"Wrong count for updated objects");
+    XCTAssert(inserted.count == 1, @"Wrong count for inserted objects");
+    XCTAssert(updated.count == 0, @"Wrong count for updated objects");
     [self finishAsync];
 }
 
@@ -217,13 +217,17 @@
     [self finishAsync];
 }
 
-- (void)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble willSaveMergedChangesInManagedObjectContext:(NSManagedObjectContext *)context info:(NSDictionary *)infoDict
+- (void)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble willSaveMergedChangesInManagedObjectContext:(NSManagedObjectContext *)savingContext reparationManagedObjectContext:(NSManagedObjectContext *)reparationContext
 {
-    willSaveInfo = infoDict;
+    [savingContext performBlockAndWait:^{
+        inserted = savingContext.insertedObjects;
+        updated = savingContext.updatedObjects;
+        deleted = savingContext.deletedObjects;
+    }];
     willSaveRepairMethodWasCalled = YES;
 }
 
-- (BOOL)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didFailToSaveMergedChangesInManagedObjectContext:(NSManagedObjectContext *)context error:(NSError *)error
+- (BOOL)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didFailToSaveMergedChangesInManagedObjectContext:(NSManagedObjectContext *)savingContext error:(NSError *)error reparationManagedObjectContext:(NSManagedObjectContext *)reparationContext
 {
     failedSaveRepairMethodWasCalled = YES;
     failedSaveErrorCode = error.code;
