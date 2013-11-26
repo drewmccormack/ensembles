@@ -14,16 +14,25 @@ Pod::Spec.new do |s|
                     custom servers.
                     DESC
 
-  s.homepage     = "https://github.com/drewmccormack/ensembles"
-  s.license      = { :type => 'MIT', :file => 'LICENCE.txt' }
-  s.author       = { "Drew McCormack" => "drewmccormack@mac.com" }
+  s.homepage = "https://github.com/drewmccormack/ensembles"
+  s.license = { 
+    :type => 'MIT', 
+    :file => 'LICENCE.txt' 
+  }
+  s.author = { "Drew McCormack" => "drewmccormack@mac.com" }
   
   s.ios.deployment_target = '6.0'
   s.osx.deployment_target = '10.7'
 
-  s.source        = { :git => 'https://github.com/drewmccormack/ensembles.git', :tag => s.version.to_s }
+  s.source        = { 
+    :git => 'https://github.com/drewmccormack/ensembles.git', 
+    :tag => s.version.to_s, 
+    :submodules => true
+  }
   
   s.requires_arc  = true
+  
+  s.default_subspec = 'Core'
   
   s.subspec 'Core' do |ss|
     ss.source_files = 'Framework/**/*.{h,m}'
@@ -36,7 +45,7 @@ Pod::Spec.new do |s|
     ss.dependency 'Ensembles/Core'
     ss.ios.dependency 'Dropbox-iOS-SDK'
     ss.osx.dependency 'Dropbox-OSX-SDK'
-    ss.source_files = 'Framework/Extensions/CDEDropboxCloudFileSystem.{h,m}'
+    ss.source_files = 'Framework/Extensions/CDEDropboxCloudFileSystem.{h,m}', 'Vendor/DropboxSDK/DropboxSDK/Classes/**/*.h'
   end
 
 end
