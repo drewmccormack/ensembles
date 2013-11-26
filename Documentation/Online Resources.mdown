@@ -35,7 +35,7 @@
 ### Open Source Core Data Sync Projects
 * [TICoreDataSync](https://github.com/nothirst/TICoreDataSync)
 * [ZumeroIncrementalStore](https://github.com/grasmeyer/ZumeroIncrementalStore)
-* [Helio](http://helios.io)
+* [Helios](http://helios.io)
 * [ParcelKit for Dropbox Datastore API](https://github.com/overcommitted/ParcelKit)
 
 ### Commercial Core Data Sync Projects
