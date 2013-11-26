@@ -26,7 +26,6 @@
 * [Under the Sheets with iCloud and Core Data: Working Code](http://mentalfaculty.tumblr.com/post/24009617665/under-the-sheets-with-icloud-and-core-data-working) by Drew McCormack
 * [Under the Sheets with iCloud and Core Data: Sentinels](http://mentalfaculty.tumblr.com/post/24692275202/under-the-sheets-with-icloud-and-core-data-sentinels) by Drew McCormack
 * [Under the Sheets with iCloud and Core Data: Troubleshooting](http://mentalfaculty.tumblr.com/post/25241910449/under-the-sheets-with-icloud-and-core-data) by Drew McCormack
-* [How the Dropbox Datastore API Handles Conflicts - Part Two: Resolving Collision](https://www.dropbox.com/developers/blog/56/how-the-dropbox-datastore-api-handles-conflicts-part-two-resolving-collisions) by Guido van Rossum
 * [How the Datastore API Handles Conflicts - Part 1: Basics of Offline Conflict Handling](https://www.dropbox.com/developers/blog/48/how-the-datastore-api-handles-conflicts-part-1-basics-of-offline-conflict-handling) by Guido van Rossum
 * [How the Dropbox Datastore API Handles Conflicts - Part Two: Resolving Collision](https://www.dropbox.com/developers/blog/56/how-the-dropbox-datastore-api-handles-conflicts-part-two-resolving-collisions) by Guido van Rossum
 * [iCloud Complications: Part 1](http://www.atomicbird.com/icloud-complications) by Tom Harrington
