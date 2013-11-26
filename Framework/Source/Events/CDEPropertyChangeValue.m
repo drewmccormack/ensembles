@@ -129,7 +129,7 @@
         NSDictionary *committedValues = [object committedValuesForKeys:@[propertyDesc.name]];
         id committed = committedValues[propertyDesc.name];
         id objectIDs = [committed valueForKeyPath:@"objectID"];
-        self.relatedObjectIDs = relationshipDescription.isOrdered ? [objectIDs set] : objectIDs;
+        self.relatedObjectIDs = relationshipDescription.isOrdered ? [(NSOrderedSet *)objectIDs set] : objectIDs;
     }
     
     if (!storeValues) return;
