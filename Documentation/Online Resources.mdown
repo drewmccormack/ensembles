@@ -11,7 +11,7 @@
 * [Introducing Ensembles: Core Data sync the way it should be](http://mentalfaculty.tumblr.com/post/62909673342/introducing-ensembles-core-data-sync-the-way-it-should) by Drew McCormack
 * [The Lessons of Functional Programming for Cocoa Developers](http://mentalfaculty.tumblr.com/post/64952009090/the-lessons-of-functional-programming-for-cocoa) by Drew McCormack
 * [How Does Core Data Save?](http://mentalfaculty.tumblr.com/post/65682908577/how-does-core-data-save) by Drew McCormack
-* [On Vesper Sync](http://mentalfaculty.tumblr.com/post/66955072014/on-vesper-sync)
+* [On Vesper Sync](http://mentalfaculty.tumblr.com/post/66955072014/on-vesper-sync) by Drew McCormack
 
 ### Articles Related to Sync
 * [A Comparison of Syncing Technologies](http://grasmeyer.com/blog/2013/10/8/a-comparison-of-syncing-technologies) by Joel Grasmeyer
