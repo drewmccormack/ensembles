@@ -1,0 +1,46 @@
+# Links to Ensembles Resources
+
+### Presentations
+* [Everything — but the kitchen — syncs](http://www.iosdevuk.com/talks/) Drew McCormack at iOSDevUK 2013
+* [Everything — but the kitchen — syncs (Video)](http://gotocon.com/video) Drew McCormack at GOTO Aarhus 2013
+
+### Podcasts
+* [NSBrief #110](http://nsbrief.com/110-drew-mccormack/) featuring Drew McCormack
+
+### Articles on Ensembles
+* [Introducing Ensembles: Core Data sync the way it should be](http://mentalfaculty.tumblr.com/post/62909673342/introducing-ensembles-core-data-sync-the-way-it-should) by Drew McCormack
+* [The Lessons of Functional Programming for Cocoa Developers](http://mentalfaculty.tumblr.com/post/64952009090/the-lessons-of-functional-programming-for-cocoa) by Drew McCormack
+* [How Does Core Data Save?](http://mentalfaculty.tumblr.com/post/65682908577/how-does-core-data-save) by Drew McCormack
+* [On Vesper Sync](http://mentalfaculty.tumblr.com/post/66955072014/on-vesper-sync)
+
+### Articles Related to Sync
+* [A Comparison of Syncing Technologies](http://grasmeyer.com/blog/2013/10/8/a-comparison-of-syncing-technologies) by Joel Grasmeyer
+* [Introducing ZumeroIncrementalStore](http://grasmeyer.com/blog/2013/10/8/introducing-zumeroincrementalstore) by Joel Grasmeyer
+* [Clear in the Cloud](http://blog.helftone.com/clear-in-the-icloud/) by Milen Dzhumerov
+* [OmniFocus: What We've Learned So Far (Engineering)](http://www.omnigroup.com/blog/OmniFocus_What_Weve_Learned_So_Far_Engineering) by Linda Sharps and Tim Wood
+* [The Trouble with Timestamps](http://aphyr.com/posts/299-the-trouble-with-timestamps) by Aphyr
+* [Does Core Data Sync Quack?](http://mentalfaculty.tumblr.com/post/51143164677/does-core-data-sync-quack) by Drew McCormack
+* [Under the Sheets with iCloud and Core Data: The Basics](http://mentalfaculty.tumblr.com/post/23163747823/under-the-sheets-with-icloud-and-core-data-the-basics) by Drew McCormack
+* [Under the Sheets with iCloud and Core Data: How it Works](http://mentalfaculty.tumblr.com/post/23231176783/under-the-sheets-with-icloud-and-core-data-how-it) by Drew McCormack
+* [Under the Sheets with iCloud and Core Data: Seeding iCloud](http://mentalfaculty.tumblr.com/post/23788055417/under-the-sheets-with-icloud-and-core-data-seeding) by Drew McCormack
+* [Under the Sheets with iCloud and Core Data: Working Code](http://mentalfaculty.tumblr.com/post/24009617665/under-the-sheets-with-icloud-and-core-data-working) by Drew McCormack
+* [Under the Sheets with iCloud and Core Data: Sentinels](http://mentalfaculty.tumblr.com/post/24692275202/under-the-sheets-with-icloud-and-core-data-sentinels) by Drew McCormack
+* [Under the Sheets with iCloud and Core Data: Troubleshooting](http://mentalfaculty.tumblr.com/post/25241910449/under-the-sheets-with-icloud-and-core-data) by Drew McCormack
+* [How the Dropbox Datastore API Handles Conflicts - Part Two: Resolving Collision](https://www.dropbox.com/developers/blog/56/how-the-dropbox-datastore-api-handles-conflicts-part-two-resolving-collisions) by Guido van Rossum
+* [How the Datastore API Handles Conflicts - Part 1: Basics of Offline Conflict Handling](https://www.dropbox.com/developers/blog/48/how-the-datastore-api-handles-conflicts-part-1-basics-of-offline-conflict-handling) by Guido van Rossum
+* [How the Dropbox Datastore API Handles Conflicts - Part Two: Resolving Collision](https://www.dropbox.com/developers/blog/56/how-the-dropbox-datastore-api-handles-conflicts-part-two-resolving-collisions) by Guido van Rossum
+* [iCloud Complications: Part 1](http://www.atomicbird.com/icloud-complications) by Tom Harrington
+* [iCloud Complications: Part 2](http://www.atomicbird.com/blog/icloud-complications-part-2) by Tom Harrington
+* [iCloud Complications: Part 3](http://www.atomicbird.com/blog/icloud-complications-part-3) by Tom Harrington
+
+### Open Source Core Data Sync Projects
+* [TICoreDataSync](https://github.com/nothirst/TICoreDataSync)
+* [ZumeroIncrementalStore](https://github.com/grasmeyer/ZumeroIncrementalStore)
+* [Helio](http://helios.io)
+* [ParcelKit for Dropbox Datastore API](https://github.com/overcommitted/ParcelKit)
+
+### Commercial Core Data Sync Projects
+* [Wasabi Sync](http://www.wasabisync.com)
+* [Simperium](https://simperium.com)
+* [iCloud](https://developer.apple.com/library/ios/documentation/General/Conceptual/iCloudDesignGuide/Chapters/DesignForCoreDataIniCloud.html)
+
