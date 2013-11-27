@@ -14,11 +14,12 @@
 
 @property (nonatomic, strong, readonly) NSString *ensembleIdentifier;
 @property (nonatomic, strong, readwrite) id <NSObject, NSCopying, NSCoding> cloudFileSystemIdentityToken;
-@property (nonatomic, copy, readonly) NSString *pathToEventDataRootDirectory;
 @property (nonatomic, copy, readonly) NSString *persistentStoreIdentifier;
+@property (nonatomic, assign, readonly) BOOL verifiesStoreRegistrationInCloud;
+
+@property (nonatomic, copy, readonly) NSString *pathToEventDataRootDirectory;
 @property (nonatomic, strong, readonly) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic, assign, readonly) BOOL containsEventData;
-@property (nonatomic, assign, readonly) BOOL verifiesStoreRegistrationInCloud;
 
 @property (nonatomic, strong, readonly) NSArray *incompleteEventIdentifiers;
 @property (nonatomic, strong, readonly) NSArray *incompleteMandatoryEventIdentifiers;
@@ -26,6 +27,9 @@
 @property (nonatomic, assign, readonly) CDERevisionNumber lastSaveRevision;
 @property (nonatomic, assign, readonly) CDERevisionNumber lastMergeRevision;
 @property (nonatomic, assign, readonly) CDERevisionNumber lastRevision;
+
+@property (nonatomic, copy, readwrite) NSString *persistentStoreBaselineIdentifier;
+@property (nonatomic, copy, readonly) NSString *currentBaselineIdentifier;
 
 +(void)setDefaultPathToEventDataRootDirectory:(NSString *)newPath;
 +(NSString *)defaultPathToEventDataRootDirectory;

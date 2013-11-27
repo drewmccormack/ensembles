@@ -15,6 +15,7 @@ NSString * const kCDEPersistentStoreIdentifierKey = @"persistentStoreIdentifier"
 NSString * const kCDECloudFileSystemIdentityKey = @"cloudFileSystemIdentity";
 NSString * const kCDEIncompleteEventIdentifiersKey = @"incompleteEventIdentifiers";
 NSString * const kCDEVerifiesStoreRegistrationInCloudKey = @"verifiesStoreRegistrationInCloud";
+NSString * const KCDEPersistentStoreBaselineIdentifierKey = @"persistentStoreBaselineIdentifier";
 
 static NSString *defaultPathToEventDataRootDirectory = nil;
 
@@ -42,6 +43,8 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 @synthesize pathToEventDataRootDirectory = pathToEventDataRootDirectory;
 @synthesize cloudFileSystemIdentityToken = cloudFileSystemIdentityToken;
 @synthesize verifiesStoreRegistrationInCloud = verifiesStoreRegistrationInCloud;
+@synthesize persistentStoreBaselineIdentifier = persistentStoreBaselineIdentifier;
+@synthesize currentBaselineIdentifier = currentBaselineIdentifier;
 
 + (void)initialize
 {
@@ -96,7 +99,8 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
            kCDEPersistentStoreIdentifierKey : self.persistentStoreIdentifier,
            kCDECloudFileSystemIdentityKey : identityData,
            kCDEIncompleteEventIdentifiersKey : incompleteEventIdentifiers,
-           kCDEVerifiesStoreRegistrationInCloudKey : @(self.verifiesStoreRegistrationInCloud)
+           kCDEVerifiesStoreRegistrationInCloudKey : @(self.verifiesStoreRegistrationInCloud),
+           KCDEPersistentStoreBaselineIdentifierKey : CDENilToNSNull(self.persistentStoreIdentifier)
         };
     }
     
@@ -114,6 +118,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
         cloudFileSystemIdentityToken = identityData ? [NSKeyedUnarchiver unarchiveObjectWithData:identityData] : nil;
         persistentStoreIdentifier = storeMetadata[kCDEPersistentStoreIdentifierKey];
         incompleteEventIdentifiers = [storeMetadata[kCDEIncompleteEventIdentifiersKey] mutableCopy];
+        persistentStoreBaselineIdentifier = CDENSNullToNil(storeMetadata[KCDEPersistentStoreBaselineIdentifierKey]);
         
         NSNumber *value = storeMetadata[kCDEVerifiesStoreRegistrationInCloudKey];
         verifiesStoreRegistrationInCloud = value ? value.boolValue : NO;
@@ -203,6 +208,30 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 {
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"persistentStoreIdentifier = %@", self.persistentStoreIdentifier];
     CDERevisionNumber result = [self lastRevisionNumberForEventRevisionPredicate:predicate];
+    return result;
+}
+
+
+#pragma mark - Baselines
+
+- (NSString *)currentBaselineIdentifier
+{
+    __block NSString *result = nil;
+    [managedObjectContext performBlockAndWait:^{
+        NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
+        fetch.predicate = [NSPredicate predicateWithFormat:@"type = %d", CDEStoreModificationEventTypeBaseline];
+        NSError *error;
+        NSArray *baselines = [managedObjectContext executeFetchRequest:fetch error:&error];
+        if (!baselines) {
+            CDELog(CDELoggingLevelError, @"Failed to retrieve baselines: %@", error);
+        }
+        else if (baselines.count > 1) {
+            CDELog(CDELoggingLevelError, @"Multiple baselines found");
+        }
+        else {
+            result = baselines.lastObject;
+        }
+    }];
     return result;
 }
 

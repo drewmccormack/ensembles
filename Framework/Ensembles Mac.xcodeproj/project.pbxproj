@@ -69,6 +69,8 @@
 		07973F16183BE466007F48CA /* CDECloudManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 07973F0F183BE466007F48CA /* CDECloudManager.h */; };
 		07973F17183BE466007F48CA /* CDECloudManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 07973F10183BE466007F48CA /* CDECloudManager.m */; };
 		07973F19183D308D007F48CA /* IntegratorMergeTestsFixture.json in Resources */ = {isa = PBXBuildFile; fileRef = 07973F18183D3082007F48CA /* IntegratorMergeTestsFixture.json */; };
+		07BAB4BD184677640096318D /* CDEBaselineConsolidator.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BAB4BB184677640096318D /* CDEBaselineConsolidator.h */; };
+		07BAB4BE184677640096318D /* CDEBaselineConsolidator.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BAB4BC184677640096318D /* CDEBaselineConsolidator.m */; };
 		07BF7A32177F0A9D0029D500 /* CDEPersistentStoreEnsemble.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF79F6177F0A9D0029D500 /* CDEPersistentStoreEnsemble.h */; };
 		07BF7A34177F0A9D0029D500 /* CDEPersistentStoreEnsemble.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF79F7177F0A9D0029D500 /* CDEPersistentStoreEnsemble.m */; };
 		07BF7A35177F0A9D0029D500 /* CDEEventIntegrator.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF79F9177F0A9D0029D500 /* CDEEventIntegrator.h */; };
@@ -184,6 +186,8 @@
 		07973F0F183BE466007F48CA /* CDECloudManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDECloudManager.h; sourceTree = "<group>"; };
 		07973F10183BE466007F48CA /* CDECloudManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDECloudManager.m; sourceTree = "<group>"; };
 		07973F18183D3082007F48CA /* IntegratorMergeTestsFixture.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = IntegratorMergeTestsFixture.json; sourceTree = "<group>"; };
+		07BAB4BB184677640096318D /* CDEBaselineConsolidator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEBaselineConsolidator.h; sourceTree = "<group>"; };
+		07BAB4BC184677640096318D /* CDEBaselineConsolidator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEBaselineConsolidator.m; sourceTree = "<group>"; };
 		07BAE701178D65D00036E743 /* CDESaveMonitorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDESaveMonitorTests.m; sourceTree = "<group>"; };
 		07BF78E9177F03320029D500 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		07BF7933177F04B30029D500 /* libensembles_mac.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libensembles_mac.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -340,6 +344,7 @@
 				07BF79F8177F0A9D0029D500 /* Events */,
 				07BF7A0C177F0A9D0029D500 /* Model */,
 				0722B26017B76B2400496F4A /* Revisioning */,
+				07BAB4BA184677240096318D /* Baselines */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -382,6 +387,15 @@
 				07973F10183BE466007F48CA /* CDECloudManager.m */,
 			);
 			path = Cloud;
+			sourceTree = "<group>";
+		};
+		07BAB4BA184677240096318D /* Baselines */ = {
+			isa = PBXGroup;
+			children = (
+				07BAB4BB184677640096318D /* CDEBaselineConsolidator.h */,
+				07BAB4BC184677640096318D /* CDEBaselineConsolidator.m */,
+			);
+			path = Baselines;
 			sourceTree = "<group>";
 		};
 		07BF79B8177F05800029D500 /* Mac */ = {
@@ -515,6 +529,7 @@
 				07BF7A41177F0A9D0029D500 /* CDEPropertyChangeValue.h in Headers */,
 				07973F11183BE466007F48CA /* CDECloudDirectory.h in Headers */,
 				07973F13183BE466007F48CA /* CDECloudFile.h in Headers */,
+				07BAB4BD184677640096318D /* CDEBaselineConsolidator.h in Headers */,
 				075FDCDD183615C60020E1C9 /* CDEMockLocalFileSystem.h in Headers */,
 				07973F05183BE44A007F48CA /* CDEICloudFileSystem.h in Headers */,
 				07D2D632182D627E001D24BC /* NSManagedObjectModel+CDEAdditions.h in Headers */,
@@ -681,6 +696,7 @@
 				07BF7A69177F0A9D0029D500 /* CDEStoreModificationEvent.m in Sources */,
 				07973F12183BE466007F48CA /* CDECloudDirectory.m in Sources */,
 				07BF7A49177F0A9D0029D500 /* CDEAsynchronousTaskQueue.m in Sources */,
+				07BAB4BE184677640096318D /* CDEBaselineConsolidator.m in Sources */,
 				07973F14183BE466007F48CA /* CDECloudFile.m in Sources */,
 				07BF7A3A177F0A9D0029D500 /* CDEEventMigrator.m in Sources */,
 				0722B26917B76B2400496F4A /* CDERevision.m in Sources */,
