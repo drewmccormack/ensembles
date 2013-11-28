@@ -190,4 +190,66 @@
     XCTAssertEqual(rev.revisionNumber, [revision2 revisionNumber], @"Wrong rev number");
 }
 
+- (void)testComparisonOfEqualRevisionSets
+{
+    [set addRevision:revision2];
+    [set addRevision:revision1];
+    
+    CDERevisionSet *other = [[CDERevisionSet alloc] init];
+    [other addRevision:revision2];
+    [other addRevision:revision1];
+    
+    XCTAssertEqual([set compare:other], NSOrderedSame, @"Should be the same");
+}
+
+- (void)testComparisonWithSubsetRevisionSet
+{
+    [set addRevision:revision2];
+    [set addRevision:revision1];
+    
+    CDERevisionSet *other = [[CDERevisionSet alloc] init];
+    [other addRevision:revision2];
+    
+    XCTAssertEqual([set compare:other], NSOrderedDescending, @"Should be descending. Other should be a subset");
+    XCTAssertEqual([other compare:set], NSOrderedAscending, @"Should be ascending. Other should be a superset");
+}
+
+- (void)testComparisonWithConcurrentRevisionSets
+{
+    [set addRevision:revision2];
+    [set addRevision:revision1];
+    
+    CDERevisionSet *other = [[CDERevisionSet alloc] init];
+    CDERevisionMock *newRevision = [[CDERevisionMock alloc] init];
+    newRevision.persistentStoreIdentifier = @"1234";
+    newRevision.revisionNumber = 1;
+    [other addRevision:(id)newRevision];
+    
+    newRevision = [[CDERevisionMock alloc] init];
+    newRevision.persistentStoreIdentifier = @"1";
+    newRevision.revisionNumber = 1;
+    [other addRevision:(id)newRevision];
+    
+    XCTAssertEqual([set compare:other], NSOrderedSame, @"Concurrent revision sets should be ordered the same");
+}
+
+- (void)testComparisonWithOneSuperset
+{
+    [set addRevision:revision2];
+    [set addRevision:revision1];
+    
+    CDERevisionSet *other = [[CDERevisionSet alloc] init];
+    CDERevisionMock *newRevision = [[CDERevisionMock alloc] init];
+    newRevision.persistentStoreIdentifier = @"1234";
+    newRevision.revisionNumber = 0;
+    [other addRevision:(id)newRevision];
+    
+    newRevision = [[CDERevisionMock alloc] init];
+    newRevision.persistentStoreIdentifier = @"1";
+    newRevision.revisionNumber = 3;
+    [other addRevision:(id)newRevision];
+    
+    XCTAssertEqual([set compare:other], NSOrderedAscending, @"Second is superset, so ascends first");
+}
+
 @end

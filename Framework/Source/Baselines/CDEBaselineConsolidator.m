@@ -9,6 +9,7 @@
 #import "CDEBaselineConsolidator.h"
 #import "CDEEventStore.h"
 #import "CDEStoreModificationEvent.h"
+#import "CDERevisionSet.h"
 
 @implementation CDEBaselineConsolidator
 
@@ -23,14 +24,19 @@
     return self;
 }
 
++ (NSFetchRequest *)baselineFetchRequest
+{
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
+    fetch.predicate = [NSPredicate predicateWithFormat:@"type = %d", CDEStoreModificationEventTypeBaseline];
+    return fetch;
+}
+
 - (BOOL)baselineNeedsConsolidation
 {
     __block BOOL result = NO;
     [self.eventStore.managedObjectContext performBlockAndWait:^{
-        NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
-        fetch.predicate = [NSPredicate predicateWithFormat:@"type = %d", CDEStoreModificationEventTypeBaseline];
-        
         NSError *error = nil;
+        NSFetchRequest *fetch = [self.class baselineFetchRequest];
         NSUInteger count = [self.eventStore.managedObjectContext countForFetchRequest:fetch error:&error];
         if (error) {
             CDELog(CDELoggingLevelError, @"Failed to get baseline count: %@", error);
@@ -44,7 +50,37 @@
 
 - (void)consolidateBaselineWithCompletion:(CDECompletionBlock)completion
 {
-#warning Not implemented yet
+    NSManagedObjectContext *childStoreContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
+    [childStoreContext performBlock:^{
+        childStoreContext.parentContext = self.eventStore.managedObjectContext;
+        
+        // Fetch existing baselines, ordered beginning with most recent
+        NSError *error = nil;
+        NSFetchRequest *fetch = [self.class baselineFetchRequest];
+        NSArray *sortDescriptors = @[
+            [NSSortDescriptor sortDescriptorWithKey:@"globalCount" ascending:NO],
+            [NSSortDescriptor sortDescriptorWithKey:@"timestamp" ascending:NO],
+            [NSSortDescriptor sortDescriptorWithKey:@"eventRevision.persistentStoreIdentifier" ascending:NO]
+        ];
+        fetch.sortDescriptors = sortDescriptors;
+        NSArray *baselineEvents = [childStoreContext executeFetchRequest:fetch error:&error];
+        
+        // Eliminate any baselines that are subsets of other baselines
+        NSMutableSet *baselinesToEliminate = [NSMutableSet setWithCapacity:baselineEvents.count];
+        for (CDEStoreModificationEvent *baselineEvent in baselineEvents) {
+            for (CDEStoreModificationEvent *otherEvent in baselineEvents) {
+                if (baselineEvent == otherEvent) continue;
+                CDERevisionSet *baselineSet = baselineEvent.revisionSet;
+                CDERevisionSet *otherSet = otherEvent.revisionSet;
+                if ([baselineSet compare:otherSet] == NSOrderedDescending) [baselinesToEliminate addObject:otherSet];
+            }
+        }
+    }];
+}
+
+- (CDEStoreModificationEvent *)mergedBaselineFromBaselineEvents:(NSArray *)baselines
+{
+    return nil;
 }
 
 @end

@@ -39,16 +39,21 @@
 - (NSComparisonResult)compare:(CDERevision *)other
 {
     NSParameterAssert(other != nil);
-    if (self.globalCount < other.globalCount)
-        return NSOrderedAscending;
-    else if (self.revisionNumber > other.revisionNumber)
-        return NSOrderedDescending;
-    else {
+    if ([self.persistentStoreIdentifier isEqualToString:other.persistentStoreIdentifier]) {
         if (self.revisionNumber < other.revisionNumber)
             return NSOrderedAscending;
         else if (self.revisionNumber > other.revisionNumber)
             return NSOrderedDescending;
-        return [self.persistentStoreIdentifier compare:other.persistentStoreIdentifier];
+        else
+            return NSOrderedSame;
+    }
+    else {
+        if (self.globalCount < other.globalCount)
+            return NSOrderedAscending;
+        else if (self.globalCount > other.globalCount)
+            return NSOrderedDescending;
+        else
+            return NSOrderedSame;
     }
 }
 

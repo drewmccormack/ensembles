@@ -119,4 +119,49 @@
     }];
 }
 
+- (NSComparisonResult)compare:(CDERevisionSet *)otherSet
+{
+    NSMutableSet *allStoreIds = [[NSMutableSet alloc] initWithSet:self.persistentStoreIdentifiers];
+    [allStoreIds unionSet:otherSet.persistentStoreIdentifiers];
+    
+    BOOL rev1AlwaysMax = YES, rev2AlwaysMax = YES;
+    BOOL rev1AlwaysEqualToRev2 = YES;
+    for ( NSString *persistentStoreId in allStoreIds ) {
+        CDERevision *rev1 = [self revisionForPersistentStoreIdentifier:persistentStoreId];
+        CDERevision *rev2 = [otherSet revisionForPersistentStoreIdentifier:persistentStoreId];
+        
+        if (!rev1) {
+            rev1AlwaysMax = NO;
+            rev1AlwaysEqualToRev2 = NO;
+            continue;
+        }
+        
+        if (!rev2) {
+            rev2AlwaysMax = NO;
+            rev1AlwaysEqualToRev2 = NO;
+            continue;
+        }
+        
+        if (rev1.revisionNumber != rev2.revisionNumber) rev1AlwaysEqualToRev2 = NO;
+        if (rev1.revisionNumber > rev2.revisionNumber) {
+            rev2AlwaysMax = NO;
+        }
+        if (rev1.revisionNumber < rev2.revisionNumber) {
+            rev1AlwaysMax = NO;
+        }
+    }
+    
+    NSComparisonResult result;
+    if (rev1AlwaysEqualToRev2)
+        result = NSOrderedSame;
+    else if (rev1AlwaysMax)
+        result = NSOrderedDescending;
+    else if (rev2AlwaysMax)
+        result = NSOrderedAscending;
+    else
+        result = NSOrderedSame;
+    
+    return result;
+}
+
 @end
