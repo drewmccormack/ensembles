@@ -11,7 +11,8 @@
 #import "CDEStoreModificationEvent.h"
 #import "CDERevisionSet.h"
 
-@implementation CDEBaselineConsolidator
+@implementation CDEBaselineConsolidator {
+}
 
 @synthesize eventStore = eventStore;
 
@@ -50,32 +51,88 @@
 
 - (void)consolidateBaselineWithCompletion:(CDECompletionBlock)completion
 {
-    NSManagedObjectContext *childStoreContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
-    [childStoreContext performBlock:^{
-        childStoreContext.parentContext = self.eventStore.managedObjectContext;
-        
+    NSManagedObjectContext *context = self.eventStore.managedObjectContext;
+    [context performBlock:^{
         // Fetch existing baselines, ordered beginning with most recent
         NSError *error = nil;
-        NSFetchRequest *fetch = [self.class baselineFetchRequest];
-        NSArray *sortDescriptors = @[
-            [NSSortDescriptor sortDescriptorWithKey:@"globalCount" ascending:NO],
-            [NSSortDescriptor sortDescriptorWithKey:@"timestamp" ascending:NO],
-            [NSSortDescriptor sortDescriptorWithKey:@"eventRevision.persistentStoreIdentifier" ascending:NO]
-        ];
-        fetch.sortDescriptors = sortDescriptors;
-        NSArray *baselineEvents = [childStoreContext executeFetchRequest:fetch error:&error];
-        
-        // Eliminate any baselines that are subsets of other baselines
-        NSMutableSet *baselinesToEliminate = [NSMutableSet setWithCapacity:baselineEvents.count];
-        for (CDEStoreModificationEvent *baselineEvent in baselineEvents) {
-            for (CDEStoreModificationEvent *otherEvent in baselineEvents) {
-                if (baselineEvent == otherEvent) continue;
-                CDERevisionSet *baselineSet = baselineEvent.revisionSet;
-                CDERevisionSet *otherSet = otherEvent.revisionSet;
-                if ([baselineSet compare:otherSet] == NSOrderedDescending) [baselinesToEliminate addObject:otherSet];
-            }
+        NSArray *baselineEvents = [self baselinesDecreasingInRecencyInManagedObjectContext:context error:&error];
+        if (!baselineEvents) {
+            [self failWithCompletion:completion error:error];
+            return;
         }
+        
+        // Determine which baselines should be eliminated
+        NSSet *baselinesToEliminate = [self redundantBaselinesInBaselines:baselineEvents];
+        
+        // Delete redundant baselines
+        [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:baselinesToEliminate.allObjects];
+        for (CDEStoreModificationEvent *baseline in baselinesToEliminate) {
+            [context deleteObject:baseline];
+        }
+        
+        // Save
+        BOOL success = [context save:&error];
+        if (!success) {
+            [self failWithCompletion:completion error:error];
+            return;
+        }
+        
+        // Merge surviving baselines
+        NSMutableArray *survivingBaselines = [NSMutableArray arrayWithArray:baselineEvents];
+        [survivingBaselines removeObjectsInArray:baselinesToEliminate.allObjects];
+        CDEStoreModificationEvent *newBaseline = [self mergedBaselineFromBaselineEvents:survivingBaselines];
+        [survivingBaselines removeObject:newBaseline];
+        
+        // Delete old baselines
+        for (CDEStoreModificationEvent *baseline in survivingBaselines) {
+            [context deleteObject:baseline];
+        }
+        
+        // Save
+        success = [context save:&error];
+        if (!success) {
+            [self failWithCompletion:completion error:error];
+            return;
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (completion) completion(nil);
+        });
     }];
+}
+
+- (void)failWithCompletion:(CDECompletionBlock)completion error:(NSError *)error
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (completion) completion(error);
+    });
+}
+
+- (NSArray *)baselinesDecreasingInRecencyInManagedObjectContext:(NSManagedObjectContext *)context error:(NSError * __autoreleasing *)error
+{
+    NSFetchRequest *fetch = [self.class baselineFetchRequest];
+    NSArray *sortDescriptors = @[
+        [NSSortDescriptor sortDescriptorWithKey:@"globalCount" ascending:NO],
+        [NSSortDescriptor sortDescriptorWithKey:@"timestamp" ascending:NO],
+        [NSSortDescriptor sortDescriptorWithKey:@"eventRevision.persistentStoreIdentifier" ascending:NO]
+    ];
+    fetch.sortDescriptors = sortDescriptors;
+    NSArray *baselineEvents = [context executeFetchRequest:fetch error:error];
+    return baselineEvents;
+}
+
+- (NSSet *)redundantBaselinesInBaselines:(NSArray *)allBaselines
+{
+    NSMutableSet *baselinesToEliminate = [NSMutableSet setWithCapacity:allBaselines.count];
+    for (CDEStoreModificationEvent *firstEvent in allBaselines) {
+        for (CDEStoreModificationEvent *secondEvent in allBaselines) {
+            if (firstEvent == secondEvent) continue;
+            CDERevisionSet *firstSet = firstEvent.revisionSet;
+            CDERevisionSet *secondSet = secondEvent.revisionSet;
+            if ([firstSet compare:secondSet] == NSOrderedDescending) [baselinesToEliminate addObject:secondSet];
+        }
+    }
+    return baselinesToEliminate;
 }
 
 - (CDEStoreModificationEvent *)mergedBaselineFromBaselineEvents:(NSArray *)baselines

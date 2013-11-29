@@ -250,6 +250,7 @@
     [other addRevision:(id)newRevision];
     
     XCTAssertEqual([set compare:other], NSOrderedAscending, @"Second is superset, so ascends first");
+    XCTAssertEqual([other compare:set], NSOrderedDescending, @"Second is subset, so descends first");
 }
 
 @end
