@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="1" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="3396" systemVersion="13A598" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
+<model userDefinedModelVersionIdentifier="1" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="3401" systemVersion="13A598" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="CDEEventRevision" representedClassName="CDEEventRevision" syncable="YES">
         <attribute name="persistentStoreIdentifier" attributeType="String" indexed="YES" syncable="YES"/>
         <attribute name="revisionNumber" attributeType="Integer 64" minValueString="0" defaultValueString="0" indexed="YES" syncable="YES"/>
@@ -46,9 +46,9 @@
         <relationship name="objectChanges" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CDEObjectChange" inverseName="storeModificationEvent" inverseEntity="CDEObjectChange" syncable="YES"/>
     </entity>
     <elements>
-        <element name="CDEEventRevision" positionX="0" positionY="0" width="0" height="0"/>
-        <element name="CDEGlobalIdentifier" positionX="0" positionY="0" width="0" height="0"/>
-        <element name="CDEObjectChange" positionX="0" positionY="0" width="0" height="0"/>
-        <element name="CDEStoreModificationEvent" positionX="0" positionY="0" width="0" height="0"/>
+        <element name="CDEEventRevision" positionX="-90" positionY="-18" width="198" height="105"/>
+        <element name="CDEGlobalIdentifier" positionX="-470" positionY="-333" width="128" height="105"/>
+        <element name="CDEObjectChange" positionX="-144" positionY="-252" width="128" height="120"/>
+        <element name="CDEStoreModificationEvent" positionX="-486" positionY="-54" width="189" height="165"/>
     </elements>
 </model>

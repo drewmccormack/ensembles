@@ -7,9 +7,14 @@
 //
 
 #import "CDEBaselineConsolidator.h"
+#import "CDEFoundationAdditions.h"
+#import "NSMapTable+CDEAdditions.h"
 #import "CDEEventStore.h"
 #import "CDEStoreModificationEvent.h"
 #import "CDERevisionSet.h"
+#import "CDEObjectChange.h"
+#import "CDEGlobalIdentifier.h"
+#import "CDEPropertyChangeValue.h"
 
 @implementation CDEBaselineConsolidator {
 }
@@ -80,16 +85,20 @@
         // Merge surviving baselines
         NSMutableArray *survivingBaselines = [NSMutableArray arrayWithArray:baselineEvents];
         [survivingBaselines removeObjectsInArray:baselinesToEliminate.allObjects];
-        CDEStoreModificationEvent *newBaseline = [self mergedBaselineFromBaselineEvents:survivingBaselines];
-        [survivingBaselines removeObject:newBaseline];
+        CDEStoreModificationEvent *newBaseline = [self mergedBaselineFromBaselineEvents:survivingBaselines error:&error];
+        if (!newBaseline) {
+            [self failWithCompletion:completion error:error];
+            return;
+        }
         
         // Delete old baselines
+        [survivingBaselines removeObject:newBaseline];
         for (CDEStoreModificationEvent *baseline in survivingBaselines) {
             [context deleteObject:baseline];
         }
         
         // Save
-        success = [context save:&error];
+        if (context.hasChanges) success = [context save:&error];
         if (!success) {
             [self failWithCompletion:completion error:error];
             return;
@@ -135,9 +144,97 @@
     return baselinesToEliminate;
 }
 
-- (CDEStoreModificationEvent *)mergedBaselineFromBaselineEvents:(NSArray *)baselines
+- (CDEStoreModificationEvent *)mergedBaselineFromBaselineEvents:(NSArray *)baselines error:(NSError * __autoreleasing *)error
 {
-    return nil;
+    if (baselines.count == 0) return nil;
+    if (baselines.count == 1) return baselines.lastObject;
+    
+    // Change the first baseline into our new baseline by assigning a different unique id
+    CDEStoreModificationEvent *firstBaseline = baselines.firstObject;
+    firstBaseline.uniqueIdentifier = [[NSProcessInfo processInfo] globallyUniqueString];
+    firstBaseline.timestamp = [NSDate timeIntervalSinceReferenceDate];
+    
+    // Retrieve all global identifiers. Map global ids to object changes.
+    [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:@[firstBaseline]];
+    NSMapTable *objectChangesByGlobalId = [NSMapTable strongToStrongObjectsMapTable];
+    NSSet *objectChanges = firstBaseline.objectChanges;
+    for (CDEObjectChange *change in objectChanges) {
+        [objectChangesByGlobalId setObject:change forKey:change.globalIdentifier];
+    }
+    
+    // Get other baselines
+    NSMutableArray *otherBaselines = [baselines mutableCopy];
+    [otherBaselines removeObject:firstBaseline];
+    [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:otherBaselines];
+    
+    // Apply changes from others
+    for (CDEStoreModificationEvent *baseline in otherBaselines) {
+        [baseline.objectChanges.allObjects cde_enumerateObjectsDrainingEveryIterations:100 usingBlock:^(CDEObjectChange *change, NSUInteger index, BOOL *stop) {
+            CDEObjectChange *existingChange = [objectChangesByGlobalId objectForKey:change.globalIdentifier];
+            if (!existingChange) {
+                // Move change to new baseline
+                change.storeModificationEvent = firstBaseline;
+                [objectChangesByGlobalId setObject:change forKey:change.globalIdentifier];
+            }
+            else {
+                [self mergeValuesIntoObjectChange:existingChange fromObjectChange:change];
+            }
+        }];
+    }
+    
+    return firstBaseline;
+}
+
+- (void)mergeValuesIntoObjectChange:(CDEObjectChange *)existingChange fromObjectChange:(CDEObjectChange *)change
+{
+    // Check if there are new property values to include, or values to merge
+    NSSet *existingNames = [[NSSet alloc] initWithArray:[existingChange.propertyChangeValues valueForKeyPath:@"propertyName"]];
+    
+    NSMutableArray *addedPropertyChangeValues = nil;
+    for (CDEPropertyChangeValue *propertyValue in change.propertyChangeValues) {
+        NSString *propertyName = propertyValue.propertyName;
+        
+        // If this property name is not already present, just copy it in
+        if (![existingNames containsObject:propertyName]) {
+            if (!addedPropertyChangeValues) addedPropertyChangeValues = [[NSMutableArray alloc] initWithCapacity:10];
+            [addedPropertyChangeValues addObject:propertyValue];
+            continue;
+        }
+        
+        
+        // If it is a to-many relationship, take the union
+        BOOL isToMany = propertyValue.type == CDEPropertyChangeTypeToManyRelationship;
+        isToMany = isToMany || propertyValue.type == CDEPropertyChangeTypeOrderedToManyRelationship;
+        if (isToMany) {
+            CDEPropertyChangeValue *existingValue = [existingChange propertyChangeValueForPropertyName:propertyName];
+            [self mergeToManyRelationshipIntoValue:existingValue fromValue:propertyValue];
+        }
+    }
+    
+    if (addedPropertyChangeValues.count > 0) {
+        existingChange.propertyChangeValues = [existingChange.propertyChangeValues arrayByAddingObjectsFromArray:addedPropertyChangeValues];
+    }
+}
+
+- (void)mergeToManyRelationshipIntoValue:(CDEPropertyChangeValue *)existingValue fromValue:(CDEPropertyChangeValue *)propertyValue
+{
+    NSSet *originalAddedIdentifiers = existingValue.addedIdentifiers;
+    if ([propertyValue.addedIdentifiers isEqualToSet:originalAddedIdentifiers]) return;
+
+    // Add the missing identifiers
+    existingValue.addedIdentifiers = [originalAddedIdentifiers setByAddingObjectsFromSet:propertyValue.addedIdentifiers];
+    if (propertyValue.type != CDEPropertyChangeTypeOrderedToManyRelationship) return;
+    
+    // If it is an ordered to-many, update ordering. Order new identifiers after the existing ones.
+    NSMutableDictionary *newMovedIdentifiersByIndex = [[NSMutableDictionary alloc] initWithDictionary:existingValue.movedIdentifiersByIndex];
+    NSUInteger newIndex = existingValue.movedIdentifiersByIndex.count;
+    for (NSUInteger oldIndex = 0; oldIndex < propertyValue.movedIdentifiersByIndex.count; oldIndex++) {
+        NSString *identifier = propertyValue.movedIdentifiersByIndex[@(oldIndex)];
+        if (!identifier || [originalAddedIdentifiers containsObject:identifier]) continue;
+        newMovedIdentifiersByIndex[@(newIndex++)] = identifier;
+    }
+    
+    existingValue.movedIdentifiersByIndex = newMovedIdentifiersByIndex;
 }
 
 @end
