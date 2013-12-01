@@ -607,10 +607,7 @@
         
         for (NSString *identifier in relationshipChange.removedIdentifiers) {
             id removedObject = [objectsByGlobalId objectForKey:identifier];
-            if (removedObject)
-                [relatedObjects removeObject:removedObject];
-            else
-                CDELog(CDELoggingLevelWarning, @"Could not find object with identifier to remove from relationship. Skipping: %@", identifier);
+            if (removedObject) [relatedObjects removeObject:removedObject];
         }
     }
 }
@@ -645,10 +642,7 @@
         // Delete removed objects
         for (NSString *identifier in relationshipChange.removedIdentifiers) {
             id removedObject = [objectsByGlobalId objectForKey:identifier];
-            if (removedObject)
-                [relatedObjects removeObject:removedObject];
-            else
-                CDELog(CDELoggingLevelWarning, @"Could not find object with identifier to remove from relationship. Skipping: %@", identifier);
+            if (removedObject) [relatedObjects removeObject:removedObject];
         }
         
         // Determine indexes for objects in the moved identifiers
