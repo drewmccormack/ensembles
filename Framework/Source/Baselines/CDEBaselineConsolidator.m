@@ -8,10 +8,15 @@
 
 #import "CDEBaselineConsolidator.h"
 #import "CDEFoundationAdditions.h"
+#import "NSManagedObjectModel+CDEAdditions.h"
 #import "NSMapTable+CDEAdditions.h"
+#import "CDEPersistentStoreEnsemble.h"
+#import "CDERevisionManager.h"
 #import "CDEEventStore.h"
 #import "CDEStoreModificationEvent.h"
 #import "CDERevisionSet.h"
+#import "CDEEventRevision.h"
+#import "CDERevision.h"
 #import "CDEObjectChange.h"
 #import "CDEGlobalIdentifier.h"
 #import "CDEPropertyChangeValue.h"
@@ -20,6 +25,7 @@
 }
 
 @synthesize eventStore = eventStore;
+@synthesize ensemble = ensemble;
 
 - (id)initWithEventStore:(CDEEventStore *)newEventStore
 {
@@ -66,6 +72,16 @@
             return;
         }
         
+        // Check that all baseline model versions are known
+        CDERevisionManager *revisionManager = [[CDERevisionManager alloc] initWithEventStore:self.eventStore];
+        revisionManager.managedObjectModelURL = self.ensemble.managedObjectModelURL;
+        BOOL hasAllModelVersions = [revisionManager checkModelVersionsOfStoreModificationEvents:baselineEvents];
+        if (!hasAllModelVersions) {
+            NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeUnknownModelVersion userInfo:nil];
+            [self failWithCompletion:completion error:error];
+            return;
+        }
+        
         // Determine which baselines should be eliminated
         NSSet *baselinesToEliminate = [self redundantBaselinesInBaselines:baselineEvents];
         
@@ -85,7 +101,7 @@
         // Merge surviving baselines
         NSMutableArray *survivingBaselines = [NSMutableArray arrayWithArray:baselineEvents];
         [survivingBaselines removeObjectsInArray:baselinesToEliminate.allObjects];
-        CDEStoreModificationEvent *newBaseline = [self mergedBaselineFromBaselineEvents:survivingBaselines error:&error];
+        CDEStoreModificationEvent *newBaseline = [self mergedBaselineFromOrderedBaselineEvents:survivingBaselines error:&error];
         if (!newBaseline) {
             [self failWithCompletion:completion error:error];
             return;
@@ -144,7 +160,7 @@
     return baselinesToEliminate;
 }
 
-- (CDEStoreModificationEvent *)mergedBaselineFromBaselineEvents:(NSArray *)baselines error:(NSError * __autoreleasing *)error
+- (CDEStoreModificationEvent *)mergedBaselineFromOrderedBaselineEvents:(NSArray *)baselines error:(NSError * __autoreleasing *)error
 {
     if (baselines.count == 0) return nil;
     if (baselines.count == 1) return baselines.lastObject;
@@ -153,6 +169,26 @@
     CDEStoreModificationEvent *firstBaseline = baselines.firstObject;
     firstBaseline.uniqueIdentifier = [[NSProcessInfo processInfo] globallyUniqueString];
     firstBaseline.timestamp = [NSDate timeIntervalSinceReferenceDate];
+    firstBaseline.modelVersion = [self.ensemble.managedObjectModel cde_entityHashesPropertyList];
+    
+    // Update the revisions of each store in the baseline
+    CDERevisionSet *newRevisionSet = [[CDERevisionSet alloc] init];
+    for (CDEStoreModificationEvent *event in baselines) {
+        newRevisionSet = [newRevisionSet revisionSetByTakingStoreWiseMaximumWithRevisionSet:event.revisionSet];
+    }
+    
+    NSManagedObjectContext *context = self.eventStore.managedObjectContext;
+    NSString *persistentStoreId = self.eventStore.persistentStoreIdentifier;
+    CDERevision *localRevision = [newRevisionSet revisionForPersistentStoreIdentifier:persistentStoreId];
+    [newRevisionSet removeRevisionForPersistentStoreIdentifier:persistentStoreId];
+    
+    CDEEventRevision *eventRevision = [NSEntityDescription insertNewObjectForEntityForName:@"CDEEventRevision" inManagedObjectContext:context];
+    eventRevision.persistentStoreIdentifier = persistentStoreId;
+    eventRevision.revisionNumber = localRevision.revisionNumber;
+    eventRevision.storeModificationEvent = firstBaseline;
+    
+    firstBaseline.eventRevision = eventRevision;
+    firstBaseline.eventRevisionsOfOtherStores = [CDEEventRevision makeEventRevisionsForRevisionSet:newRevisionSet inManagedObjectContext:context];
     
     // Retrieve all global identifiers. Map global ids to object changes.
     [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:@[firstBaseline]];
@@ -187,7 +223,6 @@
 
 - (void)mergeValuesIntoObjectChange:(CDEObjectChange *)existingChange fromObjectChange:(CDEObjectChange *)change
 {
-    // Check if there are new property values to include, or values to merge
     NSSet *existingNames = [[NSSet alloc] initWithArray:[existingChange.propertyChangeValues valueForKeyPath:@"propertyName"]];
     
     NSMutableArray *addedPropertyChangeValues = nil;
@@ -200,7 +235,6 @@
             [addedPropertyChangeValues addObject:propertyValue];
             continue;
         }
-        
         
         // If it is a to-many relationship, take the union
         BOOL isToMany = propertyValue.type == CDEPropertyChangeTypeToManyRelationship;

@@ -10,10 +10,12 @@
 #import "CDEDefines.h"
 
 @class CDEEventStore;
+@class CDEPersistentStoreEnsemble;
 
 @interface CDEBaselineConsolidator : NSObject
 
 @property (nonatomic, readonly) CDEEventStore *eventStore;
+@property (nonatomic, weak, readwrite) CDEPersistentStoreEnsemble *ensemble;
 
 - (id)initWithEventStore:(CDEEventStore *)eventStore;
 

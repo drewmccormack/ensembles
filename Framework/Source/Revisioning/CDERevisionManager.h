@@ -28,6 +28,7 @@
 - (NSArray *)recursivelyFetchStoreModificationEventsConcurrentWithEvents:(NSArray *)events error:(NSError *__autoreleasing *)error;
 
 - (BOOL)checkIntegrationPrequisites:(NSError * __autoreleasing *)error;
+
 - (BOOL)checkModelVersionsOfStoreModificationEvents:(NSArray *)events;
 - (BOOL)checkAllDependenciesExistForStoreModificationEvents:(NSArray *)events;
 - (BOOL)checkContinuityOfStoreModificationEvents:(NSArray *)events;
