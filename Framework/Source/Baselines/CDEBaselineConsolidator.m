@@ -154,7 +154,7 @@
             if (firstEvent == secondEvent) continue;
             CDERevisionSet *firstSet = firstEvent.revisionSet;
             CDERevisionSet *secondSet = secondEvent.revisionSet;
-            if ([firstSet compare:secondSet] == NSOrderedDescending) [baselinesToEliminate addObject:secondSet];
+            if ([firstSet compare:secondSet] == NSOrderedDescending) [baselinesToEliminate addObject:secondEvent];
         }
     }
     return baselinesToEliminate;

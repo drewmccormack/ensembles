@@ -41,6 +41,7 @@ static NSString *testStoreFile;
 
 - (NSString *)persistentStoreIdentifier
 {
+    if (_persistentStoreIdentifier) return _persistentStoreIdentifier;
     return @"store1";
 }
 

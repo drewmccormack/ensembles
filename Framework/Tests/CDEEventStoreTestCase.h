@@ -20,7 +20,7 @@
 
 @property (strong) NSManagedObjectContext *managedObjectContext;
 @property (readwrite) BOOL containsEventData;
-@property (readonly) NSString *persistentStoreIdentifier;
+@property (nonatomic, readwrite) NSString *persistentStoreIdentifier;
 @property (readwrite) CDERevisionNumber lastRevision, lastSaveRevision, lastMergeRevision;
 @property (readwrite) NSString *pathToEventDataRootDirectory;
 
