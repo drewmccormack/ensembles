@@ -16,6 +16,7 @@
 
 NSString * const CDEMonitoredManagedObjectContextWillSaveNotification;
 NSString * const CDEMonitoredManagedObjectContextDidSaveNotification;
+NSString * const CDEPersistentStoreEnsembleDidSaveMergeChangesNotification;
 
 @protocol CDEPersistentStoreEnsembleDelegate <NSObject>
 

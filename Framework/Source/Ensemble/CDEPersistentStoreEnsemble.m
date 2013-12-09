@@ -101,16 +101,16 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
     self.eventIntegrator = [[CDEEventIntegrator alloc] initWithStoreURL:url managedObjectModel:self.managedObjectModel eventStore:self.eventStore];
     self.eventIntegrator.ensemble = self;
     
-    __weak CDEPersistentStoreEnsemble *weakSelf = self;
+    __weak typeof(self) weakSelf = self;
     self.eventIntegrator.willSaveBlock = ^(NSManagedObjectContext *savingContext, NSManagedObjectContext *reparationContext) {
-        CDEPersistentStoreEnsemble *strongSelf = weakSelf;
+        __strong typeof(self) strongSelf = weakSelf;
         if ([strongSelf.delegate respondsToSelector:@selector(persistentStoreEnsemble:willSaveMergedChangesInManagedObjectContext:reparationManagedObjectContext:)]) {
             [strongSelf.delegate persistentStoreEnsemble:strongSelf willSaveMergedChangesInManagedObjectContext:savingContext reparationManagedObjectContext:reparationContext];
         }
     };
     
     self.eventIntegrator.failedSaveBlock = ^(NSManagedObjectContext *savingContext, NSError *error, NSManagedObjectContext *reparationContext) {
-        CDEPersistentStoreEnsemble *strongSelf = weakSelf;
+        __strong typeof(self) strongSelf = weakSelf;
         if ([strongSelf.delegate respondsToSelector:@selector(persistentStoreEnsemble:didFailToSaveMergedChangesInManagedObjectContext:error:reparationManagedObjectContext:)]) {
             return [strongSelf.delegate persistentStoreEnsemble:strongSelf didFailToSaveMergedChangesInManagedObjectContext:savingContext error:error reparationManagedObjectContext:reparationContext];
         }
@@ -118,11 +118,12 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
     };
     
     self.eventIntegrator.didSaveBlock = ^(NSManagedObjectContext *context, NSDictionary *info) {
-        CDEPersistentStoreEnsemble *strongSelf = weakSelf;
+        __strong typeof(self) strongSelf = weakSelf;
         if ([strongSelf.delegate respondsToSelector:@selector(persistentStoreEnsemble:didSaveMergeChangesWithNotification:)]) {
             NSNotification *notification = [NSNotification notificationWithName:NSManagedObjectContextDidSaveNotification object:context userInfo:info];
             [strongSelf.delegate persistentStoreEnsemble:strongSelf didSaveMergeChangesWithNotification:notification];
         }
+        [[NSNotificationCenter defaultCenter] postNotificationName:CDEPersistentStoreEnsembleDidSaveMergeChangesNotification object:strongSelf userInfo:info];
     };
 }
 
