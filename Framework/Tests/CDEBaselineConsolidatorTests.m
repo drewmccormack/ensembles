@@ -204,7 +204,7 @@
     
     NSMutableArray *values = [NSMutableArray array];
     for (NSString *key in valuesByKey) {
-        CDEPropertyChangeValue *value = [[CDEPropertyChangeValue alloc] initWithType:CDEPropertyChangeTypeAttribute propertyName:@"date"];
+        CDEPropertyChangeValue *value = [[CDEPropertyChangeValue alloc] initWithType:CDEPropertyChangeTypeAttribute propertyName:key];
         value.value = valuesByKey[key];
         [values addObject:value];
     }

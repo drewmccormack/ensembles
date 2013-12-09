@@ -184,7 +184,7 @@
     
     CDEEventRevision *eventRevision = [NSEntityDescription insertNewObjectForEntityForName:@"CDEEventRevision" inManagedObjectContext:context];
     eventRevision.persistentStoreIdentifier = persistentStoreId;
-    eventRevision.revisionNumber = localRevision.revisionNumber;
+    eventRevision.revisionNumber = localRevision ? localRevision.revisionNumber : -1;
     eventRevision.storeModificationEvent = firstBaseline;
     
     firstBaseline.eventRevision = eventRevision;
