@@ -103,6 +103,32 @@
     [self waitForAsyncOpToFinish];
 }
 
+- (void)testBaselineRevisionsWhenMergingConcurrentBaselines
+{
+    [[self addBaselineEventsForStoreId:@"123" globalCounts:@[@(10)] revisions:@[@(10)]] lastObject];
+    [[self addBaselineEventsForStoreId:@"234" globalCounts:@[@(20)] revisions:@[@(10)]] lastObject];
+    
+    [consolidator consolidateBaselineWithCompletion:^(NSError *error) {
+        [context performBlock:^{
+            NSArray *events = [self storeModEvents];
+            CDEStoreModificationEvent *event = events.lastObject;
+            
+            XCTAssertEqual(event.eventRevision.revisionNumber, (CDERevisionNumber)-1, @"Wrong revision number for store1");
+            
+            NSSet *others = [event.eventRevisionsOfOtherStores valueForKeyPath:@"revision"];
+            CDERevision *rev1 = [[CDERevision alloc] initWithPersistentStoreIdentifier:@"123" revisionNumber:10 globalCount:-1];
+            CDERevision *rev2 = [[CDERevision alloc] initWithPersistentStoreIdentifier:@"234" revisionNumber:10 globalCount:-1];
+            NSSet *set = [NSSet setWithObjects:rev1, rev2, nil];
+            XCTAssertEqualObjects(others, set, @"Wrong revisions for other stores");
+
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self stopAsyncOp];
+            });
+        }];
+    }];
+    [self waitForAsyncOpToFinish];
+}
+
 - (void)testMergingConcurrentBaselinesKeepsMostRecentObjectChange
 {
     CDEStoreModificationEvent *baseline0 = [[self addBaselineEventsForStoreId:@"123" globalCounts:@[@(10)] revisions:@[@(10)]] lastObject];

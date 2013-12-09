@@ -15,6 +15,7 @@
 
 @property NSString *persistentStoreIdentifier;
 @property CDERevisionNumber revisionNumber;
+@property CDEGlobalCount globalCount;
 
 @end
 

@@ -98,7 +98,15 @@
         else
             reducedRev = block(rev1.revisionNumber, rev2.revisionNumber);
         
-        CDERevision *newRevision = [[CDERevision alloc] initWithPersistentStoreIdentifier:persistentStoreId revisionNumber:reducedRev];
+        CDEGlobalCount reducedGlobalCount;
+        if (!rev1)
+            reducedGlobalCount = rev2.globalCount;
+        else if (!rev2)
+            reducedGlobalCount = rev1.globalCount;
+        else
+            reducedGlobalCount = block(rev1.globalCount, rev2.globalCount);
+        
+        CDERevision *newRevision = [[CDERevision alloc] initWithPersistentStoreIdentifier:persistentStoreId revisionNumber:reducedRev globalCount:reducedGlobalCount];
         [resultSet addRevision:newRevision];
     }
     

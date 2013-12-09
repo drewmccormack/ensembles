@@ -68,4 +68,9 @@
     return [self.uniqueIdentifier hash];
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"store id: %@\nrevision: %lli\nglobal count: %lli", self.persistentStoreIdentifier, self.revisionNumber, self.globalCount];
+}
+
 @end
