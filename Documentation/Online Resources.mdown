@@ -31,6 +31,7 @@
 * [iCloud Complications: Part 1](http://www.atomicbird.com/icloud-complications) by Tom Harrington
 * [iCloud Complications: Part 2](http://www.atomicbird.com/blog/icloud-complications-part-2) by Tom Harrington
 * [iCloud Complications: Part 3](http://www.atomicbird.com/blog/icloud-complications-part-3) by Tom Harrington
+* [The Gathering Storm: Our Travails with iCloud Sync](http://rms2.tumblr.com/post/46505165521/the-gathering-storm-our-travails-with-icloud-sync) by Rich Siegel
 
 ### Open Source Core Data Sync Projects
 * [TICoreDataSync](https://github.com/nothirst/TICoreDataSync)
