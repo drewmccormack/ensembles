@@ -75,6 +75,8 @@ static NSString *kCDEDefaultStoreType;
 
 - (void)migrateStoreModificationEvents:(NSArray *)events toFile:(NSString *)path completion:(CDECompletionBlock)completion
 {
+    CDELog(CDELoggingLevelVerbose, @"Migrating event store events to file");
+
     __block NSError *error = nil;
     __block NSPersistentStore *fileStore = nil;
     NSPersistentStoreCoordinator *persistentStoreCoordinator = eventStore.managedObjectContext.persistentStoreCoordinator;
@@ -120,7 +122,9 @@ static NSString *kCDEDefaultStoreType;
 }
 
 - (void)migrateEventsInFromFiles:(NSArray *)paths completion:(CDECompletionBlock)completion
-{    
+{
+    CDELog(CDELoggingLevelVerbose, @"Migrating file events to event store");
+
     NSManagedObjectContext *importContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
     
     __block NSError *error = nil;

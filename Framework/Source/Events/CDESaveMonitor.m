@@ -123,6 +123,8 @@
 {
     if (objects.count == 0) return;
     
+    CDELog(CDELoggingLevelVerbose, @"Storing pre-save changes from updated objects");
+    
     NSSet *monitoredObjects = [self monitoredManagedObjectsInSet:objects];
     
     NSMutableDictionary *changedValuesByObjectID = [NSMutableDictionary dictionaryWithCapacity:monitoredObjects.count];
@@ -157,6 +159,8 @@
     // Check if this context includes the monitored store
     NSPersistentStore *monitoredStore = [self monitoredPersistentStoreInManagedObjectContext:context];
     if (!monitoredStore) return;
+    
+    CDELog(CDELoggingLevelVerbose, @"Store changes post-save");
     
     // Add a store mod event
     CDEEventBuilder *eventBuilder = [[CDEEventBuilder alloc] initWithEventStore:self.eventStore];

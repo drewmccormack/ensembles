@@ -240,6 +240,8 @@
 // Called on background queue.
 - (BOOL)integrate:(NSError * __autoreleasing *)error
 {
+    CDELog(CDELoggingLevelVerbose, @"Integrating new events into main context");
+
     CDERevisionManager *revisionManager = [[CDERevisionManager alloc] initWithEventStore:self.eventStore eventManagedObjectContext:eventStoreChildContext];
     revisionManager.managedObjectModelURL = self.ensemble.managedObjectModelURL;
     
@@ -676,6 +678,8 @@
 // Called on background queue
 - (BOOL)repairWithMergeEventBuilder:(CDEEventBuilder *)eventBuilder error:(NSError * __autoreleasing *)error
 {
+    CDELog(CDELoggingLevelVerbose, @"Repairing context after integrating changes");
+
     // Give opportunity to merge/repair changes in a child context.
     // We can then retrieve the changes and generate a new store mod event to represent the merge.
     __block BOOL merged = YES;
@@ -906,6 +910,8 @@
 // Called on background queue
 - (BOOL)commitWithMergeEventBuilder:(CDEEventBuilder *)eventBuilder error:(NSError * __autoreleasing *)error
 {
+    CDELog(CDELoggingLevelVerbose, @"Committing merge changes to store");
+
     __block BOOL saved = [self saveContext:error];
     if (!saved) {
         if ((*error).code != NSManagedObjectMergeError && failedSaveBlock) {

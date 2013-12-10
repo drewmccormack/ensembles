@@ -31,6 +31,8 @@
 
 - (void)importWithCompletion:(CDECompletionBlock)completion
 {
+    CDELog(CDELoggingLevelVerbose, @"Importing persistent store");
+
     __block NSError *error = nil;
     
     NSManagedObjectContext *context = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];

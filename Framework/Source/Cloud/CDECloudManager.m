@@ -65,6 +65,8 @@
 {
     NSAssert([NSThread isMainThread], @"importNewRemote... called off the main thread");
     
+    CDELog(CDELoggingLevelVerbose, @"Transferring new events from cloud to event store");
+
     [self transferNewRemoteFilesToTransitCacheWithCompletion:^(NSError *error) {
         if (error) {
             if (completion) completion(error);
@@ -179,6 +181,8 @@
 
 - (void)exportNewLocalEventsWithCompletion:(CDECompletionBlock)completion
 {
+    CDELog(CDELoggingLevelVerbose, @"Transferring events from event store to cloud");
+
     [self migrateNewLocalEventsToTransitCacheWithCompletion:^(NSError *error) {
         if (error) CDELog(CDELoggingLevelWarning, @"Error migrating out events: %@", error);
         [self transferFilesInTransitCacheToCloudWithCompletion:completion];

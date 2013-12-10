@@ -221,13 +221,18 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
         return;
     }
     
+    CDELog(CDELoggingLevelVerbose, @"Beginning leech");
+    
     [self.cloudFileSystem connect:^(NSError *error) {
         if (error) {
             if (completion) completion(error);
             return;
         }
+        
+        CDELog(CDELoggingLevelVerbose, @"Connected to Cloud File System");
 
         CDECodeBlock createRemoteStructure = ^{
+            CDELog(CDELoggingLevelVerbose, @"Creating cloud directory structure");
             [self.cloudManager createRemoteDirectoryStructureWithCompletion:^(NSError *error) {
                 if (error) {
                     if (completion) completion(error);
@@ -250,9 +255,13 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
                         [self.delegate persistentStoreEnsembleWillImportStore:self];
                     }
                     
+                    CDELog(CDELoggingLevelVerbose, @"Importing store data");
+                    
                     CDEPersistentStoreImporter *importer = [[CDEPersistentStoreImporter alloc] initWithPersistentStoreAtPath:self.storePath managedObjectModel:self.managedObjectModel eventStore:self.eventStore];
                     importer.ensemble = self;
                     [importer importWithCompletion:^(NSError *error) {
+                        CDELog(CDELoggingLevelVerbose, @"Finished importing");
+
                         [self endObservingSaveNotifications];
                         
                         if (error) {
@@ -310,6 +319,8 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
 {
     NSAssert([NSThread isMainThread], @"Deleech method called off main thread");
     
+    CDELog(CDELoggingLevelVerbose, @"Deleeching");
+    
     BOOL removedStore = [eventStore removeEventStore];
     
     if (!self.isLeeched) {
@@ -357,6 +368,7 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
 
 - (void)forceDeleechDueToError:(NSError *)deleechError informCompletion:(CDECompletionBlock)completion
 {
+    CDELog(CDELoggingLevelVerbose, @"Forcing a deleech: %@", deleechError);
     [self deleechPersistentStoreWithCompletion:^(NSError *error) {
         if (!error) {
             if (completion) completion(deleechError);
@@ -373,6 +385,8 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
 
 - (void)checkCloudFileSystemIdentityWithCompletion:(CDECompletionBlock)completion
 {
+    CDELog(CDELoggingLevelVerbose, @"Checking file system identity");
+
     BOOL identityValid = [self.cloudFileSystem.identityToken isEqual:self.eventStore.cloudFileSystemIdentityToken];
     if (self.leeched && !identityValid) {
         NSError *deleechError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeCloudIdentityChanged userInfo:nil];
@@ -385,6 +399,8 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
 
 - (void)checkStoreRegistrationInCloudWithCompletion:(CDECompletionBlock)completion
 {
+    CDELog(CDELoggingLevelVerbose, @"Checking that store is registered in cloud");
+
     if (!self.eventStore.verifiesStoreRegistrationInCloud) {
         [self dispatchCompletion:completion withError:nil];
         return;
@@ -428,6 +444,8 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
         [self dispatchCompletion:completion withError:error];
         return;
     }
+    
+    CDELog(CDELoggingLevelVerbose, @"Beginning Merge");
     
     self.merging = YES;
     
