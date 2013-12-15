@@ -34,6 +34,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 
 @implementation CDEEventStore {
     NSMutableDictionary *incompleteEventIdentifiers;
+    NSRecursiveLock *lock;
 }
 
 @synthesize ensembleIdentifier = ensembleIdentifier;
@@ -75,6 +76,8 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
             CDELog(CDELoggingLevelError, @"Could not setup core data stack for event store: %@", error);
             return nil;
         }
+        
+        lock = [[NSRecursiveLock alloc] init];
     }
     return self;
 }
@@ -82,6 +85,24 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+
+#pragma mark - Locking
+
+- (void)lock
+{
+    [lock lock];
+}
+
+- (void)unlock
+{
+    [lock unlock];
+}
+
+- (BOOL)tryLock
+{
+    return [lock tryLock];
 }
 
 
