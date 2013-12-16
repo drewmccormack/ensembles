@@ -46,8 +46,9 @@
 
 #pragma mark - Making New Events
 
-- (void)makeNewEventOfType:(CDEStoreModificationEventType)type
+- (CDERevision *)makeNewEventOfType:(CDEStoreModificationEventType)type
 {
+    __block CDERevision *returnRevision = nil;
     [eventManagedObjectContext performBlockAndWait:^{
         CDERevisionNumber lastRevision = eventStore.lastRevision;
         CDERevisionNumber lastMergeRevision = eventStore.lastMergeRevision;
@@ -82,7 +83,11 @@
             [mostRecentSet removeRevisionForPersistentStoreIdentifier:self.eventStore.persistentStoreIdentifier];
             event.revisionSetOfOtherStoresAtCreation = mostRecentSet;
         }
+        
+        returnRevision = [event.revisionSet revisionForPersistentStoreIdentifier:self.eventStore.persistentStoreIdentifier];
     }];
+    
+    return returnRevision;
 }
 
 #pragma mark - Modifying Events
