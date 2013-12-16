@@ -231,44 +231,29 @@
 
 static const NSTimeInterval CDEFileCoordinatorTimeOut = 2.0;
 
-- (void)startTimeOutForCoordinator:(NSFileCoordinator *)coordinator hasExecuted:(BOOL *)coordinatorExecuted isTimedOut:(BOOL *)timedOut
-{
-    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, CDEFileCoordinatorTimeOut * NSEC_PER_SEC);
-    dispatch_after(popTime, timeOutQueue, ^{
-        if (!(*coordinatorExecuted)) {
-            [coordinator cancel];
-            *timedOut = YES;
-        }
-    });
-}
-
-- (BOOL)beginExecutingCoordinatorBlockWithHasExecuted:(BOOL *)coordinatorExecuted isTimedOut:(BOOL *)timedOut error:(NSError * __autoreleasing *)error
-{
-    dispatch_sync(timeOutQueue, ^{
-        *coordinatorExecuted = YES;
-    });
-    BOOL result = !(*timedOut);
-    if (!result && error) *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFileCoordinatorTimedOut userInfo:nil];
-    return result;
-}
-
 - (void)fileExistsAtPath:(NSString *)path completion:(void(^)(BOOL exists, BOOL isDirectory, NSError *error))block
 {
     [operationQueue addOperationWithBlock:^{
         NSError *fileCoordinatorError = nil;
         __block NSError *timeoutError = nil;
-        
-        NSURL *url = [NSURL fileURLWithPath:[self fullPathForPath:path]];
-        
         __block BOOL coordinatorExecuted = NO;
-        __block BOOL timedOut = NO;
-        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
-        [self startTimeOutForCoordinator:coordinator hasExecuted:&coordinatorExecuted isTimedOut:&timedOut];
-
         __block BOOL isDirectory = NO;
         __block BOOL exists = NO;
+        
+        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, CDEFileCoordinatorTimeOut * NSEC_PER_SEC);
+        dispatch_after(popTime, timeOutQueue, ^{
+            if (!coordinatorExecuted) {
+                [coordinator cancel];
+                timeoutError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFileCoordinatorTimedOut userInfo:nil];
+            }
+        });
+
+        NSURL *url = [NSURL fileURLWithPath:[self fullPathForPath:path]];
         [coordinator coordinateReadingItemAtURL:url options:0 error:&fileCoordinatorError byAccessor:^(NSURL *newURL) {
-            if (![self beginExecutingCoordinatorBlockWithHasExecuted:&coordinatorExecuted isTimedOut:&timedOut error:&timeoutError]) return;
+            dispatch_sync(timeOutQueue, ^{ coordinatorExecuted = YES; });
+            if (timeoutError) return;
             exists = [fileManager fileExistsAtPath:newURL.path isDirectory:&isDirectory];
         }];
         
@@ -285,17 +270,23 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 2.0;
         NSError *fileCoordinatorError = nil;
         __block NSError *timeoutError = nil;
         __block NSError *fileManagerError = nil;
-        
-        NSURL *url = [NSURL fileURLWithPath:[self fullPathForPath:path]];
-        
         __block BOOL coordinatorExecuted = NO;
-        __block BOOL timedOut = NO;
+        
         NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
-        [self startTimeOutForCoordinator:coordinator hasExecuted:&coordinatorExecuted isTimedOut:&timedOut];
+        
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, CDEFileCoordinatorTimeOut * NSEC_PER_SEC);
+        dispatch_after(popTime, timeOutQueue, ^{
+            if (!coordinatorExecuted) {
+                [coordinator cancel];
+                timeoutError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFileCoordinatorTimedOut userInfo:nil];
+            }
+        });
         
         __block NSArray *contents = nil;
+        NSURL *url = [NSURL fileURLWithPath:[self fullPathForPath:path]];
         [coordinator coordinateReadingItemAtURL:url options:0 error:&fileCoordinatorError byAccessor:^(NSURL *newURL) {
-            if (![self beginExecutingCoordinatorBlockWithHasExecuted:&coordinatorExecuted isTimedOut:&timedOut error:&timeoutError]) return;
+            dispatch_sync(timeOutQueue, ^{ coordinatorExecuted = YES; });
+            if (timeoutError) return;
             
             NSDirectoryEnumerator *dirEnum = [fileManager enumeratorAtPath:[self fullPathForPath:path]];
             if (!dirEnum) fileManagerError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFileAccessFailed userInfo:nil];
@@ -339,16 +330,22 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 2.0;
         NSError *fileCoordinatorError = nil;
         __block NSError *timeoutError = nil;
         __block NSError *fileManagerError = nil;
+        __block BOOL coordinatorExecuted = NO;
+        
+        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, CDEFileCoordinatorTimeOut * NSEC_PER_SEC);
+        dispatch_after(popTime, timeOutQueue, ^{
+            if (!coordinatorExecuted) {
+                [coordinator cancel];
+                timeoutError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFileCoordinatorTimedOut userInfo:nil];
+            }
+        });
         
         NSURL *url = [NSURL fileURLWithPath:[self fullPathForPath:path]];
-        
-        __block BOOL coordinatorExecuted = NO;
-        __block BOOL timedOut = NO;
-        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
-        [self startTimeOutForCoordinator:coordinator hasExecuted:&coordinatorExecuted isTimedOut:&timedOut];
-        
         [coordinator coordinateWritingItemAtURL:url options:0 error:&fileCoordinatorError byAccessor:^(NSURL *newURL) {
-            if (![self beginExecutingCoordinatorBlockWithHasExecuted:&coordinatorExecuted isTimedOut:&timedOut error:&timeoutError]) return;
+            dispatch_sync(timeOutQueue, ^{ coordinatorExecuted = YES; });
+            if (timeoutError) return;
             [fileManager createDirectoryAtPath:newURL.path withIntermediateDirectories:NO attributes:nil error:&fileManagerError];
         }];
         
@@ -365,16 +362,22 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 2.0;
         NSError *fileCoordinatorError = nil;
         __block NSError *timeoutError = nil;
         __block NSError *fileManagerError = nil;
+        __block BOOL coordinatorExecuted = NO;
+
+        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+        
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, CDEFileCoordinatorTimeOut * NSEC_PER_SEC);
+        dispatch_after(popTime, timeOutQueue, ^{
+            if (!coordinatorExecuted) {
+                [coordinator cancel];
+                timeoutError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFileCoordinatorTimedOut userInfo:nil];
+            }
+        });
         
         NSURL *url = [NSURL fileURLWithPath:[self fullPathForPath:path]];
-        
-        __block BOOL coordinatorExecuted = NO;
-        __block BOOL timedOut = NO;
-        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
-        [self startTimeOutForCoordinator:coordinator hasExecuted:&coordinatorExecuted isTimedOut:&timedOut];
-        
         [coordinator coordinateWritingItemAtURL:url options:NSFileCoordinatorWritingForDeleting error:&fileCoordinatorError byAccessor:^(NSURL *newURL) {
-            if (![self beginExecutingCoordinatorBlockWithHasExecuted:&coordinatorExecuted isTimedOut:&timedOut error:&timeoutError]) return;
+            dispatch_sync(timeOutQueue, ^{ coordinatorExecuted = YES; });
+            if (timeoutError) return;
             [fileManager removeItemAtPath:newURL.path error:&fileManagerError];
         }];
         
@@ -391,18 +394,23 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 2.0;
         NSError *fileCoordinatorError = nil;
         __block NSError *timeoutError = nil;
         __block NSError *fileManagerError = nil;
+        __block BOOL coordinatorExecuted = NO;
+
+        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, CDEFileCoordinatorTimeOut * NSEC_PER_SEC);
+        dispatch_after(popTime, timeOutQueue, ^{
+            if (!coordinatorExecuted) {
+                [coordinator cancel];
+                timeoutError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFileCoordinatorTimedOut userInfo:nil];
+            }
+        });
         
         NSURL *fromURL = [NSURL fileURLWithPath:fromPath];
         NSURL *toURL = [NSURL fileURLWithPath:[self fullPathForPath:toPath]];
-
-        __block BOOL coordinatorExecuted = NO;
-        __block BOOL timedOut = NO;
-        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
-        [self startTimeOutForCoordinator:coordinator hasExecuted:&coordinatorExecuted isTimedOut:&timedOut];
-        
         [coordinator coordinateReadingItemAtURL:fromURL options:0 writingItemAtURL:toURL options:NSFileCoordinatorWritingForReplacing error:&fileCoordinatorError byAccessor:^(NSURL *newReadingURL, NSURL *newWritingURL) {
-            if (![self beginExecutingCoordinatorBlockWithHasExecuted:&coordinatorExecuted isTimedOut:&timedOut error:&timeoutError]) return;
-            
+            dispatch_sync(timeOutQueue, ^{ coordinatorExecuted = YES; });
+            if (timeoutError) return;
             [fileManager removeItemAtPath:newWritingURL.path error:NULL];
             [fileManager copyItemAtPath:newReadingURL.path toPath:newWritingURL.path error:&fileManagerError];
         }];
@@ -420,18 +428,23 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 2.0;
         NSError *fileCoordinatorError = nil;
         __block NSError *timeoutError = nil;
         __block NSError *fileManagerError = nil;
+        __block BOOL coordinatorExecuted = NO;
+        
+        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+
+        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, CDEFileCoordinatorTimeOut * NSEC_PER_SEC);
+        dispatch_after(popTime, timeOutQueue, ^{
+            if (!coordinatorExecuted) {
+                [coordinator cancel];
+                timeoutError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFileCoordinatorTimedOut userInfo:nil];
+            }
+        });
         
         NSURL *fromURL = [NSURL fileURLWithPath:[self fullPathForPath:fromPath]];
         NSURL *toURL = [NSURL fileURLWithPath:toPath];
-        
-        __block BOOL coordinatorExecuted = NO;
-        __block BOOL timedOut = NO;
-        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
-        [self startTimeOutForCoordinator:coordinator hasExecuted:&coordinatorExecuted isTimedOut:&timedOut];
-        
         [coordinator coordinateReadingItemAtURL:fromURL options:0 writingItemAtURL:toURL options:NSFileCoordinatorWritingForReplacing error:&fileCoordinatorError byAccessor:^(NSURL *newReadingURL, NSURL *newWritingURL) {
-            if (![self beginExecutingCoordinatorBlockWithHasExecuted:&coordinatorExecuted isTimedOut:&timedOut error:&timeoutError]) return;
-
+            dispatch_sync(timeOutQueue, ^{ coordinatorExecuted = YES; });
+            if (timeoutError) return;
             [fileManager removeItemAtPath:newWritingURL.path error:NULL];
             [fileManager copyItemAtPath:newReadingURL.path toPath:newWritingURL.path error:&fileManagerError];
         }];
