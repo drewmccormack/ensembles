@@ -13,6 +13,9 @@
 * [How Does Core Data Save?](http://mentalfaculty.tumblr.com/post/65682908577/how-does-core-data-save) by Drew McCormack
 * [On Vesper Sync](http://mentalfaculty.tumblr.com/post/66955072014/on-vesper-sync) by Drew McCormack
 
+### Third-Party Developers on Ensembles
+* [Sync Ensemble](http://nimbleworks.co.uk/blog/sync-ensemble) by Nimbleworks
+
 ### Articles Related to Sync
 * [A Comparison of Syncing Technologies](http://grasmeyer.com/blog/2013/10/8/a-comparison-of-syncing-technologies) by Joel Grasmeyer
 * [Introducing ZumeroIncrementalStore](http://grasmeyer.com/blog/2013/10/8/introducing-zumeroincrementalstore) by Joel Grasmeyer
