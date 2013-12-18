@@ -31,7 +31,7 @@ NSString * const IDMSyncActivityDidEndNotification = @"IDMSyncActivityDidEnd";
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Ensembles logging
-    CDESetCurrentLoggingLevel(CDELoggingLevelWarning);
+    CDESetCurrentLoggingLevel(CDELoggingLevelVerbose);
     
     // Store directory and URL
     NSURL *directoryURL = [[NSFileManager defaultManager] URLForDirectory:NSApplicationSupportDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:NULL];

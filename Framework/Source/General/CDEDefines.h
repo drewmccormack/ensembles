@@ -29,6 +29,8 @@ typedef NS_ENUM(NSInteger, CDEErrorCode) {
     CDEErrorCodeDisallowedStateChange       = 103,
     CDEErrorCodeExceptionRaised             = 104,
     CDEErrorCodeFailedToWriteFile           = 105,
+    CDEErrorCodeFileCoordinatorTimedOut     = 106,
+    CDEErrorCodeFileAccessFailed            = 107,
     CDEErrorCodeDiscontinuousRevisions      = 200,
     CDEErrorCodeMissingDependencies         = 201,
     CDEErrorCodeCloudIdentityChanged        = 202,

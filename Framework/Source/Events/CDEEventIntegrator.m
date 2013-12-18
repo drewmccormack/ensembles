@@ -122,15 +122,6 @@
         eventStoreChildContext.undoManager = nil;
     }];
     
-    __weak typeof(self) weakSelf = self;
-    [[NSNotificationCenter defaultCenter] removeObserver:eventStoreChildContextSaveObserver];
-    eventStoreChildContextSaveObserver = [[NSNotificationCenter defaultCenter] addObserverForName:NSManagedObjectContextDidSaveNotification object:eventStoreChildContext queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *note) {
-        __strong typeof(weakSelf) strongSelf = weakSelf;
-        [strongSelf.eventStore.managedObjectContext performBlockAndWait:^{
-            [strongSelf.eventStore.managedObjectContext mergeChangesFromContextDidSaveNotification:note];
-        }];
-    }];
-    
     // Setup a context for accessing the main store
     NSError *error;
     NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:managedObjectModel];
@@ -171,7 +162,13 @@
             // Create a merge event
             CDEEventBuilder *eventBuilder = [[CDEEventBuilder alloc] initWithEventStore:self.eventStore eventManagedObjectContext:eventStoreChildContext];
             eventBuilder.ensemble = self.ensemble;
-            [eventBuilder makeNewEventOfType:CDEStoreModificationEventTypeMerge];
+            CDERevision *revision = [eventBuilder makeNewEventOfType:CDEStoreModificationEventTypeMerge];
+            
+            // Get unique id of event
+            __block NSString *newEventId = nil;
+            [eventStoreChildContext performBlockAndWait:^{
+                newEventId = [eventBuilder.event.uniqueIdentifier copy];
+            }];
             
             // Register event in case of crashes
             [self.eventStore registerIncompleteEventIdentifier:eventBuilder.event.uniqueIdentifier isMandatory:NO];
@@ -206,7 +203,18 @@
             }
             
             // Save parent event context
-            [self.eventStore.managedObjectContext performBlockAndWait:^{
+            NSManagedObjectContext *eventStoreContext = self.eventStore.managedObjectContext;
+            [eventStoreContext performBlockAndWait:^{
+                // Check that the revision is unique. Perhaps a save occurred concurrently.
+                BOOL isUnique = [self checkUniquenessOfEventWithRevision:revision];
+                if (!isUnique) {
+                    CDEStoreModificationEvent *event = [CDEStoreModificationEvent fetchStoreModificationEventWithUniqueIdentifier:newEventId inManagedObjectContext:eventStoreContext];
+                    [eventStoreContext deleteObject:event];
+                    eventSaveSucceeded = NO;
+                    return;
+                }
+                
+                // Save
                 eventSaveSucceeded = [self.eventStore.managedObjectContext save:&error];
             }];
             if (!eventSaveSucceeded) {
@@ -232,6 +240,17 @@
             [self failWithError:error];
         }
     });
+}
+
+- (BOOL)checkUniquenessOfEventWithRevision:(CDERevision *)revision
+{
+    __block NSUInteger count = 0;
+    [self.eventStore.managedObjectContext performBlockAndWait:^{
+        NSFetchRequest *fetch = [[NSFetchRequest alloc] initWithEntityName:@"CDEStoreModificationEvent"];
+        fetch.predicate = [NSPredicate predicateWithFormat:@"eventRevision.persistentStoreIdentifier = %@ && eventRevision.revisionNumber = %lld", self.eventStore.persistentStoreIdentifier, revision.revisionNumber];
+        count = [self.eventStore.managedObjectContext countForFetchRequest:fetch error:NULL];
+    }];
+    return count == 1;
 }
 
 

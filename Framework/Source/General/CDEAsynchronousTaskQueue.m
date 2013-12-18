@@ -70,7 +70,7 @@
     taskEnumerator = [tasks objectEnumerator];
     [self performSelector:@selector(startNextTask) withObject:nil afterDelay:0.0];
     
-    while (![NSThread isMainThread] && !self.isFinished) [[NSRunLoop currentRunLoop] runUntilDate:[NSDate distantFuture]];
+    while (![NSThread isMainThread] && !self.isFinished) [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
 }
 
 - (NSError *)combineErrors

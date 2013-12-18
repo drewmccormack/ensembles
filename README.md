@@ -3,7 +3,7 @@ Core Data Ensembles
 
 _Author:_ Drew McCormack<br>
 _Created:_ 29th September, 2013<br>
-_Updated:_ 9th November, 2013
+_Last Updated:_ 28th November, 2013
 
 Ensembles extends Apple's Core Data framework to add peer-to-peer synchronization for Mac OS and iOS. Multiple SQLite persistent stores can be coupled together via a file synchronization platform like iCloud or Dropbox. The framework can be readily extended to support any service capable of moving files between devices, including custom servers.
 
@@ -28,7 +28,7 @@ To add Ensembles to your App's Xcode Project with CocoaPods...
 1. Add the following to your Podfile 
 
 		platform :ios, '7.0'
-		pod "Ensembles", "~> 0.1"
+		pod "Ensembles", "~> 0.2.0"
 
 To manually add Ensembles to your App's Xcode Project...
 
@@ -41,9 +41,23 @@ To manually add Ensembles to your App's Xcode Project...
 7. Locate the Other Linker Flags setting, and add the flag `-ObjC`.
 8. Drag the `Framework/Resources` directory from the Ensembles project into your App project. Make sure the _Create groups for any added Folders_ option is selected.
 
+#### Including Optional Cloud Services
+
+By default, Ensembles only includes support for iCloud. To use other cloud services, such as Dropbox, you may need to add a few steps to the procedure above. 
+
+If you are using Cocoapods, you should not need to do anything. The optional cloud services are included in the default install. 
+
+If you do not want to include the optional services in your project, you can replace the standard pod command in your Podfile with the following
+
+		pod "Ensembles/Core", "~> 0.2.0"
+
+If you are not using Cocoapods, and are installing Ensembles manually, you need to locate the source files and frameworks relevant to the service you want to support. You can find frameworks in the `Vendor` folder, and source files in `Framework/Extensions`.
+
+By way of example, if you want to support Dropbox, you need to add the DropboxSDK Xcode project as a dependency, link to the appropriate product library, and include the files `CDEDropboxCloudFileSystem.h` and `CDEDropboxCloudFileSystem.m` in your project.
+
 #### Idiomatic  App
 
-Idiomatic is a relatively simple example app that incorporates Ensembles and works with iCloud to sync across devices. The app allows you to record your ideas, and add tags to group them. The Core Data model of the app includes two entities, with a many-to-many relationship.
+Idiomatic is a relatively simple example app which incorporates Ensembles and works with iCloud to sync across devices. The app allows you to record your ideas, and add tags to group them. The Core Data model of the app includes two entities, with a many-to-many relationship.
 
 The Idiomatic project is a good way to get acquainted with Ensembles, and how it is integrated in a Core Data app. Idiomatic can be run in the iPhone Simulator, or on a device, but in order to test it, you need to follow a few preparatory steps.
 
@@ -75,11 +89,11 @@ The initialization of an ensemble is typically only a few lines long.
 		initWithUbiquityContainerIdentifier:@"P7BXV6PHLD.com.mentalfaculty.idiomatic"];
 	ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"MainStore" 
 		persistentStorePath:storeURL.path 
-		managedObjectModel:model 
+		managedObjectModelURL:modelURL
 		cloudFileSystem:cloudFileSystem];
 	ensemble.delegate = self;
 
-After the cloud file system is initialized, it is passed to the `CDEPersistentStoreEnsemble` initializer, together with the `NSManagedObjectModel` and path to the `NSPersistentStore`. An ensemble identifier is used to match stores across devices. It is important that this be the same for each store in the ensemble.
+After the cloud file system is initialized, it is passed to the `CDEPersistentStoreEnsemble` initializer, together with the URL of a file containing the `NSManagedObjectModel`, and the path to the `NSPersistentStore`. An ensemble identifier is used to match stores across devices. It is important that this be the same for each store in the ensemble.
 
 Once a `CDEPersistentStoreEnsemble` has been initialized, it can be _leeched_. This step typically only needs to take place once, to setup the ensemble and perform an initial import of data in the local persistent store. Once an ensemble has been leeched, it remains leeched even after a relaunch. The ensemble only gets _deleeched_ if you explicitly request it, or if a serious problem arises in the cloud file system, such as an account switch.
 
@@ -128,5 +142,5 @@ If you do decide to provide global identifiers, it is up to you how you generate
 
 #### Unit Tests
 
-Unit tests are included for the Ensembles framework on the Mac. To run the tests, open the Xcode project for the Mac platform, choose the Ensembles Mac target in the toolbar at the top, and select the menu item `Product > Test`.
+Unit tests are included for the Ensembles framework on each platform. To run the tests, open the Xcode workspace, choose the Ensembles Mac or Ensembles iOS target in the toolbar at the top, and select the menu item `Product > Test`.
 
