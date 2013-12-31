@@ -29,7 +29,7 @@ typedef NS_ENUM(NSInteger, CDEErrorCode) {
     CDEErrorCodeDisallowedStateChange       = 103,
     CDEErrorCodeExceptionRaised             = 104,
     CDEErrorCodeFailedToWriteFile           = 105,
-    CDEErrorCodeFileCoordinatorTimedOut     = 106,
+    CDEErrorCodeFileCoordinatorTimedOut     = 106, // Usually because a service like iCloud is still downloading the file
     CDEErrorCodeFileAccessFailed            = 107,
     CDEErrorCodeDiscontinuousRevisions      = 200,
     CDEErrorCodeMissingDependencies         = 201,
