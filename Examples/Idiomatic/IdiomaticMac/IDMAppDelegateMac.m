@@ -236,7 +236,7 @@ NSString * const IDMSyncActivityDidEndNotification = @"IDMSyncActivityDidEnd";
     IDMNote *note = [NSEntityDescription insertNewObjectForEntityForName:@"IDMNote" inManagedObjectContext:managedObjectContext];
     
     
-    note.attributedText = [[NSAttributedString alloc] initWithString:text];
+    note.text = [[NSString alloc] initWithString:text];
     NSMutableSet *cdTags = [NSMutableSet setWithCapacity:noteTags.count];
     for (NSString *tagText in noteTags) {
         if (tagText.length == 0) continue;
@@ -332,7 +332,7 @@ NSString * const IDMSyncActivityDidEndNotification = @"IDMSyncActivityDidEnd";
     NSTableCellView *cell = [self.tableView makeViewWithIdentifier:@"NoteCell" owner:self];
     
     IDMNote *note = notes[row];
-    cell.textField.attributedStringValue = note.attributedText;
+    cell.textField.stringValue = note.text;
     return cell;
 }
 

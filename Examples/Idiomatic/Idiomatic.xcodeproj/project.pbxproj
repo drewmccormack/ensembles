@@ -355,6 +355,9 @@
 					9477ED2E1800137300C2A419 = {
 						DevelopmentTeam = P7BXV6PHLD;
 						SystemCapabilities = {
+							com.apple.Sandbox = {
+								enabled = 1;
+							};
 							com.apple.iCloud = {
 								enabled = 1;
 							};
