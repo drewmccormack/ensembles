@@ -39,7 +39,7 @@ int main(int argc, const char * argv[])
         
         // Extract events and export to folder on Desktop as XML
         NSString *eventDirPath = [NSString stringWithCString:argv[1] encoding:NSUTF8StringEncoding];
-        NSString *modelPath = [tempPath stringByAppendingPathComponent:@"CDEEventStoreModel.xcdatamodeld"];
+        NSString *modelPath = [tempPath stringByAppendingPathComponent:@"CDEEventStoreModel.momd"];
         NSURL *modelURL = [NSURL fileURLWithPath:modelPath];
         NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
         
@@ -52,12 +52,15 @@ int main(int argc, const char * argv[])
         NSURL *eventURL;
         while (eventURL = [dirEnum nextObject]) {
             @autoreleasepool {
+                if ([[eventURL lastPathComponent] hasPrefix:@"."]) continue;
+                
                 NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:model];
                 
                 NSError *error;
                 NSDictionary *metadata = [NSPersistentStoreCoordinator metadataForPersistentStoreOfType:nil URL:eventURL error:&error];
                 NSString *storeType = metadata[NSStoreTypeKey];
-                NSPersistentStore *fromStore = [coordinator addPersistentStoreWithType:storeType configuration:nil URL:eventURL options:nil error:&error];
+                NSDictionary *options = @{NSMigratePersistentStoresAutomaticallyOption : @YES, NSInferMappingModelAutomaticallyOption : @YES};
+                NSPersistentStore *fromStore = [coordinator addPersistentStoreWithType:storeType configuration:nil URL:eventURL options:options error:&error];
                 if (!fromStore) {
                     NSLog(@"Couldn't open store: %@", error);
                     continue;
@@ -65,7 +68,8 @@ int main(int argc, const char * argv[])
                 
                 NSURL *toURL = [resultDirURL URLByAppendingPathComponent:[eventURL.path lastPathComponent]];
                 toURL = [toURL URLByAppendingPathExtension:@"xml"];
-                [coordinator migratePersistentStore:fromStore toURL:toURL options:nil withType:NSXMLStoreType error:NULL];
+                
+                [coordinator migratePersistentStore:fromStore toURL:toURL options:options withType:NSXMLStoreType error:NULL];
             }
         }
         

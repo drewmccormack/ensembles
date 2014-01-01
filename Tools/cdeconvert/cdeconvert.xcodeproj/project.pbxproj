@@ -11,6 +11,8 @@
 		0791BCF417F6F7B700E7C31B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 0791BCF317F6F7B700E7C31B /* main.m */; };
 		0791BCF817F6F7B700E7C31B /* cdeconvert.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 0791BCF717F6F7B700E7C31B /* cdeconvert.1 */; };
 		0791BCFF17F6F82500E7C31B /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0791BCFE17F6F82500E7C31B /* CoreData.framework */; };
+		07D23CCD1873439300D89244 /* CDEPropertyChangeValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 07D23CCC1873439300D89244 /* CDEPropertyChangeValue.m */; };
+		07D23CD0187343B400D89244 /* CDEDefines.m in Sources */ = {isa = PBXBuildFile; fileRef = 07D23CCF187343B400D89244 /* CDEDefines.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -34,6 +36,10 @@
 		0791BCF717F6F7B700E7C31B /* cdeconvert.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = cdeconvert.1; sourceTree = "<group>"; };
 		0791BCFE17F6F82500E7C31B /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		07D23CC71872EC0D00D89244 /* model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = model.h; sourceTree = "<group>"; };
+		07D23CCB1873439300D89244 /* CDEPropertyChangeValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDEPropertyChangeValue.h; path = ../../../Framework/Source/Events/CDEPropertyChangeValue.h; sourceTree = "<group>"; };
+		07D23CCC1873439300D89244 /* CDEPropertyChangeValue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDEPropertyChangeValue.m; path = ../../../Framework/Source/Events/CDEPropertyChangeValue.m; sourceTree = "<group>"; };
+		07D23CCE187343B400D89244 /* CDEDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDEDefines.h; path = ../../../Framework/Source/General/CDEDefines.h; sourceTree = "<group>"; };
+		07D23CCF187343B400D89244 /* CDEDefines.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDEDefines.m; path = ../../../Framework/Source/General/CDEDefines.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,6 +84,10 @@
 		0791BCF217F6F7B700E7C31B /* cdeconvert */ = {
 			isa = PBXGroup;
 			children = (
+				07D23CCE187343B400D89244 /* CDEDefines.h */,
+				07D23CCF187343B400D89244 /* CDEDefines.m */,
+				07D23CCB1873439300D89244 /* CDEPropertyChangeValue.h */,
+				07D23CCC1873439300D89244 /* CDEPropertyChangeValue.m */,
 				0791BCF317F6F7B700E7C31B /* main.m */,
 				0791BCF717F6F7B700E7C31B /* cdeconvert.1 */,
 				07D23CC71872EC0D00D89244 /* model.h */,
@@ -153,7 +163,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "RESOURCESDIR=\"${SRCROOT}/../../Framework/Resources\"\nMODELPATH=\"CDEEventStoreModel.xcdatamodeld\"\nCONVERTTMPDIR=$(mktemp -d $TMPDIR/cdeconvert.XXX)\n\ncd \"$RESOURCESDIR\"\nTARFILENAME=eventModelTarredData\nTARPATH=$CONVERTTMPDIR/$TARFILENAME\ntar -cf \"$TARPATH\" \"$MODELPATH\" -C .\n\nBASE64PATH=$CONVERTTMPDIR/modeldata.base64\ncd `dirname \"$TARPATH\"`\n/usr/bin/xxd -i \"$TARFILENAME\" \"${SRCROOT}/cdeconvert/model.h\"\n\nrm -r $CONVERTTMPDIR";
+			shellScript = "RESOURCESDIR=\"${SRCROOT}/../../Framework/Resources\"\nMODELPATH=\"$RESOURCESDIR/CDEEventStoreModel.xcdatamodeld\"\nCONVERTTMPDIR=$(mktemp -d $TMPDIR/cdeconvert.XXXXX)\n\nMOMDNAME=\"CDEEventStoreModel.momd\"\nMOMDPATH=\"$CONVERTTMPDIR/$MOMDNAME\"\n/Applications/Xcode.app/Contents/Developer/usr/bin/momc \"$MODELPATH\" \"$MOMDPATH\"\n\ncd \"$CONVERTTMPDIR\"\nTARFILENAME=eventModelTarredData\nTARPATH=$CONVERTTMPDIR/$TARFILENAME\ntar -cf \"$TARPATH\" \"$MOMDNAME\" -C .\n\ncd `dirname \"$TARPATH\"`\n/usr/bin/xxd -i \"$TARFILENAME\" \"${SRCROOT}/cdeconvert/model.h\"\n\nrm -r $CONVERTTMPDIR";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -163,6 +173,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				0791BCF417F6F7B700E7C31B /* main.m in Sources */,
+				07D23CD0187343B400D89244 /* CDEDefines.m in Sources */,
+				07D23CCD1873439300D89244 /* CDEPropertyChangeValue.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
