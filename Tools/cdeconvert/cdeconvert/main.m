@@ -38,7 +38,7 @@ int main(int argc, const char * argv[])
         [task waitUntilExit];
         
         // Extract events and export to folder on Desktop as XML
-        NSString *eventDirPath = [NSString stringWithCString:argv[1] encoding:NSUTF8StringEncoding];
+        NSString *eventDirPath = [[NSString stringWithCString:argv[1] encoding:NSUTF8StringEncoding] stringByExpandingTildeInPath];
         NSString *modelPath = [tempPath stringByAppendingPathComponent:@"CDEEventStoreModel.momd"];
         NSURL *modelURL = [NSURL fileURLWithPath:modelPath];
         NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
