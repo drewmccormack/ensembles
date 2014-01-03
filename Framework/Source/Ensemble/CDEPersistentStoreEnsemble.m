@@ -24,6 +24,8 @@ static NSString * const kCDEIdentityTokenContext = @"kCDEIdentityTokenContext";
 static NSString * const kCDEStoreIdentifierKey = @"storeIdentifier";
 static NSString * const kCDELeechDate = @"leechDate";
 
+static NSString * const kCDEMergeTaskInfo = @"Merge";
+
 NSString * const CDEMonitoredManagedObjectContextWillSaveNotification = @"CDEMonitoredManagedObjectContextWillSaveNotification";
 NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMonitoredManagedObjectContextDidSaveNotification";
 
@@ -453,9 +455,9 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
     };
     
     CDEAsynchronousTaskBlock processChangesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
-        [self processPendingChangesWithCompletion:^(NSError *error) {
-            next(error, NO);
-        }];
+        NSError *error = nil;
+        [eventStore flush:&error];
+        next(error, NO);
     };
     
     CDEAsynchronousTaskBlock importRemoteEventsTask = ^(CDEAsynchronousTaskCallbackBlock next) {
@@ -483,7 +485,7 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
         self.merging = NO;
     }];
     
-    taskQueue.info = @"Merge";
+    taskQueue.info = kCDEMergeTaskInfo;
     [operationQueue addOperation:taskQueue];
 }
 
@@ -491,7 +493,7 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
 {
     NSAssert([NSThread isMainThread], @"cancel merge method called off main thread");
     for (NSOperation *operation in operationQueue.operations) {
-        if ([operation respondsToSelector:@selector(info)] && [[(id)operation info] isEqual:@"Merge"]) {
+        if ([operation respondsToSelector:@selector(info)] && [[(id)operation info] isEqual:kCDEMergeTaskInfo]) {
             [operation cancel];
         }
     }

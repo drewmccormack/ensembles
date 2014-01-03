@@ -105,7 +105,6 @@
 
 - (NSError *)syncChanges
 {
-    // Three merges should get all devices in sync
     __block NSError *returnError = nil;
     [self mergeEnsemble:ensemble1];
     if (returnError) return returnError;
