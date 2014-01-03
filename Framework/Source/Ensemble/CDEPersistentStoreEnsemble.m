@@ -47,7 +47,6 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
 
 @implementation CDEPersistentStoreEnsemble {
     BOOL saveOccurredDuringImport;
-    CDEAsynchronousTaskQueue *currentTaskQueue;
     NSOperationQueue *operationQueue;
 }
 
@@ -296,11 +295,9 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
     }
     
     CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:tasks terminationPolicy:CDETaskQueueTerminationPolicyStopOnError completion:^(NSError *error) {
-        currentTaskQueue = nil;
         [self dispatchCompletion:completion withError:error];
     }];
     
-    currentTaskQueue = taskQueue;
     [operationQueue addOperation:taskQueue];
 }
 
@@ -327,8 +324,6 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
             return;
         }
         
-        [currentTaskQueue cancel];
-        
         BOOL removedStore = [eventStore removeEventStore];
         self.leeched = eventStore.containsEventData;
         
@@ -341,6 +336,7 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
         [self dispatchCompletion:completion withError:error];
     }];
     
+    [operationQueue cancelAllOperations];
     [operationQueue addOperation:deleechQueue];
 }
 
@@ -485,12 +481,10 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
     
     NSArray *tasks = @[checkIdentityTask, checkRegistrationTask, processChangesTask, importRemoteEventsTask, mergeEventsTask, exportEventsTask];
     CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:tasks terminationPolicy:CDETaskQueueTerminationPolicyStopOnError completion:^(NSError *error) {
-        currentTaskQueue = nil;
         [self dispatchCompletion:completion withError:error];
         self.merging = NO;
     }];
     
-    currentTaskQueue = taskQueue;
     [operationQueue addOperation:taskQueue];
 }
 
