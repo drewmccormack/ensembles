@@ -218,9 +218,7 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
     
     if (self.isLeeched) {
         NSError *error = [[NSError alloc] initWithDomain:CDEErrorDomain code:CDEErrorCodeDisallowedStateChange userInfo:nil];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (completion) completion(error);
-        });
+        [self dispatchCompletion:completion withError:error];
         return;
     }
     
@@ -485,6 +483,7 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
         self.merging = NO;
     }];
     
+    taskQueue.info = @"Merge";
     [operationQueue addOperation:taskQueue];
 }
 
@@ -492,12 +491,17 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
 {
     NSAssert([NSThread isMainThread], @"cancel merge method called off main thread");
     if (!self.isMerging) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (completion) completion(nil);
-        });
+        [self dispatchCompletion:completion withError:nil];
     }
     else {
-        // TODO: Write this. Will require cancel methods in other classes
+        for (NSOperation *operation in operationQueue.operations) {
+            if ([operation respondsToSelector:@selector(info)] && [[(id)operation info] isEqual:@"Merge"]) {
+                [operation cancel];
+            }
+        }
+        [operationQueue addOperationWithBlock:^{
+            [self dispatchCompletion:completion withError:nil];
+        }];
     }
 }
 
@@ -508,18 +512,14 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
     NSAssert([NSThread isMainThread], @"Process pending changes invoked off main thread");
     
     if (!self.leeched) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (completion) completion(nil);
-        });
+        [self dispatchCompletion:completion withError:nil];
         return;
     }
     
     [operationQueue addOperationWithBlock:^{
         NSError *error = nil;
         [eventStore flush:&error];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (completion) completion(error);
-        });
+        [self dispatchCompletion:completion withError:error];
     }];
 }
 
