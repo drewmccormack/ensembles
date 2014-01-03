@@ -514,13 +514,13 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
         return;
     }
     
-    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+    [operationQueue addOperationWithBlock:^{
         NSError *error = nil;
         [eventStore flush:&error];
         dispatch_async(dispatch_get_main_queue(), ^{
             if (completion) completion(error);
         });
-    });
+    }];
 }
 
 - (void)stopMonitoringSaves
