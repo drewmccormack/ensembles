@@ -54,8 +54,18 @@
     return [self initWithTasks:newTasks terminationPolicy:policy completion:newCompletion];
 }
 
+- (instancetype)initWithTask:(CDEAsynchronousTaskBlock)task completion:(CDECompletionBlock)newCompletion
+{
+    return [self initWithTask:task repeatCount:1 terminationPolicy:CDETaskQueueTerminationPolicyStopOnError completion:newCompletion];
+}
+
 - (void)start
 {
+    if (![NSThread isMainThread]) {
+        [self performSelectorOnMainThread:@selector(start) withObject:nil waitUntilDone:NO];
+        return;
+    }
+    
     @synchronized (self) {
         [self willChangeValueForKey:@"isFinished"];
         [self willChangeValueForKey:@"isExecuting"];
@@ -70,7 +80,9 @@
     taskEnumerator = [tasks objectEnumerator];
     [self performSelector:@selector(startNextTask) withObject:nil afterDelay:0.0];
     
-    while (![NSThread isMainThread] && !self.isFinished) [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+//    while (![NSThread isMainThread] && !self.isFinished) {
+//        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+//    }
 }
 
 - (NSError *)combineErrors
@@ -89,7 +101,7 @@
 {
     @autoreleasepool {
         if (self.isCancelled) {
-            [self finish];
+            [self performSelector:@selector(finish) withObject:nil afterDelay:0.0];
             return;
         }
         
