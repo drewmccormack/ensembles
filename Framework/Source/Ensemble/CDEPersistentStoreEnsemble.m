@@ -490,19 +490,14 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
 - (void)cancelMergeWithCompletion:(CDECompletionBlock)completion
 {
     NSAssert([NSThread isMainThread], @"cancel merge method called off main thread");
-    if (!self.isMerging) {
-        [self dispatchCompletion:completion withError:nil];
-    }
-    else {
-        for (NSOperation *operation in operationQueue.operations) {
-            if ([operation respondsToSelector:@selector(info)] && [[(id)operation info] isEqual:@"Merge"]) {
-                [operation cancel];
-            }
+    for (NSOperation *operation in operationQueue.operations) {
+        if ([operation respondsToSelector:@selector(info)] && [[(id)operation info] isEqual:@"Merge"]) {
+            [operation cancel];
         }
-        [operationQueue addOperationWithBlock:^{
-            [self dispatchCompletion:completion withError:nil];
-        }];
     }
+    [operationQueue addOperationWithBlock:^{
+        [self dispatchCompletion:completion withError:nil];
+    }];
 }
 
 #pragma mark Prepare for app termination
