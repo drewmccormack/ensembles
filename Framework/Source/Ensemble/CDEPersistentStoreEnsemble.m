@@ -48,6 +48,7 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
 @implementation CDEPersistentStoreEnsemble {
     BOOL saveOccurredDuringImport;
     CDEAsynchronousTaskQueue *currentTaskQueue;
+    NSOperationQueue *operationQueue;
 }
 
 @synthesize cloudFileSystem = cloudFileSystem;
@@ -68,6 +69,9 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
 {
     self = [super init];
     if (self) {
+        operationQueue = [[NSOperationQueue alloc] init];
+        operationQueue.maxConcurrentOperationCount = 1;
+        
         self.ensembleIdentifier = identifier;
         self.storePath = path;
         self.managedObjectModelURL = modelURL;
@@ -273,9 +277,8 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
         if (saveOccurredDuringImport) {
             NSError *error = nil;
             error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorSaveOccurredDuringLeeching userInfo:nil];
-            [self forceDeleechDueToError:error informCompletion:^(NSError *error) {
-                next(error, NO);
-            }];
+            [self performSelector:@selector(forceDeleechDueToError:) withObject:error afterDelay:0.0];
+            next(error, NO);
             return;
         }
         
@@ -298,7 +301,7 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
     }];
     
     currentTaskQueue = taskQueue;
-    [taskQueue start];
+    [operationQueue addOperation:taskQueue];
 }
 
 - (void)setupEventStoreWithCompletion:(CDECompletionBlock)completion
@@ -338,7 +341,7 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
         [self dispatchCompletion:completion withError:error];
     }];
     
-    [deleechQueue start];
+    [operationQueue addOperation:deleechQueue];
 }
 
 #pragma mark Observing saves during import
@@ -367,18 +370,16 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
 
 #pragma mark Checks
 
-- (void)forceDeleechDueToError:(NSError *)deleechError informCompletion:(CDECompletionBlock)completion
+- (void)forceDeleechDueToError:(NSError *)deleechError
 {
     [self deleechPersistentStoreWithCompletion:^(NSError *error) {
         if (!error) {
-            if (completion) completion(deleechError);
             if ([self.delegate respondsToSelector:@selector(persistentStoreEnsemble:didDeleechWithError:)]) {
                 [self.delegate persistentStoreEnsemble:self didDeleechWithError:deleechError];
             }
         }
         else {
             CDELog(CDELoggingLevelError, @"Could not force deleech");
-            if (completion) completion(nil);
         }
     }];
 }
@@ -388,7 +389,8 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
     BOOL identityValid = [self.cloudFileSystem.identityToken isEqual:self.eventStore.cloudFileSystemIdentityToken];
     if (self.leeched && !identityValid) {
         NSError *deleechError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeCloudIdentityChanged userInfo:nil];
-        [self forceDeleechDueToError:deleechError informCompletion:completion];
+        [self performSelector:@selector(forceDeleechDueToError:) withObject:deleechError afterDelay:0.0];
+        if (completion) completion(deleechError);
     }
     else {
         [self dispatchCompletion:completion withError:nil];
@@ -406,7 +408,8 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
     [self.cloudManager retrieveRegistrationInfoForStoreWithIdentifier:storeId completion:^(NSDictionary *info, NSError *error) {
         if (!error && !info) {
             NSError *unregisteredError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeStoreUnregistered userInfo:nil];
-            [self forceDeleechDueToError:unregisteredError informCompletion:completion];
+            [self performSelector:@selector(forceDeleechDueToError:) withObject:unregisteredError afterDelay:0.0];
+            if (completion) completion(unregisteredError);
         }
         else {
             // If there was an error, can't conclude anything about registration state. Assume registered.
@@ -488,7 +491,7 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
     }];
     
     currentTaskQueue = taskQueue;
-    [taskQueue start];
+    [operationQueue addOperation:taskQueue];
 }
 
 - (void)cancelMergeWithCompletion:(CDECompletionBlock)completion
