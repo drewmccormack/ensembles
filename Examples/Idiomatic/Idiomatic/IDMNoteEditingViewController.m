@@ -20,7 +20,7 @@
 {
     [super viewWillAppear:animated];
     
-    self.textView.attributedText = self.note.attributedText;
+    self.textView.text = self.note.text;
     
     if (self.note) {
         NSArray *sortDescs = @[[NSSortDescriptor sortDescriptorWithKey:@"text" ascending:YES]];
@@ -58,7 +58,7 @@
             self.note = [NSEntityDescription insertNewObjectForEntityForName:@"IDMNote" inManagedObjectContext:self.managedObjectContext];
         }
         
-        self.note.attributedText = self.textView.attributedText;
+        self.note.text = self.textView.text;
         [self updateTags];
         
         [self.managedObjectContext save:NULL];

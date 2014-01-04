@@ -150,7 +150,7 @@
         
         [ensemble mergeWithCompletion:^(NSError *error) {
             XCTAssertNotNil(error, @"Merge should fail due to missing store info");
-            [self checkForDeleech];
+            [self performSelector:@selector(checkForDeleech) withObject:nil afterDelay:0.1];
         }];
     }];
     [self waitForAsync];

@@ -232,6 +232,10 @@ static NSString *kCDEDefaultStoreType;
     NSDictionary *relationships = fromStoreObject.entity.relationshipsByName;
     for (NSRelationshipDescription *relationship in relationships.allValues) {
         if (relationship.isTransient) continue;
+        
+        NSString *exclude = relationship.userInfo[@"excludeFromMigration"];
+        if (exclude && [exclude boolValue]) continue;
+        
         if (relationship.isToMany) {
             // To-many relationship
             id fromStoreRelatives = [fromStoreObject valueForKey:relationship.name];

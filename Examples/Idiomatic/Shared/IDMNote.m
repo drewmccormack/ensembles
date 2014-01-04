@@ -12,7 +12,7 @@
 
 @implementation IDMNote
 
-@dynamic attributedText;
+@dynamic text;
 @dynamic creationDate;
 @dynamic tags;
 @dynamic uniqueIdentifier;

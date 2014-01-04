@@ -97,6 +97,7 @@
 
 - (void)migrateToFileFromRevision:(CDERevisionNumber)rev
 {
+    finishedAsyncOp = NO;
     [migrator migrateLocalEventsSinceRevision:rev toFile:exportedEventsFile completion:^(NSError *error) {
         finishedAsyncOp = YES;
         XCTAssertNil(error, @"Error migrating to file");
@@ -173,6 +174,43 @@
     NSArray *events = [self eventsInFile];
     XCTAssertNotNil(events, @"Fetch failed");
     XCTAssertEqual(events.count, (NSUInteger)0, @"Wrong number of events");
+}
+
+- (void)testSingleEventIsMigratedWhenMultipleEventsExist
+{
+    [moc performBlockAndWait:^{
+        // Setup extra event with a shared global identifier.
+        // In the past, this caused the migration to pull in extra events. This shouldn't happen.
+        CDEStoreModificationEvent *extraEvent = [NSEntityDescription insertNewObjectForEntityForName:@"CDEStoreModificationEvent" inManagedObjectContext:moc];
+        extraEvent.timestamp = 124;
+        
+        CDEEventRevision *revision = [NSEntityDescription insertNewObjectForEntityForName:@"CDEEventRevision" inManagedObjectContext:moc];
+        revision.persistentStoreIdentifier = [self.eventStore persistentStoreIdentifier];
+        revision.revisionNumber = 1;
+        extraEvent.eventRevision = revision;
+        
+        CDEObjectChange *objectChange = [NSEntityDescription insertNewObjectForEntityForName:@"CDEObjectChange" inManagedObjectContext:moc];
+        objectChange.nameOfEntity = @"Hello";
+        objectChange.type = CDEObjectChangeTypeUpdate;
+        objectChange.storeModificationEvent = extraEvent;
+        objectChange.globalIdentifier = globalId1;
+        objectChange.propertyChangeValues = @[@"c", @"d"];
+        
+        [moc save:NULL];
+    }];
+    
+    finishedAsyncOp = NO;
+    [migrator migrateLocalEventWithRevision:0 toFile:exportedEventsFile completion:^(NSError *error) {
+        finishedAsyncOp = YES;
+        XCTAssertNil(error, @"Error migrating to file");
+    }];
+    [self waitForAsyncOpToFinish];
+    
+    NSArray *events = [self eventsInFile];
+    XCTAssertEqual(events.count, (NSUInteger)1, @"Should only be one event.");
+    
+    CDEStoreModificationEvent *event = events.lastObject;
+    XCTAssertEqual(event.eventRevision.revisionNumber, (CDERevisionNumber)0, @"Wrong revision exported");
 }
 
 - (void)testNonLocalEventsAreNotMigratedToFile

@@ -13,7 +13,7 @@
 
 @interface IDMNote : NSManagedObject
 
-@property (nonatomic, strong) NSAttributedString *attributedText;
+@property (nonatomic, strong) NSString *text;
 @property (nonatomic) NSDate *creationDate;
 @property (nonatomic, strong) NSSet *tags;
 @property (nonatomic, strong) NSString *uniqueIdentifier;

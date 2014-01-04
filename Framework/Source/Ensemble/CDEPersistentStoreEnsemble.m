@@ -24,6 +24,8 @@ static NSString * const kCDEIdentityTokenContext = @"kCDEIdentityTokenContext";
 static NSString * const kCDEStoreIdentifierKey = @"storeIdentifier";
 static NSString * const kCDELeechDate = @"leechDate";
 
+static NSString * const kCDEMergeTaskInfo = @"Merge";
+
 NSString * const CDEMonitoredManagedObjectContextWillSaveNotification = @"CDEMonitoredManagedObjectContextWillSaveNotification";
 NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMonitoredManagedObjectContextDidSaveNotification";
 
@@ -47,6 +49,7 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
 
 @implementation CDEPersistentStoreEnsemble {
     BOOL saveOccurredDuringImport;
+    NSOperationQueue *operationQueue;
 }
 
 @synthesize cloudFileSystem = cloudFileSystem;
@@ -67,6 +70,9 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
 {
     self = [super init];
     if (self) {
+        operationQueue = [[NSOperationQueue alloc] init];
+        operationQueue.maxConcurrentOperationCount = 1;
+        
         self.ensembleIdentifier = identifier;
         self.storePath = path;
         self.managedObjectModelURL = modelURL;
@@ -101,16 +107,16 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
     self.eventIntegrator = [[CDEEventIntegrator alloc] initWithStoreURL:url managedObjectModel:self.managedObjectModel eventStore:self.eventStore];
     self.eventIntegrator.ensemble = self;
     
-    __weak typeof(self) weakSelf = self;
+    __weak CDEPersistentStoreEnsemble *weakSelf = self;
     self.eventIntegrator.willSaveBlock = ^(NSManagedObjectContext *savingContext, NSManagedObjectContext *reparationContext) {
-        __strong typeof(self) strongSelf = weakSelf;
+        CDEPersistentStoreEnsemble *strongSelf = weakSelf;
         if ([strongSelf.delegate respondsToSelector:@selector(persistentStoreEnsemble:willSaveMergedChangesInManagedObjectContext:reparationManagedObjectContext:)]) {
             [strongSelf.delegate persistentStoreEnsemble:strongSelf willSaveMergedChangesInManagedObjectContext:savingContext reparationManagedObjectContext:reparationContext];
         }
     };
     
     self.eventIntegrator.failedSaveBlock = ^(NSManagedObjectContext *savingContext, NSError *error, NSManagedObjectContext *reparationContext) {
-        __strong typeof(self) strongSelf = weakSelf;
+        CDEPersistentStoreEnsemble *strongSelf = weakSelf;
         if ([strongSelf.delegate respondsToSelector:@selector(persistentStoreEnsemble:didFailToSaveMergedChangesInManagedObjectContext:error:reparationManagedObjectContext:)]) {
             return [strongSelf.delegate persistentStoreEnsemble:strongSelf didFailToSaveMergedChangesInManagedObjectContext:savingContext error:error reparationManagedObjectContext:reparationContext];
         }
@@ -118,12 +124,11 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
     };
     
     self.eventIntegrator.didSaveBlock = ^(NSManagedObjectContext *context, NSDictionary *info) {
-        __strong typeof(self) strongSelf = weakSelf;
+        CDEPersistentStoreEnsemble *strongSelf = weakSelf;
         if ([strongSelf.delegate respondsToSelector:@selector(persistentStoreEnsemble:didSaveMergeChangesWithNotification:)]) {
             NSNotification *notification = [NSNotification notificationWithName:NSManagedObjectContextDidSaveNotification object:context userInfo:info];
             [strongSelf.delegate persistentStoreEnsemble:strongSelf didSaveMergeChangesWithNotification:notification];
         }
-        [[NSNotificationCenter defaultCenter] postNotificationName:CDEPersistentStoreEnsembleDidSaveMergeChangesNotification object:strongSelf userInfo:info];
     };
 }
 
@@ -215,93 +220,85 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
     
     if (self.isLeeched) {
         NSError *error = [[NSError alloc] initWithDomain:CDEErrorDomain code:CDEErrorCodeDisallowedStateChange userInfo:nil];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (completion) completion(error);
-        });
+        [self dispatchCompletion:completion withError:error];
         return;
     }
     
-    CDELog(CDELoggingLevelVerbose, @"Beginning leech");
+    CDEAsynchronousTaskBlock connectTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self.cloudFileSystem connect:^(NSError *error) {
+            next(error, NO);
+        }];
+    };
     
-    [self.cloudFileSystem connect:^(NSError *error) {
-        if (error) {
-            if (completion) completion(error);
+    CDEAsynchronousTaskBlock initialPrepTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self.cloudFileSystem performInitialPreparation:^(NSError *error) {
+            next(error, NO);
+        }];
+    };
+    
+    CDEAsynchronousTaskBlock remoteStructureTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self.cloudManager createRemoteDirectoryStructureWithCompletion:^(NSError *error) {
+            next(error, NO);
+        }];
+    };
+    
+    CDEAsynchronousTaskBlock eventStoreTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self setupEventStoreWithCompletion:^(NSError *error) {
+            next(error, NO);
+        }];
+    };
+    
+    CDEAsynchronousTaskBlock importTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        // Listen for save notifications, and fail if a save to the store happens during the import
+        saveOccurredDuringImport = NO;
+        [self beginObservingSaveNotifications];
+        
+        // Inform delegate of import
+        if ([self.delegate respondsToSelector:@selector(persistentStoreEnsembleWillImportStore:)]) {
+            [self.delegate persistentStoreEnsembleWillImportStore:self];
+        }
+        
+        CDEPersistentStoreImporter *importer = [[CDEPersistentStoreImporter alloc] initWithPersistentStoreAtPath:self.storePath managedObjectModel:self.managedObjectModel eventStore:self.eventStore];
+        importer.ensemble = self;
+        [importer importWithCompletion:^(NSError *error) {
+            [self endObservingSaveNotifications];
+            
+            if (!error && [self.delegate respondsToSelector:@selector(persistentStoreEnsembleDidImportStore:)]) {
+                [self.delegate persistentStoreEnsembleDidImportStore:self];
+            }
+            
+            next(error, NO);
+        }];
+    };
+    
+    CDEAsynchronousTaskBlock completeLeechTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        // Deleech if a save occurred during import
+        if (saveOccurredDuringImport) {
+            NSError *error = nil;
+            error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorSaveOccurredDuringLeeching userInfo:nil];
+            [self performSelector:@selector(forceDeleechDueToError:) withObject:error afterDelay:0.0];
+            next(error, NO);
             return;
         }
         
-        CDELog(CDELoggingLevelVerbose, @"Connected to Cloud File System");
-
-        CDECodeBlock createRemoteStructure = ^{
-            CDELog(CDELoggingLevelVerbose, @"Creating cloud directory structure");
-            [self.cloudManager createRemoteDirectoryStructureWithCompletion:^(NSError *error) {
-                if (error) {
-                    if (completion) completion(error);
-                    return;
-                }
-                
-                [self setupEventStoreWithCompletion:^(NSError *error) {
-                    if (error) {
-                        if (completion) completion(error);
-                        return;
-                    }
-                    
-                    // Listen for save notifications, and fail if a save to the store happens
-                    // during the import
-                    saveOccurredDuringImport = NO;
-                    [self beginObservingSaveNotifications];
-                    
-                    // Inform delegate of import
-                    if ([self.delegate respondsToSelector:@selector(persistentStoreEnsembleWillImportStore:)]) {
-                        [self.delegate persistentStoreEnsembleWillImportStore:self];
-                    }
-                    
-                    CDELog(CDELoggingLevelVerbose, @"Importing store data");
-                    
-                    CDEPersistentStoreImporter *importer = [[CDEPersistentStoreImporter alloc] initWithPersistentStoreAtPath:self.storePath managedObjectModel:self.managedObjectModel eventStore:self.eventStore];
-                    importer.ensemble = self;
-                    [importer importWithCompletion:^(NSError *error) {
-                        CDELog(CDELoggingLevelVerbose, @"Finished importing");
-
-                        [self endObservingSaveNotifications];
-                        
-                        if (error) {
-                            if (completion) completion(error);
-                            return;
-                        }
-                        
-                        if ([self.delegate respondsToSelector:@selector(persistentStoreEnsembleDidImportStore:)]) {
-                            [self.delegate persistentStoreEnsembleDidImportStore:self];
-                        }
-                        
-                        // Deleech if a save occurred during import
-                        if (saveOccurredDuringImport) {
-                            error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorSaveOccurredDuringLeeching userInfo:nil];
-                            [self forceDeleechDueToError:error informCompletion:completion];
-                            return;
-                        }
-                        
-                        // Register in cloud
-                        NSDictionary *info = @{kCDEStoreIdentifierKey: self.eventStore.persistentStoreIdentifier, kCDELeechDate: [NSDate date]};
-                        [self.cloudManager setRegistrationInfo:info forStoreWithIdentifier:self.eventStore.persistentStoreIdentifier completion:completion];
-                    }];
-                }];
-            }];
-        };
-        
-        // Give cloud file system a chance to perform initial preparation
-        if ([self.cloudFileSystem respondsToSelector:@selector(performInitialPreparation:)]) {
-            [self.cloudFileSystem performInitialPreparation:^(NSError *error) {
-                if (error) {
-                    if (completion) completion(error);
-                    return;
-                }
-                createRemoteStructure();
-            }];
-        }
-        else {
-            createRemoteStructure();
-        }
+        // Register in cloud
+        NSDictionary *info = @{kCDEStoreIdentifierKey: self.eventStore.persistentStoreIdentifier, kCDELeechDate: [NSDate date]};
+        [self.cloudManager setRegistrationInfo:info forStoreWithIdentifier:self.eventStore.persistentStoreIdentifier completion:^(NSError *error) {
+            next(error, NO);
+        }];
+    };
+    
+    NSMutableArray *tasks = [NSMutableArray arrayWithObjects:connectTask, remoteStructureTask, eventStoreTask, importTask, completeLeechTask, nil];
+    
+    if ([self.cloudFileSystem respondsToSelector:@selector(performInitialPreparation:)]) {
+        [tasks insertObject:initialPrepTask atIndex:1];
+    }
+    
+    CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:tasks terminationPolicy:CDETaskQueueTerminationPolicyStopOnError completion:^(NSError *error) {
+        [self dispatchCompletion:completion withError:error];
     }];
+    
+    [operationQueue addOperation:taskQueue];
 }
 
 - (void)setupEventStoreWithCompletion:(CDECompletionBlock)completion
@@ -319,25 +316,28 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
 {
     NSAssert([NSThread isMainThread], @"Deleech method called off main thread");
     
-    CDELog(CDELoggingLevelVerbose, @"Deleeching");
+    CDEAsynchronousTaskBlock deleechTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        if (!self.isLeeched) {
+            [eventStore removeEventStore];
+            NSError *error = [[NSError alloc] initWithDomain:CDEErrorDomain code:CDEErrorCodeDisallowedStateChange userInfo:nil];
+            next(error, NO);
+            return;
+        }
+        
+        BOOL removedStore = [eventStore removeEventStore];
+        self.leeched = eventStore.containsEventData;
+        
+        NSError *error = nil;
+        if (!removedStore) error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeUnknown userInfo:nil];
+        next(error, NO);
+    };
     
-    BOOL removedStore = [eventStore removeEventStore];
+    CDEAsynchronousTaskQueue *deleechQueue = [[CDEAsynchronousTaskQueue alloc] initWithTask:deleechTask completion:^(NSError *error) {
+        [self dispatchCompletion:completion withError:error];
+    }];
     
-    if (!self.isLeeched) {
-        NSError *error = [[NSError alloc] initWithDomain:CDEErrorDomain code:CDEErrorCodeDisallowedStateChange userInfo:nil];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (completion) completion(error);
-        });
-        return;
-    }
-
-    self.leeched = eventStore.containsEventData;
-    
-    NSError *error = nil;
-    if (!removedStore) error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeUnknown userInfo:nil];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (completion) completion(error);
-    });
+    [operationQueue cancelAllOperations];
+    [operationQueue addOperation:deleechQueue];
 }
 
 #pragma mark Observing saves during import
@@ -366,31 +366,27 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
 
 #pragma mark Checks
 
-- (void)forceDeleechDueToError:(NSError *)deleechError informCompletion:(CDECompletionBlock)completion
+- (void)forceDeleechDueToError:(NSError *)deleechError
 {
-    CDELog(CDELoggingLevelVerbose, @"Forcing a deleech: %@", deleechError);
     [self deleechPersistentStoreWithCompletion:^(NSError *error) {
         if (!error) {
-            if (completion) completion(deleechError);
             if ([self.delegate respondsToSelector:@selector(persistentStoreEnsemble:didDeleechWithError:)]) {
                 [self.delegate persistentStoreEnsemble:self didDeleechWithError:deleechError];
             }
         }
         else {
             CDELog(CDELoggingLevelError, @"Could not force deleech");
-            if (completion) completion(nil);
         }
     }];
 }
 
 - (void)checkCloudFileSystemIdentityWithCompletion:(CDECompletionBlock)completion
 {
-    CDELog(CDELoggingLevelVerbose, @"Checking file system identity");
-
     BOOL identityValid = [self.cloudFileSystem.identityToken isEqual:self.eventStore.cloudFileSystemIdentityToken];
     if (self.leeched && !identityValid) {
         NSError *deleechError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeCloudIdentityChanged userInfo:nil];
-        [self forceDeleechDueToError:deleechError informCompletion:completion];
+        [self performSelector:@selector(forceDeleechDueToError:) withObject:deleechError afterDelay:0.0];
+        if (completion) completion(deleechError);
     }
     else {
         [self dispatchCompletion:completion withError:nil];
@@ -399,8 +395,6 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
 
 - (void)checkStoreRegistrationInCloudWithCompletion:(CDECompletionBlock)completion
 {
-    CDELog(CDELoggingLevelVerbose, @"Checking that store is registered in cloud");
-
     if (!self.eventStore.verifiesStoreRegistrationInCloud) {
         [self dispatchCompletion:completion withError:nil];
         return;
@@ -410,7 +404,8 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
     [self.cloudManager retrieveRegistrationInfoForStoreWithIdentifier:storeId completion:^(NSDictionary *info, NSError *error) {
         if (!error && !info) {
             NSError *unregisteredError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeStoreUnregistered userInfo:nil];
-            [self forceDeleechDueToError:unregisteredError informCompletion:completion];
+            [self performSelector:@selector(forceDeleechDueToError:) withObject:unregisteredError afterDelay:0.0];
+            if (completion) completion(unregisteredError);
         }
         else {
             // If there was an error, can't conclude anything about registration state. Assume registered.
@@ -445,8 +440,6 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
         return;
     }
     
-    CDELog(CDELoggingLevelVerbose, @"Beginning Merge");
-    
     self.merging = YES;
     
     CDEAsynchronousTaskBlock checkIdentityTask = ^(CDEAsynchronousTaskCallbackBlock next) {
@@ -462,9 +455,9 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
     };
     
     CDEAsynchronousTaskBlock processChangesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
-        [self processPendingChangesWithCompletion:^(NSError *error) {
-            next(error, NO);
-        }];
+        NSError *error = nil;
+        [eventStore flush:&error];
+        next(error, NO);
     };
     
     CDEAsynchronousTaskBlock importRemoteEventsTask = ^(CDEAsynchronousTaskCallbackBlock next) {
@@ -488,23 +481,25 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
     
     NSArray *tasks = @[checkIdentityTask, checkRegistrationTask, processChangesTask, importRemoteEventsTask, mergeEventsTask, exportEventsTask];
     CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:tasks terminationPolicy:CDETaskQueueTerminationPolicyStopOnError completion:^(NSError *error) {
-        if (completion) completion(error);
+        [self dispatchCompletion:completion withError:error];
         self.merging = NO;
     }];
-    [taskQueue start];
+    
+    taskQueue.info = kCDEMergeTaskInfo;
+    [operationQueue addOperation:taskQueue];
 }
 
 - (void)cancelMergeWithCompletion:(CDECompletionBlock)completion
 {
     NSAssert([NSThread isMainThread], @"cancel merge method called off main thread");
-    if (!self.isMerging) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (completion) completion(nil);
-        });
+    for (NSOperation *operation in operationQueue.operations) {
+        if ([operation respondsToSelector:@selector(info)] && [[(id)operation info] isEqual:kCDEMergeTaskInfo]) {
+            [operation cancel];
+        }
     }
-    else {
-        // TODO: Write this. Will require cancel methods in other classes
-    }
+    [operationQueue addOperationWithBlock:^{
+        [self dispatchCompletion:completion withError:nil];
+    }];
 }
 
 #pragma mark Prepare for app termination
@@ -514,19 +509,15 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
     NSAssert([NSThread isMainThread], @"Process pending changes invoked off main thread");
     
     if (!self.leeched) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (completion) completion(nil);
-        });
+        [self dispatchCompletion:completion withError:nil];
         return;
     }
     
-    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+    [operationQueue addOperationWithBlock:^{
         NSError *error = nil;
         [eventStore flush:&error];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (completion) completion(error);
-        });
-    });
+        [self dispatchCompletion:completion withError:error];
+    }];
 }
 
 - (void)stopMonitoringSaves

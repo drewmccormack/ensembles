@@ -24,9 +24,11 @@ typedef enum {
 @property (atomic, assign, readonly) NSUInteger numberOfTasks;
 @property (atomic, assign, readonly) NSUInteger numberOfTasksCompleted;
 @property (atomic, assign, readonly) CDETaskQueueTerminationPolicy terminationPolicy;
+@property (atomic, strong, readwrite) id <NSObject> info;
 
 - (instancetype)initWithTasks:(NSArray *)tasks terminationPolicy:(CDETaskQueueTerminationPolicy)policy completion:(CDECompletionBlock)completion; // Designated
 - (instancetype)initWithTasks:(NSArray *)tasks completion:(CDECompletionBlock)completion;
+- (instancetype)initWithTask:(CDEAsynchronousTaskBlock)task completion:(CDECompletionBlock)completion;
 - (instancetype)initWithTask:(CDEAsynchronousTaskBlock)task repeatCount:(NSUInteger)count terminationPolicy:(CDETaskQueueTerminationPolicy)policy completion:(CDECompletionBlock)completion;
 
 @end

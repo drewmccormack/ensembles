@@ -66,7 +66,7 @@
 {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"NoteCell"];
     IDMNote *note = notesController.fetchedObjects[indexPath.row];
-    cell.textLabel.attributedText = note.attributedText;
+    cell.textLabel.text = note.text;
     return cell;
 }
 
@@ -105,7 +105,7 @@
             {
                 UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
                 IDMNote *note = notesController.fetchedObjects[indexPath.row];
-                cell.textLabel.attributedText = note.attributedText;
+                cell.textLabel.text = note.text;
             }
             break;
     }

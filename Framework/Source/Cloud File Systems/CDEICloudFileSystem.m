@@ -229,7 +229,16 @@
 
 #pragma mark - File Operations
 
-static const NSTimeInterval CDEFileCoordinatorTimeOut = 2.0;
+static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
+
+- (NSError *)specializedErrorForCocoaError:(NSError *)cocoaError
+{
+    NSError *error = cocoaError;
+    if ([cocoaError.domain isEqualToString:NSCocoaErrorDomain] && cocoaError.code == NSUserCancelledError) {
+        error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFileCoordinatorTimedOut userInfo:nil];
+    }
+    return error;
+}
 
 - (void)fileExistsAtPath:(NSString *)path completion:(void(^)(BOOL exists, BOOL isDirectory, NSError *error))block
 {
@@ -258,6 +267,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 2.0;
         }];
         
         NSError *error = fileCoordinatorError ? : timeoutError ? : nil;
+        error = [self specializedErrorForCocoaError:error];
         dispatch_async(dispatch_get_main_queue(), ^{
             if (block) block(exists, isDirectory, error);
         });
@@ -317,6 +327,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 2.0;
         }];
         
         NSError *error = fileCoordinatorError ? : timeoutError ? : fileManagerError ? : nil;
+        error = [self specializedErrorForCocoaError:error];
         dispatch_async(dispatch_get_main_queue(), ^{
             if (block) block(contents, error);
         });
@@ -350,6 +361,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 2.0;
         }];
         
         NSError *error = fileCoordinatorError ? : timeoutError ? : fileManagerError ? : nil;
+        error = [self specializedErrorForCocoaError:error];
         dispatch_async(dispatch_get_main_queue(), ^{
             if (block) block(error);
         });
@@ -382,6 +394,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 2.0;
         }];
         
         NSError *error = fileCoordinatorError ? : timeoutError ? : fileManagerError ? : nil;
+        error = [self specializedErrorForCocoaError:error];
         dispatch_async(dispatch_get_main_queue(), ^{
             if (block) block(error);
         });
@@ -416,6 +429,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 2.0;
         }];
         
         NSError *error = fileCoordinatorError ? : timeoutError ? : fileManagerError ? : nil;
+        error = [self specializedErrorForCocoaError:error];
         dispatch_async(dispatch_get_main_queue(), ^{
             if (block) block(error);
         });
@@ -450,6 +464,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 2.0;
         }];
         
         NSError *error = fileCoordinatorError ? : timeoutError ? : fileManagerError ? : nil;
+        error = [self specializedErrorForCocoaError:error];
         dispatch_async(dispatch_get_main_queue(), ^{
             if (block) block(error);
         });

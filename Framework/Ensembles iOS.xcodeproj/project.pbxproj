@@ -159,7 +159,7 @@
 		070D33A318018AAD0054BA23 /* Tests-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Tests-Prefix.pch"; sourceTree = "<group>"; };
 		070D33D11801A0770054BA23 /* CDEGlobalIdentifierTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEGlobalIdentifierTests.m; sourceTree = "<group>"; };
 		072BA97D180AACD9003AA94E /* CDEEventStoreModel_0.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_0.xcdatamodel; sourceTree = "<group>"; };
-		072BA97E180AACD9003AA94E /* CDEEventStoreModel_1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_1.xcdatamodel; sourceTree = "<group>"; };
+		072BA97E180AACD9003AA94E /* CDEEventStoreModel_1.xcdatamodel */ = {isa = PBXFileReference; explicitFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_1.xcdatamodel; sourceTree = "<group>"; };
 		075B3FB218096C720089D4D3 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		075B3FCE18097A370089D4D3 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		075FDCDF183628F90020E1C9 /* CDEIntegratorMergeRepairTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEIntegratorMergeRepairTests.m; sourceTree = "<group>"; };
