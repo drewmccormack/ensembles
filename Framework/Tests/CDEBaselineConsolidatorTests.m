@@ -1,6 +1,6 @@
 //
 //  CDEBaselineConsolidatorTests.m
-//  Ensembles Mac
+//  Ensembles
 //
 //  Created by Drew McCormack on 04/12/13.
 //  Copyright (c) 2013 Drew McCormack. All rights reserved.

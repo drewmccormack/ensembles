@@ -107,6 +107,8 @@
 		07DDA7EA17CD1A4A009C6F94 /* libensembles_mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF7933177F04B30029D500 /* libensembles_mac.a */; };
 		07E2042417C8F2EB00ED9AB3 /* BasicIntegratorRelationshipTestsFixture.json in Resources */ = {isa = PBXBuildFile; fileRef = 07E2042317C8F2EB00ED9AB3 /* BasicIntegratorRelationshipTestsFixture.json */; };
 		07E2875417BF8D470008CC4F /* CDESaveMonitorRelationshipTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07E2875317BF8D470008CC4F /* CDESaveMonitorRelationshipTests.m */; };
+		07E64F5C18799F6800305C22 /* CDERebaser.h in Headers */ = {isa = PBXBuildFile; fileRef = 07E64F5A18799F6800305C22 /* CDERebaser.h */; };
+		07E64F5D18799F6800305C22 /* CDERebaser.m in Sources */ = {isa = PBXBuildFile; fileRef = 07E64F5B18799F6800305C22 /* CDERebaser.m */; };
 		9477ED641800146900C2A419 /* CDERevisionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 07DDA7E617C9ECF6009C6F94 /* CDERevisionManager.m */; };
 /* End PBXBuildFile section */
 
@@ -232,6 +234,8 @@
 		07E2042317C8F2EB00ED9AB3 /* BasicIntegratorRelationshipTestsFixture.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = BasicIntegratorRelationshipTestsFixture.json; sourceTree = "<group>"; };
 		07E2875317BF8D470008CC4F /* CDESaveMonitorRelationshipTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDESaveMonitorRelationshipTests.m; sourceTree = "<group>"; };
 		07E492E917172CB200FE81B5 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		07E64F5A18799F6800305C22 /* CDERebaser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDERebaser.h; sourceTree = "<group>"; };
+		07E64F5B18799F6800305C22 /* CDERebaser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDERebaser.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -397,6 +401,8 @@
 			children = (
 				07BAB4BB184677640096318D /* CDEBaselineConsolidator.h */,
 				07BAB4BC184677640096318D /* CDEBaselineConsolidator.m */,
+				07E64F5A18799F6800305C22 /* CDERebaser.h */,
+				07E64F5B18799F6800305C22 /* CDERebaser.m */,
 			);
 			path = Baselines;
 			sourceTree = "<group>";
@@ -549,6 +555,7 @@
 				0722B26717B76B2400496F4A /* CDERevision.h in Headers */,
 				07BF7A4D177F0A9D0029D500 /* CDEFoundationAdditions.h in Headers */,
 				078A3F82178C9B32009C8821 /* CDEEventRevision.h in Headers */,
+				07E64F5C18799F6800305C22 /* CDERebaser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -713,6 +720,7 @@
 				07BF7A3D177F0A9D0029D500 /* CDEEventStore.m in Sources */,
 				07BF7A40177F0A9D0029D500 /* CDESaveMonitor.m in Sources */,
 				072A87DD17EDFBB000F8B2CB /* CDEPersistentStoreImporter.m in Sources */,
+				07E64F5D18799F6800305C22 /* CDERebaser.m in Sources */,
 				07BF7A46177F0A9D0029D500 /* NSMapTable+CDEAdditions.m in Sources */,
 				078A3F84178C9B32009C8821 /* CDEEventRevision.m in Sources */,
 				07973F06183BE44A007F48CA /* CDEICloudFileSystem.m in Sources */,

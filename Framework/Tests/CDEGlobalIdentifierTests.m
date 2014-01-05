@@ -1,6 +1,6 @@
 //
 //  CDEGlobalIdentifierTests.m
-//  Ensembles Mac
+//  Ensembles
 //
 //  Created by Drew McCormack on 06/10/13.
 //  Copyright (c) 2013 Drew McCormack. All rights reserved.

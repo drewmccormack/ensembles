@@ -1,6 +1,6 @@
 //
 //  NSManagedObjectModel+CDEAdditions.h
-//  Ensembles Mac
+//  Ensembles
 //
 //  Created by Drew McCormack on 08/11/13.
 //  Copyright (c) 2013 Drew McCormack. All rights reserved.

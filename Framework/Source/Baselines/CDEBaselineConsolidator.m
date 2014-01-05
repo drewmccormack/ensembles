@@ -1,6 +1,6 @@
 //
 //  CDEBaselineConsolidator.m
-//  Ensembles Mac
+//  Ensembles
 //
 //  Created by Drew McCormack on 27/11/13.
 //  Copyright (c) 2013 Drew McCormack. All rights reserved.
@@ -27,7 +27,7 @@
 @synthesize eventStore = eventStore;
 @synthesize ensemble = ensemble;
 
-- (id)initWithEventStore:(CDEEventStore *)newEventStore
+- (instancetype)initWithEventStore:(CDEEventStore *)newEventStore
 {
     self = [super init];
     if (self) {

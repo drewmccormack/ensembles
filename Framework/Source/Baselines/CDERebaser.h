@@ -1,9 +1,9 @@
 //
-//  CDEBaselineConsolidator.h
+//  CDEBaselinePropagator.h
 //  Ensembles
 //
-//  Created by Drew McCormack on 27/11/13.
-//  Copyright (c) 2013 Drew McCormack. All rights reserved.
+//  Created by Drew McCormack on 05/01/14.
+//  Copyright (c) 2014 Drew McCormack. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -12,14 +12,16 @@
 @class CDEEventStore;
 @class CDEPersistentStoreEnsemble;
 
-@interface CDEBaselineConsolidator : NSObject
+@interface CDERebaser : NSObject
 
 @property (nonatomic, readonly) CDEEventStore *eventStore;
 @property (nonatomic, weak, readwrite) CDEPersistentStoreEnsemble *ensemble;
 
 - (instancetype)initWithEventStore:(CDEEventStore *)eventStore;
 
-- (BOOL)baselineNeedsConsolidation;
-- (void)consolidateBaselineWithCompletion:(CDECompletionBlock)completion;
+- (CGFloat)estimatedEventStoreCompactionFollowingRebase;
+- (BOOL)shouldRebase;
+
+- (void)rebaseWithCompletion:(CDECompletionBlock)completion;
 
 @end

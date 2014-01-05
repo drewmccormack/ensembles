@@ -1,6 +1,6 @@
 //
 //  CDEPersistentStoreEnsembleTests.m
-//  Ensembles Mac
+//  Ensembles
 //
 //  Created by Drew McCormack on 25/09/13.
 //  Copyright (c) 2013 Drew McCormack. All rights reserved.
