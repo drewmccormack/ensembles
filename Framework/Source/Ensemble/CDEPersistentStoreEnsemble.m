@@ -134,6 +134,8 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
 
 - (void)dealloc
 {
+    [(id)self.cloudFileSystem removeObserver:self forKeyPath:@"identityToken"];
+
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [saveMonitor stopMonitoring];
 }
