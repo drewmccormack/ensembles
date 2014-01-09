@@ -185,20 +185,20 @@
     if (!rootDirectoryURL) return;
     
     // Determine downloading key and set the appropriate predicate. This is OS dependent.
-    NSPredicate *metaDataPredicate = nil;
+    NSPredicate *metadataPredicate = nil;
     
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED < 30000) && (__MAC_OS_X_VERSION_MIN_REQUIRED < 1090)
-    metaDataPredicate = [NSPredicate predicateWithFormat:@"%K = FALSE AND %K = FALSE AND %K ENDSWITH '.cdeevent' AND %K BEGINSWITH %@",
+    metadataPredicate = [NSPredicate predicateWithFormat:@"%K = FALSE AND %K = FALSE AND %K ENDSWITH '.cdeevent' AND %K BEGINSWITH %@",
                          NSMetadataUbiquitousItemIsDownloadedKey, NSMetadataUbiquitousItemIsDownloadingKey, NSMetadataItemFSNameKey, NSMetadataItemPathKey, rootDirectoryURL.path];
 #else
-    metaDataPredicate = [NSPredicate predicateWithFormat:@"%K = FALSE AND %K != '%@' AND %K ENDSWITH '.cdeevent' AND %K BEGINSWITH %@",
-                         NSMetadataUbiquitousItemDownloadingStatusKey, NSMetadataUbiquitousItemDownloadingStatusDownloaded, NSMetadataUbiquitousItemIsDownloadingKey, NSMetadataItemFSNameKey, NSMetadataItemPathKey, rootDirectoryURL.path];
+    metadataPredicate = [NSPredicate predicateWithFormat:@"%K != %@ AND %K = FALSE AND %K ENDSWITH '.cdeevent' AND %K BEGINSWITH %@",
+                         NSMetadataUbiquitousItemDownloadingStatusKey, NSMetadataUbiquitousItemDownloadingStatusCurrent, NSMetadataUbiquitousItemIsDownloadingKey, NSMetadataItemFSNameKey, NSMetadataItemPathKey, rootDirectoryURL.path];
 #endif
     
     metadataQuery = [[NSMetadataQuery alloc] init];
     metadataQuery.notificationBatchingInterval = 10.0;
     metadataQuery.searchScopes = [NSArray arrayWithObject:NSMetadataQueryUbiquitousDataScope];
-    metadataQuery.predicate = metaDataPredicate;
+    metadataQuery.predicate = metadataPredicate;
     
     NSNotificationCenter *notifationCenter = [NSNotificationCenter defaultCenter];
     [notifationCenter addObserver:self selector:@selector(initiateDownloads:) name:NSMetadataQueryDidFinishGatheringNotification object:metadataQuery];
