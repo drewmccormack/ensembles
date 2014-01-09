@@ -252,9 +252,22 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
     return error;
 }
 
+- (NSError *)notConnectedError
+{
+    NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorConnectionError userInfo:@{NSLocalizedDescriptionKey : @"Attempted to access iCloud when not connected."}];
+    return error;
+}
+
 - (void)fileExistsAtPath:(NSString *)path completion:(void(^)(BOOL exists, BOOL isDirectory, NSError *error))block
 {
     [operationQueue addOperationWithBlock:^{
+        if (!self.isConnected) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (block) block(NO, NO, [self notConnectedError]);
+            });
+            return;
+        }
+        
         NSError *fileCoordinatorError = nil;
         __block NSError *timeoutError = nil;
         __block BOOL coordinatorExecuted = NO;
@@ -289,6 +302,13 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
 - (void)contentsOfDirectoryAtPath:(NSString *)path completion:(void(^)(NSArray *contents, NSError *error))block
 {
     [operationQueue addOperationWithBlock:^{
+        if (!self.isConnected) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (block) block(nil, [self notConnectedError]);
+            });
+            return;
+        }
+        
         NSError *fileCoordinatorError = nil;
         __block NSError *timeoutError = nil;
         __block NSError *fileManagerError = nil;
@@ -350,6 +370,13 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
 - (void)createDirectoryAtPath:(NSString *)path completion:(CDECompletionBlock)block
 {
     [operationQueue addOperationWithBlock:^{
+        if (!self.isConnected) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (block) block([self notConnectedError]);
+            });
+            return;
+        }
+        
         NSError *fileCoordinatorError = nil;
         __block NSError *timeoutError = nil;
         __block NSError *fileManagerError = nil;
@@ -383,6 +410,13 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
 - (void)removeItemAtPath:(NSString *)path completion:(CDECompletionBlock)block
 {
     [operationQueue addOperationWithBlock:^{
+        if (!self.isConnected) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (block) block([self notConnectedError]);
+            });
+            return;
+        }
+        
         NSError *fileCoordinatorError = nil;
         __block NSError *timeoutError = nil;
         __block NSError *fileManagerError = nil;
@@ -416,6 +450,13 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
 - (void)uploadLocalFile:(NSString *)fromPath toPath:(NSString *)toPath completion:(CDECompletionBlock)block
 {
     [operationQueue addOperationWithBlock:^{
+        if (!self.isConnected) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (block) block([self notConnectedError]);
+            });
+            return;
+        }
+        
         NSError *fileCoordinatorError = nil;
         __block NSError *timeoutError = nil;
         __block NSError *fileManagerError = nil;
@@ -451,6 +492,13 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
 - (void)downloadFromPath:(NSString *)fromPath toLocalFile:(NSString *)toPath completion:(CDECompletionBlock)block
 {
     [operationQueue addOperationWithBlock:^{
+        if (!self.isConnected) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (block) block([self notConnectedError]);
+            });
+            return;
+        }
+        
         NSError *fileCoordinatorError = nil;
         __block NSError *timeoutError = nil;
         __block NSError *fileManagerError = nil;
