@@ -184,20 +184,21 @@
  
     if (!rootDirectoryURL) return;
     
-    // Determine downloading key. This is OS dependent.
-    NSString *isDownloadedKey = nil;
+    // Determine downloading key and set the appropriate predicate. This is OS dependent.
+    NSPredicate *metaDataPredicate = nil;
     
-    #if (__IPHONE_OS_VERSION_MIN_REQUIRED < 30000) && (__MAC_OS_X_VERSION_MIN_REQUIRED < 1090)
-        isDownloadedKey = NSMetadataUbiquitousItemIsDownloadedKey;
-    #else
-        isDownloadedKey = NSMetadataUbiquitousItemDownloadingStatusDownloaded;
-    #endif
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED < 30000) && (__MAC_OS_X_VERSION_MIN_REQUIRED < 1090)
+    metaDataPredicate = [NSPredicate predicateWithFormat:@"%K = FALSE AND %K = FALSE AND %K ENDSWITH '.cdeevent' AND %K BEGINSWITH %@",
+                         NSMetadataUbiquitousItemIsDownloadedKey, NSMetadataUbiquitousItemIsDownloadingKey, NSMetadataItemFSNameKey, NSMetadataItemPathKey, rootDirectoryURL.path];
+#else
+    metaDataPredicate = [NSPredicate predicateWithFormat:@"%K = FALSE AND %K != '%@' AND %K ENDSWITH '.cdeevent' AND %K BEGINSWITH %@",
+                         NSMetadataUbiquitousItemDownloadingStatusKey, NSMetadataUbiquitousItemDownloadingStatusDownloaded, NSMetadataUbiquitousItemIsDownloadingKey, NSMetadataItemFSNameKey, NSMetadataItemPathKey, rootDirectoryURL.path];
+#endif
     
     metadataQuery = [[NSMetadataQuery alloc] init];
     metadataQuery.notificationBatchingInterval = 10.0;
     metadataQuery.searchScopes = [NSArray arrayWithObject:NSMetadataQueryUbiquitousDataScope];
-    metadataQuery.predicate = [NSPredicate predicateWithFormat:@"%K = FALSE AND %K = FALSE AND %K ENDSWITH '.cdeevent' AND %K BEGINSWITH %@",
-        isDownloadedKey, NSMetadataUbiquitousItemIsDownloadingKey, NSMetadataItemFSNameKey, NSMetadataItemPathKey, rootDirectoryURL.path];
+    metadataQuery.predicate = metaDataPredicate;
     
     NSNotificationCenter *notifationCenter = [NSNotificationCenter defaultCenter];
     [notifationCenter addObserver:self selector:@selector(initiateDownloads:) name:NSMetadataQueryDidFinishGatheringNotification object:metadataQuery];
