@@ -66,12 +66,11 @@
 - (void)performInitialPreparation:(CDECompletionBlock)completion
 {
     if (fileManager.ubiquityIdentityToken) {
-        [self setupRootDirectory:^{
+        [self setupRootDirectory:^(NSError *error) {
             [self startMonitoringMetadata];
             [self addUbiquityContainerNotificationObservers];
-            
             dispatch_async(dispatch_get_main_queue(), ^{
-                if (completion) completion(nil);
+                if (completion) completion(error);
             });
         }];
     }
@@ -85,14 +84,19 @@
 
 #pragma mark - Root Directory
 
-- (void)setupRootDirectory:(CDECodeBlock)completion
+- (void)setupRootDirectory:(CDECompletionBlock)completion
 {
     [operationQueue addOperationWithBlock:^{
         NSURL *newURL = [fileManager URLForUbiquityContainerIdentifier:ubiquityContainerIdentifier];
         newURL = [newURL URLByAppendingPathComponent:@"com.mentalfaculty.ensembles.clouddata"];
         rootDirectoryURL = newURL;
-        NSAssert(rootDirectoryURL, @"Could not retrieve URLForUbiquityContainerIdentifier. Check container id for iCloud");
-                 
+        if (!rootDirectoryURL) {
+            NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeServerError userInfo:@{NSLocalizedDescriptionKey : @"Could not retrieve URLForUbiquityContainerIdentifier. Check container id for iCloud."}];
+            CDELog(CDELoggingLevelError, @"Failed to get the URL of the iCloud ubiquity container: %@", error);
+            [self dispatchCompletion:completion withError:error];
+            return;
+        }
+        
         NSError *error = nil;
         __block BOOL fileExistsAtPath = NO;
         __block BOOL existingFileIsDirectory = NO;
@@ -100,9 +104,12 @@
         [coordinator coordinateReadingItemAtURL:rootDirectoryURL options:NSFileCoordinatorReadingWithoutChanges error:&error byAccessor:^(NSURL *newURL) {
             fileExistsAtPath = [fileManager fileExistsAtPath:newURL.path isDirectory:&existingFileIsDirectory];
         }];
-        if (error) CDELog(CDELoggingLevelWarning, @"File coordinator error: %@", error);
+        if (error) {
+            CDELog(CDELoggingLevelWarning, @"File coordinator error: %@", error);
+            [self dispatchCompletion:completion withError:error];
+            return;
+        }
         
-        error = nil;
         if (!fileExistsAtPath) {
             [coordinator coordinateWritingItemAtURL:rootDirectoryURL options:0 error:&error byAccessor:^(NSURL *newURL) {
                 [fileManager createDirectoryAtURL:newURL withIntermediateDirectories:YES attributes:nil error:NULL];
@@ -116,10 +123,15 @@
         }
         if (error) CDELog(CDELoggingLevelWarning, @"File coordinator error: %@", error);
         
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            if (completion) completion();
-        });
+        [self dispatchCompletion:completion withError:error];
     }];
+}
+
+- (void)dispatchCompletion:(CDECompletionBlock)completion withError:(NSError *)error
+{
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        if (completion) completion(error);
+    });
 }
 
 - (NSString *)fullPathForPath:(NSString *)path
