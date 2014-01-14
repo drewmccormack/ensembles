@@ -11,6 +11,11 @@
 #import "CDEEventStore.h"
 #import "CDEStoreModificationEvent.h"
 #import "CDEObjectChange.h"
+#import "CDEEventRevision.h"
+#import "CDERevisionManager.h"
+#import "CDERevisionSet.h"
+#import "CDERevision.h"
+
 
 @implementation CDERebaser
 
@@ -62,6 +67,33 @@
 - (void)rebaseWithCompletion:(CDECompletionBlock)completion
 {
     
+}
+
+- (CDEGlobalCount)globalCountForNewBaseline
+{
+    CDERevisionManager *revisionManager = [[CDERevisionManager alloc] initWithEventStore:self.eventStore];
+    CDERevisionSet *latestRevisionSet = [revisionManager revisionSetOfMostRecentEvents];
+    
+    // We will remove any store that hasn't updated since the existing baseline
+    NSManagedObjectContext *context = eventStore.managedObjectContext;
+    CDEStoreModificationEvent *baselineEvent = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:context];
+    CDERevisionSet *baselineRevisionSet = baselineEvent.revisionSet;
+    
+    // Baseline count is minimum of count from all devices
+    CDEGlobalCount baselineCount = NSNotFound;
+    for (CDERevision *revision in latestRevisionSet.revisions) {
+        // Ignore stores that haven't updated since the baseline
+        // They will have to re-leech
+        NSString *storeId = revision.persistentStoreIdentifier;
+        CDERevision *baselineRevision = [baselineRevisionSet revisionForPersistentStoreIdentifier:storeId];
+        if (!baselineRevision || baselineRevision.revisionNumber >= revision.revisionNumber) continue;
+        
+        // Find the minimum global count
+        baselineCount = MIN(baselineCount, revision.revisionNumber);
+    }
+    if (baselineCount == NSNotFound) baselineCount = -1;
+    
+    return baselineCount;
 }
 
 

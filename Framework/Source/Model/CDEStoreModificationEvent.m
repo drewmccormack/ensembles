@@ -71,8 +71,12 @@
 {
     NSFetchRequest *fetch = [[NSFetchRequest alloc] initWithEntityName:@"CDEStoreModificationEvent"];
     fetch.predicate = [NSPredicate predicateWithFormat:@"uniqueIdentifier = %@", uniqueId];
-    NSArray *events = [context executeFetchRequest:fetch error:NULL];
+    
+    NSError *error;
+    NSArray *events = [context executeFetchRequest:fetch error:&error];
+    NSAssert(events, @"Could not fetch store mod events: %@", error);
     NSAssert(events.count < 2, @"CDEStoreModificationEvent is not unique in fetchStoreModification...");
+    
     return events.lastObject;
 }
 
@@ -82,7 +86,10 @@
     
     NSFetchRequest *fetch = [[NSFetchRequest alloc] initWithEntityName:@"CDEStoreModificationEvent"];
     fetch.predicate = [NSPredicate predicateWithFormat:@"eventRevision.persistentStoreIdentifier = %@ && eventRevision.revisionNumber = %lld", persistentStoreId, revision];
-    NSArray *events = [context executeFetchRequest:fetch error:NULL];
+    
+    NSError *error;
+    NSArray *events = [context executeFetchRequest:fetch error:&error];
+    NSAssert(events, @"Could not fetch store mod events: %@", error);
     NSAssert(events.count < 2, @"Multiple events with same revision");
 
     return events.lastObject;
@@ -92,8 +99,25 @@
 {
     NSFetchRequest *fetch = [[NSFetchRequest alloc] initWithEntityName:@"CDEStoreModificationEvent"];
     fetch.predicate = [NSPredicate predicateWithFormat:@"eventRevision.persistentStoreIdentifier = %@ && eventRevision.revisionNumber > %lld", persistentStoreId, revision];
-    NSArray *events = [context executeFetchRequest:fetch error:NULL];
+
+    NSError *error;
+    NSArray *events = [context executeFetchRequest:fetch error:&error];
+    NSAssert(events, @"Could not fetch store mod events: %@", error);
+    
     return events;
+}
+
++ (instancetype)fetchBaselineStoreModificationEventInManagedObjectContext:(NSManagedObjectContext *)context
+{
+    NSFetchRequest *fetch = [[NSFetchRequest alloc] initWithEntityName:@"CDEStoreModificationEvent"];
+    fetch.predicate = [NSPredicate predicateWithFormat:@"type = %d", CDEStoreModificationEventTypeBaseline];
+    
+    NSError *error;
+    NSArray *events = [context executeFetchRequest:fetch error:&error];
+    NSAssert(events, @"Could not fetch store mod events: %@", error);
+    NSAssert(events.count < 2, @"Multiple baselines found");
+    
+    return events.lastObject;
 }
 
 + (void)prefetchRelatedObjectsForStoreModificationEvents:(NSArray *)storeModEvents
