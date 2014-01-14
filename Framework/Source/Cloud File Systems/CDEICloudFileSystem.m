@@ -66,12 +66,11 @@
 - (void)performInitialPreparation:(CDECompletionBlock)completion
 {
     if (fileManager.ubiquityIdentityToken) {
-        [self setupRootDirectory:^{
+        [self setupRootDirectory:^(NSError *error) {
             [self startMonitoringMetadata];
             [self addUbiquityContainerNotificationObservers];
-            
             dispatch_async(dispatch_get_main_queue(), ^{
-                if (completion) completion(nil);
+                if (completion) completion(error);
             });
         }];
     }
@@ -85,14 +84,19 @@
 
 #pragma mark - Root Directory
 
-- (void)setupRootDirectory:(CDECodeBlock)completion
+- (void)setupRootDirectory:(CDECompletionBlock)completion
 {
     [operationQueue addOperationWithBlock:^{
         NSURL *newURL = [fileManager URLForUbiquityContainerIdentifier:ubiquityContainerIdentifier];
         newURL = [newURL URLByAppendingPathComponent:@"com.mentalfaculty.ensembles.clouddata"];
         rootDirectoryURL = newURL;
-        NSAssert(rootDirectoryURL, @"Could not retrieve URLForUbiquityContainerIdentifier. Check container id for iCloud");
-                 
+        if (!rootDirectoryURL) {
+            NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeServerError userInfo:@{NSLocalizedDescriptionKey : @"Could not retrieve URLForUbiquityContainerIdentifier. Check container id for iCloud."}];
+            CDELog(CDELoggingLevelError, @"Failed to get the URL of the iCloud ubiquity container: %@", error);
+            [self dispatchCompletion:completion withError:error];
+            return;
+        }
+        
         NSError *error = nil;
         __block BOOL fileExistsAtPath = NO;
         __block BOOL existingFileIsDirectory = NO;
@@ -100,9 +104,12 @@
         [coordinator coordinateReadingItemAtURL:rootDirectoryURL options:NSFileCoordinatorReadingWithoutChanges error:&error byAccessor:^(NSURL *newURL) {
             fileExistsAtPath = [fileManager fileExistsAtPath:newURL.path isDirectory:&existingFileIsDirectory];
         }];
-        if (error) CDELog(CDELoggingLevelWarning, @"File coordinator error: %@", error);
+        if (error) {
+            CDELog(CDELoggingLevelWarning, @"File coordinator error: %@", error);
+            [self dispatchCompletion:completion withError:error];
+            return;
+        }
         
-        error = nil;
         if (!fileExistsAtPath) {
             [coordinator coordinateWritingItemAtURL:rootDirectoryURL options:0 error:&error byAccessor:^(NSURL *newURL) {
                 [fileManager createDirectoryAtURL:newURL withIntermediateDirectories:YES attributes:nil error:NULL];
@@ -116,10 +123,15 @@
         }
         if (error) CDELog(CDELoggingLevelWarning, @"File coordinator error: %@", error);
         
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            if (completion) completion();
-        });
+        [self dispatchCompletion:completion withError:error];
     }];
+}
+
+- (void)dispatchCompletion:(CDECompletionBlock)completion withError:(NSError *)error
+{
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        if (completion) completion(error);
+    });
 }
 
 - (NSString *)fullPathForPath:(NSString *)path
@@ -172,20 +184,21 @@
  
     if (!rootDirectoryURL) return;
     
-    // Determine downloading key. This is OS dependent.
-    NSString *isDownloadedKey = nil;
+    // Determine downloading key and set the appropriate predicate. This is OS dependent.
+    NSPredicate *metadataPredicate = nil;
     
-    #if (__IPHONE_OS_VERSION_MIN_REQUIRED < 30000) && (__MAC_OS_X_VERSION_MIN_REQUIRED < 1090)
-        isDownloadedKey = NSMetadataUbiquitousItemIsDownloadedKey;
-    #else
-        isDownloadedKey = NSMetadataUbiquitousItemDownloadingStatusDownloaded;
-    #endif
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED < 30000) && (__MAC_OS_X_VERSION_MIN_REQUIRED < 1090)
+    metadataPredicate = [NSPredicate predicateWithFormat:@"%K = FALSE AND %K = FALSE AND %K ENDSWITH '.cdeevent' AND %K BEGINSWITH %@",
+                         NSMetadataUbiquitousItemIsDownloadedKey, NSMetadataUbiquitousItemIsDownloadingKey, NSMetadataItemFSNameKey, NSMetadataItemPathKey, rootDirectoryURL.path];
+#else
+    metadataPredicate = [NSPredicate predicateWithFormat:@"%K != %@ AND %K = FALSE AND %K ENDSWITH '.cdeevent' AND %K BEGINSWITH %@",
+                         NSMetadataUbiquitousItemDownloadingStatusKey, NSMetadataUbiquitousItemDownloadingStatusCurrent, NSMetadataUbiquitousItemIsDownloadingKey, NSMetadataItemFSNameKey, NSMetadataItemPathKey, rootDirectoryURL.path];
+#endif
     
     metadataQuery = [[NSMetadataQuery alloc] init];
     metadataQuery.notificationBatchingInterval = 10.0;
     metadataQuery.searchScopes = [NSArray arrayWithObject:NSMetadataQueryUbiquitousDataScope];
-    metadataQuery.predicate = [NSPredicate predicateWithFormat:@"%K = FALSE AND %K = FALSE AND %K ENDSWITH '.cdeevent' AND %K BEGINSWITH %@",
-        isDownloadedKey, NSMetadataUbiquitousItemIsDownloadingKey, NSMetadataItemFSNameKey, NSMetadataItemPathKey, rootDirectoryURL.path];
+    metadataQuery.predicate = metadataPredicate;
     
     NSNotificationCenter *notifationCenter = [NSNotificationCenter defaultCenter];
     [notifationCenter addObserver:self selector:@selector(initiateDownloads:) name:NSMetadataQueryDidFinishGatheringNotification object:metadataQuery];
@@ -240,9 +253,22 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
     return error;
 }
 
+- (NSError *)notConnectedError
+{
+    NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorConnectionError userInfo:@{NSLocalizedDescriptionKey : @"Attempted to access iCloud when not connected."}];
+    return error;
+}
+
 - (void)fileExistsAtPath:(NSString *)path completion:(void(^)(BOOL exists, BOOL isDirectory, NSError *error))block
 {
     [operationQueue addOperationWithBlock:^{
+        if (!self.isConnected) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (block) block(NO, NO, [self notConnectedError]);
+            });
+            return;
+        }
+        
         NSError *fileCoordinatorError = nil;
         __block NSError *timeoutError = nil;
         __block BOOL coordinatorExecuted = NO;
@@ -277,6 +303,13 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
 - (void)contentsOfDirectoryAtPath:(NSString *)path completion:(void(^)(NSArray *contents, NSError *error))block
 {
     [operationQueue addOperationWithBlock:^{
+        if (!self.isConnected) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (block) block(nil, [self notConnectedError]);
+            });
+            return;
+        }
+        
         NSError *fileCoordinatorError = nil;
         __block NSError *timeoutError = nil;
         __block NSError *fileManagerError = nil;
@@ -338,6 +371,13 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
 - (void)createDirectoryAtPath:(NSString *)path completion:(CDECompletionBlock)block
 {
     [operationQueue addOperationWithBlock:^{
+        if (!self.isConnected) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (block) block([self notConnectedError]);
+            });
+            return;
+        }
+        
         NSError *fileCoordinatorError = nil;
         __block NSError *timeoutError = nil;
         __block NSError *fileManagerError = nil;
@@ -371,6 +411,13 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
 - (void)removeItemAtPath:(NSString *)path completion:(CDECompletionBlock)block
 {
     [operationQueue addOperationWithBlock:^{
+        if (!self.isConnected) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (block) block([self notConnectedError]);
+            });
+            return;
+        }
+        
         NSError *fileCoordinatorError = nil;
         __block NSError *timeoutError = nil;
         __block NSError *fileManagerError = nil;
@@ -404,6 +451,13 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
 - (void)uploadLocalFile:(NSString *)fromPath toPath:(NSString *)toPath completion:(CDECompletionBlock)block
 {
     [operationQueue addOperationWithBlock:^{
+        if (!self.isConnected) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (block) block([self notConnectedError]);
+            });
+            return;
+        }
+        
         NSError *fileCoordinatorError = nil;
         __block NSError *timeoutError = nil;
         __block NSError *fileManagerError = nil;
@@ -439,6 +493,13 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
 - (void)downloadFromPath:(NSString *)fromPath toLocalFile:(NSString *)toPath completion:(CDECompletionBlock)block
 {
     [operationQueue addOperationWithBlock:^{
+        if (!self.isConnected) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (block) block([self notConnectedError]);
+            });
+            return;
+        }
+        
         NSError *fileCoordinatorError = nil;
         __block NSError *timeoutError = nil;
         __block NSError *fileManagerError = nil;
