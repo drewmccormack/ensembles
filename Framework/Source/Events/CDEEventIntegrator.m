@@ -247,7 +247,7 @@
     __block NSUInteger count = 0;
     [self.eventStore.managedObjectContext performBlockAndWait:^{
         NSFetchRequest *fetch = [[NSFetchRequest alloc] initWithEntityName:@"CDEStoreModificationEvent"];
-        fetch.predicate = [NSPredicate predicateWithFormat:@"eventRevision.persistentStoreIdentifier = %@ && eventRevision.revisionNumber = %lld", self.eventStore.persistentStoreIdentifier, revision.revisionNumber];
+        fetch.predicate = [NSPredicate predicateWithFormat:@"eventRevision.persistentStoreIdentifier = %@ && eventRevision.revisionNumber = %lld && type != %d", self.eventStore.persistentStoreIdentifier, revision.revisionNumber, CDEStoreModificationEventTypeBaseline];
         count = [self.eventStore.managedObjectContext countForFetchRequest:fetch error:NULL];
     }];
     return count == 1;

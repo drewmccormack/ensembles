@@ -66,7 +66,12 @@
 
 - (void)rebaseWithCompletion:(CDECompletionBlock)completion
 {
+    CDEGlobalCount newBaselineGlobalCount = [self globalCountForNewBaseline];
     
+    NSManagedObjectContext *context = eventStore.managedObjectContext;
+    [context performBlockAndWait:^{
+        NSArray *eventsToMerge = [CDEStoreModificationEvent fetchNonBaselineStoreModificationEventsUpToGlobalCount:newBaselineGlobalCount inManagedObjectContext:context];
+    }];
 }
 
 - (CDEGlobalCount)globalCountForNewBaseline

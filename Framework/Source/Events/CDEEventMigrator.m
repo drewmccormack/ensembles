@@ -261,7 +261,7 @@ static NSString *kCDEDefaultStoreType;
 - (CDEStoreModificationEvent *)localEventWithRevisionNumber:(CDERevisionNumber)revisionNumber error:(NSError * __autoreleasing *)error
 {
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
-    fetch.predicate = [NSPredicate predicateWithFormat:@"eventRevision.revisionNumber = %lld AND eventRevision.persistentStoreIdentifier = %@", revisionNumber, eventStore.persistentStoreIdentifier];
+    fetch.predicate = [NSPredicate predicateWithFormat:@"eventRevision.revisionNumber = %lld AND eventRevision.persistentStoreIdentifier = %@ && type != %d", revisionNumber, eventStore.persistentStoreIdentifier, CDEStoreModificationEventTypeBaseline];
     NSArray *storeModEvents = [eventStore.managedObjectContext executeFetchRequest:fetch error:error];
     return [storeModEvents lastObject];
 }
@@ -269,7 +269,7 @@ static NSString *kCDEDefaultStoreType;
 - (NSArray *)storeModificationEventsCreatedLocallySinceRevisionNumber:(CDERevisionNumber)revisionNumber error:(NSError * __autoreleasing *)error
 {
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
-    fetch.predicate = [NSPredicate predicateWithFormat:@"eventRevision.revisionNumber > %lld AND eventRevision.persistentStoreIdentifier = %@", revisionNumber, eventStore.persistentStoreIdentifier];
+    fetch.predicate = [NSPredicate predicateWithFormat:@"eventRevision.revisionNumber > %lld AND eventRevision.persistentStoreIdentifier = %@ && type != %d", revisionNumber, eventStore.persistentStoreIdentifier, CDEStoreModificationEventTypeBaseline];
     NSArray *storeModEvents = [eventStore.managedObjectContext executeFetchRequest:fetch error:error];
     return storeModEvents;
 }

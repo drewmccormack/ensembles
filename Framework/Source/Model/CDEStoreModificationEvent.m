@@ -12,6 +12,8 @@
 #import "CDEEventRevision.h"
 #import "CDERevisionSet.h"
 #import "CDERevision.h"
+#import "CDERevisionManager.h"
+
 
 @implementation CDEStoreModificationEvent
 
@@ -85,7 +87,7 @@
     if (persistentStoreId == nil || revision < 0) return nil;
     
     NSFetchRequest *fetch = [[NSFetchRequest alloc] initWithEntityName:@"CDEStoreModificationEvent"];
-    fetch.predicate = [NSPredicate predicateWithFormat:@"eventRevision.persistentStoreIdentifier = %@ && eventRevision.revisionNumber = %lld", persistentStoreId, revision];
+    fetch.predicate = [NSPredicate predicateWithFormat:@"eventRevision.persistentStoreIdentifier = %@ && eventRevision.revisionNumber = %lld && type != %d", persistentStoreId, revision, CDEStoreModificationEventTypeBaseline];
     
     NSError *error;
     NSArray *events = [context executeFetchRequest:fetch error:&error];
@@ -98,7 +100,7 @@
 + (NSArray *)fetchStoreModificationEventsForPersistentStoreIdentifier:(NSString *)persistentStoreId sinceRevisionNumber:(CDERevisionNumber)revision inManagedObjectContext:(NSManagedObjectContext *)context
 {
     NSFetchRequest *fetch = [[NSFetchRequest alloc] initWithEntityName:@"CDEStoreModificationEvent"];
-    fetch.predicate = [NSPredicate predicateWithFormat:@"eventRevision.persistentStoreIdentifier = %@ && eventRevision.revisionNumber > %lld", persistentStoreId, revision];
+    fetch.predicate = [NSPredicate predicateWithFormat:@"eventRevision.persistentStoreIdentifier = %@ && eventRevision.revisionNumber > %lld && type != %d", persistentStoreId, revision, CDEStoreModificationEventTypeBaseline];
 
     NSError *error;
     NSArray *events = [context executeFetchRequest:fetch error:&error];
@@ -118,6 +120,16 @@
     NSAssert(events.count < 2, @"Multiple baselines found");
     
     return events.lastObject;
+}
+
++ (NSArray *)fetchNonBaselineStoreModificationEventsUpToGlobalCount:(CDEGlobalCount)globalCount inManagedObjectContext:(NSManagedObjectContext *)context
+{
+    NSError *error;
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
+    fetch.predicate = [NSPredicate predicateWithFormat:@"type != %d AND globalCount <= %lld", CDEStoreModificationEventTypeBaseline, globalCount];
+    NSArray *events = [context executeFetchRequest:fetch error:&error];
+    NSAssert(events, @"Fetch of events up to global count failed: %@", error);
+    return [CDERevisionManager sortStoreModificationEvents:events];
 }
 
 + (void)prefetchRelatedObjectsForStoreModificationEvents:(NSArray *)storeModEvents
