@@ -173,7 +173,7 @@
     ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"testensemble" persistentStorePath:ensemble.storePath managedObjectModelURL:ensemble.managedObjectModelURL cloudFileSystem:(id)cloudFileSystem];
     ensemble.delegate = self;
     
-    [self performSelector:@selector(checkForDeleech) withObject:nil afterDelay:0.05];
+    [self performSelector:@selector(checkForDeleech) withObject:nil afterDelay:0.1];
     [self waitForAsync];
 }
 
