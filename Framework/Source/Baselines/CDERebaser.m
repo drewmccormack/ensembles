@@ -76,8 +76,11 @@
     
     // We will remove any store that hasn't updated since the existing baseline
     NSManagedObjectContext *context = eventStore.managedObjectContext;
-    CDEStoreModificationEvent *baselineEvent = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:context];
-    CDERevisionSet *baselineRevisionSet = baselineEvent.revisionSet;
+    __block CDERevisionSet *baselineRevisionSet;
+    [context performBlockAndWait:^{
+        CDEStoreModificationEvent *baselineEvent = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:context];
+        baselineRevisionSet = baselineEvent.revisionSet;
+    }];
     
     // Baseline count is minimum of count from all devices
     CDEGlobalCount baselineCount = NSNotFound;
