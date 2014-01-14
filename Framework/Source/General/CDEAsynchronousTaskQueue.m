@@ -79,10 +79,6 @@
 
     taskEnumerator = [tasks objectEnumerator];
     [self performSelector:@selector(startNextTask) withObject:nil afterDelay:0.0];
-    
-//    while (![NSThread isMainThread] && !self.isFinished) {
-//        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
-//    }
 }
 
 - (NSError *)combineErrors
@@ -99,6 +95,11 @@
 
 - (void)startNextTask
 {
+    if (![NSThread isMainThread]) {
+        [self performSelectorOnMainThread:@selector(startNextTask) withObject:nil waitUntilDone:NO];
+        return;
+    }
+    
     @autoreleasepool {
         if (self.isCancelled) {
             [self performSelector:@selector(finish) withObject:nil afterDelay:0.0];
@@ -133,6 +134,11 @@
 
 - (void)finish
 {
+    if (![NSThread isMainThread]) {
+        [self performSelectorOnMainThread:@selector(finish) withObject:nil waitUntilDone:NO];
+        return;
+    }
+    
     NSError *error = nil;
     NSError *lastError = errors.lastObject;
     if ((id)lastError == [NSNull null]) lastError = nil;
