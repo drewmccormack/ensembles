@@ -99,23 +99,28 @@
         // Prefetch
         [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:eventsToMerge];
         
-        // Merge events
+        // Check that no events are older than the baseline
         CDERevisionSet *baselineRevisionSet = baseline.revisionSet;
-        CDERevisionSet *newRevisionSet = baselineRevisionSet;
-        for (CDEStoreModificationEvent *event in eventsToMerge) {
+        __block CDERevisionSet *newRevisionSet = baselineRevisionSet;
+        eventsToMerge = [eventsToMerge filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(CDEStoreModificationEvent *event, NSDictionary *bindings) {
             CDERevisionSet *eventRevisionSet = event.revisionSet;
-            
-            // Check that event comes after baseline
-            if ([eventRevisionSet compare:baselineRevisionSet] == NSOrderedAscending) continue;
-            
-            // Merge event
-            
-            
-            
-            
-            
-            // Get lastest revisions
+            BOOL preceedsBaseline = ([eventRevisionSet compare:baselineRevisionSet] == NSOrderedAscending);
             newRevisionSet = [newRevisionSet revisionSetByTakingStoreWiseMaximumWithRevisionSet:event.revisionSet];
+            return preceedsBaseline;
+        }]];
+        
+        // Fetch object changes
+        NSError *error;
+        NSArray *allEvents = [eventsToMerge arrayByAddingObject:baseline];
+        NSFetchRequest *changesFetch = [[NSFetchRequest alloc] initWithEntityName:@"CDEObjectChange"];
+        changesFetch.predicate = [NSPredicate predicateWithFormat:@"storeModificationEvent IN %@", allEvents];
+        
+        NSArray *objectChanges = [context executeFetchRequest:changesFetch error:&error];
+        if (!objectChanges) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (completion) completion(error);
+            });
+            return;
         }
         
         // Set new count and timestamp
@@ -136,7 +141,6 @@
         for (CDEStoreModificationEvent *event in eventsToMerge) [context deleteObject:event];
 
         // Save
-        NSError *error;
         if (![context save:&error]) CDELog(CDELoggingLevelError, @"Failed to save rebase: %@", error);
     }];
 }
