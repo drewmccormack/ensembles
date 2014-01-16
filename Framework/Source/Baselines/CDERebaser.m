@@ -92,22 +92,14 @@
         if (!baseline) {
             baseline = [NSEntityDescription insertNewObjectForEntityForName:@"CDEStoreModificationEvent" inManagedObjectContext:context];
             baseline.type = CDEStoreModificationEventTypeBaseline;
-            baseline.globalCount = -1;
             baseline.modelVersion = [self.ensemble.managedObjectModel cde_entityHashesPropertyList];
         }
         
         // Prefetch
         [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:eventsToMerge];
         
-        // Check that no events are older than the baseline
-        CDERevisionSet *baselineRevisionSet = baseline.revisionSet;
-        __block CDERevisionSet *newRevisionSet = baselineRevisionSet;
-        eventsToMerge = [eventsToMerge filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(CDEStoreModificationEvent *event, NSDictionary *bindings) {
-            CDERevisionSet *eventRevisionSet = event.revisionSet;
-            BOOL preceedsBaseline = ([eventRevisionSet compare:baselineRevisionSet] == NSOrderedAscending);
-            newRevisionSet = [newRevisionSet revisionSetByTakingStoreWiseMaximumWithRevisionSet:event.revisionSet];
-            return preceedsBaseline;
-        }]];
+        // Temporarily ensure baseline preceeds all events
+        baseline.globalCount = -1;
         
         // Fetch object changes
         NSError *error;
@@ -128,14 +120,9 @@
         baseline.timestamp = [NSDate timeIntervalSinceReferenceDate];
         
         // Update revisions
+        CDERevisionSet *newRevisionSet = [CDERevisionSet revisionSetByTakingStoreWiseMaximumOfRevisionSets:[eventsToMerge valueForKeyPath:@"revisionSet"]];
         NSString *persistentStoreId = self.eventStore.persistentStoreIdentifier;
-        CDERevision *revision = [newRevisionSet revisionForPersistentStoreIdentifier:persistentStoreId];
-        CDERevisionNumber revisionNumber = revision ? revision.revisionNumber : -1;
-        CDEEventRevision *eventRevision = [CDEEventRevision makeEventRevisionForPersistentStoreIdentifier:persistentStoreId revisionNumber:revisionNumber inManagedObjectContext:context];
-        baseline.eventRevision = eventRevision;
-        
-        [newRevisionSet removeRevisionForPersistentStoreIdentifier:persistentStoreId];
-        baseline.eventRevisionsOfOtherStores = [CDEEventRevision makeEventRevisionsForRevisionSet:newRevisionSet inManagedObjectContext:context];
+        [baseline setRevisionSet:newRevisionSet forPersistentStoreIdentifier:persistentStoreId];
         
         // Delete merged events
         for (CDEStoreModificationEvent *event in eventsToMerge) [context deleteObject:event];
@@ -165,7 +152,7 @@
         // They will have to re-leech
         NSString *storeId = revision.persistentStoreIdentifier;
         CDERevision *baselineRevision = [baselineRevisionSet revisionForPersistentStoreIdentifier:storeId];
-        if (!baselineRevision || baselineRevision.revisionNumber >= revision.revisionNumber) continue;
+        if (baselineRevision && baselineRevision.revisionNumber >= revision.revisionNumber) continue;
         
         // Find the minimum global count
         baselineCount = MIN(baselineCount, revision.revisionNumber);

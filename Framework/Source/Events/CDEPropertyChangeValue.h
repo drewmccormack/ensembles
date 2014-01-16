@@ -39,4 +39,6 @@ typedef NS_ENUM(NSInteger, CDEPropertyChangeType) {
 
 - (void)updateWithObject:(NSManagedObject *)object isPreSave:(BOOL)isPreSave storeValues:(BOOL)storeValues;
 
+- (void)mergeToManyRelationshipFromPropertyChangeValue:(CDEPropertyChangeValue *)propertyValue;
+
 @end

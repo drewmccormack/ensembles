@@ -51,6 +51,26 @@
     return set;
 }
 
+- (void)setRevisionSet:(CDERevisionSet *)newRevisionSet forPersistentStoreIdentifier:(NSString *)persistentStoreId
+{
+    NSManagedObjectContext *context = self.managedObjectContext;
+    
+    CDERevision *localRevision = [newRevisionSet revisionForPersistentStoreIdentifier:persistentStoreId];
+    [newRevisionSet removeRevisionForPersistentStoreIdentifier:persistentStoreId];
+    
+    [self deleteEventRevisions];
+    
+    CDEEventRevision *eventRevision = [NSEntityDescription insertNewObjectForEntityForName:@"CDEEventRevision" inManagedObjectContext:context];
+    eventRevision.persistentStoreIdentifier = persistentStoreId;
+    eventRevision.revisionNumber = localRevision ? localRevision.revisionNumber : -1;
+    eventRevision.storeModificationEvent = self;
+    
+    self.eventRevision = eventRevision;
+    self.eventRevisionsOfOtherStores = [CDEEventRevision makeEventRevisionsForRevisionSet:newRevisionSet inManagedObjectContext:context];
+    
+    if (localRevision) [newRevisionSet addRevision:localRevision]; // Add back removed revision
+}
+
 - (void)setRevisionSetOfOtherStoresAtCreation:(CDERevisionSet *)newSet
 {
     NSSet *eventRevisions = [CDEEventRevision makeEventRevisionsForRevisionSet:newSet inManagedObjectContext:self.managedObjectContext];
@@ -64,6 +84,17 @@
         [set addRevision:rev.revision];
     }
     return set;
+}
+
+- (void)deleteEventRevisions
+{
+    NSManagedObjectContext *context = self.managedObjectContext;
+    if (self.eventRevision) [context deleteObject:self.eventRevision];
+    if (self.eventRevisionsOfOtherStores) {
+        for (CDEEventRevision *eventRev in [self.eventRevisionsOfOtherStores copy]) {
+            [context deleteObject:eventRev];
+        }
+    }
 }
 
 

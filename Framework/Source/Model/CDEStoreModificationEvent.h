@@ -34,6 +34,10 @@ typedef NS_ENUM(int16_t, CDEStoreModificationEventType) {
 @property (nonatomic, copy, readwrite) CDERevisionSet *revisionSetOfOtherStoresAtCreation;
 @property (nonatomic, strong, readonly) CDERevisionSet *revisionSet;
 
+// Working with revisions
+- (void)setRevisionSet:(CDERevisionSet *)newSet forPersistentStoreIdentifier:(NSString *)persistentStoreId;
+- (void)deleteEventRevisions;
+
 // Fetching particular events
 + (instancetype)fetchStoreModificationEventWithUniqueIdentifier:(NSString *)uniqueId inManagedObjectContext:(NSManagedObjectContext *)context;
 + (instancetype)fetchStoreModificationEventForPersistentStoreIdentifier:(NSString *)persistentStoreId revisionNumber:(CDERevisionNumber)revision inManagedObjectContext:(NSManagedObjectContext *)context;

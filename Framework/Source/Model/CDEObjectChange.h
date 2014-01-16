@@ -29,4 +29,6 @@ typedef NS_ENUM(int16_t, CDEObjectChangeType) {
 
 - (CDEPropertyChangeValue *)propertyChangeValueForPropertyName:(NSString *)name;
 
+- (void)mergeValuesFromSubordinateObjectChange:(CDEObjectChange *)change; // Gives priority to values in self
+
 @end

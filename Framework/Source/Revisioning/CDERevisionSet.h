@@ -29,6 +29,7 @@
 
 - (CDERevisionSet *)revisionSetByTakingStoreWiseMinimumWithRevisionSet:(CDERevisionSet *)otherSet;
 - (CDERevisionSet *)revisionSetByTakingStoreWiseMaximumWithRevisionSet:(CDERevisionSet *)otherSet;
++ (CDERevisionSet *)revisionSetByTakingStoreWiseMaximumOfRevisionSets:(NSArray *)sets;
 
 - (NSComparisonResult)compare:(CDERevisionSet *)otherSet;
 

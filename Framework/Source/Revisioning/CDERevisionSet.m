@@ -80,6 +80,9 @@
     [self addRevision:newRevision];
 }
 
+
+#pragma mark Determining Maxima/Minima
+
 - (CDERevisionSet *)revisionSetByReducingRevisionSet:(CDERevisionSet *)otherSet withBlock:(CDERevisionNumber(^)(CDERevisionNumber firstRev, CDERevisionNumber secondRev))block
 {
     NSMutableSet *allStoreIds = [[NSMutableSet alloc] initWithSet:self.persistentStoreIdentifiers];
@@ -126,6 +129,18 @@
         return MAX(firstRev, secondRev);
     }];
 }
+
++ (CDERevisionSet *)revisionSetByTakingStoreWiseMaximumOfRevisionSets:(NSArray *)sets
+{
+    CDERevisionSet *newSet = [[CDERevisionSet alloc] init];
+    for (CDERevisionSet *set in sets) {
+        newSet = [newSet revisionSetByTakingStoreWiseMaximumWithRevisionSet:set];
+    }
+    return newSet;
+}
+
+
+#pragma mark Ordering
 
 - (NSComparisonResult)compare:(CDERevisionSet *)otherSet
 {

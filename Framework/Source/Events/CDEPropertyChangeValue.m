@@ -245,6 +245,33 @@
     self.movedIdentifiersByIndex = finalMovedObjects;
 }
 
+
+#pragma mark Merging
+
+- (void)mergeToManyRelationshipFromPropertyChangeValue:(CDEPropertyChangeValue *)propertyValue
+{
+    NSSet *originalAddedIdentifiers = self.addedIdentifiers;
+    if ([propertyValue.addedIdentifiers isEqualToSet:originalAddedIdentifiers]) return;
+    
+    // Add the missing identifiers
+    self.addedIdentifiers = [originalAddedIdentifiers setByAddingObjectsFromSet:propertyValue.addedIdentifiers];
+    if (propertyValue.type != CDEPropertyChangeTypeOrderedToManyRelationship) return;
+    
+    // If it is an ordered to-many, update ordering. Order new identifiers after the existing ones.
+    NSMutableDictionary *newMovedIdentifiersByIndex = [[NSMutableDictionary alloc] initWithDictionary:self.movedIdentifiersByIndex];
+    NSUInteger newIndex = self.movedIdentifiersByIndex.count;
+    for (NSUInteger oldIndex = 0; oldIndex < propertyValue.movedIdentifiersByIndex.count; oldIndex++) {
+        NSString *identifier = propertyValue.movedIdentifiersByIndex[@(oldIndex)];
+        if (!identifier || [originalAddedIdentifiers containsObject:identifier]) continue;
+        newMovedIdentifiersByIndex[@(newIndex++)] = identifier;
+    }
+    
+    self.movedIdentifiersByIndex = newMovedIdentifiersByIndex;
+}
+
+
+#pragma mark Inherited
+
 - (NSString *)description
 {
     NSString *result = [NSString stringWithFormat:@"Name: %@\rType: %d\rObjectID: %@\rValue: %@\rRelated: %@\rAdded: %@\rRemoved: %@\nMoved: %@\nRelated IDs: %@", self.propertyName, (int)self.type, self.objectID, self.value, self.relatedIdentifier, self.addedIdentifiers, self.removedIdentifiers, self.movedIdentifiersByIndex, self.relatedObjectIDs];
