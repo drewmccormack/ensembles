@@ -14,6 +14,7 @@
 #import "CDEPersistentStoreEnsemble.h"
 #import "CDEStoreModificationEvent.h"
 #import "CDEObjectChange.h"
+#import "CDEGlobalIdentifier.h"
 #import "CDEEventRevision.h"
 #import "CDERevisionManager.h"
 #import "CDERevisionSet.h"
@@ -80,20 +81,20 @@
     
     NSManagedObjectContext *context = eventStore.managedObjectContext;
     [context performBlock:^{
+        // Fetch objects
+        CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:context];
         NSArray *eventsToMerge = [CDEStoreModificationEvent fetchStoreModificationEventsUpToGlobalCount:newBaselineGlobalCount inManagedObjectContext:context];
-        if (eventsToMerge.count == 0) {
+        if (baseline && eventsToMerge.count == 0) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (completion) completion(nil);
             });
             return;
         }
         
-        // Fetch baseline. If none exists, create one.
-        CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:context];
+        // If no baseline exists, create one.
         if (!baseline) {
             baseline = [NSEntityDescription insertNewObjectForEntityForName:@"CDEStoreModificationEvent" inManagedObjectContext:context];
             baseline.type = CDEStoreModificationEventTypeBaseline;
-            baseline.globalCount = -1;
         }
     
         // Merge events into baseline
@@ -108,9 +109,15 @@
         CDERevisionSet *newRevisionSet = [CDERevisionSet revisionSetByTakingStoreWiseMaximumOfRevisionSets:[eventsToMerge valueForKeyPath:@"revisionSet"]];
         NSString *persistentStoreId = self.eventStore.persistentStoreIdentifier;
         [baseline setRevisionSet:newRevisionSet forPersistentStoreIdentifier:persistentStoreId];
+        if (baseline.eventRevision.revisionNumber == -1) baseline.eventRevision.revisionNumber = 0;
         
         // Delete merged events
         for (CDEStoreModificationEvent *event in eventsToMerge) [context deleteObject:event];
+        
+        // Delete unused global ids
+        [context processPendingChanges];
+        NSArray *unusedGlobalIds = [CDEGlobalIdentifier fetchUnreferencedGlobalIdentifiersInManagedObjectContext:context];
+        for (CDEGlobalIdentifier *globalId in unusedGlobalIds) [context deleteObject:globalId];
 
         // Save
         NSError *error = nil;
@@ -205,7 +212,7 @@
         // Find the minimum global count
         baselineCount = MIN(baselineCount, revision.revisionNumber);
     }
-    if (baselineCount == NSNotFound) baselineCount = -1;
+    if (baselineCount == NSNotFound) baselineCount = 0;
     
     return baselineCount;
 }

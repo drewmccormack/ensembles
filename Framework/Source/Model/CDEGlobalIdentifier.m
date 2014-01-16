@@ -84,4 +84,18 @@
     return result;
 }
 
++ (NSArray *)fetchUnreferencedGlobalIdentifiersInManagedObjectContext:(NSManagedObjectContext *)context
+{
+    NSError *error = nil;
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEGlobalIdentifier"];
+    fetch.predicate = [NSPredicate predicateWithFormat:@"objectChanges.@count == 0"];
+    NSArray *globalIds = [context executeFetchRequest:fetch error:&error];
+    if (!globalIds) {
+        CDELog(CDELoggingLevelError, @"Fetch for global ids failed: %@", error);
+        return nil;
+    }
+    
+    return globalIds;
+}
+
 @end
