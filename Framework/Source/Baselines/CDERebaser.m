@@ -8,6 +8,7 @@
 
 #import "CDERebaser.h"
 #import "NSManagedObjectModel+CDEAdditions.h"
+#import "CDEFoundationAdditions.h"
 #import "CDEDefines.h"
 #import "CDEEventStore.h"
 #import "CDEPersistentStoreEnsemble.h"
@@ -92,34 +93,18 @@
         if (!baseline) {
             baseline = [NSEntityDescription insertNewObjectForEntityForName:@"CDEStoreModificationEvent" inManagedObjectContext:context];
             baseline.type = CDEStoreModificationEventTypeBaseline;
-            baseline.modelVersion = [self.ensemble.managedObjectModel cde_entityHashesPropertyList];
+            baseline.globalCount = -1;
         }
+    
+        // Merge events into baseline
+        [self mergeOrderedEvents:eventsToMerge intoBaseline:baseline];
         
-        // Prefetch
-        [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:eventsToMerge];
-        
-        // Temporarily ensure baseline preceeds all events
-        baseline.globalCount = -1;
-        
-        // Fetch object changes
-        NSError *error;
-        NSArray *allEvents = [eventsToMerge arrayByAddingObject:baseline];
-        NSFetchRequest *changesFetch = [[NSFetchRequest alloc] initWithEntityName:@"CDEObjectChange"];
-        changesFetch.predicate = [NSPredicate predicateWithFormat:@"storeModificationEvent IN %@", allEvents];
-        
-        NSArray *objectChanges = [context executeFetchRequest:changesFetch error:&error];
-        if (!objectChanges) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (completion) completion(error);
-            });
-            return;
-        }
-        
-        // Set new count and timestamp
+        // Set new count and other properties
         baseline.globalCount = newBaselineGlobalCount;
         baseline.timestamp = [NSDate timeIntervalSinceReferenceDate];
+        baseline.modelVersion = [self.ensemble.managedObjectModel cde_entityHashesPropertyList];
         
-        // Update revisions
+        // Update store revisions by taking the maximum for each store
         CDERevisionSet *newRevisionSet = [CDERevisionSet revisionSetByTakingStoreWiseMaximumOfRevisionSets:[eventsToMerge valueForKeyPath:@"revisionSet"]];
         NSString *persistentStoreId = self.eventStore.persistentStoreIdentifier;
         [baseline setRevisionSet:newRevisionSet forPersistentStoreIdentifier:persistentStoreId];
@@ -128,8 +113,71 @@
         for (CDEStoreModificationEvent *event in eventsToMerge) [context deleteObject:event];
 
         // Save
-        if (![context save:&error]) CDELog(CDELoggingLevelError, @"Failed to save rebase: %@", error);
+        NSError *error = nil;
+        BOOL saved = [context save:&error];
+        if (!saved) CDELog(CDELoggingLevelError, @"Failed to save rebase: %@", error);
+        
+        // Complete
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (completion) completion(saved ? nil : error);
+        });
     }];
+}
+
+- (void)mergeOrderedEvents:(NSArray *)eventsToMerge intoBaseline:(CDEStoreModificationEvent *)baseline
+{
+    NSManagedObjectContext *context = baseline.managedObjectContext;
+    
+    // Create map of existing object changes
+    [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:@[baseline]];
+    NSMapTable *objectChangesByGlobalId = [NSMapTable strongToStrongObjectsMapTable];
+    NSSet *objectChanges = baseline.objectChanges;
+    for (CDEObjectChange *change in objectChanges) {
+        [objectChangesByGlobalId setObject:change forKey:change.globalIdentifier];
+    }
+    
+    // Loop through events, merging them in the baseline
+    for (CDEStoreModificationEvent *event in eventsToMerge) {
+        
+        // Prefetch for performance
+        [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:@[event]];
+        
+        // Loop through object changes
+        [event.objectChanges.allObjects cde_enumerateObjectsDrainingEveryIterations:100 usingBlock:^(CDEObjectChange *change, NSUInteger index, BOOL *stop) {
+            CDEObjectChange *existingChange = [objectChangesByGlobalId objectForKey:change.globalIdentifier];
+            switch (change.type) {
+                case CDEObjectChangeTypeDelete:
+                    if (existingChange) {
+                        [objectChangesByGlobalId removeObjectForKey:change.globalIdentifier];
+                        [context deleteObject:existingChange];
+                    }
+                    break;
+                    
+                case CDEObjectChangeTypeInsert:
+                    if (existingChange) {
+                        [change mergeValuesFromSubordinateObjectChange:existingChange];
+                        [context deleteObject:existingChange];
+                    }
+                    change.storeModificationEvent = baseline;
+                    [objectChangesByGlobalId setObject:change forKey:change.globalIdentifier];
+                    break;
+                    
+                case CDEObjectChangeTypeUpdate:
+                    if (existingChange) {
+                        [change mergeValuesFromSubordinateObjectChange:existingChange];
+                        [context deleteObject:existingChange];
+                        change.type = CDEObjectChangeTypeInsert;
+                        change.storeModificationEvent = baseline;
+                        [objectChangesByGlobalId setObject:change forKey:change.globalIdentifier];
+                    }
+                    break;
+                    
+                default:
+                    @throw [NSException exceptionWithName:CDEException reason:@"Invalid object change type" userInfo:nil];
+                    break;
+            }
+        }];
+    }
 }
 
 - (CDEGlobalCount)globalCountForNewBaseline
