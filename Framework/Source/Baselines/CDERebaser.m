@@ -61,7 +61,7 @@
 
 - (BOOL)shouldRebase
 {
-    // Rebase if we can reduce object changes by more than 50%
+    // Rebase if there are more than 100 object changes, and we can reduce object changes by more than 50%,
     // or if there is no baseline at all
     NSManagedObjectContext *context = eventStore.managedObjectContext;
     __block BOOL hasBaseline = NO;
@@ -69,7 +69,7 @@
         CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:context];
         hasBaseline = baseline != nil;
     }];
-    return !hasBaseline || self.estimatedEventStoreCompactionFollowingRebase > 0.5;
+    return !hasBaseline || ([self countOfAllObjectChanges] >= 100 && self.estimatedEventStoreCompactionFollowingRebase > 0.5);
 }
 
 
@@ -219,6 +219,19 @@
 
 
 #pragma mark Fetching Object Change Counts
+
+- (NSUInteger)countOfAllObjectChanges
+{
+    __block NSUInteger count = 0;
+    NSManagedObjectContext *context = eventStore.managedObjectContext;
+    [context performBlockAndWait:^{
+        NSError *error = nil;
+        NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEObjectChange"];
+        count = [context countForFetchRequest:fetch error:&error];
+        if (error) CDELog(CDELoggingLevelError, @"Couldn't fetch count of object changes: %@", error);
+    }];
+    return count;
+}
 
 - (NSUInteger)countOfNonBaselineObjectChangesOfType:(CDEObjectChangeType)type
 {
