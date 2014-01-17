@@ -248,25 +248,49 @@
 
 #pragma mark Merging
 
-- (void)mergeToManyRelationshipFromPropertyChangeValue:(CDEPropertyChangeValue *)propertyValue
+- (void)mergeToManyRelationshipFromSubordinatePropertyChangeValue:(CDEPropertyChangeValue *)propertyValue
 {
-    NSSet *originalAddedIdentifiers = self.addedIdentifiers;
-    if ([propertyValue.addedIdentifiers isEqualToSet:originalAddedIdentifiers]) return;
+    // Adds
+    NSMutableSet *newAdded = [[NSMutableSet alloc] initWithSet:self.addedIdentifiers];
+    [newAdded unionSet:propertyValue.addedIdentifiers];
+    [newAdded minusSet:self.removedIdentifiers]; // self removes override adds in other value
     
-    // Add the missing identifiers
-    self.addedIdentifiers = [originalAddedIdentifiers setByAddingObjectsFromSet:propertyValue.addedIdentifiers];
+    // Removes
+    NSMutableSet *newRemoved = [[NSMutableSet alloc] initWithSet:self.removedIdentifiers];
+    [newRemoved unionSet:propertyValue.removedIdentifiers];
+    [newRemoved minusSet:self.addedIdentifiers]; // self adds override removes in other value
+    
+    // Set
+    if (![newAdded isEqualToSet:self.addedIdentifiers]) self.addedIdentifiers = newAdded;
+    if (![newRemoved isEqualToSet:self.removedIdentifiers]) self.removedIdentifiers = newRemoved;
+    
+    // Non-ordered relationships are done
     if (propertyValue.type != CDEPropertyChangeTypeOrderedToManyRelationship) return;
     
-    // If it is an ordered to-many, update ordering. Order new identifiers after the existing ones.
-    NSMutableDictionary *newMovedIdentifiersByIndex = [[NSMutableDictionary alloc] initWithDictionary:self.movedIdentifiersByIndex];
-    NSUInteger newIndex = self.movedIdentifiersByIndex.count;
-    for (NSUInteger oldIndex = 0; oldIndex < propertyValue.movedIdentifiersByIndex.count; oldIndex++) {
-        NSString *identifier = propertyValue.movedIdentifiersByIndex[@(oldIndex)];
-        if (!identifier || [originalAddedIdentifiers containsObject:identifier]) continue;
-        newMovedIdentifiersByIndex[@(newIndex++)] = identifier;
-    }
+    // If it is an ordered to-many, update ordering.
+    NSSet *indexesSet = [[NSSet alloc] initWithArray:self.movedIdentifiersByIndex.allKeys];
+    indexesSet = [indexesSet setByAddingObjectsFromArray:propertyValue.movedIdentifiersByIndex.allKeys];
+    NSArray *indexNumbers = [indexesSet.allObjects sortedArrayUsingSelector:@selector(compare:)];
+    NSMutableDictionary *newMovedIdentifiersByIndex = [[NSMutableDictionary alloc] init];
+    NSMutableSet *usedIdentifiers = [[NSMutableSet alloc] init];
+    __block NSUInteger count = 0;
+    [indexNumbers enumerateObjectsUsingBlock:^(NSNumber *indexNumber, NSUInteger i, BOOL *stop) {
+        NSString *identifier = self.movedIdentifiersByIndex[indexNumber];
+        if (identifier && ![usedIdentifiers containsObject:identifier] && ![self.removedIdentifiers containsObject:identifier]) {
+            newMovedIdentifiersByIndex[@(count++)] = identifier;
+            [usedIdentifiers addObject:identifier];
+        }
+        
+        identifier = propertyValue.movedIdentifiersByIndex[indexNumber];
+        if (identifier && ![usedIdentifiers containsObject:identifier] && ![self.removedIdentifiers containsObject:identifier]) {
+            newMovedIdentifiersByIndex[@(count++)] = identifier;
+            [usedIdentifiers addObject:identifier];
+        }
+    }];
     
-    self.movedIdentifiersByIndex = newMovedIdentifiersByIndex;
+    if (![newMovedIdentifiersByIndex isEqualToDictionary:self.movedIdentifiersByIndex]) {
+        self.movedIdentifiersByIndex = newMovedIdentifiersByIndex;
+    }
 }
 
 
