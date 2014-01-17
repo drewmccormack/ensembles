@@ -83,8 +83,9 @@
 
 - (void)testConsolidatingMultipleBaselinesWithMultipleStoresKeepsMostRecent
 {
-    [self addBaselineEventsForStoreId:@"123" globalCounts:@[@(2), @(0), @(1)] revisions:@[@(2), @(0), @(1)]];
-    [self addBaselineEventsForStoreId:@"234" globalCounts:@[@(3)] revisions:@[@(0)]];
+    [self addBaselineEventsForStoreId:@"123" globalCounts:@[@(2), @(0), @(1)] revisions:@[@(2), @(0), @(1)]]; // Last two are redundant (subset)
+    NSArray *baselines = [self addBaselineEventsForStoreId:@"234" globalCounts:@[@(3)] revisions:@[@(0)]];
+    CDEStoreModificationEvent *mostRecentBaseline = baselines.lastObject;
 
     [consolidator consolidateBaselineWithCompletion:^(NSError *error) {
         [context performBlock:^{
@@ -92,7 +93,8 @@
             XCTAssertEqual(events.count, (NSUInteger)1, @"Should only be one baseline left");
             
             CDEStoreModificationEvent *event = events.lastObject;
-            XCTAssertEqual(event.globalCount, (int64_t)3, @"Wrong event was kept");
+            XCTAssertTrue(event == mostRecentBaseline, @"Wrong baseline kept");
+            XCTAssertEqual(event.globalCount, (int64_t)2, @"Global count should be minimum of non-redundant baselines");
             XCTAssertEqualObjects(event.eventRevision.persistentStoreIdentifier, self.eventStore.persistentStoreIdentifier, @"Store id should be the event store id");
 
             dispatch_async(dispatch_get_main_queue(), ^{

@@ -166,10 +166,12 @@
     if (baselines.count == 1) return baselines.lastObject;
     
     // Change the first baseline into our new baseline by assigning a different unique id
+    // Global count should be minimum, to ensure it preceeds all other events
     CDEStoreModificationEvent *firstBaseline = baselines.firstObject;
     firstBaseline.uniqueIdentifier = [[NSProcessInfo processInfo] globallyUniqueString];
     firstBaseline.timestamp = [NSDate timeIntervalSinceReferenceDate];
     firstBaseline.modelVersion = [self.ensemble.managedObjectModel cde_entityHashesPropertyList];
+    firstBaseline.globalCount = [baselines.lastObject globalCount];
     
     // Update the revisions of each store in the baseline
     CDERevisionSet *newRevisionSet = [CDERevisionSet revisionSetByTakingStoreWiseMaximumOfRevisionSets:[baselines valueForKeyPath:@"revisionSet"]];
@@ -187,10 +189,10 @@
     // Get other baselines
     NSMutableArray *otherBaselines = [baselines mutableCopy];
     [otherBaselines removeObject:firstBaseline];
-    [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:otherBaselines];
     
     // Apply changes from others
     for (CDEStoreModificationEvent *baseline in otherBaselines) {
+        [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:@[baseline]];
         [baseline.objectChanges.allObjects cde_enumerateObjectsDrainingEveryIterations:100 usingBlock:^(CDEObjectChange *change, NSUInteger index, BOOL *stop) {
             CDEObjectChange *existingChange = [objectChangesByGlobalId objectForKey:change.globalIdentifier];
             if (!existingChange) {
