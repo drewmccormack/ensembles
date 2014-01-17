@@ -41,14 +41,15 @@
 
 - (void)mergeValuesFromSubordinateObjectChange:(CDEObjectChange *)change
 {
-    NSSet *existingNames = [[NSSet alloc] initWithArray:[self.propertyChangeValues valueForKeyPath:@"propertyName"]];
+    NSDictionary *existingPropertiesByName = [[NSDictionary alloc] initWithObjects:self.propertyChangeValues forKeys:[self.propertyChangeValues valueForKeyPath:@"propertyName"]];
     
     NSMutableArray *addedPropertyChangeValues = nil;
     for (CDEPropertyChangeValue *propertyValue in change.propertyChangeValues) {
         NSString *propertyName = propertyValue.propertyName;
+        CDEPropertyChangeValue *existingValue = existingPropertiesByName[propertyName];
         
         // If this property name is not already present, just copy it in
-        if (![existingNames containsObject:propertyName]) {
+        if (nil == existingValue) {
             if (!addedPropertyChangeValues) addedPropertyChangeValues = [[NSMutableArray alloc] initWithCapacity:10];
             [addedPropertyChangeValues addObject:propertyValue];
             continue;
@@ -58,7 +59,6 @@
         BOOL isToMany = propertyValue.type == CDEPropertyChangeTypeToManyRelationship;
         isToMany = isToMany || propertyValue.type == CDEPropertyChangeTypeOrderedToManyRelationship;
         if (isToMany) {
-            CDEPropertyChangeValue *existingValue = [self propertyChangeValueForPropertyName:propertyName];
             [existingValue mergeToManyRelationshipFromPropertyChangeValue:propertyValue];
         }
     }
