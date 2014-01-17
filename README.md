@@ -1,3 +1,5 @@
+_Interested in a book on Ensembles? Show your interest, and tell us how much it would be worth at [Leanpub](https://leanpub.com/ensembles)_
+
 Core Data Ensembles
 ===
 
