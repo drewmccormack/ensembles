@@ -59,7 +59,7 @@
         BOOL isToMany = propertyValue.type == CDEPropertyChangeTypeToManyRelationship;
         isToMany = isToMany || propertyValue.type == CDEPropertyChangeTypeOrderedToManyRelationship;
         if (isToMany) {
-            [existingValue mergeToManyRelationshipFromPropertyChangeValue:propertyValue];
+            [existingValue mergeToManyRelationshipFromSubordinatePropertyChangeValue:propertyValue];
         }
     }
     

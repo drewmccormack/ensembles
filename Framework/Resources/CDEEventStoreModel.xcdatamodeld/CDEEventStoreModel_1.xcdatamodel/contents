@@ -3,8 +3,16 @@
     <entity name="CDEEventRevision" representedClassName="CDEEventRevision" syncable="YES">
         <attribute name="persistentStoreIdentifier" attributeType="String" indexed="YES" syncable="YES"/>
         <attribute name="revisionNumber" attributeType="Integer 64" minValueString="0" defaultValueString="0" indexed="YES" syncable="YES"/>
-        <relationship name="storeModificationEvent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDEStoreModificationEvent" inverseName="eventRevision" inverseEntity="CDEStoreModificationEvent" syncable="YES"/>
-        <relationship name="storeModificationEventForOtherStores" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="CDEStoreModificationEvent" inverseName="eventRevisionsOfOtherStores" inverseEntity="CDEStoreModificationEvent" syncable="YES"/>
+        <relationship name="storeModificationEvent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDEStoreModificationEvent" inverseName="eventRevision" inverseEntity="CDEStoreModificationEvent" syncable="YES">
+            <userInfo>
+                <entry key="excludeFromMigration" value="1"/>
+            </userInfo>
+        </relationship>
+        <relationship name="storeModificationEventForOtherStores" optional="YES" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="CDEStoreModificationEvent" inverseName="eventRevisionsOfOtherStores" inverseEntity="CDEStoreModificationEvent" syncable="YES">
+            <userInfo>
+                <entry key="excludeFromMigration" value="1"/>
+            </userInfo>
+        </relationship>
         <compoundIndexes>
             <compoundIndex>
                 <index value="persistentStoreIdentifier"/>
@@ -50,7 +58,7 @@
         <relationship name="objectChanges" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CDEObjectChange" inverseName="storeModificationEvent" inverseEntity="CDEObjectChange" syncable="YES"/>
     </entity>
     <elements>
-        <element name="CDEEventRevision" positionX="88" positionY="-81" width="128" height="105"/>
+        <element name="CDEEventRevision" positionX="88" positionY="-81" width="128" height="103"/>
         <element name="CDEGlobalIdentifier" positionX="396" positionY="-459" width="128" height="103"/>
         <element name="CDEObjectChange" positionX="106" positionY="-324" width="128" height="120"/>
         <element name="CDEStoreModificationEvent" positionX="-288" positionY="-315" width="198" height="165"/>
