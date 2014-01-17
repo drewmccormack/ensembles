@@ -76,16 +76,18 @@ static NSString *kCDEDefaultStoreType;
 - (void)migrateStoreModificationEvents:(NSArray *)events toFile:(NSString *)path completion:(CDECompletionBlock)completion
 {
     CDELog(CDELoggingLevelVerbose, @"Migrating event store events to file");
+    
+    NSManagedObjectContext *exportContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
+    NSPersistentStoreCoordinator *mainCoordinator = eventStore.managedObjectContext.persistentStoreCoordinator;
+    NSPersistentStoreCoordinator *persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:mainCoordinator.managedObjectModel];
+    exportContext.persistentStoreCoordinator = persistentStoreCoordinator;
 
-    __block NSError *error = nil;
-    __block NSPersistentStore *fileStore = nil;
-    NSPersistentStoreCoordinator *persistentStoreCoordinator = eventStore.managedObjectContext.persistentStoreCoordinator;
+    NSError *error = nil;
+    NSPersistentStore *fileStore = nil;
     @try {
         NSURL *fileURL = [NSURL fileURLWithPath:path];
         
-        [persistentStoreCoordinator lock];
         fileStore = [persistentStoreCoordinator addPersistentStoreWithType:self.storeTypeForNewFiles configuration:nil URL:fileURL options:nil error:&error];
-        [persistentStoreCoordinator unlock];
         if (!fileStore) @throw [[NSException alloc] initWithName:CDEException reason:@"" userInfo:nil];
         
         if (!events) @throw [[NSException alloc] initWithName:CDEException reason:@"" userInfo:nil];
@@ -93,28 +95,18 @@ static NSString *kCDEDefaultStoreType;
         
         NSMapTable *toStoreObjectsByFromStoreObject = [NSMapTable strongToStrongObjectsMapTable];
         for (CDEStoreModificationEvent *event in events) {
-            [self migrateObject:event andRelatedObjectsToStore:fileStore withMigratedObjectsMap:toStoreObjectsByFromStoreObject];
+            [self migrateObject:event andRelatedObjectsToManagedObjectContext:exportContext withMigratedObjectsMap:toStoreObjectsByFromStoreObject];
         }
         
-        BOOL success = [eventStore.managedObjectContext save:&error];
-        if (!success) @throw [[NSException alloc] initWithName:CDEException reason:@"" userInfo:nil];
-        
-        [persistentStoreCoordinator lock];
-        success = [persistentStoreCoordinator removePersistentStore:fileStore error:&error];
-        [persistentStoreCoordinator unlock];
-        fileStore = nil;
+        BOOL success = [exportContext save:&error];
         if (!success) @throw [[NSException alloc] initWithName:CDEException reason:@"" userInfo:nil];
     }
     @catch (NSException *exception) {
         if (!error) error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeUnknown userInfo:@{NSLocalizedDescriptionKey: exception.description}];
         CDELog(CDELoggingLevelError, @"Failed to migrate modification events out to file: %@", error);
-        if (fileStore) {
-            [persistentStoreCoordinator lock];
-            [persistentStoreCoordinator removePersistentStore:fileStore error:NULL];
-            [persistentStoreCoordinator unlock];
-        }
     }
     @finally {
+        [exportContext reset];
         dispatch_async(dispatch_get_main_queue(), ^{
             if (completion) completion(error);
         });
@@ -124,14 +116,15 @@ static NSString *kCDEDefaultStoreType;
 - (void)migrateEventsInFromFiles:(NSArray *)paths completion:(CDECompletionBlock)completion
 {
     CDELog(CDELoggingLevelVerbose, @"Migrating file events to event store");
-
-    NSManagedObjectContext *importContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
     
-    __block NSError *error = nil;
-    __block NSPersistentStore *fileStore = nil;
-    [importContext performBlock:^{
-        importContext.parentContext = eventStore.managedObjectContext;
-        NSPersistentStore *mainPersistentStore = importContext.persistentStoreCoordinator.persistentStores.lastObject;
+    [self.eventStore.managedObjectContext performBlock:^{
+        NSManagedObjectContext *importContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
+        NSPersistentStoreCoordinator *mainCoordinator = eventStore.managedObjectContext.persistentStoreCoordinator;
+        NSPersistentStoreCoordinator *persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:mainCoordinator.managedObjectModel];
+        importContext.persistentStoreCoordinator = persistentStoreCoordinator;
+        
+        NSError *error = nil;
+        NSPersistentStore *fileStore = nil;
         @try {
             for (NSString *path in paths) {
                 @autoreleasepool {
@@ -141,22 +134,18 @@ static NSString *kCDEDefaultStoreType;
                     NSString *storeType = metadata[NSStoreTypeKey];
                     if (!storeType) @throw [[NSException alloc] initWithName:CDEException reason:@"" userInfo:nil];
                     
-                    [importContext.persistentStoreCoordinator lock];
                     NSDictionary *options = @{NSMigratePersistentStoresAutomaticallyOption: @YES, NSInferMappingModelAutomaticallyOption: @YES};
                     fileStore = [importContext.persistentStoreCoordinator addPersistentStoreWithType:storeType configuration:nil URL:fileURL options:options error:&error];
-                    [importContext.persistentStoreCoordinator unlock];
                     if (!fileStore) @throw [[NSException alloc] initWithName:CDEException reason:@"" userInfo:nil];
                     
-                    BOOL success = [self migrateObjectsInContext:importContext fromStore:fileStore toStore:mainPersistentStore error:&error];
+                    BOOL success = [self migrateObjectsInContext:importContext toContext:self.eventStore.managedObjectContext error:&error];
                     if (!success) @throw [[NSException alloc] initWithName:CDEException reason:@"" userInfo:nil];
                     
-                    [importContext.persistentStoreCoordinator lock];
                     success = [importContext.persistentStoreCoordinator removePersistentStore:fileStore error:&error];
-                    [importContext.persistentStoreCoordinator unlock];
                     fileStore = nil;
                     if (!success) @throw [[NSException alloc] initWithName:CDEException reason:@"" userInfo:nil];
                     
-                    success = [importContext save:&error];
+                    success = [self.eventStore.managedObjectContext save:&error];
                     [importContext reset];
                     if (!success) @throw [[NSException alloc] initWithName:CDEException reason:@"" userInfo:nil];
                 }
@@ -165,11 +154,6 @@ static NSString *kCDEDefaultStoreType;
         @catch (NSException *exception) {
             if (!error) error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeUnknown userInfo:@{NSLocalizedDescriptionKey: exception.description}];
             CDELog(CDELoggingLevelError, @"Failed to migrate modification events: %@", error);
-            if (fileStore) {
-                [importContext.persistentStoreCoordinator lock];
-                [importContext.persistentStoreCoordinator removePersistentStore:fileStore error:NULL];
-                [importContext.persistentStoreCoordinator unlock];
-            }
         }
         @finally {
             [importContext reset];
@@ -180,26 +164,26 @@ static NSString *kCDEDefaultStoreType;
     }];
 }
 
-- (BOOL)migrateObjectsInContext:(NSManagedObjectContext *)context fromStore:(NSPersistentStore *)fromStore toStore:(NSPersistentStore *)toStore error:(NSError * __autoreleasing *)error
+- (BOOL)migrateObjectsInContext:(NSManagedObjectContext *)fromContext toContext:(NSManagedObjectContext *)toContext error:(NSError * __autoreleasing *)error
 {
     // Migrate global identifiers. Enforce uniqueness.
-    NSMapTable *toStoreIdsByFromStoreId = [self migrateEntity:@"CDEGlobalIdentifier" inManagedObjectContext:context fromStore:fromStore toStore:toStore enforceUniquenessForAttribute:@"globalIdentifier" error:error];
-    if (!toStoreIdsByFromStoreId) return NO;
+    NSMapTable *toGlobalIdsByFromGlobalId = [self migrateEntity:@"CDEGlobalIdentifier" inManagedObjectContext:fromContext toContext:toContext enforceUniquenessForAttribute:@"globalIdentifier" error:error];
+    if (!toGlobalIdsByFromGlobalId) return NO;
     
     // Retrieve modification events
-    NSArray *storeModEventsToMigrate = [self storeModificationEventsRequiringMigrationInManagedObjectContext:context fromStore:fromStore toStore:toStore error:error];
+    NSArray *storeModEventsToMigrate = [self storeModificationEventsInManagedObjectContext:fromContext requiringMigrationToContext:toContext error:error];
     if (!storeModEventsToMigrate) return NO;
     
     // Prefetch relevant objects
     [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:storeModEventsToMigrate];
     
     // Migrate mod events
-    NSMapTable *toStoreObjectsByFromStoreObject = [NSMapTable strongToStrongObjectsMapTable];
-    [toStoreObjectsByFromStoreObject cde_addEntriesFromMapTable:toStoreIdsByFromStoreId];
+    NSMapTable *toObjectsByFromObject = [NSMapTable strongToStrongObjectsMapTable];
+    [toObjectsByFromObject cde_addEntriesFromMapTable:toGlobalIdsByFromGlobalId];
     @try {
         for (CDEStoreModificationEvent *fromStoreModEvent in storeModEventsToMigrate) {
             [self.eventStore registerIncompleteEventIdentifier:fromStoreModEvent.uniqueIdentifier isMandatory:NO];
-            [self migrateObject:fromStoreModEvent andRelatedObjectsToStore:toStore withMigratedObjectsMap:toStoreObjectsByFromStoreObject];
+            [self migrateObject:fromStoreModEvent andRelatedObjectsToManagedObjectContext:toContext withMigratedObjectsMap:toObjectsByFromObject];
             [self.eventStore deregisterIncompleteEventIdentifier:fromStoreModEvent.uniqueIdentifier];
         }
     }
@@ -211,7 +195,7 @@ static NSString *kCDEDefaultStoreType;
     return YES;
 }
 
-- (NSManagedObject *)migrateObject:(NSManagedObject *)fromStoreObject andRelatedObjectsToStore:(NSPersistentStore *)toStore withMigratedObjectsMap:(NSMapTable *)toStoreObjectsByFromStoreObject
+- (NSManagedObject *)migrateObject:(NSManagedObject *)fromStoreObject andRelatedObjectsToManagedObjectContext:(NSManagedObjectContext *)toContext withMigratedObjectsMap:(NSMapTable *)toStoreObjectsByFromStoreObject
 {
     if (fromStoreObject == nil) return nil;
     
@@ -219,10 +203,8 @@ static NSString *kCDEDefaultStoreType;
     if (migratedObject) return migratedObject;
     
     // Migrated object doesn't exist, so create it
-    NSManagedObjectContext *context = fromStoreObject.managedObjectContext;
     NSString *entityName = fromStoreObject.entity.name;
-    migratedObject = [NSEntityDescription insertNewObjectForEntityForName:entityName inManagedObjectContext:context];
-    [context assignObject:migratedObject toPersistentStore:toStore];
+    migratedObject = [NSEntityDescription insertNewObjectForEntityForName:entityName inManagedObjectContext:toContext];
     [self copyAttributesFromObject:fromStoreObject toObject:migratedObject];
     
     // Add object to map
@@ -240,7 +222,7 @@ static NSString *kCDEDefaultStoreType;
             // To-many relationship
             id fromStoreRelatives = [fromStoreObject valueForKey:relationship.name];
             for (NSManagedObject *fromRelative in fromStoreRelatives) {
-                NSManagedObject *toStoreRelative = [self migrateObject:fromRelative andRelatedObjectsToStore:toStore withMigratedObjectsMap:toStoreObjectsByFromStoreObject];
+                NSManagedObject *toStoreRelative = [self migrateObject:fromRelative andRelatedObjectsToManagedObjectContext:toContext withMigratedObjectsMap:toStoreObjectsByFromStoreObject];
                 if (relationship.isOrdered)
                     [[migratedObject mutableOrderedSetValueForKey:relationship.name] addObject:toStoreRelative];
                 else
@@ -250,7 +232,7 @@ static NSString *kCDEDefaultStoreType;
         else {
             // To-one relationship
             NSManagedObject *fromStoreRelative = [fromStoreObject valueForKey:relationship.name];
-            NSManagedObject *toStoreRelative = [self migrateObject:fromStoreRelative andRelatedObjectsToStore:toStore withMigratedObjectsMap:toStoreObjectsByFromStoreObject];
+            NSManagedObject *toStoreRelative = [self migrateObject:fromStoreRelative andRelatedObjectsToManagedObjectContext:toContext withMigratedObjectsMap:toStoreObjectsByFromStoreObject];
             [migratedObject setValue:toStoreRelative forKey:relationship.name];
         }
     }
@@ -274,29 +256,26 @@ static NSString *kCDEDefaultStoreType;
     return storeModEvents;
 }
 
-- (NSArray *)storeModificationEventsRequiringMigrationInManagedObjectContext:(NSManagedObjectContext *)context fromStore:(NSPersistentStore *)fromStore toStore:(NSPersistentStore *)toStore error:(NSError * __autoreleasing *)error
+- (NSArray *)storeModificationEventsInManagedObjectContext:(NSManagedObjectContext *)fromContext requiringMigrationToContext:(NSManagedObjectContext *)toContext error:(NSError * __autoreleasing *)error
 {
-    NSParameterAssert(context != nil);
-    NSParameterAssert(fromStore != nil);
-    NSParameterAssert(toStore != nil);
+    NSParameterAssert(fromContext != nil);
+    NSParameterAssert(toContext != nil);
     
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
-    fetch.affectedStores = @[fromStore];
-    NSArray *fromStoreObjects = [context executeFetchRequest:fetch error:error];
-    if (!fromStoreObjects) return nil;
+    NSArray *fromContextObjects = [fromContext executeFetchRequest:fetch error:error];
+    if (!fromContextObjects) return nil;
     
-    NSFetchRequest *toStoreFetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
-    toStoreFetch.affectedStores = @[toStore];
-    NSArray *toStoreObjects = [context executeFetchRequest:toStoreFetch error:error];
-    if (!toStoreObjects) return nil;
+    NSFetchRequest *toContextFetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
+    NSArray *toContextObjects = [toContext executeFetchRequest:toContextFetch error:error];
+    if (!toContextObjects) return nil;
     
     // Make sure there are no duplicates. Enforce uniqueness on revision.
-    NSArray *keys = [toStoreObjects valueForKeyPath:@"eventRevision.revision.uniqueIdentifier"];
-    NSDictionary *toStoreObjectsByRevisionId = [[NSDictionary alloc] initWithObjects:toStoreObjects forKeys:keys];
-    NSMutableArray *objectsToMigrate = [NSMutableArray arrayWithCapacity:fromStoreObjects.count];
-    for (CDEStoreModificationEvent *event in fromStoreObjects) {
+    NSArray *keys = [toContextObjects valueForKeyPath:@"eventRevision.revision.uniqueIdentifier"];
+    NSDictionary *toContextObjectsByRevisionId = [[NSDictionary alloc] initWithObjects:toContextObjects forKeys:keys];
+    NSMutableArray *objectsToMigrate = [NSMutableArray arrayWithCapacity:fromContextObjects.count];
+    for (CDEStoreModificationEvent *event in fromContextObjects) {
         id <NSCopying> key = event.eventRevision.revision.uniqueIdentifier;
-        CDEStoreModificationEvent *existingObject = toStoreObjectsByRevisionId[key];
+        CDEStoreModificationEvent *existingObject = toContextObjectsByRevisionId[key];
         if (existingObject) continue;
         [objectsToMigrate addObject:event];
     }
@@ -304,36 +283,33 @@ static NSString *kCDEDefaultStoreType;
     return objectsToMigrate;
 }
 
-- (NSMapTable *)migrateEntity:(NSString *)entityName inManagedObjectContext:(NSManagedObjectContext *)context fromStore:(NSPersistentStore *)fromStore toStore:(NSPersistentStore *)toStore enforceUniquenessForAttribute:(NSString *)uniqueAttribute error:(NSError * __autoreleasing *)error
+- (NSMapTable *)migrateEntity:(NSString *)entityName inManagedObjectContext:(NSManagedObjectContext *)fromContext toContext:(NSManagedObjectContext *)toContext enforceUniquenessForAttribute:(NSString *)uniqueAttribute error:(NSError * __autoreleasing *)error
 {
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:entityName];
-    fetch.affectedStores = @[fromStore];
-    NSArray *fromStoreObjects = [context executeFetchRequest:fetch error:error];
-    if (!fromStoreObjects) return nil;
+    NSArray *fromContextObjects = [fromContext executeFetchRequest:fetch error:error];
+    if (!fromContextObjects) return nil;
     
-    NSFetchRequest *toStoreFetch = [NSFetchRequest fetchRequestWithEntityName:entityName];
-    toStoreFetch.affectedStores = @[toStore];
-    NSArray *toStoreObjects = [context executeFetchRequest:toStoreFetch error:error];
-    if (!toStoreObjects) return nil;
+    NSFetchRequest *toContextFetch = [NSFetchRequest fetchRequestWithEntityName:entityName];
+    NSArray *toContextObjects = [toContext executeFetchRequest:toContextFetch error:error];
+    if (!toContextObjects) return nil;
     
-    NSDictionary *toStoreObjectsByUniqueValue = [[NSDictionary alloc] initWithObjects:toStoreObjects forKeys:[toStoreObjects valueForKeyPath:uniqueAttribute]];
-    NSDictionary *fromStoreObjectsByUniqueValue = [[NSDictionary alloc] initWithObjects:fromStoreObjects forKeys:[fromStoreObjects valueForKeyPath:uniqueAttribute]];
+    NSDictionary *toStoreObjectsByUniqueValue = [[NSDictionary alloc] initWithObjects:toContextObjects forKeys:[toContextObjects valueForKeyPath:uniqueAttribute]];
+    NSDictionary *fromStoreObjectsByUniqueValue = [[NSDictionary alloc] initWithObjects:fromContextObjects forKeys:[fromContextObjects valueForKeyPath:uniqueAttribute]];
     
     NSMapTable *toObjectByFromObject = [NSMapTable strongToStrongObjectsMapTable];
     for (id uniqueValue in fromStoreObjectsByUniqueValue) {
-        CDEGlobalIdentifier *toStoreObject = toStoreObjectsByUniqueValue[uniqueValue];
-        CDEGlobalIdentifier *fromStoreObject = fromStoreObjectsByUniqueValue[uniqueValue];
+        CDEGlobalIdentifier *toContextObject = toStoreObjectsByUniqueValue[uniqueValue];
+        CDEGlobalIdentifier *fromContextObject = fromStoreObjectsByUniqueValue[uniqueValue];
         
-        if (toStoreObject) {
-            [toObjectByFromObject setObject:toStoreObject forKey:fromStoreObject];
+        if (toContextObject) {
+            [toObjectByFromObject setObject:toContextObject forKey:fromContextObject];
             continue;
         }
         
-        toStoreObject = [NSEntityDescription insertNewObjectForEntityForName:fromStoreObject.entity.name inManagedObjectContext:context];
-        [context assignObject:toStoreObject toPersistentStore:toStore];
-        [self copyAttributesFromObject:fromStoreObject toObject:toStoreObject];
+        toContextObject = [NSEntityDescription insertNewObjectForEntityForName:fromContextObject.entity.name inManagedObjectContext:toContext];
+        [self copyAttributesFromObject:fromContextObject toObject:toContextObject];
         
-        [toObjectByFromObject setObject:toStoreObject forKey:fromStoreObject];
+        [toObjectByFromObject setObject:toContextObject forKey:fromContextObject];
     }
     
     return toObjectByFromObject;
