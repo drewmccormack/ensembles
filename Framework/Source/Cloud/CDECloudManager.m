@@ -226,8 +226,16 @@
             NSAssert(isEventFile, @"Filename was not in correct form");
             
             // Migrate data to file
-            [fileManager removeItemAtPath:path error:NULL];
             dispatch_async(dispatch_get_main_queue(), ^{
+                BOOL isDir;
+                if ([fileManager fileExistsAtPath:path isDirectory:&isDir]) {
+                    NSError *error;
+                    if (![fileManager removeItemAtPath:path error:&error]) {
+                        next(error, NO);
+                        return;
+                    }
+                }
+                
                 [migrator migrateLocalEventWithRevision:revision.revisionNumber toFile:path completion:^(NSError *error) {
                     next(error, NO);
                 }];
@@ -326,7 +334,12 @@
             fetch.predicate = [NSPredicate predicateWithFormat:@"eventRevision.persistentStoreIdentifier = %@", persistentStoreIdentifier];
         }
         
-        NSArray *events = [moc executeFetchRequest:fetch error:NULL];
+        NSError *error;
+        NSArray *events = [moc executeFetchRequest:fetch error:&error];
+        if (!events) {
+            CDELog(CDELoggingLevelError, @"Could not retrieve local events");
+        }
+        
         for (CDEStoreModificationEvent *event in events) {
             CDERevision *revision = event.eventRevision.revision;
             NSString *filename = [self filenameFromGlobalCount:event.globalCount revision:revision];
