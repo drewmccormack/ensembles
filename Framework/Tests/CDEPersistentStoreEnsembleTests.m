@@ -132,7 +132,7 @@
     [ensemble leechPersistentStoreWithCompletion:^(NSError *error) {
         XCTAssertNil(error, @"Error occurred while leeching");
         cloudFileSystem.identityToken = @"second";
-        [self performSelector:@selector(checkForDeleech) withObject:nil afterDelay:0.05];
+        [self performSelector:@selector(checkForDeleech) withObject:nil afterDelay:0.2];
     }];
     [self waitForAsync];
 }
@@ -150,7 +150,7 @@
         
         [ensemble mergeWithCompletion:^(NSError *error) {
             XCTAssertNotNil(error, @"Merge should fail due to missing store info");
-            [self performSelector:@selector(checkForDeleech) withObject:nil afterDelay:0.1];
+            [self performSelector:@selector(checkForDeleech) withObject:nil afterDelay:0.2];
         }];
     }];
     [self waitForAsync];
@@ -173,7 +173,7 @@
     ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"testensemble" persistentStorePath:ensemble.storePath managedObjectModelURL:ensemble.managedObjectModelURL cloudFileSystem:(id)cloudFileSystem];
     ensemble.delegate = self;
     
-    [self performSelector:@selector(checkForDeleech) withObject:nil afterDelay:0.05];
+    [self performSelector:@selector(checkForDeleech) withObject:nil afterDelay:0.2];
     [self waitForAsync];
 }
 
@@ -189,7 +189,7 @@
     ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"testensemble" persistentStorePath:ensemble.storePath managedObjectModelURL:ensemble.managedObjectModelURL cloudFileSystem:(id)cloudFileSystem];
     ensemble.delegate = self;
     
-    [self performSelector:@selector(checkForLeech) withObject:nil afterDelay:0.05];
+    [self performSelector:@selector(checkForLeech) withObject:nil afterDelay:0.2];
     [self waitForAsync];
 }
 

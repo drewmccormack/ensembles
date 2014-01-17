@@ -7,8 +7,9 @@
 //
 
 #import "CDEObjectChange.h"
-#import "CDEStoreModificationEvent.h"
 #import "CDEDefines.h"
+#import "CDEStoreModificationEvent.h"
+#import "CDEPropertyChangeValue.h"
 
 @implementation CDEObjectChange
 
@@ -33,6 +34,38 @@
     NSArray *values = [self.propertyChangeValues filteredArrayUsingPredicate:predicate];
     CDEPropertyChangeValue *value = values.lastObject;
     return value;
+}
+
+
+#pragma mark Merging
+
+- (void)mergeValuesFromSubordinateObjectChange:(CDEObjectChange *)change
+{
+    NSDictionary *existingPropertiesByName = [[NSDictionary alloc] initWithObjects:self.propertyChangeValues forKeys:[self.propertyChangeValues valueForKeyPath:@"propertyName"]];
+    
+    NSMutableArray *addedPropertyChangeValues = nil;
+    for (CDEPropertyChangeValue *propertyValue in change.propertyChangeValues) {
+        NSString *propertyName = propertyValue.propertyName;
+        CDEPropertyChangeValue *existingValue = existingPropertiesByName[propertyName];
+        
+        // If this property name is not already present, just copy it in
+        if (nil == existingValue) {
+            if (!addedPropertyChangeValues) addedPropertyChangeValues = [[NSMutableArray alloc] initWithCapacity:10];
+            [addedPropertyChangeValues addObject:propertyValue];
+            continue;
+        }
+        
+        // If it is a to-many relationship, take the union
+        BOOL isToMany = propertyValue.type == CDEPropertyChangeTypeToManyRelationship;
+        isToMany = isToMany || propertyValue.type == CDEPropertyChangeTypeOrderedToManyRelationship;
+        if (isToMany) {
+            [existingValue mergeToManyRelationshipFromPropertyChangeValue:propertyValue];
+        }
+    }
+    
+    if (addedPropertyChangeValues.count > 0) {
+        self.propertyChangeValues = [self.propertyChangeValues arrayByAddingObjectsFromArray:addedPropertyChangeValues];
+    }
 }
 
 @end

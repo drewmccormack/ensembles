@@ -12,6 +12,8 @@
 #import "CDEEventRevision.h"
 #import "CDERevisionSet.h"
 #import "CDERevision.h"
+#import "CDERevisionManager.h"
+
 
 @implementation CDEStoreModificationEvent
 
@@ -49,6 +51,26 @@
     return set;
 }
 
+- (void)setRevisionSet:(CDERevisionSet *)newRevisionSet forPersistentStoreIdentifier:(NSString *)persistentStoreId
+{
+    NSManagedObjectContext *context = self.managedObjectContext;
+    
+    CDERevision *localRevision = [newRevisionSet revisionForPersistentStoreIdentifier:persistentStoreId];
+    [newRevisionSet removeRevisionForPersistentStoreIdentifier:persistentStoreId];
+    
+    [self deleteEventRevisions];
+    
+    CDEEventRevision *eventRevision = [NSEntityDescription insertNewObjectForEntityForName:@"CDEEventRevision" inManagedObjectContext:context];
+    eventRevision.persistentStoreIdentifier = persistentStoreId;
+    eventRevision.revisionNumber = localRevision ? localRevision.revisionNumber : -1;
+    eventRevision.storeModificationEvent = self;
+    
+    self.eventRevision = eventRevision;
+    self.eventRevisionsOfOtherStores = [CDEEventRevision makeEventRevisionsForRevisionSet:newRevisionSet inManagedObjectContext:context];
+    
+    if (localRevision) [newRevisionSet addRevision:localRevision]; // Add back removed revision
+}
+
 - (void)setRevisionSetOfOtherStoresAtCreation:(CDERevisionSet *)newSet
 {
     NSSet *eventRevisions = [CDEEventRevision makeEventRevisionsForRevisionSet:newSet inManagedObjectContext:self.managedObjectContext];
@@ -62,6 +84,17 @@
         [set addRevision:rev.revision];
     }
     return set;
+}
+
+- (void)deleteEventRevisions
+{
+    NSManagedObjectContext *context = self.managedObjectContext;
+    if (self.eventRevision) [context deleteObject:self.eventRevision];
+    if (self.eventRevisionsOfOtherStores) {
+        for (CDEEventRevision *eventRev in [self.eventRevisionsOfOtherStores copy]) {
+            [context deleteObject:eventRev];
+        }
+    }
 }
 
 
@@ -85,7 +118,7 @@
     if (persistentStoreId == nil || revision < 0) return nil;
     
     NSFetchRequest *fetch = [[NSFetchRequest alloc] initWithEntityName:@"CDEStoreModificationEvent"];
-    fetch.predicate = [NSPredicate predicateWithFormat:@"eventRevision.persistentStoreIdentifier = %@ && eventRevision.revisionNumber = %lld", persistentStoreId, revision];
+    fetch.predicate = [NSPredicate predicateWithFormat:@"eventRevision.persistentStoreIdentifier = %@ && eventRevision.revisionNumber = %lld && type != %d", persistentStoreId, revision, CDEStoreModificationEventTypeBaseline];
     
     NSError *error;
     NSArray *events = [context executeFetchRequest:fetch error:&error];
@@ -98,7 +131,7 @@
 + (NSArray *)fetchStoreModificationEventsForPersistentStoreIdentifier:(NSString *)persistentStoreId sinceRevisionNumber:(CDERevisionNumber)revision inManagedObjectContext:(NSManagedObjectContext *)context
 {
     NSFetchRequest *fetch = [[NSFetchRequest alloc] initWithEntityName:@"CDEStoreModificationEvent"];
-    fetch.predicate = [NSPredicate predicateWithFormat:@"eventRevision.persistentStoreIdentifier = %@ && eventRevision.revisionNumber > %lld", persistentStoreId, revision];
+    fetch.predicate = [NSPredicate predicateWithFormat:@"eventRevision.persistentStoreIdentifier = %@ && eventRevision.revisionNumber > %lld && type != %d", persistentStoreId, revision, CDEStoreModificationEventTypeBaseline];
 
     NSError *error;
     NSArray *events = [context executeFetchRequest:fetch error:&error];
@@ -118,6 +151,16 @@
     NSAssert(events.count < 2, @"Multiple baselines found");
     
     return events.lastObject;
+}
+
++ (NSArray *)fetchStoreModificationEventsUpToGlobalCount:(CDEGlobalCount)globalCount inManagedObjectContext:(NSManagedObjectContext *)context
+{
+    NSError *error;
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
+    fetch.predicate = [NSPredicate predicateWithFormat:@"type != %d AND globalCount <= %lld", CDEStoreModificationEventTypeBaseline, globalCount];
+    NSArray *events = [context executeFetchRequest:fetch error:&error];
+    NSAssert(events, @"Fetch of events up to global count failed: %@", error);
+    return [CDERevisionManager sortStoreModificationEvents:events];
 }
 
 + (void)prefetchRelatedObjectsForStoreModificationEvents:(NSArray *)storeModEvents

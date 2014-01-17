@@ -166,29 +166,17 @@
     if (baselines.count == 1) return baselines.lastObject;
     
     // Change the first baseline into our new baseline by assigning a different unique id
+    // Global count should be minimum, to ensure it preceeds all other events
     CDEStoreModificationEvent *firstBaseline = baselines.firstObject;
     firstBaseline.uniqueIdentifier = [[NSProcessInfo processInfo] globallyUniqueString];
     firstBaseline.timestamp = [NSDate timeIntervalSinceReferenceDate];
     firstBaseline.modelVersion = [self.ensemble.managedObjectModel cde_entityHashesPropertyList];
+    firstBaseline.globalCount = [baselines.lastObject globalCount];
     
     // Update the revisions of each store in the baseline
-    CDERevisionSet *newRevisionSet = [[CDERevisionSet alloc] init];
-    for (CDEStoreModificationEvent *event in baselines) {
-        newRevisionSet = [newRevisionSet revisionSetByTakingStoreWiseMaximumWithRevisionSet:event.revisionSet];
-    }
-    
-    NSManagedObjectContext *context = self.eventStore.managedObjectContext;
+    CDERevisionSet *newRevisionSet = [CDERevisionSet revisionSetByTakingStoreWiseMaximumOfRevisionSets:[baselines valueForKeyPath:@"revisionSet"]];
     NSString *persistentStoreId = self.eventStore.persistentStoreIdentifier;
-    CDERevision *localRevision = [newRevisionSet revisionForPersistentStoreIdentifier:persistentStoreId];
-    [newRevisionSet removeRevisionForPersistentStoreIdentifier:persistentStoreId];
-    
-    CDEEventRevision *eventRevision = [NSEntityDescription insertNewObjectForEntityForName:@"CDEEventRevision" inManagedObjectContext:context];
-    eventRevision.persistentStoreIdentifier = persistentStoreId;
-    eventRevision.revisionNumber = localRevision ? localRevision.revisionNumber : -1;
-    eventRevision.storeModificationEvent = firstBaseline;
-    
-    firstBaseline.eventRevision = eventRevision;
-    firstBaseline.eventRevisionsOfOtherStores = [CDEEventRevision makeEventRevisionsForRevisionSet:newRevisionSet inManagedObjectContext:context];
+    [firstBaseline setRevisionSet:newRevisionSet forPersistentStoreIdentifier:persistentStoreId];
     
     // Retrieve all global identifiers. Map global ids to object changes.
     [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:@[firstBaseline]];
@@ -201,10 +189,10 @@
     // Get other baselines
     NSMutableArray *otherBaselines = [baselines mutableCopy];
     [otherBaselines removeObject:firstBaseline];
-    [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:otherBaselines];
     
     // Apply changes from others
     for (CDEStoreModificationEvent *baseline in otherBaselines) {
+        [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:@[baseline]];
         [baseline.objectChanges.allObjects cde_enumerateObjectsDrainingEveryIterations:100 usingBlock:^(CDEObjectChange *change, NSUInteger index, BOOL *stop) {
             CDEObjectChange *existingChange = [objectChangesByGlobalId objectForKey:change.globalIdentifier];
             if (!existingChange) {
@@ -213,62 +201,12 @@
                 [objectChangesByGlobalId setObject:change forKey:change.globalIdentifier];
             }
             else {
-                [self mergeValuesIntoObjectChange:existingChange fromObjectChange:change];
+                [existingChange mergeValuesFromSubordinateObjectChange:change];
             }
         }];
     }
     
     return firstBaseline;
-}
-
-- (void)mergeValuesIntoObjectChange:(CDEObjectChange *)existingChange fromObjectChange:(CDEObjectChange *)change
-{
-    NSSet *existingNames = [[NSSet alloc] initWithArray:[existingChange.propertyChangeValues valueForKeyPath:@"propertyName"]];
-    
-    NSMutableArray *addedPropertyChangeValues = nil;
-    for (CDEPropertyChangeValue *propertyValue in change.propertyChangeValues) {
-        NSString *propertyName = propertyValue.propertyName;
-        
-        // If this property name is not already present, just copy it in
-        if (![existingNames containsObject:propertyName]) {
-            if (!addedPropertyChangeValues) addedPropertyChangeValues = [[NSMutableArray alloc] initWithCapacity:10];
-            [addedPropertyChangeValues addObject:propertyValue];
-            continue;
-        }
-        
-        // If it is a to-many relationship, take the union
-        BOOL isToMany = propertyValue.type == CDEPropertyChangeTypeToManyRelationship;
-        isToMany = isToMany || propertyValue.type == CDEPropertyChangeTypeOrderedToManyRelationship;
-        if (isToMany) {
-            CDEPropertyChangeValue *existingValue = [existingChange propertyChangeValueForPropertyName:propertyName];
-            [self mergeToManyRelationshipIntoValue:existingValue fromValue:propertyValue];
-        }
-    }
-    
-    if (addedPropertyChangeValues.count > 0) {
-        existingChange.propertyChangeValues = [existingChange.propertyChangeValues arrayByAddingObjectsFromArray:addedPropertyChangeValues];
-    }
-}
-
-- (void)mergeToManyRelationshipIntoValue:(CDEPropertyChangeValue *)existingValue fromValue:(CDEPropertyChangeValue *)propertyValue
-{
-    NSSet *originalAddedIdentifiers = existingValue.addedIdentifiers;
-    if ([propertyValue.addedIdentifiers isEqualToSet:originalAddedIdentifiers]) return;
-
-    // Add the missing identifiers
-    existingValue.addedIdentifiers = [originalAddedIdentifiers setByAddingObjectsFromSet:propertyValue.addedIdentifiers];
-    if (propertyValue.type != CDEPropertyChangeTypeOrderedToManyRelationship) return;
-    
-    // If it is an ordered to-many, update ordering. Order new identifiers after the existing ones.
-    NSMutableDictionary *newMovedIdentifiersByIndex = [[NSMutableDictionary alloc] initWithDictionary:existingValue.movedIdentifiersByIndex];
-    NSUInteger newIndex = existingValue.movedIdentifiersByIndex.count;
-    for (NSUInteger oldIndex = 0; oldIndex < propertyValue.movedIdentifiersByIndex.count; oldIndex++) {
-        NSString *identifier = propertyValue.movedIdentifiersByIndex[@(oldIndex)];
-        if (!identifier || [originalAddedIdentifiers containsObject:identifier]) continue;
-        newMovedIdentifiersByIndex[@(newIndex++)] = identifier;
-    }
-    
-    existingValue.movedIdentifiersByIndex = newMovedIdentifiersByIndex;
 }
 
 @end

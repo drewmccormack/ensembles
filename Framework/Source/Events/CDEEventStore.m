@@ -161,30 +161,38 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 
 - (void)registerIncompleteEventIdentifier:(NSString *)identifier isMandatory:(BOOL)mandatory
 {
-    [incompleteEventIdentifiers setObject:@(mandatory) forKey:identifier];
-    [self saveStoreMetadata];
+    @synchronized (self) {
+        [incompleteEventIdentifiers setObject:@(mandatory) forKey:identifier];
+        [self saveStoreMetadata];
+    }
 }
 
 - (void)deregisterIncompleteEventIdentifier:(NSString *)identifier
 {
-    [incompleteEventIdentifiers removeObjectForKey:identifier];
-    [self saveStoreMetadata];
+    @synchronized (self) {
+        [incompleteEventIdentifiers removeObjectForKey:identifier];
+        [self saveStoreMetadata];
+    }
 }
 
 - (NSArray *)incompleteEventIdentifiers
 {
-    return [incompleteEventIdentifiers.allKeys copy];
+    @synchronized (self) {
+        return [incompleteEventIdentifiers.allKeys copy];
+    }
 }
 
 - (NSArray *)incompleteMandatoryEventIdentifiers
 {
-    NSMutableArray *result = [NSMutableArray arrayWithCapacity:incompleteEventIdentifiers.count];
-    for (NSString *identifier in incompleteEventIdentifiers) {
-        if ([incompleteEventIdentifiers[identifier] boolValue]) {
-            [result addObject:identifier];
+    @synchronized (self) {
+        NSMutableArray *result = [NSMutableArray arrayWithCapacity:incompleteEventIdentifiers.count];
+        for (NSString *identifier in incompleteEventIdentifiers) {
+            if ([incompleteEventIdentifiers[identifier] boolValue]) {
+                [result addObject:identifier];
+            }
         }
+        return result;
     }
-    return result;
 }
 
 

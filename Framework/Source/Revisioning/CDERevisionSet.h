@@ -11,7 +11,7 @@
 
 @class CDERevision;
 
-@interface CDERevisionSet : NSObject
+@interface CDERevisionSet : NSObject 
 
 @property (nonatomic, assign, readonly) NSUInteger numberOfRevisions;
 @property (nonatomic, strong, readonly) NSSet *revisions;
@@ -29,6 +29,7 @@
 
 - (CDERevisionSet *)revisionSetByTakingStoreWiseMinimumWithRevisionSet:(CDERevisionSet *)otherSet;
 - (CDERevisionSet *)revisionSetByTakingStoreWiseMaximumWithRevisionSet:(CDERevisionSet *)otherSet;
++ (CDERevisionSet *)revisionSetByTakingStoreWiseMaximumOfRevisionSets:(NSArray *)sets;
 
 - (NSComparisonResult)compare:(CDERevisionSet *)otherSet;
 

@@ -38,7 +38,7 @@
 
 #pragma mark Fetching from Event Store
 
-- (NSArray *)sortStoreModificationEvents:(NSArray *)events
++ (NSArray *)sortStoreModificationEvents:(NSArray *)events
 {
     // Sort in save order. Use store id to disambiguate in unlikely event of identical timestamps.
     NSArray *sortDescriptors = @[
@@ -74,7 +74,7 @@
             [events addObjectsFromArray:recentEvents];
         }
         
-        result = [self sortStoreModificationEvents:events];
+        result = [self.class sortStoreModificationEvents:events];
     }];
     return result;
 }
@@ -110,7 +110,7 @@
             [concurrentEvents addObjectsFromArray:recentEvents];
         }
         
-        result = [self sortStoreModificationEvents:concurrentEvents.allObjects];
+        result = [self.class sortStoreModificationEvents:concurrentEvents.allObjects];
     }];
     
     return result;

@@ -172,7 +172,7 @@
     XCTAssertEqual([events[0] globalCount], (CDEGlobalCount)100, @"Global count of first wrong in uncommitted");
     XCTAssertEqual([events[1] globalCount], (CDEGlobalCount)110, @"Global count of second wrong in uncommitted");
     
-    events = [revisionManager sortStoreModificationEvents:events];
+    events = [CDERevisionManager sortStoreModificationEvents:events];
     
     XCTAssertEqual([events[0] globalCount], (CDEGlobalCount)100, @"Global count of first wrong");
     XCTAssertEqual([events[1] globalCount], (CDEGlobalCount)110, @"Global count of second wrong");
