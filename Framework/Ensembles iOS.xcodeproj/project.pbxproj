@@ -225,6 +225,7 @@
 		07D2D63A182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSManagedObjectModel+CDEAdditions.m"; sourceTree = "<group>"; };
 		07D2D63F182D6887001D24BC /* CDEManagedObjectModelTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEManagedObjectModelTests.m; sourceTree = "<group>"; };
 		07F001BD18427645001A0504 /* IntegratorMergeTestsFixture.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = IntegratorMergeTestsFixture.json; sourceTree = "<group>"; };
+		34700E9D188B225700FD00B1 /* CDEAvailabilityMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEAvailabilityMacros.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -462,6 +463,7 @@
 				07BF379017F1853000C56F64 /* CDEAsynchronousTaskQueue.m */,
 				07BF379117F1853000C56F64 /* CDEDefines.h */,
 				07BF379217F1853000C56F64 /* CDEDefines.m */,
+				34700E9D188B225700FD00B1 /* CDEAvailabilityMacros.h */,
 				07BF379317F1853000C56F64 /* CDEFoundationAdditions.h */,
 				07BF379417F1853000C56F64 /* CDEFoundationAdditions.m */,
 				07BF379517F1853000C56F64 /* CoreDataEnsembles.h */,
