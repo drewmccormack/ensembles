@@ -44,6 +44,7 @@
 		074DE61217B77BB6009755EB /* CDEEventMigratorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07157A2217B555A4004AAD22 /* CDEEventMigratorTests.m */; };
 		074DE61717B80325009755EB /* CDEEventIntegrator.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF79FA177F0A9D0029D500 /* CDEEventIntegrator.m */; };
 		0754307717F20BEE00FA4946 /* CDECloudManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07697A7117E0B6C000A9BB63 /* CDECloudManagerTests.m */; };
+		075754B5188BC952006803FA /* CDEAvailabilityMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 075754B4188BC952006803FA /* CDEAvailabilityMacros.h */; };
 		07592CA7177F2D1000816034 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF78E9177F03320029D500 /* XCTest.framework */; };
 		07592CAD177F2D1000816034 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 07592CAB177F2D1000816034 /* InfoPlist.strings */; };
 		075FDCD518360B0E0020E1C9 /* CDEIntegratorMergeRepairTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 075FDCD418360B0E0020E1C9 /* CDEIntegratorMergeRepairTests.m */; };
@@ -159,6 +160,7 @@
 		0747CDA317C3E0A300221ED7 /* CDEIntegratorTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEIntegratorTestCase.h; sourceTree = "<group>"; };
 		0747CDA417C3E0A300221ED7 /* CDEIntegratorTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEIntegratorTestCase.m; sourceTree = "<group>"; };
 		074DE61017B779D8009755EB /* CDERevisionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDERevisionTests.m; sourceTree = "<group>"; };
+		075754B4188BC952006803FA /* CDEAvailabilityMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEAvailabilityMacros.h; sourceTree = "<group>"; };
 		07592CA6177F2D1000816034 /* Tests Mac.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests Mac.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		07592CAA177F2D1000816034 /* Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Tests-Info.plist"; sourceTree = "<group>"; };
 		07592CAC177F2D1000816034 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -451,11 +453,12 @@
 		07BF7A03177F0A9D0029D500 /* General */ = {
 			isa = PBXGroup;
 			children = (
+				07BF7A08177F0A9D0029D500 /* CDEDefines.h */,
+				07BF7A09177F0A9D0029D500 /* CDEDefines.m */,
+				075754B4188BC952006803FA /* CDEAvailabilityMacros.h */,
 				07CCA9D617E49CA80017B6C4 /* CoreDataEnsembles.h */,
 				07BF7A06177F0A9D0029D500 /* CDEAsynchronousTaskQueue.h */,
 				07BF7A07177F0A9D0029D500 /* CDEAsynchronousTaskQueue.m */,
-				07BF7A08177F0A9D0029D500 /* CDEDefines.h */,
-				07BF7A09177F0A9D0029D500 /* CDEDefines.m */,
 				07BF7A0A177F0A9D0029D500 /* CDEFoundationAdditions.h */,
 				07BF7A0B177F0A9D0029D500 /* CDEFoundationAdditions.m */,
 				07D2D630182D627E001D24BC /* NSManagedObjectModel+CDEAdditions.h */,
@@ -557,6 +560,7 @@
 				07973F15183BE466007F48CA /* CDECloudFileSystem.h in Headers */,
 				0722B26717B76B2400496F4A /* CDERevision.h in Headers */,
 				07BF7A4D177F0A9D0029D500 /* CDEFoundationAdditions.h in Headers */,
+				075754B5188BC952006803FA /* CDEAvailabilityMacros.h in Headers */,
 				078A3F82178C9B32009C8821 /* CDEEventRevision.h in Headers */,
 				07E64F5C18799F6800305C22 /* CDERebaser.h in Headers */,
 			);

@@ -459,11 +459,11 @@
 		07BF378E17F1853000C56F64 /* General */ = {
 			isa = PBXGroup;
 			children = (
-				07BF378F17F1853000C56F64 /* CDEAsynchronousTaskQueue.h */,
-				07BF379017F1853000C56F64 /* CDEAsynchronousTaskQueue.m */,
 				07BF379117F1853000C56F64 /* CDEDefines.h */,
 				07BF379217F1853000C56F64 /* CDEDefines.m */,
 				34700E9D188B225700FD00B1 /* CDEAvailabilityMacros.h */,
+				07BF378F17F1853000C56F64 /* CDEAsynchronousTaskQueue.h */,
+				07BF379017F1853000C56F64 /* CDEAsynchronousTaskQueue.m */,
 				07BF379317F1853000C56F64 /* CDEFoundationAdditions.h */,
 				07BF379417F1853000C56F64 /* CDEFoundationAdditions.m */,
 				07BF379517F1853000C56F64 /* CoreDataEnsembles.h */,
