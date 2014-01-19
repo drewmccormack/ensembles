@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "CDECloudFileSystem.h"
 
+extern NSString * const CDEICloudFileSystemDidDownloadFilesNotification;
+
 @interface CDEICloudFileSystem : NSObject <CDECloudFileSystem>
 
 - (instancetype)initWithUbiquityContainerIdentifier:(NSString *)newIdentifier;

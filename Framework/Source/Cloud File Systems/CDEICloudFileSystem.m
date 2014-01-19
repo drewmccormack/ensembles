@@ -10,6 +10,8 @@
 #import "CDECloudDirectory.h"
 #import "CDECloudFile.h"
 
+NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFileSystemDidUpdateFilesNotification";
+
 @implementation CDEICloudFileSystem {
     NSFileManager *fileManager;
     NSURL *rootDirectoryURL;
@@ -18,6 +20,7 @@
     NSString *ubiquityContainerIdentifier;
     dispatch_queue_t timeOutQueue;
     id ubiquityIdentityObserver;
+    BOOL didStartDownloading;
 }
 
 - (instancetype)initWithUbiquityContainerIdentifier:(NSString *)newIdentifier
@@ -35,6 +38,7 @@
         metadataQuery = nil;
         ubiquityContainerIdentifier = [newIdentifier copy];
         ubiquityIdentityObserver = nil;
+        didStartDownloading = NO;
         
         [self performInitialPreparation:NULL];
     }
@@ -184,6 +188,8 @@
  
     if (!rootDirectoryURL) return;
     
+    didStartDownloading = NO;
+    
     // Determine downloading key and set the appropriate predicate. This is OS dependent.
     NSPredicate *metadataPredicate = nil;
     
@@ -196,7 +202,7 @@
 #endif
     
     metadataQuery = [[NSMetadataQuery alloc] init];
-    metadataQuery.notificationBatchingInterval = 10.0;
+    metadataQuery.notificationBatchingInterval = 0.0;
     metadataQuery.searchScopes = [NSArray arrayWithObject:NSMetadataQueryUbiquitousDataScope];
     metadataQuery.predicate = metadataPredicate;
     
@@ -224,7 +230,15 @@
 {
     [metadataQuery disableUpdates];
     
+    // If there were downloads, and aren't anymore, fire notification
     NSUInteger count = [metadataQuery resultCount];
+    if (didStartDownloading && count == 0) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:CDEICloudFileSystemDidDownloadFilesNotification object:self];
+        });
+    }
+    didStartDownloading = count > 0;
+    
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
     for ( NSUInteger i = 0; i < count; i++ ) {
         @autoreleasepool {
