@@ -37,6 +37,36 @@
     XCTAssertTrue([rebaser shouldRebase], @"Empty store should be rebased to give it a baseline");
 }
 
+- (void)testEventStoreWithNoBaselineNeedsRebasing
+{
+    [self addEventsForType:CDEStoreModificationEventTypeMerge storeId:@"123" globalCounts:@[@0] revisions:@[@0]];
+    XCTAssertTrue([rebaser shouldRebase], @"Store with events, but no baseline, should need a new baseline");
+}
+
+- (void)testEventStoreWithFewEventsDoesNotNeedRebasing
+{
+    NSArray *baselines = [self addEventsForType:CDEStoreModificationEventTypeBaseline storeId:@"store1" globalCounts:@[@0] revisions:@[@0]];
+    
+    [context performBlockAndWait:^{
+        CDEStoreModificationEvent *baseline = baselines.lastObject;
+        CDEEventRevision *rev;
+        rev = [CDEEventRevision makeEventRevisionForPersistentStoreIdentifier:@"123" revisionNumber:0 inManagedObjectContext:context];
+        baseline.eventRevisionsOfOtherStores = [NSSet setWithObject:rev];
+        [context save:NULL];
+    }];
+
+    [self addEventsForType:CDEStoreModificationEventTypeMerge storeId:@"123" globalCounts:@[@1, @2] revisions:@[@1, @2]];
+    
+    XCTAssertFalse([rebaser shouldRebase], @"Store with only a few events should not rebase, even if baseline is small");
+}
+
+- (void)testBaselineMissingADeviceNeedsRebasing
+{
+    [self addEventsForType:CDEStoreModificationEventTypeBaseline storeId:@"store1" globalCounts:@[@0] revisions:@[@0]];
+    [self addEventsForType:CDEStoreModificationEventTypeMerge storeId:@"123" globalCounts:@[@1, @2] revisions:@[@1, @2]];
+    XCTAssertTrue([rebaser shouldRebase], @"If baseline misses a device, it should rebase");
+}
+
 - (void)testRebasingEmptyEventStoreGeneratesBaseline
 {
     [rebaser rebaseWithCompletion:^(NSError *error) {
@@ -54,6 +84,29 @@
         }];
     }];
     [self waitForAsyncOpToFinish];
+}
+
+- (NSArray *)addEventsForType:(CDEStoreModificationEventType)type storeId:(NSString *)storeId globalCounts:(NSArray *)globalCounts revisions:(NSArray *)revisions
+{
+    __block NSMutableArray *events = [NSMutableArray array];
+    [context performBlockAndWait:^{
+        for (NSUInteger i = 0; i < globalCounts.count; i++) {
+            CDEStoreModificationEvent *event = [NSEntityDescription insertNewObjectForEntityForName:@"CDEStoreModificationEvent" inManagedObjectContext:context];
+            event.type = type;
+            event.globalCount = [globalCounts[i] integerValue];
+            event.timestamp = 10.0;
+            
+            CDEEventRevision *rev;
+            rev = [CDEEventRevision makeEventRevisionForPersistentStoreIdentifier:storeId revisionNumber:[revisions[i] integerValue] inManagedObjectContext:context];
+            event.eventRevision = rev;
+            
+            [events addObject:event];
+        }
+        
+        [context save:NULL];
+    }];
+    
+    return events;
 }
 
 - (void)waitForAsyncOpToFinish

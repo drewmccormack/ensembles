@@ -296,4 +296,12 @@
     return set;
 }
 
+#pragma mark Persistent Stores
+
+- (NSSet *)allPersistentStoreIdentifiers
+{
+    CDERevisionSet *latestRevisionSet = [self revisionSetOfMostRecentEvents];
+    return latestRevisionSet.persistentStoreIdentifiers;
+}
+
 @end

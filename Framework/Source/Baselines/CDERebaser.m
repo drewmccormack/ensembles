@@ -65,11 +65,21 @@
     // or if there is no baseline at all
     NSManagedObjectContext *context = eventStore.managedObjectContext;
     __block BOOL hasBaseline = NO;
+    __block CDERevisionSet *baselineRevisionSet = nil;
     [context performBlockAndWait:^{
         CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:context];
         hasBaseline = baseline != nil;
+        baselineRevisionSet = baseline.revisionSet;
     }];
-    return !hasBaseline || ([self countOfAllObjectChanges] >= 100 && self.estimatedEventStoreCompactionFollowingRebase > 0.5);
+    
+    // Rebase if the baseline doesn't include all stores
+    CDERevisionManager *revisionManager = [[CDERevisionManager alloc] initWithEventStore:self.eventStore];
+    NSSet *allStores = revisionManager.allPersistentStoreIdentifiers;
+    BOOL hasAllDevicesInBaseline = [baselineRevisionSet.persistentStoreIdentifiers isEqualToSet:allStores];
+    
+    BOOL hasManyEvents = [self countOfAllObjectChanges] >= 100;
+    BOOL compactionIsAdequate = self.estimatedEventStoreCompactionFollowingRebase > 0.5;
+    return !hasBaseline || !hasAllDevicesInBaseline || (hasManyEvents && compactionIsAdequate);
 }
 
 

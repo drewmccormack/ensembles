@@ -35,6 +35,7 @@
 
 - (CDEGlobalCount)maximumGlobalCount;
 - (CDERevisionSet *)revisionSetOfMostRecentEvents;
+- (NSSet *)allPersistentStoreIdentifiers;
 
 + (NSArray *)sortStoreModificationEvents:(NSArray *)events;
 
