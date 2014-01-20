@@ -44,7 +44,10 @@
 
 - (CDERevision *)revision
 {
-    return [[CDERevision alloc] initWithPersistentStoreIdentifier:self.persistentStoreIdentifier revisionNumber:self.revisionNumber];
+    if (self.storeModificationEvent)
+        return [[CDERevision alloc] initWithPersistentStoreIdentifier:self.persistentStoreIdentifier revisionNumber:self.revisionNumber globalCount:self.storeModificationEvent.globalCount];
+    else
+        return [[CDERevision alloc] initWithPersistentStoreIdentifier:self.persistentStoreIdentifier revisionNumber:self.revisionNumber];
 }
 
 + (NSSet *)makeEventRevisionsForRevisionSet:(CDERevisionSet *)revisionSet inManagedObjectContext:(NSManagedObjectContext *)context

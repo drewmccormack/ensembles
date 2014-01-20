@@ -16,6 +16,12 @@
 #import "CDEPropertyChangeValue.h"
 #import "CDERevision.h"
 
+@interface CDERebaser (TestMethods)
+
+- (CDEGlobalCount)globalCountForNewBaseline;
+
+@end
+
 @interface CDERebaserTests : CDEEventStoreTestCase
 
 @end
@@ -84,6 +90,24 @@
         }];
     }];
     [self waitForAsyncOpToFinish];
+}
+
+- (void)testDevicesWhichHaveNoEventsSinceBaselineAreIgnoredInGlobalCountCutoff
+{
+    NSArray *baselines = [self addEventsForType:CDEStoreModificationEventTypeBaseline storeId:@"store1" globalCounts:@[@0] revisions:@[@0]];
+    
+    [context performBlockAndWait:^{
+        CDEStoreModificationEvent *baseline = baselines.lastObject;
+        CDEEventRevision *rev;
+        rev = [CDEEventRevision makeEventRevisionForPersistentStoreIdentifier:@"123" revisionNumber:0 inManagedObjectContext:context];
+        baseline.eventRevisionsOfOtherStores = [NSSet setWithObject:rev];
+        [context save:NULL];
+    }];
+    
+    [self addEventsForType:CDEStoreModificationEventTypeMerge storeId:@"123" globalCounts:@[@1, @2] revisions:@[@1, @2]];
+    
+    XCTAssertEqual([rebaser globalCountForNewBaseline], (CDEGlobalCount)2, @"Wrong global count");
+
 }
 
 - (NSArray *)addEventsForType:(CDEStoreModificationEventType)type storeId:(NSString *)storeId globalCounts:(NSArray *)globalCounts revisions:(NSArray *)revisions

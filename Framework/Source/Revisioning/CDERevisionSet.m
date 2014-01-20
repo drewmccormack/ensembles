@@ -187,4 +187,16 @@
     return result;
 }
 
+
+#pragma mark Description
+
+- (NSString *)description
+{
+    NSMutableString *result = [[NSMutableString alloc] initWithString:[super description]];
+    for (CDERevision *revision in self.revisions) {
+        [result appendFormat:@"Store: %@, Global Count: %lli, Revision: %lli\n", revision.persistentStoreIdentifier, revision.globalCount, revision.revisionNumber];
+    }
+    return result;
+}
+
 @end
