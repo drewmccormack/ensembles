@@ -132,6 +132,37 @@
     [self waitForAsyncOpToFinish];
 }
 
+- (void)testNewBaselineIncludesUpToGlobalCountOfStoreWithLeastRecentEvents
+{
+    NSArray *baselines = [self addEventsForType:CDEStoreModificationEventTypeBaseline storeId:@"store1" globalCounts:@[@10] revisions:@[@110]];
+    [self addEventsForType:CDEStoreModificationEventTypeSave storeId:@"store1" globalCounts:@[@20, @21] revisions:@[@111, @112]];
+    
+    [context performBlockAndWait:^{
+        CDEStoreModificationEvent *baseline = baselines.lastObject;
+        CDEEventRevision *rev;
+        rev = [CDEEventRevision makeEventRevisionForPersistentStoreIdentifier:@"123" revisionNumber:1 inManagedObjectContext:context];
+        baseline.eventRevisionsOfOtherStores = [NSSet setWithObject:rev];
+        [context save:NULL];
+    }];
+    
+    [self addEventsForType:CDEStoreModificationEventTypeSave storeId:@"123" globalCounts:@[@16, @30] revisions:@[@2, @3]];
+    
+    [rebaser rebaseWithCompletion:^(NSError *error) {
+        [context performBlockAndWait:^{
+            CDEStoreModificationEvent *baseline = [self fetchBaseline];
+            CDERevisionSet *revSet = baseline.revisionSet;
+            CDERevision *revForStore1 = [revSet revisionForPersistentStoreIdentifier:@"store1"];
+            CDERevision *revFor123 = [revSet revisionForPersistentStoreIdentifier:@"123"];
+            CDEGlobalCount baselineGlobalCount = baseline.globalCount;
+            XCTAssertEqual(baselineGlobalCount, (CDEGlobalCount)21, @"Wrong global count");
+            XCTAssertEqual(revForStore1.revisionNumber, (CDERevisionNumber)112, @"Wrong revision number for store1");
+            XCTAssertEqual(revFor123.revisionNumber, (CDERevisionNumber)2, @"Wrong revision number for 123");
+        }];
+        [self stopAsyncOp];
+    }];
+    [self waitForAsyncOpToFinish];
+}
+
 - (NSArray *)addEventsForType:(CDEStoreModificationEventType)type storeId:(NSString *)storeId globalCounts:(NSArray *)globalCounts revisions:(NSArray *)revisions
 {
     __block NSMutableArray *events = [NSMutableArray array];
