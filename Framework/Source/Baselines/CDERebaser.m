@@ -146,8 +146,6 @@
 
 - (void)mergeOrderedEvents:(NSArray *)eventsToMerge intoBaseline:(CDEStoreModificationEvent *)baseline
 {
-    NSManagedObjectContext *context = baseline.managedObjectContext;
-    
     // Create map of existing object changes
     [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:@[baseline]];
     NSMapTable *objectChangesByGlobalId = [NSMapTable strongToStrongObjectsMapTable];
@@ -165,38 +163,44 @@
         // Loop through object changes
         [event.objectChanges.allObjects cde_enumerateObjectsDrainingEveryIterations:100 usingBlock:^(CDEObjectChange *change, NSUInteger index, BOOL *stop) {
             CDEObjectChange *existingChange = [objectChangesByGlobalId objectForKey:change.globalIdentifier];
-            switch (change.type) {
-                case CDEObjectChangeTypeDelete:
-                    if (existingChange) {
-                        [objectChangesByGlobalId removeObjectForKey:change.globalIdentifier];
-                        [context deleteObject:existingChange];
-                    }
-                    break;
-                    
-                case CDEObjectChangeTypeInsert:
-                    if (existingChange) {
-                        [change mergeValuesFromSubordinateObjectChange:existingChange];
-                        [context deleteObject:existingChange];
-                    }
-                    change.storeModificationEvent = baseline;
-                    [objectChangesByGlobalId setObject:change forKey:change.globalIdentifier];
-                    break;
-                    
-                case CDEObjectChangeTypeUpdate:
-                    if (existingChange) {
-                        [change mergeValuesFromSubordinateObjectChange:existingChange];
-                        [context deleteObject:existingChange];
-                        change.type = CDEObjectChangeTypeInsert;
-                        change.storeModificationEvent = baseline;
-                        [objectChangesByGlobalId setObject:change forKey:change.globalIdentifier];
-                    }
-                    break;
-                    
-                default:
-                    @throw [NSException exceptionWithName:CDEException reason:@"Invalid object change type" userInfo:nil];
-                    break;
-            }
+            [self mergeChange:change withSubordinateChange:existingChange addToBaseline:baseline withObjectChangesByGlobalId:objectChangesByGlobalId];
         }];
+    }
+}
+
+- (void)mergeChange:(CDEObjectChange *)change withSubordinateChange:(CDEObjectChange *)subordinateChange addToBaseline:(CDEStoreModificationEvent *)baseline withObjectChangesByGlobalId:(NSMapTable *)objectChangesByGlobalId
+{
+    NSManagedObjectContext *context = change.managedObjectContext;
+    switch (change.type) {
+        case CDEObjectChangeTypeDelete:
+            if (subordinateChange) {
+                [objectChangesByGlobalId removeObjectForKey:change.globalIdentifier];
+                [context deleteObject:subordinateChange];
+            }
+            break;
+            
+        case CDEObjectChangeTypeInsert:
+            if (subordinateChange) {
+                [change mergeValuesFromSubordinateObjectChange:subordinateChange];
+                [context deleteObject:subordinateChange];
+            }
+            change.storeModificationEvent = baseline;
+            [objectChangesByGlobalId setObject:change forKey:change.globalIdentifier];
+            break;
+            
+        case CDEObjectChangeTypeUpdate:
+            if (subordinateChange) {
+                [change mergeValuesFromSubordinateObjectChange:subordinateChange];
+                [context deleteObject:subordinateChange];
+                change.type = CDEObjectChangeTypeInsert;
+                change.storeModificationEvent = baseline;
+                [objectChangesByGlobalId setObject:change forKey:change.globalIdentifier];
+            }
+            break;
+            
+        default:
+            @throw [NSException exceptionWithName:CDEException reason:@"Invalid object change type" userInfo:nil];
+            break;
     }
 }
 

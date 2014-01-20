@@ -164,6 +164,106 @@
     [self waitForAsyncOpToFinish];
 }
 
+- (void)testRebasingAttribute
+{
+    NSArray *baselines = [self addEventsForType:CDEStoreModificationEventTypeBaseline storeId:@"store1" globalCounts:@[@10] revisions:@[@110]];
+    CDEStoreModificationEvent *baseline = baselines.lastObject;
+    CDEStoreModificationEvent *event = [[self addEventsForType:CDEStoreModificationEventTypeSave storeId:@"store1" globalCounts:@[@20] revisions:@[@111]] lastObject];
+    
+    [context performBlockAndWait:^{
+        // Object change in baseline
+        CDEGlobalIdentifier *globalId1 = [NSEntityDescription insertNewObjectForEntityForName:@"CDEGlobalIdentifier" inManagedObjectContext:context];
+        globalId1.globalIdentifier = @"unique";
+        globalId1.nameOfEntity = @"A";
+        
+        CDEObjectChange *change1 = [NSEntityDescription insertNewObjectForEntityForName:@"CDEObjectChange" inManagedObjectContext:context];
+        change1.storeModificationEvent = baseline;
+        change1.type = CDEObjectChangeTypeInsert;
+        change1.nameOfEntity = @"A";
+        change1.globalIdentifier = globalId1;
+        
+        CDEPropertyChangeValue *value1 = [[CDEPropertyChangeValue alloc] initWithType:CDEPropertyChangeTypeAttribute propertyName:@"property"];
+        value1.value = @(10);
+        change1.propertyChangeValues = @[value1];
+        
+        // Object change outside baseline
+        CDEObjectChange *change2 = [NSEntityDescription insertNewObjectForEntityForName:@"CDEObjectChange" inManagedObjectContext:context];
+        change2.storeModificationEvent = event;
+        change2.type = CDEObjectChangeTypeInsert;
+        change2.nameOfEntity = @"A";
+        change2.globalIdentifier = globalId1;
+        
+        CDEPropertyChangeValue *value2 = [[CDEPropertyChangeValue alloc] initWithType:CDEPropertyChangeTypeAttribute propertyName:@"property"];
+        value2.value = @(11);
+        change2.propertyChangeValues = @[value2];
+        
+        [context save:NULL];
+    }];
+    
+    [rebaser rebaseWithCompletion:^(NSError *error) {
+        [context performBlockAndWait:^{
+            CDEStoreModificationEvent *baseline = [self fetchBaseline];
+            XCTAssertEqual(baseline.objectChanges.count, (NSUInteger)1, @"Wrong number of object changes");
+            
+            NSArray *values = [baseline.objectChanges.anyObject propertyChangeValues];
+            CDEPropertyChangeValue *value = values.lastObject;
+            XCTAssertEqualObjects(value.value, @(11), @"Wrong attribute value");
+        }];
+        [self stopAsyncOp];
+    }];
+    [self waitForAsyncOpToFinish];
+}
+
+- (void)testRebasingAttributeWithSameGlobalIdButDifferentEntity
+{
+    NSArray *baselines = [self addEventsForType:CDEStoreModificationEventTypeBaseline storeId:@"store1" globalCounts:@[@10] revisions:@[@110]];
+    CDEStoreModificationEvent *baseline = baselines.lastObject;
+    CDEStoreModificationEvent *event = [[self addEventsForType:CDEStoreModificationEventTypeSave storeId:@"store1" globalCounts:@[@20] revisions:@[@111]] lastObject];
+    
+    [context performBlockAndWait:^{
+        // Object change in baseline
+        CDEGlobalIdentifier *globalId1 = [NSEntityDescription insertNewObjectForEntityForName:@"CDEGlobalIdentifier" inManagedObjectContext:context];
+        globalId1.globalIdentifier = @"unique";
+        globalId1.nameOfEntity = @"A";
+        
+        CDEObjectChange *change1 = [NSEntityDescription insertNewObjectForEntityForName:@"CDEObjectChange" inManagedObjectContext:context];
+        change1.storeModificationEvent = baseline;
+        change1.type = CDEObjectChangeTypeInsert;
+        change1.nameOfEntity = @"A";
+        change1.globalIdentifier = globalId1;
+        
+        CDEPropertyChangeValue *value1 = [[CDEPropertyChangeValue alloc] initWithType:CDEPropertyChangeTypeAttribute propertyName:@"property"];
+        value1.value = @(10);
+        change1.propertyChangeValues = @[value1];
+        
+        // Object change outside baseline
+        CDEGlobalIdentifier *globalId2 = [NSEntityDescription insertNewObjectForEntityForName:@"CDEGlobalIdentifier" inManagedObjectContext:context];
+        globalId2.globalIdentifier = @"unique";
+        globalId2.nameOfEntity = @"B";
+    
+        CDEObjectChange *change2 = [NSEntityDescription insertNewObjectForEntityForName:@"CDEObjectChange" inManagedObjectContext:context];
+        change2.storeModificationEvent = event;
+        change2.type = CDEObjectChangeTypeInsert;
+        change2.nameOfEntity = @"B";
+        change2.globalIdentifier = globalId2;
+        
+        CDEPropertyChangeValue *value2 = [[CDEPropertyChangeValue alloc] initWithType:CDEPropertyChangeTypeAttribute propertyName:@"property"];
+        value2.value = @(11);
+        change2.propertyChangeValues = @[value2];
+        
+        [context save:NULL];
+    }];
+    
+    [rebaser rebaseWithCompletion:^(NSError *error) {
+        [context performBlockAndWait:^{
+            CDEStoreModificationEvent *baseline = [self fetchBaseline];
+            XCTAssertEqual(baseline.objectChanges.count, (NSUInteger)2, @"Wrong number of object changes");
+        }];
+        [self stopAsyncOp];
+    }];
+    [self waitForAsyncOpToFinish];
+}
+
 - (NSArray *)addEventsForType:(CDEStoreModificationEventType)type storeId:(NSString *)storeId globalCounts:(NSArray *)globalCounts revisions:(NSArray *)revisions
 {
     __block NSMutableArray *events = [NSMutableArray array];
