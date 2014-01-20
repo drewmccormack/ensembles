@@ -193,6 +193,7 @@
 - (NSString *)description
 {
     NSMutableString *result = [[NSMutableString alloc] initWithString:[super description]];
+    [result appendString:@"\n"];
     for (CDERevision *revision in self.revisions) {
         [result appendFormat:@"Store: %@, Global Count: %lli, Revision: %lli\n", revision.persistentStoreIdentifier, revision.globalCount, revision.revisionNumber];
     }

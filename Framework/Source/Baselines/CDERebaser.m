@@ -92,9 +92,9 @@
     NSManagedObjectContext *context = eventStore.managedObjectContext;
     [context performBlock:^{
         // Fetch objects
-        CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:context];
+        CDEStoreModificationEvent *existingBaseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:context];
         NSArray *eventsToMerge = [CDEStoreModificationEvent fetchStoreModificationEventsUpToGlobalCount:newBaselineGlobalCount inManagedObjectContext:context];
-        if (baseline && eventsToMerge.count == 0) {
+        if (existingBaseline && eventsToMerge.count == 0) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (completion) completion(nil);
             });
@@ -102,24 +102,27 @@
         }
         
         // If no baseline exists, create one.
-        if (!baseline) {
-            baseline = [NSEntityDescription insertNewObjectForEntityForName:@"CDEStoreModificationEvent" inManagedObjectContext:context];
-            baseline.type = CDEStoreModificationEventTypeBaseline;
+        CDEStoreModificationEvent *newBaseline = existingBaseline;
+        if (!existingBaseline) {
+            newBaseline = [NSEntityDescription insertNewObjectForEntityForName:@"CDEStoreModificationEvent" inManagedObjectContext:context];
+            newBaseline.type = CDEStoreModificationEventTypeBaseline;
         }
     
         // Merge events into baseline
-        [self mergeOrderedEvents:eventsToMerge intoBaseline:baseline];
+        [self mergeOrderedEvents:eventsToMerge intoBaseline:newBaseline];
         
         // Set new count and other properties
-        baseline.globalCount = newBaselineGlobalCount;
-        baseline.timestamp = [NSDate timeIntervalSinceReferenceDate];
-        baseline.modelVersion = [self.ensemble.managedObjectModel cde_entityHashesPropertyList];
+        newBaseline.globalCount = newBaselineGlobalCount;
+        newBaseline.timestamp = [NSDate timeIntervalSinceReferenceDate];
+        newBaseline.modelVersion = [self.ensemble.managedObjectModel cde_entityHashesPropertyList];
         
-        // Update store revisions by taking the maximum for each store
-        CDERevisionSet *newRevisionSet = [CDERevisionSet revisionSetByTakingStoreWiseMaximumOfRevisionSets:[eventsToMerge valueForKeyPath:@"revisionSet"]];
+        // Update store revisions by taking the maximum for each store, and the baseline
+        NSArray *revisionedEvents = eventsToMerge;
+        if (existingBaseline) revisionedEvents = [revisionedEvents arrayByAddingObject:existingBaseline];
+        CDERevisionSet *newRevisionSet = [CDERevisionSet revisionSetByTakingStoreWiseMaximumOfRevisionSets:[revisionedEvents valueForKeyPath:@"revisionSet"]];
         NSString *persistentStoreId = self.eventStore.persistentStoreIdentifier;
-        [baseline setRevisionSet:newRevisionSet forPersistentStoreIdentifier:persistentStoreId];
-        if (baseline.eventRevision.revisionNumber == -1) baseline.eventRevision.revisionNumber = 0;
+        [newBaseline setRevisionSet:newRevisionSet forPersistentStoreIdentifier:persistentStoreId];
+        if (newBaseline.eventRevision.revisionNumber == -1) newBaseline.eventRevision.revisionNumber = 0;
         
         // Delete merged events
         for (CDEStoreModificationEvent *event in eventsToMerge) [context deleteObject:event];

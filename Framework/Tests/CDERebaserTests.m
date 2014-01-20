@@ -107,7 +107,29 @@
     [self addEventsForType:CDEStoreModificationEventTypeMerge storeId:@"123" globalCounts:@[@1, @2] revisions:@[@1, @2]];
     
     XCTAssertEqual([rebaser globalCountForNewBaseline], (CDEGlobalCount)2, @"Wrong global count");
+}
 
+- (void)testRevisionsForRebasingWithStoreNotInBaseline
+{
+    [self addEventsForType:CDEStoreModificationEventTypeBaseline storeId:@"store1" globalCounts:@[@10] revisions:@[@110]];
+    [self addEventsForType:CDEStoreModificationEventTypeSave storeId:@"123" globalCounts:@[@0, @1] revisions:@[@0, @1]];
+    [rebaser rebaseWithCompletion:^(NSError *error) {
+        XCTAssertNil(error, @"Error was not nil");
+        [context performBlockAndWait:^{
+            XCTAssertEqual([[self storeModEvents] count], (NSUInteger)1, @"Should only be baseline left");
+            
+            CDEStoreModificationEvent *baseline = [self fetchBaseline];
+            CDERevisionSet *revSet = baseline.revisionSet;
+            CDERevision *revForStore1 = [revSet revisionForPersistentStoreIdentifier:@"store1"];
+            CDERevision *revFor123 = [revSet revisionForPersistentStoreIdentifier:@"123"];
+            CDEGlobalCount baselineGlobalCount = baseline.globalCount;
+            XCTAssertEqual(baselineGlobalCount, (CDEGlobalCount)1, @"Wrong global count");
+            XCTAssertEqual(revForStore1.revisionNumber, (CDERevisionNumber)110, @"Wrong revision number for store1");
+            XCTAssertEqual(revFor123.revisionNumber, (CDERevisionNumber)1, @"Wrong revision number for 123");
+        }];
+        [self stopAsyncOp];
+    }];
+    [self waitForAsyncOpToFinish];
 }
 
 - (NSArray *)addEventsForType:(CDEStoreModificationEventType)type storeId:(NSString *)storeId globalCounts:(NSArray *)globalCounts revisions:(NSArray *)revisions
@@ -147,6 +169,13 @@
 {
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
     return [context executeFetchRequest:fetch error:NULL];
+}
+
+- (CDEStoreModificationEvent *)fetchBaseline
+{
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
+    fetch.predicate = [NSPredicate predicateWithFormat:@"type = %d", CDEStoreModificationEventTypeBaseline];
+    return [[context executeFetchRequest:fetch error:NULL] lastObject];
 }
 
 @end
