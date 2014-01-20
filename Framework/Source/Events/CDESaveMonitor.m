@@ -17,9 +17,7 @@
 #import "CDEFoundationAdditions.h"
 #import "CDEEventStore.h"
 #import "CDEStoreModificationEvent.h"
-#import "CDEObjectChange.h"
 #import "CDEPropertyChangeValue.h"
-#import "CDEGlobalIdentifier.h"
 
 
 @implementation CDESaveMonitor {

@@ -301,8 +301,8 @@ static NSString *kCDEDefaultStoreType;
     
     NSMapTable *toObjectByFromObject = [NSMapTable strongToStrongObjectsMapTable];
     for (id uniqueValue in fromStoreObjectsByUniqueValue) {
-        CDEGlobalIdentifier *toContextObject = toStoreObjectsByUniqueValue[uniqueValue];
-        CDEGlobalIdentifier *fromContextObject = fromStoreObjectsByUniqueValue[uniqueValue];
+        NSManagedObject *toContextObject = toStoreObjectsByUniqueValue[uniqueValue];
+        NSManagedObject *fromContextObject = fromStoreObjectsByUniqueValue[uniqueValue];
         
         if (toContextObject) {
             [toObjectByFromObject setObject:toContextObject forKey:fromContextObject];
