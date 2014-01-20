@@ -157,6 +157,7 @@
             XCTAssertEqual(baselineGlobalCount, (CDEGlobalCount)21, @"Wrong global count");
             XCTAssertEqual(revForStore1.revisionNumber, (CDERevisionNumber)112, @"Wrong revision number for store1");
             XCTAssertEqual(revFor123.revisionNumber, (CDERevisionNumber)2, @"Wrong revision number for 123");
+            XCTAssertEqual([[self storeModEvents] count], (NSUInteger)2, @"Wrong number of events. Should have baseline and 1 other.");
         }];
         [self stopAsyncOp];
     }];
