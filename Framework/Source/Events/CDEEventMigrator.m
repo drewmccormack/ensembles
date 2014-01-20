@@ -167,7 +167,7 @@ static NSString *kCDEDefaultStoreType;
 - (BOOL)migrateObjectsInContext:(NSManagedObjectContext *)fromContext toContext:(NSManagedObjectContext *)toContext error:(NSError * __autoreleasing *)error
 {
     // Migrate global identifiers. Enforce uniqueness.
-    NSMapTable *toGlobalIdsByFromGlobalId = [self migrateEntity:@"CDEGlobalIdentifier" inManagedObjectContext:fromContext toContext:toContext enforceUniquenessForAttribute:@"globalIdentifier" error:error];
+    NSMapTable *toGlobalIdsByFromGlobalId = [self migrateEntity:@"CDEGlobalIdentifier" inManagedObjectContext:fromContext toContext:toContext enforceUniquenessForAttributes:@[@"nameOfEntity", @"globalIdentifier"] error:error];
     if (!toGlobalIdsByFromGlobalId) return NO;
     
     // Retrieve modification events
@@ -283,7 +283,7 @@ static NSString *kCDEDefaultStoreType;
     return objectsToMigrate;
 }
 
-- (NSMapTable *)migrateEntity:(NSString *)entityName inManagedObjectContext:(NSManagedObjectContext *)fromContext toContext:(NSManagedObjectContext *)toContext enforceUniquenessForAttribute:(NSString *)uniqueAttribute error:(NSError * __autoreleasing *)error
+- (NSMapTable *)migrateEntity:(NSString *)entityName inManagedObjectContext:(NSManagedObjectContext *)fromContext toContext:(NSManagedObjectContext *)toContext enforceUniquenessForAttributes:(NSArray *)uniqueAttributes error:(NSError * __autoreleasing *)error
 {
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:entityName];
     NSArray *fromContextObjects = [fromContext executeFetchRequest:fetch error:error];
@@ -293,8 +293,11 @@ static NSString *kCDEDefaultStoreType;
     NSArray *toContextObjects = [toContext executeFetchRequest:toContextFetch error:error];
     if (!toContextObjects) return nil;
     
-    NSDictionary *toStoreObjectsByUniqueValue = [[NSDictionary alloc] initWithObjects:toContextObjects forKeys:[toContextObjects valueForKeyPath:uniqueAttribute]];
-    NSDictionary *fromStoreObjectsByUniqueValue = [[NSDictionary alloc] initWithObjects:fromContextObjects forKeys:[fromContextObjects valueForKeyPath:uniqueAttribute]];
+    NSArray *toStoreKeys = [self uniqueKeysForObjects:toContextObjects uniqueAttributes:uniqueAttributes];
+    NSArray *fromStoreKeys = [self uniqueKeysForObjects:fromContextObjects uniqueAttributes:uniqueAttributes];
+
+    NSDictionary *toStoreObjectsByUniqueValue = [[NSDictionary alloc] initWithObjects:toContextObjects forKeys:toStoreKeys];
+    NSDictionary *fromStoreObjectsByUniqueValue = [[NSDictionary alloc] initWithObjects:fromContextObjects forKeys:fromStoreKeys];
     
     NSMapTable *toObjectByFromObject = [NSMapTable strongToStrongObjectsMapTable];
     for (id uniqueValue in fromStoreObjectsByUniqueValue) {
@@ -313,6 +316,20 @@ static NSString *kCDEDefaultStoreType;
     }
     
     return toObjectByFromObject;
+}
+
+- (NSArray *)uniqueKeysForObjects:(NSArray *)objects uniqueAttributes:(NSArray *)uniqueAttributes
+{
+    NSMutableArray *keys = [[NSMutableArray alloc] init];
+    for (id object in objects) {
+        NSMutableString *key = [[NSMutableString alloc] init];
+        for (NSString *attribute in uniqueAttributes) {
+            [key appendString:[[object valueForKeyPath:attribute] description]];
+            [key appendString:@"__"];
+        }
+        [keys addObject:key];
+    }
+    return keys;
 }
 
 - (void)copyAttributesFromObject:(NSManagedObject *)fromObject toObject:(NSManagedObject *)toObject

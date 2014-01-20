@@ -20,7 +20,7 @@
 
 @implementation CDEEventMigratorTests  {
     CDEStoreModificationEvent *modEvent;
-    CDEGlobalIdentifier *globalId1, *globalId2;
+    CDEGlobalIdentifier *globalId1, *globalId2, *globalId3;
     CDEObjectChange *objectChange1, *objectChange2, *objectChange3;
     NSManagedObjectContext *moc;
     CDEEventMigrator *migrator;
@@ -51,6 +51,10 @@
         globalId2.globalIdentifier = @"1234";
         globalId2.nameOfEntity = @"Hello";
         
+        globalId3 = [NSEntityDescription insertNewObjectForEntityForName:@"CDEGlobalIdentifier" inManagedObjectContext:moc];
+        globalId3.globalIdentifier = @"1234";
+        globalId3.nameOfEntity = @"Blah";
+        
         objectChange1 = [NSEntityDescription insertNewObjectForEntityForName:@"CDEObjectChange" inManagedObjectContext:moc];
         objectChange1.nameOfEntity = @"Hello";
         objectChange1.type = CDEObjectChangeTypeInsert;
@@ -59,7 +63,7 @@
         objectChange1.propertyChangeValues = @[@"a", @"b"];
         
         objectChange2 = [NSEntityDescription insertNewObjectForEntityForName:@"CDEObjectChange" inManagedObjectContext:moc];
-        objectChange2.nameOfEntity = @"Blah";
+        objectChange2.nameOfEntity = @"Hello";
         objectChange2.type = CDEObjectChangeTypeUpdate;
         objectChange2.storeModificationEvent = modEvent;
         objectChange2.globalIdentifier = globalId2;
@@ -69,7 +73,7 @@
         objectChange3.nameOfEntity = @"Blah";
         objectChange3.type = CDEObjectChangeTypeDelete;
         objectChange3.storeModificationEvent = modEvent;
-        objectChange3.globalIdentifier = globalId2;
+        objectChange3.globalIdentifier = globalId3;
         
         [moc save:NULL];
     }];
@@ -277,8 +281,17 @@
         XCTAssertNotNil(newEvent, @"Could not retrieve new event");
         XCTAssertEqual(newEvent.objectChanges.count, (NSUInteger)3, @"Wrong number of object changes");
         
-        CDEObjectChange *change = newEvent.objectChanges.anyObject;
-        XCTAssertNotNil(change.globalIdentifier, @"No global id");
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"globalIdentifier.globalIdentifier = \"123\" AND globalIdentifier.nameOfEntity = \"Hello\""];
+        CDEObjectChange *change = [[newEvent.objectChanges filteredSetUsingPredicate:predicate] anyObject];
+        XCTAssertNotNil(change, @"No change found");
+        
+        predicate = [NSPredicate predicateWithFormat:@"globalIdentifier.globalIdentifier = \"1234\" AND globalIdentifier.nameOfEntity = \"Blah\""];
+        change = [[newEvent.objectChanges filteredSetUsingPredicate:predicate] anyObject];
+        XCTAssertNotNil(change, @"No change found");
+        
+        predicate = [NSPredicate predicateWithFormat:@"globalIdentifier.globalIdentifier = \"1234\" AND globalIdentifier.nameOfEntity = \"Blah\""];
+        change = [[newEvent.objectChanges filteredSetUsingPredicate:predicate] anyObject];
+        XCTAssertNotNil(change, @"No change found");
     }];
 }
 
