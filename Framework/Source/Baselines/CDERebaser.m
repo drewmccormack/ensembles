@@ -210,7 +210,7 @@
         if (baselineRevision && baselineRevision.revisionNumber >= revision.revisionNumber) continue;
         
         // Find the minimum global count
-        baselineCount = MIN(baselineCount, revision.revisionNumber);
+        baselineCount = MIN(baselineCount, revision.globalCount);
     }
     if (baselineCount == NSNotFound) baselineCount = 0;
     
