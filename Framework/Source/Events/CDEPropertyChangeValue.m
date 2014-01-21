@@ -268,20 +268,21 @@
     if (propertyValue.type != CDEPropertyChangeTypeOrderedToManyRelationship) return;
     
     // If it is an ordered to-many, update ordering.
-    NSSet *indexesSet = [[NSSet alloc] initWithArray:self.movedIdentifiersByIndex.allKeys];
-    indexesSet = [indexesSet setByAddingObjectsFromArray:propertyValue.movedIdentifiersByIndex.allKeys];
-    NSArray *indexNumbers = [indexesSet.allObjects sortedArrayUsingSelector:@selector(compare:)];
     NSMutableDictionary *newMovedIdentifiersByIndex = [[NSMutableDictionary alloc] init];
     NSMutableSet *usedIdentifiers = [[NSMutableSet alloc] init];
     __block NSUInteger count = 0;
+    NSArray *indexNumbers = [self.movedIdentifiersByIndex.allKeys sortedArrayUsingSelector:@selector(compare:)];
     [indexNumbers enumerateObjectsUsingBlock:^(NSNumber *indexNumber, NSUInteger i, BOOL *stop) {
         NSString *identifier = self.movedIdentifiersByIndex[indexNumber];
         if (identifier && ![usedIdentifiers containsObject:identifier] && ![self.removedIdentifiers containsObject:identifier]) {
             newMovedIdentifiersByIndex[@(count++)] = identifier;
             [usedIdentifiers addObject:identifier];
         }
-        
-        identifier = propertyValue.movedIdentifiersByIndex[indexNumber];
+    }];
+    
+    indexNumbers = [propertyValue.movedIdentifiersByIndex.allKeys sortedArrayUsingSelector:@selector(compare:)];
+    [indexNumbers enumerateObjectsUsingBlock:^(NSNumber *indexNumber, NSUInteger i, BOOL *stop) {
+        NSString *identifier = propertyValue.movedIdentifiersByIndex[indexNumber];
         if (identifier && ![usedIdentifiers containsObject:identifier] && ![self.removedIdentifiers containsObject:identifier]) {
             newMovedIdentifiersByIndex[@(count++)] = identifier;
             [usedIdentifiers addObject:identifier];

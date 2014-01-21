@@ -264,6 +264,131 @@
     [self waitForAsyncOpToFinish];
 }
 
+- (void)testRebasingToManyRelationship
+{
+    NSArray *baselines = [self addEventsForType:CDEStoreModificationEventTypeBaseline storeId:@"store1" globalCounts:@[@10] revisions:@[@110]];
+    CDEStoreModificationEvent *baseline = baselines.lastObject;
+    CDEStoreModificationEvent *event = [[self addEventsForType:CDEStoreModificationEventTypeSave storeId:@"store1" globalCounts:@[@20] revisions:@[@111]] lastObject];
+
+    [context performBlockAndWait:^{
+        // Object change in baseline
+        CDEGlobalIdentifier *globalId1 = [NSEntityDescription insertNewObjectForEntityForName:@"CDEGlobalIdentifier" inManagedObjectContext:context];
+        globalId1.globalIdentifier = @"unique";
+        globalId1.nameOfEntity = @"A";
+        
+        CDEObjectChange *change1 = [NSEntityDescription insertNewObjectForEntityForName:@"CDEObjectChange" inManagedObjectContext:context];
+        change1.storeModificationEvent = baseline;
+        change1.type = CDEObjectChangeTypeInsert;
+        change1.nameOfEntity = @"A";
+        change1.globalIdentifier = globalId1;
+        
+        CDEPropertyChangeValue *value1 = [[CDEPropertyChangeValue alloc] initWithType:CDEPropertyChangeTypeToManyRelationship propertyName:@"property"];
+        value1.addedIdentifiers = [NSSet setWithObjects:@"11", @"12", nil];
+        value1.removedIdentifiers = [NSSet setWithObjects:@"13", nil];
+        change1.propertyChangeValues = @[value1];
+        
+        // Object change outside baseline
+        CDEObjectChange *change2 = [NSEntityDescription insertNewObjectForEntityForName:@"CDEObjectChange" inManagedObjectContext:context];
+        change2.storeModificationEvent = event;
+        change2.type = CDEObjectChangeTypeUpdate;
+        change2.nameOfEntity = @"A";
+        change2.globalIdentifier = globalId1;
+        
+        CDEPropertyChangeValue *value2 = [[CDEPropertyChangeValue alloc] initWithType:CDEPropertyChangeTypeToManyRelationship propertyName:@"property"];
+        value2.addedIdentifiers = [NSSet setWithObjects:@"21", @"13", nil];
+        value2.removedIdentifiers = [NSSet setWithObjects:@"11", @"22", nil];
+        change2.propertyChangeValues = @[value2];
+        
+        [context save:NULL];
+    }];
+    
+    [rebaser rebaseWithCompletion:^(NSError *error) {
+        [context performBlockAndWait:^{
+            CDEStoreModificationEvent *baseline = [self fetchBaseline];
+            XCTAssertEqual(baseline.objectChanges.count, (NSUInteger)1, @"Wrong number of object changes");
+            
+            CDEObjectChange *change = baseline.objectChanges.anyObject;
+            XCTAssertEqual(change.propertyChangeValues.count, (NSUInteger)1, @"Wrong number of changes");
+            XCTAssertEqual(change.type, CDEObjectChangeTypeInsert, @"Wrong type");
+            
+            CDEPropertyChangeValue *value = change.propertyChangeValues.lastObject;
+            XCTAssertEqual(value.type, CDEPropertyChangeTypeToManyRelationship, @"Wrong value type");
+            
+            NSSet *added = [NSSet setWithObjects:@"12", @"21", @"13", nil];
+            NSSet *removed = [NSSet setWithObjects:@"11", @"22", nil];
+            XCTAssertEqualObjects(value.addedIdentifiers, added, @"Wrong added ids");
+            XCTAssertEqualObjects(value.removedIdentifiers, removed, @"Wrong removed ids");
+        }];
+        [self stopAsyncOp];
+    }];
+    [self waitForAsyncOpToFinish];
+}
+
+- (void)testRebasingOrderedToManyRelationship
+{
+    NSArray *baselines = [self addEventsForType:CDEStoreModificationEventTypeBaseline storeId:@"store1" globalCounts:@[@10] revisions:@[@110]];
+    CDEStoreModificationEvent *baseline = baselines.lastObject;
+    CDEStoreModificationEvent *event = [[self addEventsForType:CDEStoreModificationEventTypeSave storeId:@"store1" globalCounts:@[@20] revisions:@[@111]] lastObject];
+    
+    [context performBlockAndWait:^{
+        // Object change in baseline
+        CDEGlobalIdentifier *globalId1 = [NSEntityDescription insertNewObjectForEntityForName:@"CDEGlobalIdentifier" inManagedObjectContext:context];
+        globalId1.globalIdentifier = @"unique";
+        globalId1.nameOfEntity = @"A";
+        
+        CDEObjectChange *change1 = [NSEntityDescription insertNewObjectForEntityForName:@"CDEObjectChange" inManagedObjectContext:context];
+        change1.storeModificationEvent = baseline;
+        change1.type = CDEObjectChangeTypeInsert;
+        change1.nameOfEntity = @"A";
+        change1.globalIdentifier = globalId1;
+        
+        CDEPropertyChangeValue *value1 = [[CDEPropertyChangeValue alloc] initWithType:CDEPropertyChangeTypeOrderedToManyRelationship propertyName:@"property"];
+        value1.addedIdentifiers = [NSSet setWithObjects:@"11", @"12", nil];
+        value1.removedIdentifiers = [NSSet setWithObjects:@"13", nil];
+        value1.movedIdentifiersByIndex = @{@0 : @"11", @1 : @"666", @2 : @"12", @3 : @"777"};
+        change1.propertyChangeValues = @[value1];
+        
+        // Object change outside baseline
+        CDEObjectChange *change2 = [NSEntityDescription insertNewObjectForEntityForName:@"CDEObjectChange" inManagedObjectContext:context];
+        change2.storeModificationEvent = event;
+        change2.type = CDEObjectChangeTypeUpdate;
+        change2.nameOfEntity = @"A";
+        change2.globalIdentifier = globalId1;
+        
+        CDEPropertyChangeValue *value2 = [[CDEPropertyChangeValue alloc] initWithType:CDEPropertyChangeTypeOrderedToManyRelationship propertyName:@"property"];
+        value2.addedIdentifiers = [NSSet setWithObjects:@"21", @"13", nil];
+        value2.removedIdentifiers = [NSSet setWithObjects:@"11", @"22", nil];
+        value2.movedIdentifiersByIndex = @{@0 : @"21", @1 : @"13", @2 : @"12", @3 : @"666"};
+        change2.propertyChangeValues = @[value2];
+        
+        [context save:NULL];
+    }];
+    
+    [rebaser rebaseWithCompletion:^(NSError *error) {
+        [context performBlockAndWait:^{
+            CDEStoreModificationEvent *baseline = [self fetchBaseline];
+            XCTAssertEqual(baseline.objectChanges.count, (NSUInteger)1, @"Wrong number of object changes");
+            
+            CDEObjectChange *change = baseline.objectChanges.anyObject;
+            XCTAssertEqual(change.propertyChangeValues.count, (NSUInteger)1, @"Wrong number of changes");
+            XCTAssertEqual(change.type, CDEObjectChangeTypeInsert, @"Wrong type");
+            
+            CDEPropertyChangeValue *value = change.propertyChangeValues.lastObject;
+            XCTAssertEqual(value.type, CDEPropertyChangeTypeOrderedToManyRelationship, @"Wrong value type");
+            
+            NSSet *added = [NSSet setWithObjects:@"12", @"21", @"13", nil];
+            NSSet *removed = [NSSet setWithObjects:@"11", @"22", nil];
+            XCTAssertEqualObjects(value.addedIdentifiers, added, @"Wrong added ids");
+            XCTAssertEqualObjects(value.removedIdentifiers, removed, @"Wrong removed ids");
+            
+            NSDictionary *moved = @{@0 : @"21", @1 : @"13", @2 : @"12", @3 : @"666", @4 : @"777"};
+            XCTAssertEqualObjects(value.movedIdentifiersByIndex, moved, @"Wrong moved ids");
+        }];
+        [self stopAsyncOp];
+    }];
+    [self waitForAsyncOpToFinish];
+}
+
 - (NSArray *)addEventsForType:(CDEStoreModificationEventType)type storeId:(NSString *)storeId globalCounts:(NSArray *)globalCounts revisions:(NSArray *)revisions
 {
     __block NSMutableArray *events = [NSMutableArray array];
