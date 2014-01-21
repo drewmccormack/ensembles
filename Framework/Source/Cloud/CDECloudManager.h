@@ -21,6 +21,11 @@
 
 - (void)createRemoteDirectoryStructureWithCompletion:(CDECompletionBlock)completion;
 
+- (void)snapshotRemoteFilesWithCompletion:(CDECompletionBlock)completion;
+- (void)clearSnapshot;
+
+- (void)removeOutdatedRemoteFilesWithCompletion:(CDECompletionBlock)completion;
+
 - (void)importNewRemoteEventsWithCompletion:(CDECompletionBlock)completion;
 - (void)transferNewRemoteFilesToTransitCacheWithCompletion:(CDECompletionBlock)completion;
 - (void)migrateNewEventsFromTransitCacheWithCompletion:(CDECompletionBlock)completion;

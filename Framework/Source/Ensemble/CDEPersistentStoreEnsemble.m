@@ -277,7 +277,7 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
         // Deleech if a save occurred during import
         if (saveOccurredDuringImport) {
             NSError *error = nil;
-            error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorSaveOccurredDuringLeeching userInfo:nil];
+            error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeSaveOccurredDuringLeeching userInfo:nil];
             [self performSelector:@selector(forceDeleechDueToError:) withObject:error afterDelay:0.0];
             next(error, NO);
             return;

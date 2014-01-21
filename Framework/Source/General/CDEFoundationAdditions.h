@@ -10,6 +10,8 @@
 
 @interface NSArray (CDEFoundationAdditions)
 
--(void)cde_enumerateObjectsDrainingEveryIterations:(NSUInteger)iterationsBetweenDrains usingBlock:(void (^)(id object, NSUInteger index, BOOL *stop))block;
+- (void)cde_enumerateObjectsDrainingEveryIterations:(NSUInteger)iterationsBetweenDrains usingBlock:(void (^)(id object, NSUInteger index, BOOL *stop))block;
+
+- (NSArray *)cde_arrayByTransformingObjectsWithBlock:(id(^)(id))block;
 
 @end

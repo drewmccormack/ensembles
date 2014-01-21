@@ -7,6 +7,7 @@
 //
 
 #import "CDECloudManager.h"
+#import "CDEFoundationAdditions.h"
 #import "CDEEventStore.h"
 #import "CDECloudFileSystem.h"
 #import "CDEAsynchronousTaskQueue.h"
@@ -26,10 +27,12 @@
 @property (nonatomic, strong, readonly) NSString *localUploadRoot;
 @property (nonatomic, strong, readonly) NSString *localStoresUploadDirectory;
 @property (nonatomic, strong, readonly) NSString *localEventsUploadDirectory;
+@property (nonatomic, strong, readonly) NSString *localBaselinesUploadDirectory;
 
 @property (nonatomic, strong, readonly) NSString *remoteEnsembleDirectory;
 @property (nonatomic, strong, readonly) NSString *remoteStoresDirectory;
 @property (nonatomic, strong, readonly) NSString *remoteEventsDirectory;
+@property (nonatomic, strong, readonly) NSString *remoteBaselinesDirectory;
 
 @end
 
@@ -37,6 +40,8 @@
     NSString *localFileRoot;
     NSFileManager *fileManager;
     NSOperationQueue *operationQueue;
+    NSSet *snapshotBaselineFilenames;
+    NSSet *snapshotEventFilenames;
 }
 
 @synthesize eventStore = eventStore;
@@ -57,6 +62,87 @@
         [self createTransitCacheDirectories];
     }
     return self;
+}
+
+#pragma mark Snapshotting Remote Files
+
+- (void)snapshotRemoteFilesWithCompletion:(CDECompletionBlock)completion
+{
+    [self clearSnapshot];
+    [self.cloudFileSystem contentsOfDirectoryAtPath:self.remoteBaselinesDirectory completion:^(NSArray *baselineContents, NSError *error) {
+        if (error) {
+            if (completion) completion(error);
+            return;
+        }
+        
+        [self.cloudFileSystem contentsOfDirectoryAtPath:self.remoteEventsDirectory completion:^(NSArray *eventContents, NSError *error) {
+            if (!error) {
+                snapshotEventFilenames = [NSSet setWithArray:[eventContents valueForKeyPath:@"name"]];
+                snapshotBaselineFilenames = [NSSet setWithArray:[baselineContents valueForKeyPath:@"name"]];
+            }
+            
+            if (completion) completion(error);
+        }];
+    }];
+}
+
+- (void)clearSnapshot
+{
+    snapshotEventFilenames = nil;
+    snapshotBaselineFilenames = nil;
+}
+
+#pragma mark Removing Outdated Files
+
+// Requires a snapshot already exist
+- (void)removeOutdatedRemoteFilesWithCompletion:(CDECompletionBlock)completion
+{
+    if (!snapshotBaselineFilenames || !snapshotEventFilenames) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeMissingCloudSnapshot userInfo:nil];
+            if (completion) completion(error);
+        });
+        return;
+    }
+    
+    // Determine corresponding files for data still in event store
+    NSSet *baselineFilesForEventStore = [self filenamesForAllStoreModificationEventsOfType:CDEStoreModificationEventTypeBaseline createdInStore:nil];
+    NSSet *allEventFilesForEventStore = [self filenamesForAllStoreModificationEventsOfType:0 createdInStore:nil];
+    NSMutableSet *nonBaselineFilesForEventStore = [NSMutableSet setWithSet:allEventFilesForEventStore];
+    [nonBaselineFilesForEventStore minusSet:baselineFilesForEventStore];
+    
+    // Determine baselines to remove
+    NSMutableSet *baselinesToRemove = [snapshotBaselineFilenames mutableCopy];
+    [baselinesToRemove minusSet:baselineFilesForEventStore];
+    
+    // Determine non-baselines to remove
+    NSMutableSet *nonBaselinesToRemove = [snapshotEventFilenames mutableCopy];
+    [nonBaselinesToRemove minusSet:nonBaselineFilesForEventStore];
+    
+    // Queue up removals
+    NSArray *baselinePaths = [baselinesToRemove.allObjects cde_arrayByTransformingObjectsWithBlock:^id(NSString *file) {
+        NSString *path = [self.remoteBaselinesDirectory stringByAppendingPathComponent:file];
+        return path;
+    }];
+    NSArray *nonBaselinePaths = [nonBaselinesToRemove.allObjects cde_arrayByTransformingObjectsWithBlock:^id(NSString *file) {
+        NSString *path = [self.remoteEventsDirectory stringByAppendingPathComponent:file];
+        return path;
+    }];
+    NSArray *pathsToRemove = [baselinePaths arrayByAddingObjectsFromArray:nonBaselinePaths];
+
+    // Queue up tasks
+    NSMutableArray *tasks = [[NSMutableArray alloc] initWithCapacity:pathsToRemove.count];
+    for (NSString *path in pathsToRemove) {
+        CDEAsynchronousTaskBlock block = ^(CDEAsynchronousTaskCallbackBlock next) {
+            [self.cloudFileSystem removeItemAtPath:path completion:^(NSError *error) {
+                next(error, NO);
+            }];
+        };
+        [tasks addObject:block];
+    }
+    
+    CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:tasks terminationPolicy:CDETaskQueueTerminationPolicyCompleteAll completion:completion];
+    [operationQueue addOperation:taskQueue];
 }
 
 #pragma mark Retrieving Remote Files
@@ -114,7 +200,7 @@
         [taskBlocks addObject:block];
     }
     
-    CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:taskBlocks terminationPolicy:CDETaskQueueTerminationPolicyStopOnError completion:CDEMainQueueCompletionFromCompletion(completion)];
+    CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:taskBlocks terminationPolicy:CDETaskQueueTerminationPolicyStopOnError completion:completion];
     [operationQueue addOperation:taskQueue];
 }
 
@@ -172,7 +258,7 @@
         [tasks addObject:block];
     }
     
-    CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:tasks terminationPolicy:CDETaskQueueTerminationPolicyCompleteAll completion:CDEMainQueueCompletionFromCompletion(completion)];
+    CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:tasks terminationPolicy:CDETaskQueueTerminationPolicyCompleteAll completion:completion];
     [operationQueue addOperation:taskQueue];
 }
 
@@ -245,7 +331,7 @@
         [tasks addObject:block];
     }
     
-    CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:tasks terminationPolicy:CDETaskQueueTerminationPolicyCompleteAll completion:CDEMainQueueCompletionFromCompletion(completion)];
+    CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:tasks terminationPolicy:CDETaskQueueTerminationPolicyCompleteAll completion:completion];
     [operationQueue addOperation:taskQueue];
 }
 
@@ -270,7 +356,7 @@
         [taskBlocks addObject:block];
     }
     
-    CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:taskBlocks terminationPolicy:CDETaskQueueTerminationPolicyStopOnError completion:CDEMainQueueCompletionFromCompletion(completion)];
+    CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:taskBlocks terminationPolicy:CDETaskQueueTerminationPolicyStopOnError completion:completion];
     [operationQueue addOperation:taskQueue];
 }
 
@@ -323,6 +409,13 @@
 
 - (NSSet *)filenamesForAllStoreModificationEventsCreatedInStore:(NSString *)persistentStoreIdentifier
 {
+    return [self filenamesForAllStoreModificationEventsOfType:0 createdInStore:persistentStoreIdentifier];
+}
+
+// Use type of 0 for all types
+// Use nil for store if any store is allowed
+- (NSSet *)filenamesForAllStoreModificationEventsOfType:(CDEStoreModificationEventType)type createdInStore:(NSString *)persistentStoreIdentifier
+{
     NSMutableSet *filenames = [[NSMutableSet alloc] init];
     NSManagedObjectContext *moc = self.eventStore.managedObjectContext;
     [moc performBlockAndWait:^{
@@ -330,9 +423,20 @@
         fetch.relationshipKeyPathsForPrefetching = @[@"eventRevision"];
         fetch.propertiesToFetch = @[@"globalCount"];
         
+        NSPredicate *predicate = nil;
         if (persistentStoreIdentifier) {
-            fetch.predicate = [NSPredicate predicateWithFormat:@"eventRevision.persistentStoreIdentifier = %@", persistentStoreIdentifier];
+            predicate = [NSPredicate predicateWithFormat:@"eventRevision.persistentStoreIdentifier = %@", persistentStoreIdentifier];
         }
+        
+        if (type > 0) {
+            NSPredicate *typePredicate = [NSPredicate predicateWithFormat:@"type = %d", type];
+            if (!predicate)
+                predicate = typePredicate;
+            else
+                predicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[predicate, typePredicate]];
+        }
+        
+        fetch.predicate = predicate;
         
         NSError *error;
         NSArray *events = [moc executeFetchRequest:fetch error:&error];
@@ -386,6 +490,16 @@
     return [self.localUploadRoot stringByAppendingPathComponent:@"events"];
 }
 
+- (NSString *)localBaselinesDownloadDirectory
+{
+    return [self.localDownloadRoot stringByAppendingPathComponent:@"baselines"];
+}
+
+- (NSString *)localBaselinesUploadDirectory
+{
+    return [self.localUploadRoot stringByAppendingPathComponent:@"baselines"];
+}
+
 #pragma mark Local Directory Structure
 
 - (void)createTransitCacheDirectories
@@ -393,6 +507,8 @@
     [fileManager createDirectoryAtPath:localFileRoot withIntermediateDirectories:YES attributes:nil error:NULL];
     [fileManager createDirectoryAtPath:self.localEventsDownloadDirectory withIntermediateDirectories:YES attributes:nil error:NULL];
     [fileManager createDirectoryAtPath:self.localEventsUploadDirectory withIntermediateDirectories:YES attributes:nil error:NULL];
+    [fileManager createDirectoryAtPath:self.localBaselinesDownloadDirectory withIntermediateDirectories:YES attributes:nil error:NULL];
+    [fileManager createDirectoryAtPath:self.localBaselinesUploadDirectory withIntermediateDirectories:YES attributes:nil error:NULL];
     [fileManager createDirectoryAtPath:self.localStoresDownloadDirectory withIntermediateDirectories:YES attributes:nil error:NULL];
     [fileManager createDirectoryAtPath:self.localStoresUploadDirectory withIntermediateDirectories:YES attributes:nil error:NULL];
 }
@@ -429,9 +545,14 @@
     return [self.remoteEnsembleDirectory stringByAppendingPathComponent:@"events"];
 }
 
+- (NSString *)remoteBaselinesDirectory
+{
+    return [self.remoteEnsembleDirectory stringByAppendingPathComponent:@"baselines"];
+}
+
 - (void)createRemoteDirectoryStructureWithCompletion:(CDECompletionBlock)completion
 {
-    NSArray *dirs = @[self.remoteEnsembleDirectory, self.remoteStoresDirectory, self.remoteEventsDirectory];
+    NSArray *dirs = @[self.remoteEnsembleDirectory, self.remoteStoresDirectory, self.remoteEventsDirectory, self.remoteBaselinesDirectory];
     [self createRemoteDirectories:dirs withCompletion:completion];
 }
 
@@ -462,7 +583,7 @@
         [taskBlocks addObject:block];
     }
     
-    CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:taskBlocks terminationPolicy:CDETaskQueueTerminationPolicyStopOnError completion:CDEMainQueueCompletionFromCompletion(completion)];
+    CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:taskBlocks terminationPolicy:CDETaskQueueTerminationPolicyStopOnError completion:completion];
     [operationQueue addOperation:taskQueue];
 }
 

@@ -270,7 +270,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
 
 - (NSError *)notConnectedError
 {
-    NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorConnectionError userInfo:@{NSLocalizedDescriptionKey : @"Attempted to access iCloud when not connected."}];
+    NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeConnectionError userInfo:@{NSLocalizedDescriptionKey : @"Attempted to access iCloud when not connected."}];
     return error;
 }
 
