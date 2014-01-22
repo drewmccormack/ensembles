@@ -95,7 +95,7 @@
 
 #pragma mark Importing Remote Files
 
-- (void)importNewRemoteEventsWithCompletion:(CDECompletionBlock)completion
+- (void)importNewRemoteNonBaselineEventsWithCompletion:(CDECompletionBlock)completion
 {
     NSAssert([NSThread isMainThread], @"importNewRemote... called off the main thread");
     
@@ -248,13 +248,14 @@
 
 #pragma mark Uploading Local Events
 
-- (void)exportNewLocalEventsWithCompletion:(CDECompletionBlock)completion
+- (void)exportNewLocalNonBaselineEventsWithCompletion:(CDECompletionBlock)completion
 {
     CDELog(CDELoggingLevelVerbose, @"Transferring events from event store to cloud");
 
-    [self migrateNewLocalNonBaselineEventsToTransitCacheWithCompletion:^(NSError *error) {
+    NSArray *types = @[@(CDEStoreModificationEventTypeMerge), @(CDEStoreModificationEventTypeSave)];
+    [self migrateNewLocalEventsToTransitCacheWithRemoteDirectory:self.remoteEventsDirectory allowedTypes:types completion:^(NSError *error) {
         if (error) CDELog(CDELoggingLevelWarning, @"Error migrating out events: %@", error);
-        [self transferFilesInTransitCacheToRemoteDirectory:self.remoteEventsDirectory completion:completion];
+        [self transferEventFilesInTransitCacheToRemoteDirectory:self.remoteEventsDirectory completion:completion];
     }];
 }
 
@@ -262,9 +263,10 @@
 {
     CDELog(CDELoggingLevelVerbose, @"Transferring baseline from event store to cloud");
     
-    [self migrateNewLocalBaselinesToTransitCacheWithCompletion:^(NSError *error) {
+    NSArray *types = @[@(CDEStoreModificationEventTypeBaseline)];
+    [self migrateNewLocalEventsToTransitCacheWithRemoteDirectory:self.remoteEventsDirectory allowedTypes:types completion:^(NSError *error) {
         if (error) CDELog(CDELoggingLevelWarning, @"Error migrating out baseline: %@", error);
-        [self transferFilesInTransitCacheToRemoteDirectory:self.remoteBaselinesDirectory completion:completion];
+        [self transferEventFilesInTransitCacheToRemoteDirectory:self.remoteBaselinesDirectory completion:completion];
     }];
 }
 
@@ -279,18 +281,6 @@
             [self migrateLocalEventsToTransitCacheForFilenames:filenamesToUpload allowedTypes:types completion:completion];
         }
     }];
-}
-
-- (void)migrateNewLocalNonBaselineEventsToTransitCacheWithCompletion:(CDECompletionBlock)completion
-{
-    NSArray *types = @[@(CDEStoreModificationEventTypeMerge), @(CDEStoreModificationEventTypeSave)];
-    [self migrateNewLocalEventsToTransitCacheWithRemoteDirectory:self.remoteEventsDirectory allowedTypes:types completion:completion];
-}
-
-- (void)migrateNewLocalBaselinesToTransitCacheWithCompletion:(CDECompletionBlock)completion
-{
-    NSArray *types = @[@(CDEStoreModificationEventTypeBaseline)];
-    [self migrateNewLocalEventsToTransitCacheWithRemoteDirectory:self.remoteBaselinesDirectory allowedTypes:types completion:completion];
 }
 
 - (void)migrateLocalEventsToTransitCacheForFilenames:(NSArray *)filesToUpload allowedTypes:(NSArray *)types completion:(CDECompletionBlock)completion
@@ -340,7 +330,7 @@
     [operationQueue addOperation:taskQueue];
 }
 
-- (void)transferFilesInTransitCacheToRemoteDirectory:(NSString *)remoteDirectory completion:(CDECompletionBlock)completion
+- (void)transferEventFilesInTransitCacheToRemoteDirectory:(NSString *)remoteDirectory completion:(CDECompletionBlock)completion
 {
     NSError *error = nil;
     NSArray *files = [fileManager contentsOfDirectoryAtPath:self.localEventsUploadDirectory error:&error];
@@ -497,7 +487,6 @@
     
     return YES;
 }
-
 
 
 #pragma mark Removing Outdated Files

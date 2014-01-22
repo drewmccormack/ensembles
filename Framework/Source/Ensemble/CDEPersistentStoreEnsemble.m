@@ -463,7 +463,7 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
     };
     
     CDEAsynchronousTaskBlock importRemoteEventsTask = ^(CDEAsynchronousTaskCallbackBlock next) {
-        [self.cloudManager importNewRemoteEventsWithCompletion:^(NSError *error) {
+        [self.cloudManager importNewRemoteNonBaselineEventsWithCompletion:^(NSError *error) {
             next(error, NO);
         }];
     };
@@ -476,7 +476,7 @@ NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMoni
     };
     
     CDEAsynchronousTaskBlock exportEventsTask = ^(CDEAsynchronousTaskCallbackBlock next) {
-        [self.cloudManager exportNewLocalEventsWithCompletion:^(NSError *error) {
+        [self.cloudManager exportNewLocalNonBaselineEventsWithCompletion:^(NSError *error) {
             next(error, NO);
         }];
     };
