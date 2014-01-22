@@ -27,8 +27,12 @@
 - (void)removeOutdatedRemoteFilesWithCompletion:(CDECompletionBlock)completion;
 
 - (void)importNewRemoteEventsWithCompletion:(CDECompletionBlock)completion;
-- (void)transferNewRemoteFilesToTransitCacheWithCompletion:(CDECompletionBlock)completion;
-- (void)migrateNewEventsFromTransitCacheWithCompletion:(CDECompletionBlock)completion;
+- (void)transferNewRemoteEventFilesToTransitCacheWithCompletion:(CDECompletionBlock)completion;
+
+- (void)importNewBaselineEventsWithCompletion:(CDECompletionBlock)completion;
+- (void)transferNewRemoteBaselineFilesToTransitCacheWithCompletion:(CDECompletionBlock)completion;
+
+- (void)migrateNewEventsWithAllowedTypes:(NSArray *)types fromTransitCacheWithCompletion:(CDECompletionBlock)completion;
 
 - (void)exportNewLocalEventsWithCompletion:(CDECompletionBlock)completion;
 - (void)migrateNewLocalEventsToTransitCacheWithCompletion:(CDECompletionBlock)completion;

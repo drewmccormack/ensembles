@@ -27,7 +27,6 @@
 @property (nonatomic, strong, readonly) NSString *localUploadRoot;
 @property (nonatomic, strong, readonly) NSString *localStoresUploadDirectory;
 @property (nonatomic, strong, readonly) NSString *localEventsUploadDirectory;
-@property (nonatomic, strong, readonly) NSString *localBaselinesUploadDirectory;
 
 @property (nonatomic, strong, readonly) NSString *remoteEnsembleDirectory;
 @property (nonatomic, strong, readonly) NSString *remoteStoresDirectory;
@@ -64,6 +63,7 @@
     return self;
 }
 
+
 #pragma mark Snapshotting Remote Files
 
 - (void)snapshotRemoteFilesWithCompletion:(CDECompletionBlock)completion
@@ -92,91 +92,71 @@
     snapshotBaselineFilenames = nil;
 }
 
-#pragma mark Removing Outdated Files
 
-// Requires a snapshot already exist
-- (void)removeOutdatedRemoteFilesWithCompletion:(CDECompletionBlock)completion
-{
-    if (!snapshotBaselineFilenames || !snapshotEventFilenames) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeMissingCloudSnapshot userInfo:nil];
-            if (completion) completion(error);
-        });
-        return;
-    }
-    
-    // Determine corresponding files for data still in event store
-    NSSet *baselineFilesForEventStore = [self filenamesForAllStoreModificationEventsOfType:CDEStoreModificationEventTypeBaseline createdInStore:nil];
-    NSSet *allEventFilesForEventStore = [self filenamesForAllStoreModificationEventsOfType:0 createdInStore:nil];
-    NSMutableSet *nonBaselineFilesForEventStore = [NSMutableSet setWithSet:allEventFilesForEventStore];
-    [nonBaselineFilesForEventStore minusSet:baselineFilesForEventStore];
-    
-    // Determine baselines to remove
-    NSMutableSet *baselinesToRemove = [snapshotBaselineFilenames mutableCopy];
-    [baselinesToRemove minusSet:baselineFilesForEventStore];
-    
-    // Determine non-baselines to remove
-    NSMutableSet *nonBaselinesToRemove = [snapshotEventFilenames mutableCopy];
-    [nonBaselinesToRemove minusSet:nonBaselineFilesForEventStore];
-    
-    // Queue up removals
-    NSArray *baselinePaths = [baselinesToRemove.allObjects cde_arrayByTransformingObjectsWithBlock:^id(NSString *file) {
-        NSString *path = [self.remoteBaselinesDirectory stringByAppendingPathComponent:file];
-        return path;
-    }];
-    NSArray *nonBaselinePaths = [nonBaselinesToRemove.allObjects cde_arrayByTransformingObjectsWithBlock:^id(NSString *file) {
-        NSString *path = [self.remoteEventsDirectory stringByAppendingPathComponent:file];
-        return path;
-    }];
-    NSArray *pathsToRemove = [baselinePaths arrayByAddingObjectsFromArray:nonBaselinePaths];
-
-    // Queue up tasks
-    NSMutableArray *tasks = [[NSMutableArray alloc] initWithCapacity:pathsToRemove.count];
-    for (NSString *path in pathsToRemove) {
-        CDEAsynchronousTaskBlock block = ^(CDEAsynchronousTaskCallbackBlock next) {
-            [self.cloudFileSystem removeItemAtPath:path completion:^(NSError *error) {
-                next(error, NO);
-            }];
-        };
-        [tasks addObject:block];
-    }
-    
-    CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:tasks terminationPolicy:CDETaskQueueTerminationPolicyCompleteAll completion:completion];
-    [operationQueue addOperation:taskQueue];
-}
-
-#pragma mark Retrieving Remote Files
+#pragma mark Importing Remote Files
 
 - (void)importNewRemoteEventsWithCompletion:(CDECompletionBlock)completion
 {
     NSAssert([NSThread isMainThread], @"importNewRemote... called off the main thread");
     
     CDELog(CDELoggingLevelVerbose, @"Transferring new events from cloud to event store");
-
-    [self transferNewRemoteFilesToTransitCacheWithCompletion:^(NSError *error) {
+    
+    [self transferNewRemoteEventFilesToTransitCacheWithCompletion:^(NSError *error) {
         if (error) {
             if (completion) completion(error);
             return;
         }
-        [self migrateNewEventsFromTransitCacheWithCompletion:completion];
+        NSArray *types = @[@(CDEStoreModificationEventTypeMerge), @(CDEStoreModificationEventTypeSave)];
+        [self migrateNewEventsWithAllowedTypes:types fromTransitCacheWithCompletion:completion];
     }];
 }
 
-- (void)transferNewRemoteFilesToTransitCacheWithCompletion:(CDECompletionBlock)completion
+- (void)importNewBaselineEventsWithCompletion:(CDECompletionBlock)completion
 {
-    [self.cloudFileSystem contentsOfDirectoryAtPath:self.remoteEventsDirectory completion:^(NSArray *contents, NSError *error) {
+    NSAssert([NSThread isMainThread], @"importNewBaselineEventsWithCompletion... called off the main thread");
+    
+    CDELog(CDELoggingLevelVerbose, @"Transferring new baselines from cloud to event store");
+    
+    [self transferNewRemoteBaselineFilesToTransitCacheWithCompletion:^(NSError *error) {
+        if (error) {
+            if (completion) completion(error);
+            return;
+        }
+        NSArray *types = @[@(CDEStoreModificationEventTypeBaseline)];
+        [self migrateNewEventsWithAllowedTypes:types fromTransitCacheWithCompletion:completion];
+    }];
+}
+
+
+#pragma mark Downloading Remote Files
+
+- (void)transferNewFilesFromRemoteDirectory:(NSString *)remoteDirectory toTransitCacheForEventTypes:(NSArray *)eventTypes completion:(CDECompletionBlock)completion
+{
+    [self.cloudFileSystem contentsOfDirectoryAtPath:remoteDirectory completion:^(NSArray *contents, NSError *error) {
         if (error) {
             if (completion) completion(error);
         }
         else {
             NSArray *filenames = [contents valueForKeyPath:@"name"];
-            NSArray *filenamesToRetrieve = [self filesRequiringRetrievalFromAvailableRemoteFiles:filenames];
-            [self transferRemoteEventFiles:filenamesToRetrieve toTransitCacheWithCompletion:completion];
+            NSArray *filenamesToRetrieve = [self eventFilesRequiringRetrievalFromAvailableRemoteFiles:filenames eventTypes:eventTypes];
+            [self transferRemoteEventFiles:filenamesToRetrieve fromRemoteDirectory:remoteDirectory toTransitCacheWithCompletion:completion];
         }
     }];
 }
 
-- (void)transferRemoteEventFiles:(NSArray *)filenames toTransitCacheWithCompletion:(CDECompletionBlock)completion
+- (void)transferNewRemoteEventFilesToTransitCacheWithCompletion:(CDECompletionBlock)completion
+{
+    NSArray *types = @[@(CDEStoreModificationEventTypeSave), @(CDEStoreModificationEventTypeMerge)];
+    [self transferNewFilesFromRemoteDirectory:self.remoteEventsDirectory toTransitCacheForEventTypes:types completion:completion];
+}
+
+- (void)transferNewRemoteBaselineFilesToTransitCacheWithCompletion:(CDECompletionBlock)completion
+{
+    NSArray *types = @[@(CDEStoreModificationEventTypeBaseline)];
+    [self transferNewFilesFromRemoteDirectory:self.remoteBaselinesDirectory toTransitCacheForEventTypes:types completion:completion];
+}
+
+- (void)transferRemoteEventFiles:(NSArray *)filenames fromRemoteDirectory:(NSString *)remoteDirectory toTransitCacheWithCompletion:(CDECompletionBlock)completion
 {
     // Remove any existing files in the cache first
     NSError *error = nil;
@@ -188,7 +168,7 @@
     
     NSMutableArray *taskBlocks = [NSMutableArray array];
     for (NSString *filename in filenames) {
-        NSString *remotePath = [self.remoteEventsDirectory stringByAppendingPathComponent:filename];
+        NSString *remotePath = [remoteDirectory stringByAppendingPathComponent:filename];
         NSString *localPath = [self.localEventsDownloadDirectory stringByAppendingPathComponent:filename];
         CDEAsynchronousTaskBlock block = ^(CDEAsynchronousTaskCallbackBlock next) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -204,15 +184,18 @@
     [operationQueue addOperation:taskQueue];
 }
 
-- (NSArray *)filesRequiringRetrievalFromAvailableRemoteFiles:(NSArray *)remoteFiles
+- (NSArray *)eventFilesRequiringRetrievalFromAvailableRemoteFiles:(NSArray *)remoteFiles eventTypes:(NSArray *)eventTypes
 {
     NSMutableSet *toRetrieve = [NSMutableSet setWithArray:remoteFiles];
-    NSSet *storeFilenames = [self filenamesForAllStoreModificationEventsCreatedInStore:nil];
+    NSSet *storeFilenames = [self filenamesForAllStoreModificationEventsOfTypes:eventTypes createdInStore:nil];
     [toRetrieve minusSet:storeFilenames];
     return [self sortFilenamesByGlobalCount:toRetrieve.allObjects];
 }
 
-- (void)migrateNewEventsFromTransitCacheWithCompletion:(CDECompletionBlock)completion
+
+#pragma mark Migrating Data In
+
+- (void)migrateNewEventsWithAllowedTypes:(NSArray *)types fromTransitCacheWithCompletion:(CDECompletionBlock)completion
 {
     NSError *error = nil;
     NSArray *files = [fileManager contentsOfDirectoryAtPath:self.localEventsDownloadDirectory error:&error];
@@ -236,7 +219,7 @@
             // Check for a pre-existing event first. Skip if we find one.
             __block BOOL eventExists = NO;
             [moc performBlockAndWait:^{
-                CDEStoreModificationEvent *existingEvent = [CDEStoreModificationEvent fetchStoreModificationEventForPersistentStoreIdentifier:revision.persistentStoreIdentifier revisionNumber:revision.revisionNumber inManagedObjectContext:moc];
+                CDEStoreModificationEvent *existingEvent = [CDEStoreModificationEvent fetchStoreModificationEventWithAllowedTypes:types persistentStoreIdentifier:revision.persistentStoreIdentifier revisionNumber:revision.revisionNumber inManagedObjectContext:moc]; 
                 eventExists = existingEvent != nil;
             }];
             
@@ -363,7 +346,8 @@
 - (NSArray *)localEventFilesMissingFromRemoteCloudFiles:(NSArray *)remoteFiles
 {
     NSString *persistentStoreId = self.eventStore.persistentStoreIdentifier;
-    NSMutableSet *filenames = [[self filenamesForAllStoreModificationEventsCreatedInStore:persistentStoreId] mutableCopy];
+    NSArray *types = @[@(CDEStoreModificationEventTypeSave), @(CDEStoreModificationEventTypeMerge)];
+    NSMutableSet *filenames = [[self filenamesForAllStoreModificationEventsOfTypes:types createdInStore:persistentStoreId] mutableCopy];
     
     // Remove remote files to get the missing ones
     NSSet *remoteSet = [NSSet setWithArray:[remoteFiles valueForKeyPath:@"name"]];
@@ -407,39 +391,14 @@
     return sortedResult;
 }
 
-- (NSSet *)filenamesForAllStoreModificationEventsCreatedInStore:(NSString *)persistentStoreIdentifier
-{
-    return [self filenamesForAllStoreModificationEventsOfType:0 createdInStore:persistentStoreIdentifier];
-}
-
-// Use type of 0 for all types
+// Use type of nil for all types
 // Use nil for store if any store is allowed
-- (NSSet *)filenamesForAllStoreModificationEventsOfType:(CDEStoreModificationEventType)type createdInStore:(NSString *)persistentStoreIdentifier
+- (NSSet *)filenamesForAllStoreModificationEventsOfTypes:(NSArray *)types createdInStore:(NSString *)persistentStoreIdentifier
 {
     NSMutableSet *filenames = [[NSMutableSet alloc] init];
     NSManagedObjectContext *moc = self.eventStore.managedObjectContext;
     [moc performBlockAndWait:^{
-        NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
-        fetch.relationshipKeyPathsForPrefetching = @[@"eventRevision"];
-        fetch.propertiesToFetch = @[@"globalCount"];
-        
-        NSPredicate *predicate = nil;
-        if (persistentStoreIdentifier) {
-            predicate = [NSPredicate predicateWithFormat:@"eventRevision.persistentStoreIdentifier = %@", persistentStoreIdentifier];
-        }
-        
-        if (type > 0) {
-            NSPredicate *typePredicate = [NSPredicate predicateWithFormat:@"type = %d", type];
-            if (!predicate)
-                predicate = typePredicate;
-            else
-                predicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[predicate, typePredicate]];
-        }
-        
-        fetch.predicate = predicate;
-        
-        NSError *error;
-        NSArray *events = [moc executeFetchRequest:fetch error:&error];
+        NSArray *events = [CDEStoreModificationEvent fetchStoreModificationEventsWithTypes:types persistentStoreIdentifier:persistentStoreIdentifier inManagedObjectContext:moc];
         if (!events) {
             CDELog(CDELoggingLevelError, @"Could not retrieve local events");
         }
@@ -452,6 +411,7 @@
     }];
     return filenames;
 }
+
 
 #pragma mark Local Directories
 
@@ -490,15 +450,6 @@
     return [self.localUploadRoot stringByAppendingPathComponent:@"events"];
 }
 
-- (NSString *)localBaselinesDownloadDirectory
-{
-    return [self.localDownloadRoot stringByAppendingPathComponent:@"baselines"];
-}
-
-- (NSString *)localBaselinesUploadDirectory
-{
-    return [self.localUploadRoot stringByAppendingPathComponent:@"baselines"];
-}
 
 #pragma mark Local Directory Structure
 
@@ -507,8 +458,6 @@
     [fileManager createDirectoryAtPath:localFileRoot withIntermediateDirectories:YES attributes:nil error:NULL];
     [fileManager createDirectoryAtPath:self.localEventsDownloadDirectory withIntermediateDirectories:YES attributes:nil error:NULL];
     [fileManager createDirectoryAtPath:self.localEventsUploadDirectory withIntermediateDirectories:YES attributes:nil error:NULL];
-    [fileManager createDirectoryAtPath:self.localBaselinesDownloadDirectory withIntermediateDirectories:YES attributes:nil error:NULL];
-    [fileManager createDirectoryAtPath:self.localBaselinesUploadDirectory withIntermediateDirectories:YES attributes:nil error:NULL];
     [fileManager createDirectoryAtPath:self.localStoresDownloadDirectory withIntermediateDirectories:YES attributes:nil error:NULL];
     [fileManager createDirectoryAtPath:self.localStoresUploadDirectory withIntermediateDirectories:YES attributes:nil error:NULL];
 }
@@ -527,6 +476,68 @@
     
     return YES;
 }
+
+
+
+#pragma mark Removing Outdated Files
+
+// Requires a snapshot already exist
+- (void)removeOutdatedRemoteFilesWithCompletion:(CDECompletionBlock)completion
+{
+    NSAssert([NSThread isMainThread], @"removeOutdatedRemoteFilesWithCompletion... called off the main thread");
+    
+    CDELog(CDELoggingLevelVerbose, @"Removing outdated files");
+    
+    if (!snapshotBaselineFilenames || !snapshotEventFilenames) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeMissingCloudSnapshot userInfo:nil];
+            if (completion) completion(error);
+        });
+        return;
+    }
+    
+    // Determine corresponding files for data still in event store
+    NSSet *baselineFilesForEventStore = [self filenamesForAllStoreModificationEventsOfTypes:@[@(CDEStoreModificationEventTypeBaseline)] createdInStore:nil];
+    NSSet *allEventFilesForEventStore = [self filenamesForAllStoreModificationEventsOfTypes:nil createdInStore:nil];
+    NSMutableSet *nonBaselineFilesForEventStore = [NSMutableSet setWithSet:allEventFilesForEventStore];
+    [nonBaselineFilesForEventStore minusSet:baselineFilesForEventStore];
+    
+    // Determine baselines to remove
+    NSMutableSet *baselinesToRemove = [snapshotBaselineFilenames mutableCopy];
+    [baselinesToRemove minusSet:baselineFilesForEventStore];
+    
+    // Determine non-baselines to remove
+    NSMutableSet *nonBaselinesToRemove = [snapshotEventFilenames mutableCopy];
+    [nonBaselinesToRemove minusSet:nonBaselineFilesForEventStore];
+    
+    // Queue up removals
+    NSArray *baselinePaths = [baselinesToRemove.allObjects cde_arrayByTransformingObjectsWithBlock:^id(NSString *file) {
+        NSString *path = [self.remoteBaselinesDirectory stringByAppendingPathComponent:file];
+        return path;
+    }];
+    NSArray *nonBaselinePaths = [nonBaselinesToRemove.allObjects cde_arrayByTransformingObjectsWithBlock:^id(NSString *file) {
+        NSString *path = [self.remoteEventsDirectory stringByAppendingPathComponent:file];
+        return path;
+    }];
+    NSArray *pathsToRemove = [baselinePaths arrayByAddingObjectsFromArray:nonBaselinePaths];
+    
+    CDELog(CDELoggingLevelVerbose, @"Removing cloud files: %@", [pathsToRemove componentsJoinedByString:@"\n"]);
+    
+    // Queue up tasks
+    NSMutableArray *tasks = [[NSMutableArray alloc] initWithCapacity:pathsToRemove.count];
+    for (NSString *path in pathsToRemove) {
+        CDEAsynchronousTaskBlock block = ^(CDEAsynchronousTaskCallbackBlock next) {
+            [self.cloudFileSystem removeItemAtPath:path completion:^(NSError *error) {
+                next(error, NO);
+            }];
+        };
+        [tasks addObject:block];
+    }
+    
+    CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:tasks terminationPolicy:CDETaskQueueTerminationPolicyCompleteAll completion:completion];
+    [operationQueue addOperation:taskQueue];
+}
+
 
 #pragma mark Remote Directory Structure
 
@@ -586,6 +597,7 @@
     CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:taskBlocks terminationPolicy:CDETaskQueueTerminationPolicyStopOnError completion:completion];
     [operationQueue addOperation:taskQueue];
 }
+
 
 #pragma mark Store Registration Info
 

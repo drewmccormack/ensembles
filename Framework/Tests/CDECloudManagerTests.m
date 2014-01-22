@@ -235,15 +235,16 @@
             }];
             
             [moc performBlockAndWait:^{
-                CDEStoreModificationEvent *fetchedEvent = [CDEStoreModificationEvent fetchStoreModificationEventForPersistentStoreIdentifier:store revisionNumber:1 inManagedObjectContext:moc];
+                CDEStoreModificationEvent *fetchedEvent = [CDEStoreModificationEvent fetchNonBaselineEventForPersistentStoreIdentifier:store revisionNumber:1 inManagedObjectContext:moc];
                 XCTAssertNil(fetchedEvent, @"Event should not be present after deletion");
             }];
             
-            [cloudManager migrateNewEventsFromTransitCacheWithCompletion:^(NSError *error) {
+            NSArray *types = @[@(CDEStoreModificationEventTypeSave), @(CDEStoreModificationEventTypeMerge)];
+            [cloudManager migrateNewEventsWithAllowedTypes:types fromTransitCacheWithCompletion:^(NSError *error) {
                 XCTAssertNil(error, @"Error importing");
                 
                 [moc performBlockAndWait:^{
-                    CDEStoreModificationEvent *fetchedEvent = [CDEStoreModificationEvent fetchStoreModificationEventForPersistentStoreIdentifier:store revisionNumber:1 inManagedObjectContext:moc];
+                    CDEStoreModificationEvent *fetchedEvent = [CDEStoreModificationEvent fetchNonBaselineEventForPersistentStoreIdentifier:store revisionNumber:1 inManagedObjectContext:moc];
                     XCTAssertNotNil(fetchedEvent, @"Event was not imported");
                 }];
                 

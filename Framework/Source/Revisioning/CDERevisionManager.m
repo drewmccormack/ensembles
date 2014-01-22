@@ -53,7 +53,7 @@
 {
     __block NSArray *result = nil;
     [eventManagedObjectContext performBlockAndWait:^{
-        CDEStoreModificationEvent *lastMergeEvent = [CDEStoreModificationEvent fetchStoreModificationEventForPersistentStoreIdentifier:eventStore.persistentStoreIdentifier revisionNumber:eventStore.lastMergeRevision inManagedObjectContext:eventManagedObjectContext];
+        CDEStoreModificationEvent *lastMergeEvent = [CDEStoreModificationEvent fetchNonBaselineEventForPersistentStoreIdentifier:eventStore.persistentStoreIdentifier revisionNumber:eventStore.lastMergeRevision inManagedObjectContext:eventManagedObjectContext];
         CDERevisionSet *lastMergeRevisionSet = lastMergeEvent.revisionSet;
         if (!lastMergeRevisionSet) lastMergeRevisionSet = [CDERevisionSet new]; // No previous merge
         
@@ -214,7 +214,7 @@
         for (CDEStoreModificationEvent *event in events) {
             NSSet *otherStoreRevs = event.eventRevisionsOfOtherStores;
             for (CDEEventRevision *otherStoreRev in otherStoreRevs) {
-                CDEStoreModificationEvent *dependency = [CDEStoreModificationEvent fetchStoreModificationEventForPersistentStoreIdentifier:otherStoreRev.persistentStoreIdentifier revisionNumber:otherStoreRev.revisionNumber inManagedObjectContext:event.managedObjectContext];
+                CDEStoreModificationEvent *dependency = [CDEStoreModificationEvent fetchNonBaselineEventForPersistentStoreIdentifier:otherStoreRev.persistentStoreIdentifier revisionNumber:otherStoreRev.revisionNumber inManagedObjectContext:event.managedObjectContext];
                 if (!dependency) {
                     result = NO;
                     return;

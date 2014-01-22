@@ -72,7 +72,8 @@
         
         // Set the state of other stores
         if (type == CDEStoreModificationEventTypeSave) {
-            CDEStoreModificationEvent *lastMergeEvent = [CDEStoreModificationEvent fetchStoreModificationEventForPersistentStoreIdentifier:persistentStoreId revisionNumber:lastMergeRevision inManagedObjectContext:eventManagedObjectContext];
+            CDEStoreModificationEvent *lastMergeEvent = [CDEStoreModificationEvent fetchNonBaselineEventForPersistentStoreIdentifier:persistentStoreId revisionNumber:lastMergeRevision inManagedObjectContext:eventManagedObjectContext];
+            
             CDERevisionSet *lastMergeRevisionsSet = lastMergeEvent.revisionSet;
             [lastMergeRevisionsSet removeRevisionForPersistentStoreIdentifier:persistentStoreId];
             if (!lastMergeRevisionsSet) lastMergeRevisionsSet = [[CDERevisionSet alloc] init]; // No previous merge exists

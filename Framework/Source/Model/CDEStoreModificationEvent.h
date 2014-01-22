@@ -38,9 +38,13 @@ typedef NS_ENUM(int16_t, CDEStoreModificationEventType) {
 - (void)setRevisionSet:(CDERevisionSet *)newSet forPersistentStoreIdentifier:(NSString *)persistentStoreId;
 - (void)deleteEventRevisions;
 
+// Fetching types of events. Pass nil for either argument to allow all.
++ (NSArray *)fetchStoreModificationEventsWithTypes:(NSArray *)types persistentStoreIdentifier:(NSString *)persistentStoreIdentifier inManagedObjectContext:(NSManagedObjectContext *)context;
+
 // Fetching particular events
 + (instancetype)fetchStoreModificationEventWithUniqueIdentifier:(NSString *)uniqueId inManagedObjectContext:(NSManagedObjectContext *)context;
-+ (instancetype)fetchStoreModificationEventForPersistentStoreIdentifier:(NSString *)persistentStoreId revisionNumber:(CDERevisionNumber)revision inManagedObjectContext:(NSManagedObjectContext *)context;
++ (instancetype)fetchStoreModificationEventWithAllowedTypes:(NSArray *)types persistentStoreIdentifier:(NSString *)storeId revisionNumber:(CDERevisionNumber)revision inManagedObjectContext:(NSManagedObjectContext *)context;
++ (instancetype)fetchNonBaselineEventForPersistentStoreIdentifier:(NSString *)persistentStoreId revisionNumber:(CDERevisionNumber)revision inManagedObjectContext:(NSManagedObjectContext *)context; // Non-baseline events
 
 // Fetching non-baseline events
 + (NSArray *)fetchStoreModificationEventsForPersistentStoreIdentifier:(NSString *)persistentStoreId sinceRevisionNumber:(CDERevisionNumber)revision inManagedObjectContext:(NSManagedObjectContext *)context;
