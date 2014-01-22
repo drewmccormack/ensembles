@@ -14,9 +14,9 @@
 @class CDEPersistentStoreEnsemble;
 @protocol CDECloudFileSystem;
 
-NSString * const CDEMonitoredManagedObjectContextWillSaveNotification;
-NSString * const CDEMonitoredManagedObjectContextDidSaveNotification;
-NSString * const CDEPersistentStoreEnsembleDidSaveMergeChangesNotification;
+extern NSString * const CDEMonitoredManagedObjectContextWillSaveNotification;
+extern NSString * const CDEMonitoredManagedObjectContextDidSaveNotification;
+extern NSString * const CDEPersistentStoreEnsembleDidSaveMergeChangesNotification;
 
 @protocol CDEPersistentStoreEnsembleDelegate <NSObject>
 
