@@ -62,7 +62,35 @@
     [testManagedObjectContext obtainPermanentIDsForObjects:objects.allObjects error:NULL];
     [eventBuilder addChangesForInsertedObjects:objects objectsAreSaved:NO inManagedObjectContext:testManagedObjectContext];
     [self.eventStore.managedObjectContext performBlockAndWait:^{
-        XCTAssertTrue(event.objectChanges.count == 1, @"Should be no object changes initially");
+        XCTAssertTrue(event.objectChanges.count == 1, @"Should be an object change initially");
+    }];
+}
+
+- (void)testFetchingOnTypeAndStore
+{
+    NSManagedObjectContext *context = self.eventStore.managedObjectContext;
+    
+    CDEEventBuilder *b = [[CDEEventBuilder alloc] initWithEventStore:(id)self.eventStore];
+    [b makeNewEventOfType:CDEStoreModificationEventTypeMerge];
+    
+    b = [[CDEEventBuilder alloc] initWithEventStore:(id)self.eventStore];
+    [b makeNewEventOfType:CDEStoreModificationEventTypeBaseline];
+    
+    b = [[CDEEventBuilder alloc] initWithEventStore:(id)self.eventStore];
+    [b makeNewEventOfType:CDEStoreModificationEventTypeMerge];
+    [context performBlockAndWait:^{
+        b.event.eventRevision.persistentStoreIdentifier = @"123";
+        
+        NSArray *types = @[@(CDEStoreModificationEventTypeMerge)];
+        NSArray *events = [CDEStoreModificationEvent fetchStoreModificationEventsWithTypes:types persistentStoreIdentifier:@"123" inManagedObjectContext:context];
+        XCTAssertEqual(events.count, (NSUInteger)1, @"Wrong number of events when fetching or a particular store");
+        
+        types = @[@(CDEStoreModificationEventTypeMerge), @(CDEStoreModificationEventTypeSave)];
+        events = [CDEStoreModificationEvent fetchStoreModificationEventsWithTypes:types persistentStoreIdentifier:nil inManagedObjectContext:context];
+        XCTAssertEqual(events.count, (NSUInteger)3, @"Wrong number of save/merge");
+        
+        events = [CDEStoreModificationEvent fetchStoreModificationEventsWithTypes:nil persistentStoreIdentifier:@"123" inManagedObjectContext:context];
+        XCTAssertEqual(events.count, (NSUInteger)1, @"Wrong number of events for particular store");
     }];
 }
 

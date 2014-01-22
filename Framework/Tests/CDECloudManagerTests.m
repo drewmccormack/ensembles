@@ -111,6 +111,20 @@
     [self waitForAsyncOperation];
 }
 
+- (void)testCreateRemoteBaselinesDirectory
+{
+    [cloudManager createRemoteDirectoryStructureWithCompletion:^(NSError *error) {
+        XCTAssertNil(error, @"Error creating directories");
+        NSString *eventsDir = [remoteEnsemblesDir stringByAppendingPathComponent:@"baselines"];
+        [cloudFileSystem fileExistsAtPath:eventsDir completion:^(BOOL exists, BOOL isDirectory, NSError *error) {
+            XCTAssert(isDirectory, @"Stores was not directory");
+            XCTAssert(exists, @"No stores dir created");
+            [self stopWaiting];
+        }];
+    }];
+    [self waitForAsyncOperation];
+}
+
 - (void)testImportFromCloudWithNoData
 {
     [cloudManager importNewRemoteEventsWithCompletion:^(NSError *error) {
