@@ -264,7 +264,7 @@
     CDELog(CDELoggingLevelVerbose, @"Transferring baseline from event store to cloud");
     
     NSArray *types = @[@(CDEStoreModificationEventTypeBaseline)];
-    [self migrateNewLocalEventsToTransitCacheWithRemoteDirectory:self.remoteEventsDirectory allowedTypes:types completion:^(NSError *error) {
+    [self migrateNewLocalEventsToTransitCacheWithRemoteDirectory:self.remoteBaselinesDirectory allowedTypes:types completion:^(NSError *error) {
         if (error) CDELog(CDELoggingLevelWarning, @"Error migrating out baseline: %@", error);
         [self transferEventFilesInTransitCacheToRemoteDirectory:self.remoteBaselinesDirectory completion:completion];
     }];
