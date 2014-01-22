@@ -16,6 +16,9 @@
 
 @interface CDECloudManager (TestMethods)
 
+@property (nonatomic, strong, readonly) NSString *remoteEventsDirectory;
+@property (nonatomic, strong, readonly) NSString *remoteBaselinesDirectory;
+
 - (NSArray *)sortFilenamesByGlobalCount:(NSArray *)files;
 
 @end
@@ -181,7 +184,7 @@
     }];
     
     [cloudManager createRemoteDirectoryStructureWithCompletion:^(NSError *error) {
-        [cloudManager migrateNewLocalEventsToTransitCacheWithCompletion:^(NSError *error) {
+        [cloudManager migrateNewLocalNonBaselineEventsToTransitCacheWithCompletion:^(NSError *error) {
             BOOL isDir;
             NSString *path = [rootDir stringByAppendingPathComponent:@"transitcache/ensemble1/upload/events/2_store1_1.cdeevent"];
             XCTAssertTrue([fileManager fileExistsAtPath:path isDirectory:&isDir], @"Transit file missing");
@@ -189,7 +192,7 @@
             NSString *eventsDir = [path stringByDeletingLastPathComponent];
             XCTAssertEqual([[fileManager contentsOfDirectoryAtPath:eventsDir error:NULL] count], (NSUInteger)2, @"Wrong number of files exported");
             
-            [cloudManager transferFilesInTransitCacheToCloudWithCompletion:^(NSError *error) {
+            [cloudManager transferFilesInTransitCacheToRemoteDirectory:cloudManager.remoteEventsDirectory completion:^(NSError *error) {
                 XCTAssertNil(error, @"Error transferring to cloud");
                 
                 NSString *remotePath = [remoteEnsemblesDir stringByAppendingPathComponent:@"events/2_store1_1.cdeevent"];
@@ -234,7 +237,7 @@
     }];
     
     [cloudManager createRemoteDirectoryStructureWithCompletion:^(NSError *error) {
-        [cloudManager migrateNewLocalEventsToTransitCacheWithCompletion:^(NSError *error) {
+        [cloudManager migrateNewLocalNonBaselineEventsToTransitCacheWithCompletion:^(NSError *error) {
             // Move cached file from the upload to the download folder
             NSString *uploadEventsDir = [rootDir stringByAppendingPathComponent:@"transitcache/ensemble1/upload/events"];
             NSString *downloadEventsDir = [rootDir stringByAppendingPathComponent:@"transitcache/ensemble1/download/events"];
