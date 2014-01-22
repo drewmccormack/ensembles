@@ -284,7 +284,7 @@
         
         CDEPropertyChangeValue *value1 = [[CDEPropertyChangeValue alloc] initWithType:CDEPropertyChangeTypeToManyRelationship propertyName:@"property"];
         value1.addedIdentifiers = [NSSet setWithObjects:@"11", @"12", nil];
-        value1.removedIdentifiers = [NSSet setWithObjects:@"13", nil];
+        value1.removedIdentifiers = [NSSet set];
         change1.propertyChangeValues = @[value1];
         
         // Object change outside baseline
@@ -315,9 +315,8 @@
             XCTAssertEqual(value.type, CDEPropertyChangeTypeToManyRelationship, @"Wrong value type");
             
             NSSet *added = [NSSet setWithObjects:@"12", @"21", @"13", nil];
-            NSSet *removed = [NSSet setWithObjects:@"11", @"22", nil];
             XCTAssertEqualObjects(value.addedIdentifiers, added, @"Wrong added ids");
-            XCTAssertEqualObjects(value.removedIdentifiers, removed, @"Wrong removed ids");
+            XCTAssertEqualObjects(value.removedIdentifiers, [NSSet set], @"Wrong removed ids");
         }];
         [self stopAsyncOp];
     }];
@@ -344,8 +343,8 @@
         
         CDEPropertyChangeValue *value1 = [[CDEPropertyChangeValue alloc] initWithType:CDEPropertyChangeTypeOrderedToManyRelationship propertyName:@"property"];
         value1.addedIdentifiers = [NSSet setWithObjects:@"11", @"12", nil];
-        value1.removedIdentifiers = [NSSet setWithObjects:@"13", nil];
-        value1.movedIdentifiersByIndex = @{@0 : @"11", @1 : @"666", @2 : @"12", @3 : @"777"};
+        value1.removedIdentifiers = [NSSet set];
+        value1.movedIdentifiersByIndex = @{@0 : @"11", @1 : @"12"};
         change1.propertyChangeValues = @[value1];
         
         // Object change outside baseline
@@ -358,7 +357,7 @@
         CDEPropertyChangeValue *value2 = [[CDEPropertyChangeValue alloc] initWithType:CDEPropertyChangeTypeOrderedToManyRelationship propertyName:@"property"];
         value2.addedIdentifiers = [NSSet setWithObjects:@"21", @"13", nil];
         value2.removedIdentifiers = [NSSet setWithObjects:@"11", @"22", nil];
-        value2.movedIdentifiersByIndex = @{@0 : @"21", @1 : @"13", @2 : @"12", @3 : @"666"};
+        value2.movedIdentifiersByIndex = @{@0 : @"21", @1 : @"13", @2 : @"17", @3 : @"666"};
         change2.propertyChangeValues = @[value2];
         
         [context save:NULL];
@@ -377,11 +376,10 @@
             XCTAssertEqual(value.type, CDEPropertyChangeTypeOrderedToManyRelationship, @"Wrong value type");
             
             NSSet *added = [NSSet setWithObjects:@"12", @"21", @"13", nil];
-            NSSet *removed = [NSSet setWithObjects:@"11", @"22", nil];
             XCTAssertEqualObjects(value.addedIdentifiers, added, @"Wrong added ids");
-            XCTAssertEqualObjects(value.removedIdentifiers, removed, @"Wrong removed ids");
+            XCTAssertEqualObjects(value.removedIdentifiers, [NSSet set], @"Wrong removed ids");
             
-            NSDictionary *moved = @{@0 : @"21", @1 : @"13", @2 : @"12", @3 : @"666", @4 : @"777"};
+            NSDictionary *moved = @{@0 : @"21", @1 : @"12", @2 : @"13"};
             XCTAssertEqualObjects(value.movedIdentifiersByIndex, moved, @"Wrong moved ids");
         }];
         [self stopAsyncOp];
