@@ -34,7 +34,7 @@
 - (void)exportNewLocalNonBaselineEventsWithCompletion:(CDECompletionBlock)completion;
 - (void)exportNewLocalBaselineWithCompletion:(CDECompletionBlock)completion;
 - (void)transferEventFilesInTransitCacheToRemoteDirectory:(NSString *)remoteDirectory completion:(CDECompletionBlock)completion;
-- (void)migrateNewLocalEventsToTransitCacheWithRemoteDirectory:(NSString *)remoteDirectory allowedTypes:(NSArray *)types completion:(CDECompletionBlock)completion;
+- (void)migrateNewLocalEventsToTransitCacheWithRemoteDirectory:(NSString *)remoteDirectory existingRemoteFilenames:(NSArray *)filenames allowedTypes:(NSArray *)types completion:(CDECompletionBlock)completion;
 
 - (void)removeOutdatedRemoteFilesWithCompletion:(CDECompletionBlock)completion;
 
