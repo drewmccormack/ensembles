@@ -20,6 +20,7 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
     NSOperationQueue *operationQueue;
     NSString *ubiquityContainerIdentifier;
     dispatch_queue_t timeOutQueue;
+    dispatch_queue_t initiatingDownloadsQueue;
     id ubiquityIdentityObserver;
     BOOL didStartDownloading;
 }
@@ -34,6 +35,7 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
         operationQueue.maxConcurrentOperationCount = 1;
         
         timeOutQueue = dispatch_queue_create("com.mentalfaculty.ensembles.queue.icloudtimeout", DISPATCH_QUEUE_SERIAL);
+        initiatingDownloadsQueue = dispatch_queue_create("com.mentalfaculty.ensembles.queue.initiatedownloads", DISPATCH_QUEUE_SERIAL);
         
         rootDirectoryURL = nil;
         metadataQuery = nil;
@@ -240,11 +242,10 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
     }
     didStartDownloading = count > 0;
     
-    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
     for ( NSUInteger i = 0; i < count; i++ ) {
         @autoreleasepool {
             NSURL *url = [metadataQuery valueOfAttribute:NSMetadataItemURLKey forResultAtIndex:i];
-            dispatch_async(queue, ^{
+            dispatch_async(initiatingDownloadsQueue, ^{
                 NSError *error;
                 BOOL startedDownload = [fileManager startDownloadingUbiquitousItemAtURL:url error:&error];
                 if ( !startedDownload ) CDELog(CDELoggingLevelWarning, @"Error starting download: %@", error);
