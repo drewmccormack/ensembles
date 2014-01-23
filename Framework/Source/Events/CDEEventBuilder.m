@@ -74,10 +74,17 @@
         if (type == CDEStoreModificationEventTypeSave) {
             CDEStoreModificationEvent *lastMergeEvent = [CDEStoreModificationEvent fetchNonBaselineEventForPersistentStoreIdentifier:persistentStoreId revisionNumber:lastMergeRevision inManagedObjectContext:eventManagedObjectContext];
             
-            CDERevisionSet *lastMergeRevisionsSet = lastMergeEvent.revisionSet;
-            [lastMergeRevisionsSet removeRevisionForPersistentStoreIdentifier:persistentStoreId];
-            if (!lastMergeRevisionsSet) lastMergeRevisionsSet = [[CDERevisionSet alloc] init]; // No previous merge exists
-            event.revisionSetOfOtherStoresAtCreation = lastMergeRevisionsSet;
+            CDERevisionSet *newRevisionSet = lastMergeEvent.revisionSet;
+            if (!newRevisionSet) {
+                // No previous merge exists. Try baseline.
+                CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:eventManagedObjectContext];
+                if (baseline)
+                    newRevisionSet = baseline.revisionSet;
+                else
+                    newRevisionSet = [[CDERevisionSet alloc] init];
+            }
+            [newRevisionSet removeRevisionForPersistentStoreIdentifier:persistentStoreId];
+            event.revisionSetOfOtherStoresAtCreation = newRevisionSet;
         }
         else if (type == CDEStoreModificationEventTypeMerge) {
             CDERevisionSet *mostRecentSet = [revisionManager revisionSetOfMostRecentEvents];

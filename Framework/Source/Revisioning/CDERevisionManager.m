@@ -277,7 +277,7 @@
     __block CDERevisionSet *set = nil;
     [eventManagedObjectContext performBlockAndWait:^{
         NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"CDEEventRevision"];
-        request.predicate = [NSPredicate predicateWithFormat:@"storeModificationEvent != NIL"];
+        request.predicate = [NSPredicate predicateWithFormat:@"storeModificationEvent != NIL OR storeModificationEventForOtherStores != NIL"];
         
         NSError *error;
         NSArray *allRevisions = [eventManagedObjectContext executeFetchRequest:request error:&error];

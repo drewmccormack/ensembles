@@ -20,7 +20,6 @@
 
 @implementation CDERevisionManagerTests {
     CDERevisionManager *revisionManager;
-    NSManagedObjectContext *childMOC;
     CDEStoreModificationEvent *modEvent;
 }
 
@@ -28,12 +27,7 @@
 {
     [super setUp];
     
-    childMOC = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
-    [childMOC performBlockAndWait:^{
-        childMOC.parentContext = self.eventStore.managedObjectContext;
-    }];
-    
-    revisionManager = [[CDERevisionManager alloc] initWithEventStore:(id)self.eventStore eventManagedObjectContext:childMOC];
+    revisionManager = [[CDERevisionManager alloc] initWithEventStore:(id)self.eventStore];
     revisionManager.managedObjectModelURL = self.testModelURL;
     
     NSManagedObjectContext *moc = self.eventStore.managedObjectContext;
@@ -180,7 +174,8 @@
 
 - (void)testPrerequisitesWithNoOtherEvents
 {
-    [childMOC performBlockAndWait:^{
+    NSManagedObjectContext *moc = self.eventStore.managedObjectContext;
+    [moc performBlockAndWait:^{
         NSArray *events = [revisionManager fetchUncommittedStoreModificationEvents:NULL];
         BOOL passedCheck = [revisionManager checkAllDependenciesExistForStoreModificationEvents:events];
         XCTAssertTrue(passedCheck, @"Should not be any dependencies for one event");
