@@ -53,7 +53,7 @@
 
 - (void)testInsertGeneratesObjects
 {
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
     NSArray *parents = [self.testManagedObjectContext executeFetchRequest:fetch error:NULL];
     XCTAssertEqual(parents.count, (NSUInteger)2, @"Wrong number of parents");
@@ -61,7 +61,7 @@
 
 - (void)testInsertSetsAttribute
 {
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
     NSArray *parents = [self.testManagedObjectContext executeFetchRequest:fetch error:NULL];
     parents = [parents filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"name = \"parent1\""]];
@@ -71,7 +71,7 @@
 
 - (void)testInsertSetsNilAttribute
 {
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
     NSArray *parents = [self.testManagedObjectContext executeFetchRequest:fetch error:NULL];
     parents = [parents filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"name = \"parent2\""]];
@@ -81,7 +81,7 @@
 
 - (void)testInsertSetsRelationship
 {
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
     NSArray *parents = [self.testManagedObjectContext executeFetchRequest:fetch error:NULL];
     parents = [parents filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"name = \"parent1\""]];
@@ -91,7 +91,7 @@
 
 - (void)testMergeWithNoRepairGeneratesAStoreModificationEvent
 {
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
     NSManagedObjectContext *moc = self.eventStore.managedObjectContext;
     [self.eventStore.managedObjectContext performBlockAndWait:^{
         NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
@@ -106,7 +106,7 @@
         [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:savingContext];
     };
     
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
     
     NSManagedObjectContext *moc = self.eventStore.managedObjectContext;
     [self.eventStore.managedObjectContext performBlockAndWait:^{

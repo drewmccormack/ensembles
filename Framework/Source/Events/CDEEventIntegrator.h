@@ -31,7 +31,7 @@ typedef void (^CDEEventIntegratorDidSaveBlock)(NSManagedObjectContext *savingCon
 
 - (instancetype)initWithStoreURL:(NSURL *)newStoreURL managedObjectModel:(NSManagedObjectModel *)model eventStore:(CDEEventStore *)newEventStore;
 
-- (void)mergeEventsImportedSinceRevision:(CDERevisionNumber)revisionNumber completion:(CDECompletionBlock)completion;
+- (void)mergeEventsWithCompletion:(CDECompletionBlock)completion;
 
 @end
 

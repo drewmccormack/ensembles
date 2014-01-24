@@ -29,7 +29,6 @@
 @implementation CDEEventIntegrator {
     CDECompletionBlock completion;
     NSManagedObjectContext *eventStoreChildContext;
-    CDERevisionNumber fromRevisionNumber;
     NSDictionary *saveInfoDictionary;
     dispatch_queue_t queue;
     id eventStoreChildContextSaveObserver;
@@ -108,12 +107,11 @@
 
 #pragma mark Merging Store Modification Events
 
-- (void)mergeEventsImportedSinceRevision:(CDERevisionNumber)revision completion:(CDECompletionBlock)newCompletion
+- (void)mergeEventsWithCompletion:(CDECompletionBlock)newCompletion
 {
     NSAssert([NSThread isMainThread], @"mergeEvents... called off main thread");
     
     completion = [newCompletion copy];
-    fromRevisionNumber = revision;
     
     // Setup child context of the event store
     eventStoreChildContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];

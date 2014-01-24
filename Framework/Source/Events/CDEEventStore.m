@@ -29,8 +29,6 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 @property (nonatomic, strong, readonly) NSString *pathToBlobsDirectory;
 @property (nonatomic, strong, readonly) NSString *pathToStoreInfoFile;
 @property (nonatomic, copy, readwrite) NSString *persistentStoreIdentifier;
-@property (nonatomic, assign, readwrite) CDERevisionNumber lastSaveRevision;
-@property (nonatomic, assign, readwrite) CDERevisionNumber lastMergeRevision;
 
 @end
 

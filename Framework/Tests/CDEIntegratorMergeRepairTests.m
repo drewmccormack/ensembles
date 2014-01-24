@@ -55,7 +55,7 @@
         failError = error;
         return NO;
     };
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
     
     XCTAssert(failBlockInvoked, @"Fail block not invoked");
     XCTAssertNotNil(failError, @"Should give an error");
@@ -68,13 +68,13 @@
     self.integrator.didSaveBlock = ^(NSManagedObjectContext *context, NSDictionary *info) {
         didSave = YES;
     };
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
     XCTAssertTrue(didSave, @"Did not successfully save");
 }
 
 - (void)testMergeEventIncludesObjectChanges
 {
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
 
     [self.eventStore.managedObjectContext performBlockAndWait:^{
         NSArray *events = [CDEStoreModificationEvent fetchStoreModificationEventsForPersistentStoreIdentifier:self.eventStore.persistentStoreIdentifier sinceRevisionNumber:-1 inManagedObjectContext:self.eventStore.managedObjectContext];
@@ -113,7 +113,7 @@
         failError = error;
         return NO;
     };
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
     
     XCTAssertFalse(failBlockInvoked, @"Fail block not invoked");
 }
@@ -137,7 +137,7 @@
         }];
     };
     
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
     
     [self.eventStore.managedObjectContext performBlockAndWait:^{
         NSArray *events = [CDEStoreModificationEvent fetchStoreModificationEventsForPersistentStoreIdentifier:self.eventStore.persistentStoreIdentifier sinceRevisionNumber:-1 inManagedObjectContext:self.eventStore.managedObjectContext];

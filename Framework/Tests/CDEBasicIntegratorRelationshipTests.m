@@ -21,7 +21,7 @@
     [super setUp];
     NSString *path = [[NSBundle bundleForClass:self.class] pathForResource:@"BasicIntegratorRelationshipTestsFixture" ofType:@"json"];
     [self addEventsFromJSONFile:path];
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
 }
 
 - (void)testParentInserted
