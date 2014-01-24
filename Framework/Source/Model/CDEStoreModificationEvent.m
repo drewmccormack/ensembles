@@ -219,6 +219,16 @@
     return [CDERevisionManager sortStoreModificationEvents:events];
 }
 
++ (NSArray *)fetchNonBaselineEventsInManagedObjectContext:(NSManagedObjectContext *)context
+{
+    NSError *error;
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
+    fetch.predicate = [NSPredicate predicateWithFormat:@"type != %d", CDEStoreModificationEventTypeBaseline];
+    NSArray *events = [context executeFetchRequest:fetch error:&error];
+    NSAssert(events, @"Fetch of events failed: %@", error);
+    return [CDERevisionManager sortStoreModificationEvents:events];
+}
+
 + (void)prefetchRelatedObjectsForStoreModificationEvents:(NSArray *)storeModEvents
 {
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
