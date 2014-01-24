@@ -43,11 +43,21 @@
     NSManagedObjectContext *context = eventStore.managedObjectContext;
     [context performBlock:^{
         CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:context];
-        CDEGlobalCount globalCountCutoff = baseline.globalCount;
-        NSArray *eventsToDelete = [CDEStoreModificationEvent fetchNonBaselineEventsUpToGlobalCount:globalCountCutoff inManagedObjectContext:context];
-        [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:eventsToDelete];
-        for (CDEStoreModificationEvent *event in eventsToDelete) [context deleteObject:event];
+        CDERevisionSet *baselineRevisionSet = baseline.revisionSet;
         
+        if (baseline) {
+            CDEGlobalCount globalCountCutoff = baseline.globalCount;
+            NSArray *eventsToDelete = [CDEStoreModificationEvent fetchNonBaselineEventsUpToGlobalCount:globalCountCutoff inManagedObjectContext:context];
+            [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:eventsToDelete];
+            
+            for (CDEStoreModificationEvent *event in eventsToDelete) {
+                // Don't delete events from stores not in the baseline
+                NSString *storeId = event.eventRevision.persistentStoreIdentifier;
+                if (nil == [baselineRevisionSet revisionForPersistentStoreIdentifier:storeId]) continue;
+                [context deleteObject:event];
+            }
+        }
+
         NSError *error = nil;
         BOOL saved = [context save:&error];
         
