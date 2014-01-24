@@ -136,6 +136,7 @@
         // Check that events can be integrated, ie, pass all checks.
         NSError *error = nil;
         CDERevisionManager *revisionManager = [[CDERevisionManager alloc] initWithEventStore:self.eventStore];
+        revisionManager.managedObjectModelURL = self.ensemble.managedObjectModelURL;
         BOOL passedChecks = [revisionManager checkRebasingPrequisitesForEvents:eventsToMerge error:&error];
         if (!passedChecks) {
             dispatch_async(dispatch_get_main_queue(), ^{
