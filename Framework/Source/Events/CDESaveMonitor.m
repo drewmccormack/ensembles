@@ -162,6 +162,21 @@
     
     CDELog(CDELoggingLevelVerbose, @"Store changes post-save");
     
+    // Store changes
+    [self storeChangesForContext:context changedObjectsDictionary:notif.userInfo];
+    
+    // Notification
+    NSDictionary *userInfo = self.ensemble ? @{@"persistentStoreEnsemble" : self.ensemble} : nil;
+    [[NSNotificationCenter defaultCenter] postNotificationName:CDEMonitoredManagedObjectContextDidSaveNotification object:context userInfo:userInfo];
+}
+
+- (void)storeChangesForContext:(NSManagedObjectContext *)context changedObjectsDictionary:(NSDictionary *)changedObjectsDictionary
+{
+    NSSet *insertedObjects = [changedObjectsDictionary objectForKey:NSInsertedObjectsKey];
+    NSSet *deletedObjects = [changedObjectsDictionary objectForKey:NSDeletedObjectsKey];
+    NSSet *updatedObjects = [changedObjectsDictionary objectForKey:NSUpdatedObjectsKey];
+    if (insertedObjects.count + deletedObjects.count + updatedObjects.count == 0) return;
+    
     // Add a store mod event
     CDEEventBuilder *eventBuilder = [[CDEEventBuilder alloc] initWithEventStore:self.eventStore];
     eventBuilder.ensemble = self.ensemble;
@@ -171,19 +186,16 @@
     [self.eventStore registerIncompleteEventIdentifier:eventBuilder.event.uniqueIdentifier isMandatory:YES];
     
     // Inserted Objects. Do inserts before updates to make sure each object has a global identifier.
-    NSSet *insertedObjects = [notif.userInfo objectForKey:NSInsertedObjectsKey];
     insertedObjects = [self monitoredManagedObjectsInSet:insertedObjects];
     [eventBuilder addChangesForInsertedObjects:insertedObjects objectsAreSaved:YES inManagedObjectContext:context];
     [self saveEventStore];
     
     // Deleted Objects
-    NSSet *deletedObjects = [notif.userInfo objectForKey:NSDeletedObjectsKey];
     deletedObjects = [self monitoredManagedObjectsInSet:deletedObjects];
     [eventBuilder addChangesForDeletedObjects:deletedObjects inManagedObjectContext:context];
     [self saveEventStore];
     
     // Updated Objects
-    NSSet *updatedObjects = [notif.userInfo objectForKey:NSUpdatedObjectsKey];
     updatedObjects = [self monitoredManagedObjectsInSet:updatedObjects];
     NSDictionary *changedValuesByObjectID = [changedValuesByContext objectForKey:context];
     [eventBuilder addChangesForUpdatedObjects:updatedObjects inManagedObjectContext:context options:CDEUpdateStoreOptionSavedValue propertyChangeValuesByObjectID:changedValuesByObjectID];
@@ -192,10 +204,6 @@
     // Deregister event, and clean up
     [self.eventStore deregisterIncompleteEventIdentifier:eventBuilder.event.uniqueIdentifier];
     [changedValuesByContext removeObjectForKey:context];
-    
-    // Notification
-    NSDictionary *userInfo = self.ensemble ? @{@"persistentStoreEnsemble" : self.ensemble} : nil;
-    [[NSNotificationCenter defaultCenter] postNotificationName:CDEMonitoredManagedObjectContextDidSaveNotification object:context userInfo:userInfo];
 }
 
 @end
