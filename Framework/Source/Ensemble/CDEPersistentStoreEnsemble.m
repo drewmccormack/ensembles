@@ -476,8 +476,9 @@ NSString * const CDEPersistentStoreEnsembleDidSaveMergeChangesNotification = @"C
     };
     
     CDEAsynchronousTaskBlock mergeEventsTask = ^(CDEAsynchronousTaskCallbackBlock next) {
-        CDERevisionNumber lastMerge = [self.eventStore lastMergeRevision];
-        [self.eventIntegrator mergeEventsImportedSinceRevision:lastMerge completion:^(NSError *error) {
+        CDERevisionNumber rev = [self.eventStore lastMergeRevision];
+        if (rev < 0) rev = [self.eventStore baselineRevision];
+        [self.eventIntegrator mergeEventsImportedSinceRevision:rev completion:^(NSError *error) {
             next(error, NO);
         }];
     };

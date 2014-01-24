@@ -60,6 +60,18 @@
     XCTAssertEqual(revisionManager.maximumGlobalCount, (CDEGlobalCount)-1, @"Wrong count");
 }
 
+- (void)testMaximumGlobalCountForStoreWithBaseline
+{
+    NSManagedObjectContext *moc = self.eventStore.managedObjectContext;
+    [moc performBlockAndWait:^{
+        [moc deleteObject:modEvent];
+        modEvent = [self addModEventForStore:@"store1" revision:5 globalCount:78 timestamp:124];
+        modEvent.type = CDEStoreModificationEventTypeBaseline;
+    }];
+    
+    XCTAssertEqual(revisionManager.maximumGlobalCount, (CDEGlobalCount)78, @"Wrong count");
+}
+
 - (void)testRecentRevisionsWithNoEvents
 {
     NSManagedObjectContext *moc = self.eventStore.managedObjectContext;
@@ -86,7 +98,6 @@
     CDERevision *revision = [set revisionForPersistentStoreIdentifier:@"1234"];
     XCTAssertEqual(revision.revisionNumber, (CDERevisionNumber)1, @"Wrong revision number");
 }
-
 
 - (void)testFetchingUncommittedEventsWithOnlyCurrentStoreEvent
 {
@@ -130,6 +141,64 @@
     NSArray *events = [revisionManager fetchUncommittedStoreModificationEvents:NULL];
     XCTAssertEqual(events.count, (NSUInteger)2, @"Wrong event count for merge revision 0");
 }
+
+- (void)testFetchingNoUncommittedEventsWithBaseline
+{
+    NSManagedObjectContext *moc = self.eventStore.managedObjectContext;
+    [moc performBlockAndWait:^{
+        CDEStoreModificationEvent *baseline = [self addModEventForStore:@"otherstore" revision:5 timestamp:1234];
+        baseline.type = CDEStoreModificationEventTypeBaseline;
+        baseline.eventRevisionsOfOtherStores = [NSSet setWithObject:[self addEventRevisionForStore:@"store1" revision:4]];
+    }];
+    
+    self.eventStore.lastMergeRevision = -1;
+    NSArray *events = [revisionManager fetchUncommittedStoreModificationEvents:NULL];
+    XCTAssertEqual(events.count, (NSUInteger)0, @"Should be no events since baseline");
+}
+
+- (void)testFetchingUncommittedEventsWithBaseline
+{
+    NSManagedObjectContext *moc = self.eventStore.managedObjectContext;
+    [moc performBlockAndWait:^{
+        modEvent.eventRevision.revisionNumber = 5;
+        CDEStoreModificationEvent *baseline = [self addModEventForStore:@"otherstore" revision:5 timestamp:1234];
+        baseline.type = CDEStoreModificationEventTypeBaseline;
+        baseline.eventRevisionsOfOtherStores = [NSSet setWithObject:[self addEventRevisionForStore:@"store1" revision:4]];
+    }];
+    
+    self.eventStore.lastMergeRevision = -1;
+    NSArray *events = [revisionManager fetchUncommittedStoreModificationEvents:NULL];
+    XCTAssertEqual(events.count, (NSUInteger)1, @"Should be an event");
+}
+
+- (void)testFetchingUncommittedEventsWithBaselineAndLastMerge
+{
+    NSManagedObjectContext *moc = self.eventStore.managedObjectContext;
+    
+    __block CDEStoreModificationEvent *merge;
+    [moc performBlockAndWait:^{
+        modEvent.eventRevision.revisionNumber = 4;
+        
+        merge = [self addModEventForStore:@"store1" revision:5 timestamp:1234];
+        merge.type = CDEStoreModificationEventTypeMerge;
+        
+        CDEStoreModificationEvent *baseline = [self addModEventForStore:@"otherstore" revision:5 timestamp:1234];
+        baseline.type = CDEStoreModificationEventTypeBaseline;
+        baseline.eventRevisionsOfOtherStores = [NSSet setWithObject:[self addEventRevisionForStore:@"store1" revision:2]];
+    }];
+    
+    self.eventStore.lastMergeRevision = 5;
+    NSArray *events = [revisionManager fetchUncommittedStoreModificationEvents:NULL];
+    XCTAssertEqual(events.count, (NSUInteger)0, @"Should be no event");
+    
+    [moc performBlockAndWait:^{
+        merge.eventRevision.revisionNumber = 3;
+    }];
+    self.eventStore.lastMergeRevision = 3;
+    events = [revisionManager fetchUncommittedStoreModificationEvents:NULL];
+    XCTAssertEqual(events.count, (NSUInteger)1, @"Should be an event");
+}
+
 
 - (void)testFetchingConcurrentEventsForSingleEvent
 {

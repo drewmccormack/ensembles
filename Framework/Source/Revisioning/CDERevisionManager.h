@@ -37,6 +37,8 @@
 - (CDERevisionSet *)revisionSetOfMostRecentEvents;
 - (NSSet *)allPersistentStoreIdentifiers;
 
+- (CDERevisionSet *)revisionSetForLastMergeOrBaseline;
+
 + (NSArray *)sortStoreModificationEvents:(NSArray *)events;
 
 
