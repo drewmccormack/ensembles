@@ -36,6 +36,28 @@
 }
 
 
+#pragma mark Removing Out-of-Date Events
+
+- (void)deleteEventsPreceedingBaselineWithCompletion:(CDECompletionBlock)completion
+{
+    NSManagedObjectContext *context = eventStore.managedObjectContext;
+    [context performBlock:^{
+        CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:context];
+        CDEGlobalCount globalCountCutoff = baseline.globalCount;
+        NSArray *eventsToDelete = [CDEStoreModificationEvent fetchNonBaselineEventsUpToGlobalCount:globalCountCutoff inManagedObjectContext:context];
+        [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:eventsToDelete];
+        for (CDEStoreModificationEvent *event in eventsToDelete) [context deleteObject:event];
+        
+        NSError *error = nil;
+        BOOL saved = [context save:&error];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (completion) completion(saved ? nil : error);
+        });
+    }];
+}
+
+
 #pragma mark Determining When to Rebase
 
 - (float)estimatedEventStoreCompactionFollowingRebase
@@ -78,7 +100,7 @@
     BOOL hasAllDevicesInBaseline = [baselineRevisionSet.persistentStoreIdentifiers isEqualToSet:allStores];
     
     BOOL hasManyEvents = [self countOfAllObjectChanges] >= 100;
-    BOOL compactionIsAdequate = self.estimatedEventStoreCompactionFollowingRebase > 0.5;
+    BOOL compactionIsAdequate = self.estimatedEventStoreCompactionFollowingRebase > 0.5f;
     return !hasBaseline || !hasAllDevicesInBaseline || (hasManyEvents && compactionIsAdequate);
 }
 
@@ -93,7 +115,7 @@
     [context performBlock:^{
         // Fetch objects
         CDEStoreModificationEvent *existingBaseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:context];
-        NSArray *eventsToMerge = [CDEStoreModificationEvent fetchStoreModificationEventsUpToGlobalCount:newBaselineGlobalCount inManagedObjectContext:context];
+        NSArray *eventsToMerge = [CDEStoreModificationEvent fetchNonBaselineEventsUpToGlobalCount:newBaselineGlobalCount inManagedObjectContext:context];
         if (existingBaseline && eventsToMerge.count == 0) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (completion) completion(nil);

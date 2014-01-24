@@ -19,6 +19,8 @@
 
 - (instancetype)initWithEventStore:(CDEEventStore *)eventStore;
 
+- (void)deleteEventsPreceedingBaselineWithCompletion:(CDECompletionBlock)completion;
+
 - (float)estimatedEventStoreCompactionFollowingRebase;
 - (BOOL)shouldRebase;
 

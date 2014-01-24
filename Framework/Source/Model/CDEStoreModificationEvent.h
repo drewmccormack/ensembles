@@ -48,7 +48,7 @@ typedef NS_ENUM(int16_t, CDEStoreModificationEventType) {
 
 // Fetching non-baseline events
 + (NSArray *)fetchNonBaselineEventsForPersistentStoreIdentifier:(NSString *)persistentStoreId sinceRevisionNumber:(CDERevisionNumber)revision inManagedObjectContext:(NSManagedObjectContext *)context;
-+ (NSArray *)fetchStoreModificationEventsUpToGlobalCount:(CDEGlobalCount)globalCount inManagedObjectContext:(NSManagedObjectContext *)context;
++ (NSArray *)fetchNonBaselineEventsUpToGlobalCount:(CDEGlobalCount)globalCount inManagedObjectContext:(NSManagedObjectContext *)context;
 
 // Fetching baseline events
 + (instancetype)fetchBaselineStoreModificationEventInManagedObjectContext:(NSManagedObjectContext *)context;

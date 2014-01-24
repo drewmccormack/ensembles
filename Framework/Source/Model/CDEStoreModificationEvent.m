@@ -209,7 +209,7 @@
     return events.lastObject;
 }
 
-+ (NSArray *)fetchStoreModificationEventsUpToGlobalCount:(CDEGlobalCount)globalCount inManagedObjectContext:(NSManagedObjectContext *)context
++ (NSArray *)fetchNonBaselineEventsUpToGlobalCount:(CDEGlobalCount)globalCount inManagedObjectContext:(NSManagedObjectContext *)context
 {
     NSError *error;
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
