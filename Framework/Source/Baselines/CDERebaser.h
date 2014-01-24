@@ -1,5 +1,5 @@
 //
-//  CDEBaselinePropagator.h
+//  CDERebaser.h
 //  Ensembles
 //
 //  Created by Drew McCormack on 05/01/14.
@@ -19,7 +19,7 @@
 
 - (instancetype)initWithEventStore:(CDEEventStore *)eventStore;
 
-- (CGFloat)estimatedEventStoreCompactionFollowingRebase;
+- (float)estimatedEventStoreCompactionFollowingRebase;
 - (BOOL)shouldRebase;
 
 - (void)rebaseWithCompletion:(CDECompletionBlock)completion;

@@ -184,7 +184,7 @@
     return [self fetchStoreModificationEventWithAllowedTypes:types persistentStoreIdentifier:persistentStoreId revisionNumber:revision inManagedObjectContext:context];
 }
 
-+ (NSArray *)fetchStoreModificationEventsForPersistentStoreIdentifier:(NSString *)persistentStoreId sinceRevisionNumber:(CDERevisionNumber)revision inManagedObjectContext:(NSManagedObjectContext *)context
++ (NSArray *)fetchNonBaselineEventsForPersistentStoreIdentifier:(NSString *)persistentStoreId sinceRevisionNumber:(CDERevisionNumber)revision inManagedObjectContext:(NSManagedObjectContext *)context
 {
     NSFetchRequest *fetch = [[NSFetchRequest alloc] initWithEntityName:@"CDEStoreModificationEvent"];
     fetch.predicate = [NSPredicate predicateWithFormat:@"eventRevision.persistentStoreIdentifier = %@ && eventRevision.revisionNumber > %lld && type != %d", persistentStoreId, revision, CDEStoreModificationEventTypeBaseline];

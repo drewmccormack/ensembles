@@ -1,5 +1,5 @@
 //
-//  CDEBaselinePropagator.m
+//  CDERebaser.m
 //  Ensembles
 //
 //  Created by Drew McCormack on 05/01/14.
@@ -38,7 +38,7 @@
 
 #pragma mark Determining When to Rebase
 
-- (CGFloat)estimatedEventStoreCompactionFollowingRebase
+- (float)estimatedEventStoreCompactionFollowingRebase
 {
     // Determine size of baseline
     NSInteger currentBaselineCount = [self countOfBaseline];
@@ -53,7 +53,7 @@
 
     // Estimate compaction
     NSInteger currentCount = currentBaselineCount + deletedCount + insertedCount + updatedCount;
-    CGFloat compaction = 1.0f - ( rebasedBaselineCount / (CGFloat)MAX(1,currentCount) );
+    float compaction = 1.0f - ( rebasedBaselineCount / (float)MAX(1,currentCount) );
     compaction = MIN( MAX(compaction, 0.0f), 1.0f);
     
     return compaction;
@@ -101,6 +101,17 @@
             return;
         }
         
+        // Check that events can be integrated, ie, pass all checks.
+        NSError *error = nil;
+        CDERevisionManager *revisionManager = [[CDERevisionManager alloc] initWithEventStore:self.eventStore];
+        BOOL passedChecks = [revisionManager checkRebasingPrequisitesForEvents:eventsToMerge error:&error];
+        if (!passedChecks) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (completion) completion(error);
+            });
+            return;
+        }
+        
         // If no baseline exists, create one.
         CDEStoreModificationEvent *newBaseline = existingBaseline;
         if (!existingBaseline) {
@@ -133,7 +144,6 @@
         for (CDEGlobalIdentifier *globalId in unusedGlobalIds) [context deleteObject:globalId];
 
         // Save
-        NSError *error = nil;
         BOOL saved = [context save:&error];
         if (!saved) CDELog(CDELoggingLevelError, @"Failed to save rebase: %@", error);
         

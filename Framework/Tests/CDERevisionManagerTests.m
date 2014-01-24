@@ -276,6 +276,39 @@
     XCTAssertTrue(passedCheck, @"Integration prerequisites should pass");
 }
 
+- (void)testPrerequisitesPassingDependenciesWithBaseline
+{
+    NSManagedObjectContext *moc = self.eventStore.managedObjectContext;
+    [moc performBlockAndWait:^{
+        [moc deleteObject:modEvent];
+        [self addModEventForStore:@"store1" revision:3 globalCount:112 timestamp:1210.0];
+        CDEStoreModificationEvent *event = [self addModEventForStore:@"other" revision:4 globalCount:100 timestamp:1234.0];
+        event.eventRevisionsOfOtherStores = [NSSet setWithObject:[self addEventRevisionForStore:@"store1" revision:2]];
+    }];
+    
+    BOOL passedCheck = [revisionManager checkIntegrationPrequisites:NULL];
+    XCTAssertFalse(passedCheck, @"Should fail check with no baseline in place, due to missing event");
+
+    [moc performBlockAndWait:^{
+        CDEStoreModificationEvent *baseline = [self addModEventForStore:@"other" revision:3 timestamp:1234];
+        baseline.type = CDEStoreModificationEventTypeBaseline;
+        baseline.eventRevisionsOfOtherStores = [NSSet setWithObject:[self addEventRevisionForStore:@"store1" revision:2]];
+    }];
+    
+    NSArray *events = [revisionManager fetchUncommittedStoreModificationEvents:NULL];
+    XCTAssertEqual(events.count, (NSUInteger)2, @"Wrong number of events uncommitted");
+    
+    passedCheck = [revisionManager checkAllDependenciesExistForStoreModificationEvents:events];
+    XCTAssertTrue(passedCheck, @"Should pass due to baseline");
+    
+    events = [revisionManager fetchStoreModificationEventsConcurrentWithEvents:events error:NULL];
+    passedCheck = [revisionManager checkContinuityOfStoreModificationEvents:events];
+    XCTAssertTrue(passedCheck, @"Continuity should pass");
+    
+    passedCheck = [revisionManager checkIntegrationPrequisites:NULL];
+    XCTAssertTrue(passedCheck, @"Integration prerequisites should pass");
+}
+
 - (void)testPrerequisitesWithPreviousMerge
 {
     NSManagedObjectContext *moc = self.eventStore.managedObjectContext;
