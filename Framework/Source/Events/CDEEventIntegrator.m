@@ -254,6 +254,16 @@
 
 #pragma mark Integrating Changes
 
+- (BOOL)needsFullIntegration
+{
+    // Determine if we need to do a full integration of all data.
+    // This is the case if the baseline identity has changed.
+    NSString *storeBaselineId = self.eventStore.persistentStoreBaselineIdentifier;
+    NSString *currentBaselineId = self.eventStore.currentBaselineIdentifier;
+    BOOL needFullIntegration = !storeBaselineId || ![storeBaselineId isEqualToString:currentBaselineId];
+    return needFullIntegration;
+}
+
 // Called on background queue.
 - (BOOL)integrate:(NSError * __autoreleasing *)error
 {
@@ -268,13 +278,8 @@
     
     // Move to the child event store queue
     __block BOOL success = YES;
-    NSString *storeBaselineId = self.eventStore.persistentStoreBaselineIdentifier;
-    NSString *currentBaselineId = self.eventStore.currentBaselineIdentifier;
+    BOOL needFullIntegration = [self needsFullIntegration];
     [eventStoreChildContext performBlockAndWait:^{
-        // Determine if we need to do a full integration of all data.
-        // This is the case if the baseline identity has changed.
-        BOOL needFullIntegration = !storeBaselineId || ![storeBaselineId isEqualToString:currentBaselineId];
-        
         // Get events
         NSArray *storeModEvents = nil;
         if (needFullIntegration) {
