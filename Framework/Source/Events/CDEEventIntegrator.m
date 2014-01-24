@@ -291,6 +291,7 @@
                 success = NO;
                 return;
             }
+            if (storeModEvents.count == 0) return;
             
             // Add any modification events concurrent with the new events. Results are ordered.
             // We repeat this until there is no change in the set. This will be when there are
