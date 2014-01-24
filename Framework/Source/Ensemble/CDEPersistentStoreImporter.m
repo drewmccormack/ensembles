@@ -56,7 +56,7 @@
     NSManagedObjectContext *eventContext = eventStore.managedObjectContext;
     CDEEventBuilder *eventBuilder = [[CDEEventBuilder alloc] initWithEventStore:self.eventStore];
     eventBuilder.ensemble = self.ensemble;
-    [eventBuilder makeNewEventOfType:CDEStoreModificationEventTypeSave];
+    [eventBuilder makeNewEventOfType:CDEStoreModificationEventTypeBaseline];
     [eventBuilder performBlockAndWait:^{
         eventBuilder.event.globalCount = 0;
     }];
