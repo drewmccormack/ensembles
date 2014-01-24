@@ -268,19 +268,35 @@
     
     // Move to the child event store queue
     __block BOOL success = YES;
+    NSString *storeBaselineId = self.eventStore.persistentStoreBaselineIdentifier;
+    NSString *currentBaselineId = self.eventStore.currentBaselineIdentifier;
     [eventStoreChildContext performBlockAndWait:^{
-        // Get all modification events added since the last merge
-        NSArray *storeModEvents = [revisionManager fetchUncommittedStoreModificationEvents:error];
-        if (!storeModEvents) {
-            success = NO;
-            return;
-        }
-        if (storeModEvents.count == 0) return;
+        // Determine if we need to do a full integration of all data.
+        // This is the case if the baseline identity has changed.
+        BOOL needFullIntegration = !storeBaselineId || ![storeBaselineId isEqualToString:currentBaselineId];
         
-        // Add any modification events concurrent with the new events. Results are ordered.
-        // We repeat this until there is no change in the set. This will be when there are
-        // no events existing outside the set that are concurrent with the events in the set.
-        storeModEvents = [revisionManager recursivelyFetchStoreModificationEventsConcurrentWithEvents:storeModEvents error:error];
+        // Get events
+        NSArray *storeModEvents = nil;
+        if (needFullIntegration) {
+            // All events, including baseline
+            NSMutableArray *events = [[CDEStoreModificationEvent fetchNonBaselineEventsInManagedObjectContext:eventStoreChildContext] mutableCopy];
+            CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:eventStoreChildContext];
+            if (baseline) [events insertObject:baseline atIndex:0];
+            storeModEvents = events;
+        }
+        else {
+            // Get all modification events added since the last merge
+            storeModEvents = [revisionManager fetchUncommittedStoreModificationEvents:error];
+            if (!storeModEvents) {
+                success = NO;
+                return;
+            }
+            
+            // Add any modification events concurrent with the new events. Results are ordered.
+            // We repeat this until there is no change in the set. This will be when there are
+            // no events existing outside the set that are concurrent with the events in the set.
+            storeModEvents = [revisionManager recursivelyFetchStoreModificationEventsConcurrentWithEvents:storeModEvents error:error];
+        }
         if (storeModEvents == nil) success = NO;
         if (storeModEvents.count == 0) return;
         
