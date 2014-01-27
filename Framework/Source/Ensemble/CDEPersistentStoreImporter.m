@@ -62,7 +62,7 @@
     }];
     
     NSMutableSet *allObjects = [[NSMutableSet alloc] initWithCapacity:1000];
-    [context performBlockAndWait:^{
+    [context performBlock:^{
         for (NSEntityDescription *entity in managedObjectModel) {
             NSFetchRequest *fetch = [[NSFetchRequest alloc] initWithEntityName:entity.name];
             fetch.fetchBatchSize = 100;
@@ -79,14 +79,14 @@
         }
         
         [eventBuilder addChangesForInsertedObjects:allObjects objectsAreSaved:YES inManagedObjectContext:context];
-    }];
         
-    [eventContext performBlockAndWait:^{
-        [eventContext save:&error];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (completion) completion(error);
-        });
+        [eventContext performBlock:^{
+            [eventContext save:&error];
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (completion) completion(error);
+            });
+        }];
     }];
 }
 
