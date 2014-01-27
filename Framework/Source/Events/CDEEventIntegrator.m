@@ -986,14 +986,14 @@
 {
     __block BOOL saved = NO;
     [managedObjectContext performBlockAndWait:^{
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(mergeChangesFromContextDidSaveNotification:) name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(storeChangesFromContextDidSaveNotification:) name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
         saved = [managedObjectContext save:error];
         [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
     }];
     return saved;
 }
 
-- (void)mergeChangesFromContextDidSaveNotification:(NSNotification *)notif
+- (void)storeChangesFromContextDidSaveNotification:(NSNotification *)notif
 {
     saveInfoDictionary = notif.userInfo;
 }

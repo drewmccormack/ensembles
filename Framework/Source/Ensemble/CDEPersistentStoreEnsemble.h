@@ -18,6 +18,8 @@ extern NSString * const CDEMonitoredManagedObjectContextWillSaveNotification;
 extern NSString * const CDEMonitoredManagedObjectContextDidSaveNotification;
 extern NSString * const CDEPersistentStoreEnsembleDidSaveMergeChangesNotification;
 
+extern NSString * const CDEManagedObjectContextSaveNotificationKey; // Passed in userInfo of CDEPersistentStoreEnsembleDidSaveMergeChangesNotification
+
 @protocol CDEPersistentStoreEnsembleDelegate <NSObject>
 
 @optional

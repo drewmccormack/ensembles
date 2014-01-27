@@ -94,9 +94,7 @@
 }
 
 - (void)testBaselineConsolidation
-{
-    CDESetCurrentLoggingLevel(CDELoggingLevelVerbose);
-    
+{    
     NSManagedObject *parentOnDevice1 = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context1];
     [parentOnDevice1 setValue:@"bob" forKey:@"name"];
     XCTAssertTrue([context1 save:NULL], @"Could not save");

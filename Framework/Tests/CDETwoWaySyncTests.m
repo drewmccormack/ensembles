@@ -34,10 +34,6 @@
     
     XCTAssertNil([self syncChanges], @"Second sync failed");
     
-    // Note stalenessInterval setting is 0.0. Otherwise these will use cached values, which are no good.
-    [context1 refreshObject:parentOnDevice1 mergeChanges:NO];
-    [context2 refreshObject:parentOnDevice2 mergeChanges:NO];
-    
     XCTAssertEqualObjects([parentOnDevice1 valueForKey:@"name"], @"dave", @"Wrong name on device 1");
     XCTAssertEqualObjects([parentOnDevice2 valueForKey:@"name"], @"dave", @"Wrong name on device 2");
 }
@@ -66,10 +62,6 @@
     
     XCTAssertNil([self syncChanges], @"Second sync failed");
     
-    // Note stalenessInterval setting is 0.0. Otherwise these will use cached values, which are no good.
-    [context1 refreshObject:parentOnDevice1 mergeChanges:NO];
-    [context2 refreshObject:parentOnDevice2 mergeChanges:NO];
-    
     XCTAssertEqualObjects([parentOnDevice1 valueForKey:@"name"], @"dave", @"Wrong name on device 1");
     XCTAssertEqualObjects([parentOnDevice2 valueForKey:@"name"], @"dave", @"Wrong name on device 2");
 }
@@ -95,9 +87,6 @@
     XCTAssertTrue([context2 save:NULL], @"Could not save");
     
     XCTAssertNil([self syncChanges], @"Sync failed");
-    
-    [context1 refreshObject:childOnDevice1 mergeChanges:NO];
-    [context1 refreshObject:parent mergeChanges:NO];
     
     id newParentOnDevice1 = [childOnDevice1 valueForKey:@"parent"];
     XCTAssertNotNil(newParentOnDevice1, @"No parent");
@@ -129,9 +118,6 @@
     
     XCTAssertTrue([context2 save:NULL], @"Could not save");
     XCTAssertNil([self syncChanges], @"Sync failed");
-    
-    [context1 refreshObject:parent mergeChanges:NO];
-    [context1 refreshObject:child2OnDevice1 mergeChanges:NO];
 
     NSSet *childrenOnDevice1 = [parent valueForKey:@"children"];
     XCTAssertEqualObjects([child2OnDevice1 valueForKey:@"name"], @"child2", @"Wrong name for child");
@@ -184,9 +170,7 @@
     
     XCTAssertNil([self syncChanges], @"Sync failed");
 
-    [context1 refreshObject:child1OnDevice1 mergeChanges:NO];
     id parentOnDevice1 = [child1OnDevice1 valueForKey:@"orderedParent"];
-    [context1 refreshObject:parentOnDevice1 mergeChanges:NO];
 
     NSOrderedSet *orderedChildrenOnDevice1 = [parentOnDevice1 valueForKey:@"orderedChildren"];
     XCTAssertEqual(orderedChildrenOnDevice1.count, (NSUInteger)3, @"Expected 3 children");
@@ -226,9 +210,6 @@
     NSMutableOrderedSet *childrenOnDevice2 = [[parentOnDevice2 valueForKey:@"orderedChildren"] mutableCopy];
     XCTAssertEqual(childrenOnDevice2.count, (NSUInteger)3, @"Expected 3 children");
 
-    // On device one, add a new object at index 1 (child1,child4,child2,child3)
-    [context1 refreshObject:parent mergeChanges:NO];
-
     id child4OnDevice1 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context1];
     [child4OnDevice1 setName:@"child4"];
     set = [NSOrderedSet orderedSetWithArray:@[child1OnDevice1, child4OnDevice1, child2OnDevice1, child3OnDevice1]];
@@ -242,9 +223,6 @@
     XCTAssertTrue([context2 save:NULL], @"Could not save");
 
     XCTAssertNil([self syncChanges], @"Sync failed");
-    
-    [context1 refreshObject:parent mergeChanges:NO];
-    [context2 refreshObject:parentOnDevice2 mergeChanges:NO];
     
     NSOrderedSet *finalDevice1Set = [parent valueForKey:@"orderedChildren"];
     NSOrderedSet *finalDevice2Set = [parentOnDevice2 valueForKey:@"orderedChildren"];
@@ -264,8 +242,6 @@
     XCTAssertTrue([context1 save:NULL], @"Could not save");
     XCTAssertNil([self syncChanges], @"Sync failed");
 
-    [context1 refreshObject:P1 mergeChanges:NO];
-    
     // Device 1
     id A1 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context1];
     [A1 setName:@"A"];
@@ -316,9 +292,6 @@
     XCTAssertTrue([context1 save:NULL], @"Could not save");
 
     XCTAssertNil([self syncChanges], @"Sync failed");
-    
-    [context1 refreshObject:P1 mergeChanges:NO];
-    [context2 refreshObject:P2 mergeChanges:NO];
     
     NSOrderedSet *finalDevice1Set = [P1 valueForKey:@"orderedChildren"];
     NSOrderedSet *finalDevice2Set = [P2 valueForKey:@"orderedChildren"];
