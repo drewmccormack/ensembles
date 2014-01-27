@@ -70,6 +70,7 @@
 		07973F16183BE466007F48CA /* CDECloudManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 07973F0F183BE466007F48CA /* CDECloudManager.h */; };
 		07973F17183BE466007F48CA /* CDECloudManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 07973F10183BE466007F48CA /* CDECloudManager.m */; };
 		07973F19183D308D007F48CA /* IntegratorMergeTestsFixture.json in Resources */ = {isa = PBXBuildFile; fileRef = 07973F18183D3082007F48CA /* IntegratorMergeTestsFixture.json */; };
+		07AD39B5189675C3008545AD /* CDEBaseliningSyncTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07AD39B4189675C3008545AD /* CDEBaseliningSyncTests.m */; };
 		07B18212188806A0005229A1 /* CDERebaserTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07B18211188806A0005229A1 /* CDERebaserTests.m */; };
 		07BAB4BD184677640096318D /* CDEBaselineConsolidator.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BAB4BB184677640096318D /* CDEBaselineConsolidator.h */; };
 		07BAB4BE184677640096318D /* CDEBaselineConsolidator.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BAB4BC184677640096318D /* CDEBaselineConsolidator.m */; };
@@ -192,6 +193,7 @@
 		07973F0F183BE466007F48CA /* CDECloudManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDECloudManager.h; sourceTree = "<group>"; };
 		07973F10183BE466007F48CA /* CDECloudManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDECloudManager.m; sourceTree = "<group>"; };
 		07973F18183D3082007F48CA /* IntegratorMergeTestsFixture.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = IntegratorMergeTestsFixture.json; sourceTree = "<group>"; };
+		07AD39B4189675C3008545AD /* CDEBaseliningSyncTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEBaseliningSyncTests.m; sourceTree = "<group>"; };
 		07B18211188806A0005229A1 /* CDERebaserTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDERebaserTests.m; sourceTree = "<group>"; };
 		07BAB4BB184677640096318D /* CDEBaselineConsolidator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEBaselineConsolidator.h; sourceTree = "<group>"; };
 		07BAB4BC184677640096318D /* CDEBaselineConsolidator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEBaselineConsolidator.m; sourceTree = "<group>"; };
@@ -307,6 +309,7 @@
 				072E5AEB17EB4332002D9604 /* CDESyncTest.m */,
 				07CCA9D417E49B4A0017B6C4 /* CDEOneWaySyncTests.m */,
 				072E5AED17EB44C3002D9604 /* CDETwoWaySyncTests.m */,
+				07AD39B4189675C3008545AD /* CDEBaseliningSyncTests.m */,
 			);
 			name = "Sync System Tests";
 			sourceTree = "<group>";
@@ -676,6 +679,7 @@
 				074DE60E17B77970009755EB /* CDEStoreModificationEventTests.m in Sources */,
 				074DE61217B77BB6009755EB /* CDEEventMigratorTests.m in Sources */,
 				07697A7817E0BD0800A9BB63 /* CDEMockCloudFileSystem.m in Sources */,
+				07AD39B5189675C3008545AD /* CDEBaseliningSyncTests.m in Sources */,
 				07CCA9D917E4AF0E0017B6C4 /* CDEOneWaySyncTests.m in Sources */,
 				0754307717F20BEE00FA4946 /* CDECloudManagerTests.m in Sources */,
 				0747CDA517C3E0A300221ED7 /* CDEIntegratorTestCase.m in Sources */,
