@@ -99,12 +99,16 @@
     [parentOnDevice1 setValue:@"bob" forKey:@"name"];
     XCTAssertTrue([context1 save:NULL], @"Could not save");
     
+    NSManagedObject *parentOnDevice2 = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context2];
+    [parentOnDevice2 setValue:@"john" forKey:@"name"];
+    XCTAssertTrue([context2 save:NULL], @"Could not save");
+    
     [self leechStores];
     [self syncChanges];
     
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
     NSArray *parents = [context2 executeFetchRequest:fetch error:NULL];
-    XCTAssertEqual(parents.count, (NSUInteger)1, @"Should be a parent object in context2");
+    XCTAssertEqual(parents.count, (NSUInteger)2, @"Should be a parent object in context2");
 }
 
 - (NSManagedObjectContext *)eventFileContextForURL:(NSURL *)baselineURL
