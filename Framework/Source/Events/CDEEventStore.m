@@ -264,6 +264,14 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
     return result;
 }
 
+- (void)setPersistentStoreBaselineIdentifier:(NSString *)newId
+{
+    if (![newId isEqualToString:persistentStoreBaselineIdentifier]) {
+        persistentStoreBaselineIdentifier = [newId copy];
+        [self saveStoreMetadata];
+    }
+}
+
 
 #pragma mark - Flushing out queued operations
 
