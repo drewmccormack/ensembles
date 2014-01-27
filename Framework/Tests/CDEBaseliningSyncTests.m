@@ -95,6 +95,8 @@
 
 - (void)testBaselineConsolidation
 {
+    CDESetCurrentLoggingLevel(CDELoggingLevelVerbose);
+    
     NSManagedObject *parentOnDevice1 = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context1];
     [parentOnDevice1 setValue:@"bob" forKey:@"name"];
     XCTAssertTrue([context1 save:NULL], @"Could not save");
@@ -104,10 +106,14 @@
     XCTAssertTrue([context2 save:NULL], @"Could not save");
     
     [self leechStores];
-    [self syncChanges];
+    NSError *syncError = [self syncChanges];
+    XCTAssertNil(syncError, @"Sync error: %@", syncError);
     
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
-    NSArray *parents = [context2 executeFetchRequest:fetch error:NULL];
+    NSArray *parents = [context1 executeFetchRequest:fetch error:NULL];
+    XCTAssertEqual(parents.count, (NSUInteger)2, @"Should be a parent object in context1");
+    
+    parents = [context2 executeFetchRequest:fetch error:NULL];
     XCTAssertEqual(parents.count, (NSUInteger)2, @"Should be a parent object in context2");
 }
 

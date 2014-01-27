@@ -275,11 +275,30 @@ NSString * const CDEPersistentStoreEnsembleDidSaveMergeChangesNotification = @"C
         [importer importWithCompletion:^(NSError *error) {
             [self endObservingSaveNotifications];
             
-            if (!error && [self.delegate respondsToSelector:@selector(persistentStoreEnsembleDidImportStore:)]) {
-                [self.delegate persistentStoreEnsembleDidImportStore:self];
+            if (nil == error) {
+                // Store baseline
+                self.eventStore.persistentStoreBaselineIdentifier = [self.eventStore currentBaselineIdentifier];
+                
+                // Inform delegate
+                if ([self.delegate respondsToSelector:@selector(persistentStoreEnsembleDidImportStore:)]) {
+                    [self.delegate persistentStoreEnsembleDidImportStore:self];
+                }
             }
             
             next(error, NO);
+        }];
+    };
+    
+    CDEAsynchronousTaskBlock snapshotRemoteFilesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self.cloudManager snapshotRemoteFilesWithCompletion:^(NSError *error) {
+            next(error, NO);
+        }];
+    };
+    
+    CDEAsynchronousTaskBlock exportBaselinesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self.cloudManager exportNewLocalBaselineWithCompletion:^(NSError *error) {
+            if (error) CDELog(CDELoggingLevelError, @"Failed to export baseline file during leech. Continuing regardless.");
+            next(nil, NO); // If the export fails, continue regardless. Not essential.
         }];
     };
     
@@ -300,7 +319,7 @@ NSString * const CDEPersistentStoreEnsembleDidSaveMergeChangesNotification = @"C
         }];
     };
     
-    NSMutableArray *tasks = [NSMutableArray arrayWithObjects:connectTask, remoteStructureTask, eventStoreTask, importTask, completeLeechTask, nil];
+    NSMutableArray *tasks = [NSMutableArray arrayWithObjects:connectTask, remoteStructureTask, eventStoreTask, importTask, snapshotRemoteFilesTask, exportBaselinesTask, completeLeechTask, nil];
     
     if ([self.cloudFileSystem respondsToSelector:@selector(performInitialPreparation:)]) {
         [tasks insertObject:initialPrepTask atIndex:1];

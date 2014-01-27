@@ -51,7 +51,6 @@
     context2.persistentStoreCoordinator = testPSC2;
     context2.stalenessInterval = 0.0;
     
-    cloudRootDir = [testRootDirectory stringByAppendingPathComponent:@"cloudfiles"];
     cloudFileSystem2 = [[CDELocalCloudFileSystem alloc] initWithRootDirectory:cloudRootDir];
     eventDataRoot2 = [testRootDirectory stringByAppendingPathComponent:@"eventData2"];
     ensemble2 = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"com.ensembles.synctest" persistentStorePath:testStoreURL2.path managedObjectModelURL:testModelURL cloudFileSystem:cloudFileSystem2 localDataRootDirectory:eventDataRoot2];
