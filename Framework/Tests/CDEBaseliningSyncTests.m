@@ -126,6 +126,36 @@
     XCTAssertEqual(parents.count, (NSUInteger)2, @"Should be a parent object in context2");
 }
 
+- (void)testRebasingIsTriggered
+{
+    [self leechStores];
+    [self mergeEnsemble:ensemble1];
+
+    for (NSUInteger i = 0; i < 100; i++) {
+        NSManagedObject *parentOnDevice1 = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context1];
+        [parentOnDevice1 setValue:@"bob" forKey:@"name"];
+    }
+    XCTAssertTrue([context1 save:NULL], @"Could not save");
+    
+    NSArray *parents = [context1 executeFetchRequest:[NSFetchRequest fetchRequestWithEntityName:@"Parent"] error:NULL];
+    for (id parent in parents) {
+        [parent setValue:@"tom" forKey:@"name"];
+    }
+    XCTAssertTrue([context1 save:NULL], @"Could not save");
+    
+    [self mergeEnsemble:ensemble1];
+    
+    NSArray *baselineFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cloudBaselinesDir error:NULL];
+    NSArray *eventFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cloudEventsDir error:NULL];
+    XCTAssertEqual(baselineFiles.count, (NSUInteger)1, @"Should be one baseline file");
+    XCTAssertEqual(eventFiles.count, (NSUInteger)0, @"Should be one baseline file");
+    
+    [self mergeEnsemble:ensemble2];
+    
+    NSArray *parentsIn2 = [context2 executeFetchRequest:[NSFetchRequest fetchRequestWithEntityName:@"Parent"] error:NULL];
+    XCTAssertEqual(parentsIn2.count, (NSUInteger)100, @"Wrong parent count in second context");
+}
+
 - (NSManagedObjectContext *)eventFileContextForURL:(NSURL *)baselineURL
 {
     NSManagedObjectContext *baselineContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
