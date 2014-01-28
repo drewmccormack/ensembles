@@ -56,9 +56,16 @@ typedef NS_ENUM(NSUInteger, CDELoggingLevel) {
     CDELoggingLevelVerbose
 };
 
-void CDELog(NSUInteger level, NSString *format, ...);
-void CDESetCurrentLoggingLevel(NSUInteger newLevel);
+#define CDELog(level, ...)                                                                                  \
+do {                                                                                                        \
+    if (CDECurrentLoggingLevel() >= level) {                                                                \
+        NSLog(@"%s line %d: %@", __PRETTY_FUNCTION__, __LINE__, [NSString stringWithFormat:__VA_ARGS__]);   \
+    }                                                                                                       \
+} while (0)
 
+
+void CDESetCurrentLoggingLevel(NSUInteger newLevel);
+NSUInteger CDECurrentLoggingLevel(void);
 
 #pragma mark Callbacks
 

@@ -794,7 +794,7 @@
                 }
 
                 merged = [reparationContext save:error];
-                if (!merged) CDELog(CDELoggingLevelError, @"Saving merge context after willSave changes failed: %@", error);
+                if (!merged) CDELog(CDELoggingLevelError, @"Saving merge context after willSave changes failed: %@", *error);
             }
         }];
     }
