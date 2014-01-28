@@ -329,19 +329,7 @@
                     appliedInsertsByEntity[entity.name] = appliedInsertChanges;
                     
                     // If full integration, track all inserted object ids, so we can delete unreferenced objects
-                    if (needFullIntegration) {
-                        NSMutableSet *objectIDs = insertedObjectIDsByEntity[entity.name];
-                        if (!objectIDs) objectIDs = [NSMutableSet set];
-                        NSArray *storeURIs = [appliedInsertChanges valueForKeyPath:@"globalIdentifier.storeURI"];
-                        [managedObjectContext performBlockAndWait:^{
-                            for (NSString *uri in storeURIs) {
-                                NSURL *url = [NSURL URLWithString:uri];
-                                NSManagedObjectID *objectID = [managedObjectContext.persistentStoreCoordinator managedObjectIDForURIRepresentation:url];
-                                if (objectID) [objectIDs addObject:objectID];
-                            }
-                        }];
-                        insertedObjectIDsByEntity[entity.name] = objectIDs;
-                    }
+                    if (needFullIntegration) [self updateObjectIDsByEntity:insertedObjectIDsByEntity forEntity:entity insertChanges:appliedInsertChanges];
                 }
                 
                 // Now that all objects exist, we can apply property changes.
@@ -361,19 +349,7 @@
         }
         
         // In a full integration, remove any objects that didn't get inserted
-        if (needFullIntegration) {
-            [managedObjectContext performBlockAndWait:^{
-                [insertedObjectIDsByEntity enumerateKeysAndObjectsUsingBlock:^(NSString *entityName, NSSet *objectIDs, BOOL *stop) {
-                    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:entityName];
-                    fetch.predicate = [NSPredicate predicateWithFormat:@"NOT (SELF IN %@)", objectIDs];
-                    NSError *error;
-                    NSArray *unreferencedObjects = [managedObjectContext executeFetchRequest:fetch error:&error];
-                    for (NSManagedObject *object in unreferencedObjects) {
-                        [self nullifyRelationshipsAndDeleteObject:object];
-                    }
-                }];
-            }];
-        }
+        if (needFullIntegration) [self deleteUnreferencedObjectsInObjectIDsByEntity:insertedObjectIDsByEntity];
     }];
     
     return success;
@@ -428,6 +404,39 @@
     NSSortDescriptor *storeDesc = [NSSortDescriptor sortDescriptorWithKey:@"storeModificationEvent.eventRevision.persistentStoreIdentifier" ascending:YES];
     NSSortDescriptor *typeDesc = [NSSortDescriptor sortDescriptorWithKey:@"type" ascending:YES];
     return @[countDesc, timestampDesc, storeDesc, typeDesc];
+}
+
+
+#pragma mark Tracking Deletions of Unreferenced Objects in Full Integrations
+
+- (void)updateObjectIDsByEntity:(NSMutableDictionary *)objectIDsByEntity forEntity:(NSEntityDescription *)entity insertChanges:(NSArray *)changes
+{
+    NSMutableSet *objectIDs = objectIDsByEntity[entity.name];
+    if (!objectIDs) objectIDs = [NSMutableSet set];
+    NSArray *storeURIs = [changes valueForKeyPath:@"globalIdentifier.storeURI"];
+    [managedObjectContext performBlockAndWait:^{
+        for (NSString *uri in storeURIs) {
+            NSURL *url = [NSURL URLWithString:uri];
+            NSManagedObjectID *objectID = [managedObjectContext.persistentStoreCoordinator managedObjectIDForURIRepresentation:url];
+            if (objectID) [objectIDs addObject:objectID];
+        }
+    }];
+    objectIDsByEntity[entity.name] = objectIDs;
+}
+
+- (void)deleteUnreferencedObjectsInObjectIDsByEntity:(NSDictionary *)objectIDsByEntity
+{
+    [managedObjectContext performBlockAndWait:^{
+        [objectIDsByEntity enumerateKeysAndObjectsUsingBlock:^(NSString *entityName, NSSet *objectIDs, BOOL *stop) {
+            NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:entityName];
+            fetch.predicate = [NSPredicate predicateWithFormat:@"NOT (SELF IN %@)", objectIDs];
+            NSError *error;
+            NSArray *unreferencedObjects = [managedObjectContext executeFetchRequest:fetch error:&error];
+            for (NSManagedObject *object in unreferencedObjects) {
+                [self nullifyRelationshipsAndDeleteObject:object];
+            }
+        }];
+    }];
 }
 
 
