@@ -124,8 +124,8 @@
             XCTAssertEqual(event.eventRevision.revisionNumber, (CDERevisionNumber)-1, @"Wrong revision number for store1");
             
             NSSet *others = [event.eventRevisionsOfOtherStores valueForKeyPath:@"revision"];
-            CDERevision *rev1 = [[CDERevision alloc] initWithPersistentStoreIdentifier:@"123" revisionNumber:10 globalCount:-1];
-            CDERevision *rev2 = [[CDERevision alloc] initWithPersistentStoreIdentifier:@"234" revisionNumber:10 globalCount:-1];
+            CDERevision *rev1 = [[CDERevision alloc] initWithPersistentStoreIdentifier:@"123" revisionNumber:10 globalCount:10];
+            CDERevision *rev2 = [[CDERevision alloc] initWithPersistentStoreIdentifier:@"234" revisionNumber:10 globalCount:10];
             NSSet *set = [NSSet setWithObjects:rev1, rev2, nil];
             XCTAssertEqualObjects(others, set, @"Wrong revisions for other stores");
 
