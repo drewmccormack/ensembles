@@ -311,6 +311,7 @@
         if (!needFullIntegration && storeIds.count == 1 && [storeIds.lastObject isEqualToString:self.eventStore.persistentStoreIdentifier]) return;
         
         // Apply changes in the events, in order.
+        NSMutableDictionary *insertedObjectIDsByEntity = needFullIntegration ? [[NSMutableDictionary alloc] init] : nil;
         for (CDEStoreModificationEvent *storeModEvent in storeModEvents) {
             @autoreleasepool {
                 // Insertions are split into two parts: first, we perform an insert without applying property changes,
@@ -326,6 +327,21 @@
                         return;
                     }
                     appliedInsertsByEntity[entity.name] = appliedInsertChanges;
+                    
+                    // If full integration, track all inserted object ids, so we can delete unreferenced objects
+                    if (needFullIntegration) {
+                        NSMutableSet *objectIDs = insertedObjectIDsByEntity[entity.name];
+                        if (!objectIDs) objectIDs = [NSMutableSet set];
+                        NSArray *storeURIs = [appliedInsertChanges valueForKeyPath:@"globalIdentifier.storeURI"];
+                        [managedObjectContext performBlockAndWait:^{
+                            for (NSString *uri in storeURIs) {
+                                NSURL *url = [NSURL URLWithString:uri];
+                                NSManagedObjectID *objectID = [managedObjectContext.persistentStoreCoordinator managedObjectIDForURIRepresentation:url];
+                                if (objectID) [objectIDs addObject:objectID];
+                            }
+                        }];
+                        insertedObjectIDsByEntity[entity.name] = objectIDs;
+                    }
                 }
                 
                 // Now that all objects exist, we can apply property changes.
@@ -342,6 +358,21 @@
                     if (!success) return;
                 }
             }
+        }
+        
+        // In a full integration, remove any objects that didn't get inserted
+        if (needFullIntegration) {
+            [managedObjectContext performBlockAndWait:^{
+                [insertedObjectIDsByEntity enumerateKeysAndObjectsUsingBlock:^(NSString *entityName, NSSet *objectIDs, BOOL *stop) {
+                    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:entityName];
+                    fetch.predicate = [NSPredicate predicateWithFormat:@"NOT (SELF IN %@)", objectIDs];
+                    NSError *error;
+                    NSArray *unreferencedObjects = [managedObjectContext executeFetchRequest:fetch error:&error];
+                    for (NSManagedObject *object in unreferencedObjects) {
+                        [self nullifyRelationshipsAndDeleteObject:object];
+                    }
+                }];
+            }];
         }
     }];
     
@@ -483,38 +514,43 @@
         
         // Clear the store URI in the global id
         change.globalIdentifier.storeURI = nil;
-        
-        if (!object) continue;
-        
-        [managedObjectContext performBlockAndWait:^{
-            if (object.isDeleted || object.managedObjectContext == nil) return;
 
-            // Nullify relationships first to prevent cascading
-            NSEntityDescription *entity = object.entity;
-            for (NSString *relationshipName in entity.relationshipsByName) {
-                id related = [self valueForKey:relationshipName inObject:object];
-                if (related == nil) continue;
-                
-                NSRelationshipDescription *description = entity.relationshipsByName[relationshipName];
-                if (description.isToMany && [related count] > 0) {
-                    if (description.isOrdered) {
-                        related = [object mutableOrderedSetValueForKey:relationshipName];
-                        [related removeAllObjects];
-                    } else {
-                        related = [object mutableSetValueForKey:relationshipName];
-                        [related removeAllObjects];
-                    }
-                }
-                else {
-                    [self setValue:nil forKey:relationshipName inObject:object];
-                }
-            }
-            
-            [managedObjectContext deleteObject:object];
+        [managedObjectContext performBlockAndWait:^{
+            [self nullifyRelationshipsAndDeleteObject:object];
         }];
     }
     
     return YES;
+}
+
+// Called on managedObjectContext thread
+- (void)nullifyRelationshipsAndDeleteObject:(NSManagedObject *)object
+{
+    if (!object) return;
+    if (object.isDeleted || object.managedObjectContext == nil) return;
+    
+    // Nullify relationships first to prevent cascading
+    NSEntityDescription *entity = object.entity;
+    for (NSString *relationshipName in entity.relationshipsByName) {
+        id related = [self valueForKey:relationshipName inObject:object];
+        if (related == nil) continue;
+        
+        NSRelationshipDescription *description = entity.relationshipsByName[relationshipName];
+        if (description.isToMany && [related count] > 0) {
+            if (description.isOrdered) {
+                related = [object mutableOrderedSetValueForKey:relationshipName];
+                [related removeAllObjects];
+            } else {
+                related = [object mutableSetValueForKey:relationshipName];
+                [related removeAllObjects];
+            }
+        }
+        else {
+            [self setValue:nil forKey:relationshipName inObject:object];
+        }
+    }
+    
+    [managedObjectContext deleteObject:object];
 }
 
 
