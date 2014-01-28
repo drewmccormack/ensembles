@@ -161,6 +161,19 @@
     return events.lastObject;
 }
 
++ (instancetype)fetchStoreModificationEventWithUniqueIdentifier:(NSString *)uniqueId globalCount:(CDEGlobalCount)count inManagedObjectContext:(NSManagedObjectContext *)context
+{
+    NSFetchRequest *fetch = [[NSFetchRequest alloc] initWithEntityName:@"CDEStoreModificationEvent"];
+    fetch.predicate = [NSPredicate predicateWithFormat:@"uniqueIdentifier = %@ AND globalCount = %lld", uniqueId, count];
+    
+    NSError *error;
+    NSArray *events = [context executeFetchRequest:fetch error:&error];
+    NSAssert(events, @"Could not fetch store mod events: %@", error);
+    NSAssert(events.count < 2, @"CDEStoreModificationEvent is not unique in fetchStoreModification...");
+    
+    return events.lastObject;
+}
+
 + (instancetype)fetchStoreModificationEventWithAllowedTypes:(NSArray *)types persistentStoreIdentifier:(NSString *)persistentStoreId revisionNumber:(CDERevisionNumber)revision inManagedObjectContext:(NSManagedObjectContext *)context
 {
     if (persistentStoreId == nil || revision < 0) return nil;

@@ -162,8 +162,10 @@
     [self mergeEnsemble:ensemble1];
     
     NSArray *baselineFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cloudBaselinesDir error:NULL];
+    NSArray *eventFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cloudEventsDir error:NULL];
     XCTAssertEqual(baselineFiles.count, (NSUInteger)1, @"Should be one baseline file");
-    
+    XCTAssertEqual(eventFiles.count, (NSUInteger)0, @"Should be no event file");
+
     // Should generate event with global count 1
     for (NSUInteger i = 0; i < 100; i++) {
         NSManagedObject *parentOnDevice2 = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context2];
@@ -173,7 +175,7 @@
     [self mergeEnsemble:ensemble2];
     
     baselineFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cloudBaselinesDir error:NULL];
-    NSArray *eventFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cloudEventsDir error:NULL];
+     eventFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cloudEventsDir error:NULL];
     XCTAssertEqual(baselineFiles.count, (NSUInteger)1, @"Should be one baseline file");
     XCTAssertEqual(eventFiles.count, (NSUInteger)1, @"Should be one event file");
     
@@ -197,7 +199,9 @@
     baselineFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cloudBaselinesDir error:NULL];
     eventFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cloudEventsDir error:NULL];
     XCTAssertEqual(baselineFiles.count, (NSUInteger)1, @"Should be one baseline file");
-    XCTAssertEqual(eventFiles.count, (NSUInteger)2, @"Should be two events from store 1");
+    XCTAssertEqual(eventFiles.count, (NSUInteger)1, @"Should be an event from store 1 after rebasing");
+    XCTAssertEqual([baselineFiles.lastObject integerValue], (NSInteger)1, @"Wrong global count for baseline");
+    XCTAssertEqual([eventFiles.lastObject integerValue], (NSInteger)2, @"Wrong global count for left over event");
 }
 
 - (NSManagedObjectContext *)eventFileContextForURL:(NSURL *)baselineURL

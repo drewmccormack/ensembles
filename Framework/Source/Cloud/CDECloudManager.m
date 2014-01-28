@@ -205,20 +205,33 @@
         NSString *path = [self.localEventsDownloadDirectory stringByAppendingPathComponent:file];
         
         CDEAsynchronousTaskBlock block = ^(CDEAsynchronousTaskCallbackBlock next) {
-            CDEGlobalCount globalCount;
-            CDERevision *revision;
-            BOOL isEventFile = [self count:&globalCount andRevision:&revision fromFilename:file];
-            if (!isEventFile) {
+            BOOL isBaseline = NO;
+            BOOL valid = [self filename:file isValidForAllowedEventTypes:types isBaseline:&isBaseline];
+            
+            if (!valid) {
                 next(nil, NO);
                 return;
             }
             
             // Check for a pre-existing event first. Skip if we find one.
             __block BOOL eventExists = NO;
-            [moc performBlockAndWait:^{
-                CDEStoreModificationEvent *existingEvent = [CDEStoreModificationEvent fetchStoreModificationEventWithAllowedTypes:types persistentStoreIdentifier:revision.persistentStoreIdentifier revisionNumber:revision.revisionNumber inManagedObjectContext:moc]; 
-                eventExists = existingEvent != nil;
-            }];
+            CDEGlobalCount globalCount;
+            if (isBaseline) {
+                NSString *uniqueId;
+                [self count:&globalCount andUniqueIdentifier:&uniqueId fromBaselineFilename:file];
+                [moc performBlockAndWait:^{
+                    CDEStoreModificationEvent *existingEvent = [CDEStoreModificationEvent fetchStoreModificationEventWithUniqueIdentifier:uniqueId globalCount:globalCount inManagedObjectContext:moc];
+                    eventExists = existingEvent != nil;
+                }];
+            }
+            else {
+                CDERevision *revision;
+                [self count:&globalCount andRevision:&revision fromEventFilename:file];
+                [moc performBlockAndWait:^{
+                    CDEStoreModificationEvent *existingEvent = [CDEStoreModificationEvent fetchStoreModificationEventWithAllowedTypes:types persistentStoreIdentifier:revision.persistentStoreIdentifier revisionNumber:revision.revisionNumber inManagedObjectContext:moc]; 
+                    eventExists = existingEvent != nil;
+                }];
+            }
             
             if (eventExists) {
                 [fileManager removeItemAtPath:path error:NULL];
@@ -289,16 +302,26 @@
     
     // Migrate events to file
     CDEEventMigrator *migrator = [[CDEEventMigrator alloc] initWithEventStore:self.eventStore];
-    
     NSMutableArray *tasks = [[NSMutableArray alloc] initWithCapacity:filesToUpload.count];
     for (NSString *file in filesToUpload) {
         NSString *path = [self.localEventsUploadDirectory stringByAppendingPathComponent:file];
         
         CDEAsynchronousTaskBlock block = ^(CDEAsynchronousTaskCallbackBlock next) {
-            CDEGlobalCount globalCount;
-            CDERevision *revision;
-            BOOL isEventFile = [self count:&globalCount andRevision:&revision fromFilename:file];
-            NSAssert(isEventFile, @"Filename was not in correct form");
+            BOOL isBaseline = NO;
+            BOOL valid = [self filename:file isValidForAllowedEventTypes:types isBaseline:&isBaseline];
+            NSAssert(valid, @"Invalid filename");
+            
+            CDEGlobalCount globalCount = -1;
+            CDERevision *revision = nil;
+            NSString *uniqueId = nil;
+            if (isBaseline) {
+                BOOL isBaselineFile = [self count:&globalCount andUniqueIdentifier:&uniqueId fromBaselineFilename:file];
+                NSAssert(isBaselineFile, @"Should be baseline");
+            }
+            else {
+                BOOL isEventFile = [self count:&globalCount andRevision:&revision fromEventFilename:file];
+                NSAssert(isEventFile, @"Should be event file");
+            }
             
             // Migrate data to file
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -311,9 +334,16 @@
                     }
                 }
                 
-                [migrator migrateLocalEventWithRevision:revision.revisionNumber toFile:path allowedTypes:types completion:^(NSError *error) {
-                    next(error, NO);
-                }];
+                if (isBaseline) {
+                    [migrator migrateLocalBaselineWithUniqueIdentifier:uniqueId globalCount:globalCount toFile:path completion:^(NSError *error) {
+                        next(error, NO);
+                    }];
+                }
+                else {
+                    [migrator migrateLocalEventWithRevision:revision.revisionNumber toFile:path allowedTypes:types completion:^(NSError *error) {
+                        next(error, NO);
+                    }];
+                }
             });
         };
         
@@ -364,16 +394,23 @@
 
 #pragma mark File Naming
 
-- (NSString *)filenameFromGlobalCount:(CDEGlobalCount)count revision:(CDERevision *)revision
+- (NSString *)filenameForEvent:(CDEStoreModificationEvent *)event
 {
-    return [NSString stringWithFormat:@"%lli_%@_%lli.cdeevent", count, revision.persistentStoreIdentifier, revision.revisionNumber];
+    NSString *result = nil;
+    if (event.type == CDEStoreModificationEventTypeBaseline)
+        result = [NSString stringWithFormat:@"%lli_%@.cdeevent", event.globalCount, event.uniqueIdentifier];
+    else {
+        CDERevision *revision = event.eventRevision.revision;
+        result = [NSString stringWithFormat:@"%lli_%@_%lli.cdeevent", event.globalCount, revision.persistentStoreIdentifier, revision.revisionNumber];
+    }
+    return result;
 }
 
-- (BOOL)count:(CDEGlobalCount *)count andRevision:(CDERevision * __autoreleasing *)revision fromFilename:(NSString *)filename
+- (BOOL)count:(CDEGlobalCount *)count andRevision:(CDERevision * __autoreleasing *)revision fromEventFilename:(NSString *)filename
 {
     NSArray *components = [[filename stringByDeletingPathExtension] componentsSeparatedByString:@"_"];
     if (components.count != 3) {
-        *count = 0;
+        *count = -1;
         *revision = nil;
         return NO;
     }
@@ -384,6 +421,38 @@
     *revision = [[CDERevision alloc] initWithPersistentStoreIdentifier:components[1] revisionNumber:revNumber];
     
     return YES;
+}
+
+- (BOOL)count:(CDEGlobalCount *)count andUniqueIdentifier:(NSString * __autoreleasing *)uniqueId fromBaselineFilename:(NSString *)filename
+{
+    NSArray *components = [[filename stringByDeletingPathExtension] componentsSeparatedByString:@"_"];
+    if (components.count != 2) {
+        *count = -1;
+        *uniqueId = nil;
+        return NO;
+    }
+    
+    *count = [components[0] longLongValue];
+    *uniqueId = components[1];
+    
+    return YES;
+}
+
+- (BOOL)filename:(NSString *)file isValidForAllowedEventTypes:(NSArray *)types isBaseline:(BOOL *)isBaselineFile
+{
+    CDEGlobalCount globalCount = -1;
+    CDERevision *revision = nil;
+    NSString *uniqueId = nil;
+    BOOL isEventFile = [self count:&globalCount andRevision:&revision fromEventFilename:file];
+    *isBaselineFile = NO;
+    if (isEventFile &&
+        ([types containsObject:@(CDEStoreModificationEventTypeSave)] ||
+         [types containsObject:@(CDEStoreModificationEventTypeMerge)]) ) return YES;
+    
+    *isBaselineFile = [self count:&globalCount andUniqueIdentifier:&uniqueId fromBaselineFilename:file];
+    if (*isBaselineFile && [types containsObject:@(CDEStoreModificationEventTypeBaseline)]) return YES;
+    
+    return NO;
 }
 
 - (NSArray *)sortFilenamesByGlobalCount:(NSArray *)filenames
@@ -409,8 +478,7 @@
         }
         
         for (CDEStoreModificationEvent *event in events) {
-            CDERevision *revision = event.eventRevision.revision;
-            NSString *filename = [self filenameFromGlobalCount:event.globalCount revision:revision];
+            NSString *filename = [self filenameForEvent:event];
             [filenames addObject:filename];
         }
     }];

@@ -57,6 +57,24 @@ static NSString *kCDEDefaultStoreType;
     }];
 }
 
+- (void)migrateLocalBaselineWithUniqueIdentifier:(NSString *)uniqueId globalCount:(CDEGlobalCount)count toFile:(NSString *)path completion:(CDECompletionBlock)completion
+{
+    [eventStore.managedObjectContext performBlock:^{
+        NSError *error = nil;
+        CDEStoreModificationEvent *baseline = nil;
+        baseline = [CDEStoreModificationEvent fetchStoreModificationEventWithUniqueIdentifier:uniqueId globalCount:count inManagedObjectContext:eventStore.managedObjectContext];
+        if (!baseline) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (completion) completion(error);
+            });
+        }
+        else {
+            NSAssert(baseline.type == CDEStoreModificationEventTypeBaseline, @"Wrong event type for baseline");
+            [self migrateStoreModificationEvents:@[baseline] toFile:path completion:completion];
+        }
+    }];
+}
+
 - (void)migrateNonBaselineEventsSinceRevision:(CDERevisionNumber)revision toFile:(NSString *)path completion:(CDECompletionBlock)completion
 {
     [eventStore.managedObjectContext performBlock:^{
