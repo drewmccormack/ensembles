@@ -93,6 +93,8 @@
 
 - (void)consolidateBaselineWithCompletion:(CDECompletionBlock)completion
 {
+    CDELog(CDELoggingLevelVerbose, @"Consolidating baselines");
+
     NSManagedObjectContext *context = self.eventStore.managedObjectContext;
     [context performBlock:^{
         // Fetch existing baselines, ordered beginning with most recent
@@ -119,6 +121,7 @@
         // Delete redundant baselines
         [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:baselinesToEliminate.allObjects];
         for (CDEStoreModificationEvent *baseline in baselinesToEliminate) {
+            CDELog(CDELoggingLevelVerbose, @"Deleting redundant baseline with unique id: %@", baseline.uniqueIdentifier);
             [context deleteObject:baseline];
         }
         
@@ -132,6 +135,7 @@
         // Merge surviving baselines
         NSMutableArray *survivingBaselines = [NSMutableArray arrayWithArray:baselineEvents];
         [survivingBaselines removeObjectsInArray:baselinesToEliminate.allObjects];
+        CDELog(CDELoggingLevelVerbose, @"Merging baselines with unique ids: %@", [survivingBaselines valueForKeyPath:@"uniqueIdentifier"]);
         CDEStoreModificationEvent *newBaseline = [self mergedBaselineFromOrderedBaselineEvents:survivingBaselines error:&error];
         if (!newBaseline) {
             [self failWithCompletion:completion error:error];
@@ -152,6 +156,7 @@
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{
+            CDELog(CDELoggingLevelVerbose, @"Finishing baseline consolidation");
             if (completion) completion(nil);
         });
     }];

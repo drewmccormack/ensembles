@@ -142,7 +142,7 @@
 
 #pragma mark Checks
 
-- (BOOL)checkRebasingPrequisitesForEvents:(NSArray *)events error:(NSError * __autoreleasing *)error
+- (BOOL)checkRebasingPrerequisitesForEvents:(NSArray *)events error:(NSError * __autoreleasing *)error
 {
     __block BOOL result = YES;
     [eventManagedObjectContext performBlockAndWait:^{
@@ -327,7 +327,7 @@
     __block CDERevisionSet *set = nil;
     [eventManagedObjectContext performBlockAndWait:^{
         NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"CDEEventRevision"];
-        request.predicate = [NSPredicate predicateWithFormat:@"storeModificationEvent != NIL OR storeModificationEventForOtherStores != NIL"];
+        request.predicate = [NSPredicate predicateWithFormat:@"storeModificationEvent != NIL OR storeModificationEventForOtherStores.type = %d", CDEStoreModificationEventTypeBaseline];
         
         NSError *error;
         NSArray *allRevisions = [eventManagedObjectContext executeFetchRequest:request error:&error];

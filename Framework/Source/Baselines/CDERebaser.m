@@ -109,9 +109,10 @@
     NSSet *allStores = revisionManager.allPersistentStoreIdentifiers;
     BOOL hasAllDevicesInBaseline = [baselineRevisionSet.persistentStoreIdentifiers isEqualToSet:allStores];
     
-    BOOL hasManyEvents = [self countOfAllObjectChanges] >= 100;
+    BOOL hasManyEvents = [self countOfStoreModificationEvents] > 50;
+    BOOL hasAdequateChanges = [self countOfAllObjectChanges] >= 100;
     BOOL compactionIsAdequate = self.estimatedEventStoreCompactionFollowingRebase > 0.5f;
-    return !hasBaseline || !hasAllDevicesInBaseline || (hasManyEvents && compactionIsAdequate);
+    return !hasBaseline || !hasAllDevicesInBaseline || hasManyEvents || (hasAdequateChanges && compactionIsAdequate);
 }
 
 
@@ -119,7 +120,10 @@
 
 - (void)rebaseWithCompletion:(CDECompletionBlock)completion
 {
+    CDELog(CDELoggingLevelVerbose, @"Starting rebase");
+    
     CDEGlobalCount newBaselineGlobalCount = [self globalCountForNewBaseline];
+    CDELog(CDELoggingLevelVerbose, @"New baseline global count: %lld", newBaselineGlobalCount);
     
     NSManagedObjectContext *context = eventStore.managedObjectContext;
     [context performBlock:^{
@@ -137,8 +141,9 @@
         NSError *error = nil;
         CDERevisionManager *revisionManager = [[CDERevisionManager alloc] initWithEventStore:self.eventStore];
         revisionManager.managedObjectModelURL = self.ensemble.managedObjectModelURL;
-        BOOL passedChecks = [revisionManager checkRebasingPrequisitesForEvents:eventsToMerge error:&error];
+        BOOL passedChecks = [revisionManager checkRebasingPrerequisitesForEvents:eventsToMerge error:&error];
         if (!passedChecks) {
+            CDELog(CDELoggingLevelWarning, @"Failed rebasing prerequisite checks. Aborting rebase");
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (completion) completion(error);
             });
@@ -182,6 +187,7 @@
         
         // Complete
         dispatch_async(dispatch_get_main_queue(), ^{
+            CDELog(CDELoggingLevelVerbose, @"Finishing rebase");
             if (completion) completion(saved ? nil : error);
         });
     }];
@@ -264,7 +270,7 @@
     CDEGlobalCount baselineCount = NSNotFound;
     for (CDERevision *revision in latestRevisionSet.revisions) {
         // Ignore stores that haven't updated since the baseline
-        // They will have to re-leech
+        // They will have to do a full integration to catch up
         NSString *storeId = revision.persistentStoreIdentifier;
         CDERevision *baselineRevision = [baselineRevisionSet revisionForPersistentStoreIdentifier:storeId];
         if (baselineRevision && baselineRevision.revisionNumber >= revision.revisionNumber) continue;
@@ -278,7 +284,20 @@
 }
 
 
-#pragma mark Fetching Object Change Counts
+#pragma mark Fetching Counts
+
+- (NSUInteger)countOfStoreModificationEvents
+{
+    __block NSUInteger count = 0;
+    NSManagedObjectContext *context = eventStore.managedObjectContext;
+    [context performBlockAndWait:^{
+        NSError *error = nil;
+        NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
+        count = [context countForFetchRequest:fetch error:&error];
+        if (error) CDELog(CDELoggingLevelError, @"Couldn't fetch count of events: %@", error);
+    }];
+    return count;
+}
 
 - (NSUInteger)countOfAllObjectChanges
 {
