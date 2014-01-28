@@ -104,8 +104,19 @@
     XCTAssertTrue([context2 save:NULL], @"Could not save");
     
     [self leechStores];
-    NSError *syncError = [self syncChanges];
-    XCTAssertNil(syncError, @"Sync error: %@", syncError);
+
+    NSArray *baselineFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cloudBaselinesDir error:NULL];
+    XCTAssertEqual(baselineFiles.count, (NSUInteger)2, @"Should be two baseline files after leeching");
+
+    [self mergeEnsemble:ensemble1];
+    
+    baselineFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cloudBaselinesDir error:NULL];
+    XCTAssertEqual(baselineFiles.count, (NSUInteger)1, @"Should only be one baseline files after merge");
+    
+    [self mergeEnsemble:ensemble2];
+    
+    baselineFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cloudBaselinesDir error:NULL];
+    XCTAssertEqual(baselineFiles.count, (NSUInteger)1, @"Should only be one baseline files after merge");
     
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
     NSArray *parents = [context1 executeFetchRequest:fetch error:NULL];

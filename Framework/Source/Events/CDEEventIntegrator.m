@@ -308,7 +308,7 @@
         
         // If all events are from this device, don't merge
         NSArray *storeIds = [storeModEvents valueForKeyPath:@"@distinctUnionOfObjects.eventRevision.persistentStoreIdentifier"];
-        if (storeIds.count == 1 && [storeIds.lastObject isEqualToString:self.eventStore.persistentStoreIdentifier]) return;
+        if (!needFullIntegration && storeIds.count == 1 && [storeIds.lastObject isEqualToString:self.eventStore.persistentStoreIdentifier]) return;
         
         // Apply changes in the events, in order.
         for (CDEStoreModificationEvent *storeModEvent in storeModEvents) {
