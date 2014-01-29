@@ -258,10 +258,8 @@
             [self.eventStore deregisterIncompleteEventIdentifier:eventBuilder.event.uniqueIdentifier];
             
             // Notify of save
-            [managedObjectContext performBlockAndWait:^{
-                if (didSaveBlock) didSaveBlock(managedObjectContext, saveInfoDictionary);
-                saveInfoDictionary = nil;
-            }];
+            if (didSaveBlock) didSaveBlock(managedObjectContext, saveInfoDictionary);
+            saveInfoDictionary = nil;
             
             // Complete
             [self completeSuccessfully];
