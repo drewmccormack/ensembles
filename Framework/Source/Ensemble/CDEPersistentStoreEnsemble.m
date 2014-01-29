@@ -444,7 +444,8 @@ NSString * const CDEPersistentStoreEnsembleDidSaveMergeChangesNotification = @"C
     }
     
     self.merging = YES;
-    
+    [self.eventIntegrator startMonitoringSaves]; // Will cancel merge if save occurs
+
     CDEAsynchronousTaskBlock checkIdentityTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self checkCloudFileSystemIdentityWithCompletion:^(NSError *error) {
             next(error, NO);
@@ -485,6 +486,7 @@ NSString * const CDEPersistentStoreEnsembleDidSaveMergeChangesNotification = @"C
     NSArray *tasks = @[checkIdentityTask, checkRegistrationTask, processChangesTask, importRemoteEventsTask, mergeEventsTask, exportEventsTask];
     CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:tasks terminationPolicy:CDETaskQueueTerminationPolicyStopOnError completion:^(NSError *error) {
         [self dispatchCompletion:completion withError:error];
+        [self.eventIntegrator stopMonitoringSaves];
         self.merging = NO;
     }];
     

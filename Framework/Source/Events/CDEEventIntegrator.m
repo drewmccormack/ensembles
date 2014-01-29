@@ -33,6 +33,7 @@
     NSDictionary *saveInfoDictionary;
     dispatch_queue_t queue;
     id eventStoreChildContextSaveObserver;
+    BOOL saveOccurredDuringMerge;
 }
 
 @synthesize storeURL = storeURL;
@@ -64,6 +65,7 @@
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:eventStoreChildContextSaveObserver];
+    [self stopMonitoringSaves];
 }
 
 
@@ -102,6 +104,36 @@
         [object willChangeValueForKey:key];
         [object setPrimitiveValue:value forKey:key];
         [object didChangeValueForKey:key];
+    }
+}
+
+
+#pragma mark Observing Saves
+
+- (void)startMonitoringSaves
+{
+    [self stopMonitoringSaves];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contextWillSave:) name:NSManagedObjectContextWillSaveNotification object:nil];
+}
+
+- (void)stopMonitoringSaves
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextWillSaveNotification object:nil];
+    saveOccurredDuringMerge = NO;
+}
+
+- (void)contextWillSave:(NSNotification *)notif
+{
+    NSManagedObjectContext *context = notif.object;
+    if (self.managedObjectContext == context) return;
+    if (context.parentContext == self.managedObjectContext) return;
+    
+    NSArray *stores = context.persistentStoreCoordinator.persistentStores;
+    for (NSPersistentStore *store in stores) {
+        if ([self.storeURL isEqual:store.URL]) {
+            saveOccurredDuringMerge = YES;
+            break;
+        }
     }
 }
 
@@ -932,7 +964,7 @@
     CDELog(CDELoggingLevelVerbose, @"Committing merge changes to store");
 
     __block BOOL saved = [self saveContext:error];
-    if (!saved) {
+    if (!saved && !saveOccurredDuringMerge) {
         if ((*error).code != NSManagedObjectMergeError && failedSaveBlock) {
             // Setup a child reparation context
             NSManagedObjectContext *reparationContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
@@ -966,6 +998,11 @@
 {
     __block BOOL saved = NO;
     [managedObjectContext performBlockAndWait:^{
+        if (saveOccurredDuringMerge) {
+            *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeSaveOccurredDuringMerge userInfo:nil];
+            return;
+        }
+        
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(mergeChangesFromContextDidSaveNotification:) name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
         saved = [managedObjectContext save:error];
         [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
