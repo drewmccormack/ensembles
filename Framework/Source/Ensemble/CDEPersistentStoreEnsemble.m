@@ -474,7 +474,8 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
     }
     
     self.merging = YES;
-    
+    [self.eventIntegrator startMonitoringSaves]; // Will cancel merge if save occurs
+
     CDEAsynchronousTaskBlock checkIdentityTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self checkCloudFileSystemIdentityWithCompletion:^(NSError *error) {
             next(error, NO);
@@ -575,6 +576,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
     NSArray *tasks = @[checkIdentityTask, checkRegistrationTask, processChangesTask, remoteStructureTask, snapshotRemoteFilesTask, importBaselinesTask, mergeBaselinesTask, importRemoteEventsTask, removeOutdatedEventsTask, rebaseTask, mergeEventsTask, exportBaselinesTask, exportEventsTask, removeRemoteFiles];
     CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:tasks terminationPolicy:CDETaskQueueTerminationPolicyStopOnError completion:^(NSError *error) {
         [self dispatchCompletion:completion withError:error];
+        [self.eventIntegrator stopMonitoringSaves];
         self.merging = NO;
     }];
     

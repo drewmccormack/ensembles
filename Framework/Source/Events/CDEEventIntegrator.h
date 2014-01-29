@@ -33,5 +33,8 @@ typedef void (^CDEEventIntegratorDidSaveBlock)(NSManagedObjectContext *savingCon
 
 - (void)mergeEventsWithCompletion:(CDECompletionBlock)completion;
 
+- (void)startMonitoringSaves;
+- (void)stopMonitoringSaves;
+
 @end
 
