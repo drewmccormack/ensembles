@@ -93,7 +93,7 @@
 
 - (void)testRepairInWillSaveBlockAvoidsFail
 {
-    self.integrator.willSaveBlock = ^(NSManagedObjectContext *context, NSManagedObjectContext *reparationContext) {
+    self.integrator.shouldSaveBlock = ^(NSManagedObjectContext *context, NSManagedObjectContext *reparationContext) {
         __block NSManagedObjectID *parentID;
         [reparationContext performBlockAndWait:^{
             NSManagedObject *parent = context.insertedObjects.anyObject;
@@ -104,6 +104,8 @@
             NSManagedObject *repairParent = [reparationContext existingObjectWithID:parentID error:NULL];
             [repairParent setValue:@(0) forKey:@"invalidatingAttribute"];
         }];
+        
+        return YES;
     };
     
     __block BOOL failBlockInvoked = NO;
@@ -120,7 +122,7 @@
 
 - (void)testRelationshipUpdateGeneratesObjectChange
 {
-    self.integrator.willSaveBlock = ^(NSManagedObjectContext *context, NSManagedObjectContext *reparationContext) {
+    self.integrator.shouldSaveBlock = ^(NSManagedObjectContext *context, NSManagedObjectContext *reparationContext) {
         __block NSManagedObjectID *parentID;
         [reparationContext performBlockAndWait:^{
             NSManagedObject *parent = context.insertedObjects.anyObject;
@@ -135,6 +137,8 @@
             [repairParent setValue:child forKey:@"child"];
             [repairParent setValue:@(0) forKey:@"invalidatingAttribute"];
         }];
+        
+        return YES;
     };
     
     [self mergeEventsSinceRevision:-1];

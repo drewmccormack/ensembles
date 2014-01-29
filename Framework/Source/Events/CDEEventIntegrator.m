@@ -40,7 +40,7 @@
 @synthesize managedObjectContext = managedObjectContext;
 @synthesize managedObjectModel = managedObjectModel;
 @synthesize eventStore = eventStore;
-@synthesize willSaveBlock = willSaveBlock;
+@synthesize shouldSaveBlock = shouldSaveBlock;
 @synthesize didSaveBlock = didSaveBlock;
 @synthesize failedSaveBlock = failedSaveBlock;
 
@@ -54,7 +54,7 @@
         storeURL = [newStoreURL copy];
         managedObjectModel = model;
         eventStore = newEventStore;
-        willSaveBlock = NULL;
+        shouldSaveBlock = NULL;
         didSaveBlock = NULL;
         failedSaveBlock = NULL;
         queue = dispatch_queue_create("com.mentalfaculty.ensembles.eventintegrator", DISPATCH_QUEUE_SERIAL);
@@ -740,7 +740,7 @@
         contextHasChanges = managedObjectContext.hasChanges;
     }];
     
-    if (contextHasChanges && willSaveBlock) {
+    if (contextHasChanges && shouldSaveBlock) {
         // Setup a context to store repairs
         NSManagedObjectContext *reparationContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
         [reparationContext performBlockAndWait:^{
@@ -748,7 +748,11 @@
         }];
         
         // Call block on the saving context queue
-        willSaveBlock(managedObjectContext, reparationContext);
+        BOOL shouldSave = shouldSaveBlock(managedObjectContext, reparationContext);
+        if (!shouldSave) {
+            *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeCancelled userInfo:nil];
+            return NO;
+        }
         
         // Capture changes in the reparation context in the merge event.
         // Save any changes made in the reparation context.

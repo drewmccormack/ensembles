@@ -102,8 +102,9 @@
 
 - (void)testMergeWithRepairGeneratesStoreModificationEvent
 {
-    self.integrator.willSaveBlock = ^(NSManagedObjectContext *savingContext, NSManagedObjectContext *reparationContext) {
+    self.integrator.shouldSaveBlock = ^(NSManagedObjectContext *savingContext, NSManagedObjectContext *reparationContext) {
         [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:savingContext];
+        return YES;
     };
     
     [self mergeEventsSinceRevision:-1];

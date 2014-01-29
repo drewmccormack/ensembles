@@ -13,7 +13,7 @@
 @class CDEEventStore;
 @class CDEPersistentStoreEnsemble;
 
-typedef void (^CDEEventIntegratorWillSaveBlock)(NSManagedObjectContext *savingContext, NSManagedObjectContext *reparationContext);
+typedef BOOL (^CDEEventIntegratorShouldSaveBlock)(NSManagedObjectContext *savingContext, NSManagedObjectContext *reparationContext);
 typedef BOOL (^CDEEventIntegratorFailedSaveBlock)(NSManagedObjectContext *savingContext, NSError *error, NSManagedObjectContext *reparationContext);
 typedef void (^CDEEventIntegratorDidSaveBlock)(NSManagedObjectContext *savingContext, NSDictionary *info);
 
@@ -23,7 +23,7 @@ typedef void (^CDEEventIntegratorDidSaveBlock)(NSManagedObjectContext *savingCon
 @property (nonatomic, strong, readonly) NSManagedObjectModel *managedObjectModel;
 @property (nonatomic, strong, readonly) CDEEventStore *eventStore;
 @property (nonatomic, weak, readwrite) CDEPersistentStoreEnsemble *ensemble;
-@property (nonatomic, copy, readwrite) CDEEventIntegratorWillSaveBlock willSaveBlock;
+@property (nonatomic, copy, readwrite) CDEEventIntegratorShouldSaveBlock shouldSaveBlock;
 @property (nonatomic, copy, readwrite) CDEEventIntegratorFailedSaveBlock failedSaveBlock;
 @property (nonatomic, copy, readwrite) CDEEventIntegratorDidSaveBlock didSaveBlock;
 

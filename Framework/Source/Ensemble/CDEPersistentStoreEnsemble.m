@@ -108,12 +108,14 @@ NSString * const CDEPersistentStoreEnsembleDidSaveMergeChangesNotification = @"C
     self.eventIntegrator = [[CDEEventIntegrator alloc] initWithStoreURL:url managedObjectModel:self.managedObjectModel eventStore:self.eventStore];
     self.eventIntegrator.ensemble = self;
     
-    __weak CDEPersistentStoreEnsemble *weakSelf = self;
-    self.eventIntegrator.willSaveBlock = ^(NSManagedObjectContext *savingContext, NSManagedObjectContext *reparationContext) {
-        CDEPersistentStoreEnsemble *strongSelf = weakSelf;
-        if ([strongSelf.delegate respondsToSelector:@selector(persistentStoreEnsemble:willSaveMergedChangesInManagedObjectContext:reparationManagedObjectContext:)]) {
-            [strongSelf.delegate persistentStoreEnsemble:strongSelf willSaveMergedChangesInManagedObjectContext:savingContext reparationManagedObjectContext:reparationContext];
+    __weak typeof(self) weakSelf = self;
+    self.eventIntegrator.shouldSaveBlock = ^(NSManagedObjectContext *savingContext, NSManagedObjectContext *reparationContext) {
+        BOOL result = YES;
+        __strong typeof(self) strongSelf = weakSelf;
+        if ([strongSelf.delegate respondsToSelector:@selector(persistentStoreEnsemble:shouldSaveMergedChangesInManagedObjectContext:reparationManagedObjectContext:)]) {
+            result = [strongSelf.delegate persistentStoreEnsemble:strongSelf shouldSaveMergedChangesInManagedObjectContext:savingContext reparationManagedObjectContext:reparationContext];
         }
+        return result;
     };
     
     self.eventIntegrator.failedSaveBlock = ^(NSManagedObjectContext *savingContext, NSError *error, NSManagedObjectContext *reparationContext) {
