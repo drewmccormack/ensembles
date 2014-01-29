@@ -493,6 +493,12 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
         next(error, NO);
     };
     
+    CDEAsynchronousTaskBlock remoteStructureTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self.cloudManager createRemoteDirectoryStructureWithCompletion:^(NSError *error) {
+            next(error, NO);
+        }];
+    };
+    
     CDEAsynchronousTaskBlock snapshotRemoteFilesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self.cloudManager snapshotRemoteFilesWithCompletion:^(NSError *error) {
             next(error, NO);
@@ -566,7 +572,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
         }];
     };
     
-    NSArray *tasks = @[checkIdentityTask, checkRegistrationTask, processChangesTask, snapshotRemoteFilesTask, importBaselinesTask, mergeBaselinesTask, importRemoteEventsTask, removeOutdatedEventsTask, rebaseTask, mergeEventsTask, exportBaselinesTask, exportEventsTask, removeRemoteFiles];
+    NSArray *tasks = @[checkIdentityTask, checkRegistrationTask, processChangesTask, remoteStructureTask, snapshotRemoteFilesTask, importBaselinesTask, mergeBaselinesTask, importRemoteEventsTask, removeOutdatedEventsTask, rebaseTask, mergeEventsTask, exportBaselinesTask, exportEventsTask, removeRemoteFiles];
     CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:tasks terminationPolicy:CDETaskQueueTerminationPolicyStopOnError completion:^(NSError *error) {
         [self dispatchCompletion:completion withError:error];
         self.merging = NO;
