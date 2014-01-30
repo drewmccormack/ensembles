@@ -475,33 +475,30 @@
 // Called on event child context queue
 - (BOOL)insertObjectsForEntity:(NSEntityDescription *)entity objectChanges:(NSArray *)insertChanges error:(NSError * __autoreleasing *)error
 {
-    // Loop over insertions, and create all objects before applying properties, because
-    // they might be related to each other, and they all need to exist before setting
-    // relationships.
-    NSMapTable *newObjectsByGlobalId = [NSMapTable strongToStrongObjectsMapTable];
-    NSMutableArray *changesNeedingNewObjects = [[NSMutableArray alloc] initWithCapacity:insertChanges.count];
+    // Determine which insertions actually need new objects. Some may already have
+    // objects due to insertions on other devices.
+    NSMutableArray *urisForInsertChanges = [[NSMutableArray alloc] initWithCapacity:insertChanges.count];
     for (CDEObjectChange *change in insertChanges) {
-        // Check if this object has already been created in this import
-        // due to multiple inserts of the same global id in different stores
-        if ([newObjectsByGlobalId objectForKey:change.globalIdentifier]) continue;
-        
-        // Check if object already exists in store, and thus doesn't need creating
-        if (change.globalIdentifier.storeURI) {
-            // Object seems to exist already. Check to be sure.
-            NSURL *url = [NSURL URLWithString:change.globalIdentifier.storeURI];
-            
-            // Check if the object really exists on the queue of the store context
-            __block BOOL objectAlreadyExists = NO;
-            [managedObjectContext performBlockAndWait:^{
+        NSURL *url = nil;
+        if (change.globalIdentifier.storeURI) url = [[NSURL alloc] initWithString:change.globalIdentifier.storeURI];
+        [urisForInsertChanges addObject:CDENilToNSNull(url)];
+    }
+    
+    NSMutableArray *changesNeedingNewObjects = [[NSMutableArray alloc] initWithCapacity:insertChanges.count];
+    [managedObjectContext performBlockAndWait:^{
+        [urisForInsertChanges enumerateObjectsUsingBlock:^(NSURL *url, NSUInteger i, BOOL *stop) {
+            BOOL objectNeedsCreating = NO;
+            if (url == (id)[NSNull null]) {
+                objectNeedsCreating = YES;
+            }
+            else {
                 NSManagedObjectID *objectID = [managedObjectContext.persistentStoreCoordinator managedObjectIDForURIRepresentation:url];
                 NSManagedObject *object = [managedObjectContext existingObjectWithID:objectID error:NULL];
-                objectAlreadyExists = object && !object.isDeleted && object.managedObjectContext;
-            }];
-            if (objectAlreadyExists) continue; // Object does exist. Don't create again, but we do apply property changes later.
-        }
-        
-        [changesNeedingNewObjects addObject:change];
-    }
+                objectNeedsCreating = !object || object.isDeleted || nil == object.managedObjectContext;
+            }
+            if (objectNeedsCreating) [changesNeedingNewObjects addObject:insertChanges[i]];
+        }];
+    }];
         
     // Only now actually create objects, on the main context queue
     NSArray *globalIds = [changesNeedingNewObjects valueForKeyPath:@"globalIdentifier"];
@@ -514,7 +511,6 @@
                 success = NO;
                 return;
             }
-            [newObjectsByGlobalId setObject:newObject forKey:globalId];
             [newObjects addObject:newObject];
         }
     }];
