@@ -65,7 +65,7 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
         [self.delegate linkSessionForDropboxCloudFileSystem:self completion:completion];
     }
     else {
-        NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorConnectionError userInfo:nil];
+        NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeConnectionError userInfo:nil];
         if (completion) completion(error);
     }
 }

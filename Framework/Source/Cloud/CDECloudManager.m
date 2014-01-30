@@ -308,18 +308,18 @@
         
         CDEAsynchronousTaskBlock block = ^(CDEAsynchronousTaskCallbackBlock next) {
             BOOL isBaseline = NO;
-            BOOL valid = [self filename:file isValidForAllowedEventTypes:types isBaseline:&isBaseline];
+            __unused BOOL valid = [self filename:file isValidForAllowedEventTypes:types isBaseline:&isBaseline];
             NSAssert(valid, @"Invalid filename");
             
             CDEGlobalCount globalCount = -1;
             CDERevision *revision = nil;
             NSString *uniqueId = nil;
             if (isBaseline) {
-                BOOL isBaselineFile = [self count:&globalCount andUniqueIdentifier:&uniqueId fromBaselineFilename:file];
+                __unused BOOL isBaselineFile = [self count:&globalCount andUniqueIdentifier:&uniqueId fromBaselineFilename:file];
                 NSAssert(isBaselineFile, @"Should be baseline");
             }
             else {
-                BOOL isEventFile = [self count:&globalCount andRevision:&revision fromEventFilename:file];
+                __unused BOOL isEventFile = [self count:&globalCount andRevision:&revision fromEventFilename:file];
                 NSAssert(isEventFile, @"Should be event file");
             }
             
