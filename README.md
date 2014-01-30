@@ -5,7 +5,7 @@ Core Data Ensembles
 
 _Author:_ Drew McCormack<br>
 _Created:_ 29th September, 2013<br>
-_Last Updated:_ 28th November, 2013
+_Last Updated:_ 30th January, 2014
 
 Ensembles extends Apple's Core Data framework to add peer-to-peer synchronization for Mac OS and iOS. Multiple SQLite persistent stores can be coupled together via a file synchronization platform like iCloud or Dropbox. The framework can be readily extended to support any service capable of moving files between devices, including custom servers.
 
@@ -30,7 +30,7 @@ To add Ensembles to your App's Xcode Project with CocoaPods...
 1. Add the following to your Podfile 
 
 		platform :ios, '7.0'
-		pod "Ensembles", "~> 0.2.0"
+		pod "Ensembles", "~> 0.3.0"
 
 To manually add Ensembles to your App's Xcode Project...
 
@@ -51,7 +51,7 @@ If you are using Cocoapods, you should not need to do anything. The optional clo
 
 If you do not want to include the optional services in your project, you can replace the standard pod command in your Podfile with the following
 
-		pod "Ensembles/Core", "~> 0.2.0"
+		pod "Ensembles/Core", "~> 0.3.0"
 
 If you are not using Cocoapods, and are installing Ensembles manually, you need to locate the source files and frameworks relevant to the service you want to support. You can find frameworks in the `Vendor` folder, and source files in `Framework/Extensions`.
 
