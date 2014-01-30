@@ -1,5 +1,5 @@
 //
-//  CDEBaselinePropagator.m
+//  CDERebaser.m
 //  Ensembles
 //
 //  Created by Drew McCormack on 05/01/14.
@@ -36,9 +36,41 @@
 }
 
 
+#pragma mark Removing Out-of-Date Events
+
+- (void)deleteEventsPreceedingBaselineWithCompletion:(CDECompletionBlock)completion
+{
+    NSManagedObjectContext *context = eventStore.managedObjectContext;
+    [context performBlock:^{
+        CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:context];
+        CDERevisionSet *baselineRevisionSet = baseline.revisionSet;
+        
+        if (baseline) {
+            CDEGlobalCount globalCountCutoff = baseline.globalCount;
+            NSArray *eventsToDelete = [CDEStoreModificationEvent fetchNonBaselineEventsUpToGlobalCount:globalCountCutoff inManagedObjectContext:context];
+            [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:eventsToDelete];
+            
+            for (CDEStoreModificationEvent *event in eventsToDelete) {
+                // Don't delete events from stores not in the baseline
+                NSString *storeId = event.eventRevision.persistentStoreIdentifier;
+                if (nil == [baselineRevisionSet revisionForPersistentStoreIdentifier:storeId]) continue;
+                [context deleteObject:event];
+            }
+        }
+
+        NSError *error = nil;
+        BOOL saved = [context save:&error];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (completion) completion(saved ? nil : error);
+        });
+    }];
+}
+
+
 #pragma mark Determining When to Rebase
 
-- (CGFloat)estimatedEventStoreCompactionFollowingRebase
+- (float)estimatedEventStoreCompactionFollowingRebase
 {
     // Determine size of baseline
     NSInteger currentBaselineCount = [self countOfBaseline];
@@ -53,7 +85,7 @@
 
     // Estimate compaction
     NSInteger currentCount = currentBaselineCount + deletedCount + insertedCount + updatedCount;
-    CGFloat compaction = 1.0f - ( rebasedBaselineCount / (CGFloat)MAX(1,currentCount) );
+    float compaction = 1.0f - ( rebasedBaselineCount / (float)MAX(1,currentCount) );
     compaction = MIN( MAX(compaction, 0.0f), 1.0f);
     
     return compaction;
@@ -77,9 +109,10 @@
     NSSet *allStores = revisionManager.allPersistentStoreIdentifiers;
     BOOL hasAllDevicesInBaseline = [baselineRevisionSet.persistentStoreIdentifiers isEqualToSet:allStores];
     
-    BOOL hasManyEvents = [self countOfAllObjectChanges] >= 100;
-    BOOL compactionIsAdequate = self.estimatedEventStoreCompactionFollowingRebase > 0.5;
-    return !hasBaseline || !hasAllDevicesInBaseline || (hasManyEvents && compactionIsAdequate);
+    BOOL hasManyEvents = [self countOfStoreModificationEvents] > 50;
+    BOOL hasAdequateChanges = [self countOfAllObjectChanges] >= 100;
+    BOOL compactionIsAdequate = self.estimatedEventStoreCompactionFollowingRebase > 0.5f;
+    return !hasBaseline || !hasAllDevicesInBaseline || hasManyEvents || (hasAdequateChanges && compactionIsAdequate);
 }
 
 
@@ -87,16 +120,32 @@
 
 - (void)rebaseWithCompletion:(CDECompletionBlock)completion
 {
+    CDELog(CDELoggingLevelVerbose, @"Starting rebase");
+    
     CDEGlobalCount newBaselineGlobalCount = [self globalCountForNewBaseline];
+    CDELog(CDELoggingLevelVerbose, @"New baseline global count: %lld", newBaselineGlobalCount);
     
     NSManagedObjectContext *context = eventStore.managedObjectContext;
     [context performBlock:^{
         // Fetch objects
         CDEStoreModificationEvent *existingBaseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:context];
-        NSArray *eventsToMerge = [CDEStoreModificationEvent fetchStoreModificationEventsUpToGlobalCount:newBaselineGlobalCount inManagedObjectContext:context];
+        NSArray *eventsToMerge = [CDEStoreModificationEvent fetchNonBaselineEventsUpToGlobalCount:newBaselineGlobalCount inManagedObjectContext:context];
         if (existingBaseline && eventsToMerge.count == 0) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (completion) completion(nil);
+            });
+            return;
+        }
+        
+        // Check that events can be integrated, ie, pass all checks.
+        NSError *error = nil;
+        CDERevisionManager *revisionManager = [[CDERevisionManager alloc] initWithEventStore:self.eventStore];
+        revisionManager.managedObjectModelURL = self.ensemble.managedObjectModelURL;
+        BOOL passedChecks = [revisionManager checkRebasingPrerequisitesForEvents:eventsToMerge error:&error];
+        if (!passedChecks) {
+            CDELog(CDELoggingLevelWarning, @"Failed rebasing prerequisite checks. Aborting rebase");
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (completion) completion(error);
             });
             return;
         }
@@ -133,12 +182,12 @@
         for (CDEGlobalIdentifier *globalId in unusedGlobalIds) [context deleteObject:globalId];
 
         // Save
-        NSError *error = nil;
         BOOL saved = [context save:&error];
         if (!saved) CDELog(CDELoggingLevelError, @"Failed to save rebase: %@", error);
         
         // Complete
         dispatch_async(dispatch_get_main_queue(), ^{
+            CDELog(CDELoggingLevelVerbose, @"Finishing rebase");
             if (completion) completion(saved ? nil : error);
         });
     }];
@@ -221,7 +270,7 @@
     CDEGlobalCount baselineCount = NSNotFound;
     for (CDERevision *revision in latestRevisionSet.revisions) {
         // Ignore stores that haven't updated since the baseline
-        // They will have to re-leech
+        // They will have to do a full integration to catch up
         NSString *storeId = revision.persistentStoreIdentifier;
         CDERevision *baselineRevision = [baselineRevisionSet revisionForPersistentStoreIdentifier:storeId];
         if (baselineRevision && baselineRevision.revisionNumber >= revision.revisionNumber) continue;
@@ -235,7 +284,20 @@
 }
 
 
-#pragma mark Fetching Object Change Counts
+#pragma mark Fetching Counts
+
+- (NSUInteger)countOfStoreModificationEvents
+{
+    __block NSUInteger count = 0;
+    NSManagedObjectContext *context = eventStore.managedObjectContext;
+    [context performBlockAndWait:^{
+        NSError *error = nil;
+        NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
+        count = [context countForFetchRequest:fetch error:&error];
+        if (error) CDELog(CDELoggingLevelError, @"Couldn't fetch count of events: %@", error);
+    }];
+    return count;
+}
 
 - (NSUInteger)countOfAllObjectChanges
 {

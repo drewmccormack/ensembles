@@ -271,7 +271,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
 
 - (NSError *)notConnectedError
 {
-    NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorConnectionError userInfo:@{NSLocalizedDescriptionKey : @"Attempted to access iCloud when not connected."}];
+    NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeConnectionError userInfo:@{NSLocalizedDescriptionKey : @"Attempted to access iCloud when not connected."}];
     return error;
 }
 
@@ -348,7 +348,8 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
             if (timeoutError) return;
             
             NSDirectoryEnumerator *dirEnum = [fileManager enumeratorAtPath:[self fullPathForPath:path]];
-            if (!dirEnum) fileManagerError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFileAccessFailed userInfo:nil];
+            NSDictionary *info = @{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Couldn't create directory enumerator for path: %@", path]};
+            if (!dirEnum) fileManagerError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFileAccessFailed userInfo:info];
             
             NSString *filename;
             NSMutableArray *mutableContents = [[NSMutableArray alloc] init];

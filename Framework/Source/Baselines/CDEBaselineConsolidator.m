@@ -43,6 +43,37 @@
     return fetch;
 }
 
+- (BOOL)persistentStoreHasBeenAbandoned
+{
+    // If there are multiple baselines with the unique identifier of the local store,
+    // see if the revision number is unchanged between them. If so, consider this store
+    // abandoned, as it did not commit any new changes before the rebase.
+    __block BOOL result = NO;
+    NSManagedObjectContext *context = self.eventStore.managedObjectContext;
+    [context performBlockAndWait:^{
+        NSError *error;
+        NSString *storeId = self.eventStore.persistentStoreBaselineIdentifier;
+        if (nil == storeId) return;
+        
+        NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
+        fetch.predicate = [NSPredicate predicateWithFormat:@"type = %d AND uniqueIdentifier = %@", CDEStoreModificationEventTypeBaseline, storeId];
+        NSArray *baselines = [context executeFetchRequest:fetch error:&error];
+        if (!baselines) CDELog(CDELoggingLevelError, @"Failed to fetch baselines: %@", error);
+        if (baselines.count <= 1) return;
+        
+        NSMutableSet *baselineRevisions = [NSMutableSet set];
+        for (CDEStoreModificationEvent *baseline in baselines) {
+            CDERevisionSet *revSet = baseline.revisionSet;
+            CDERevision *storeRevision = [revSet revisionForPersistentStoreIdentifier:storeId];
+            [baselineRevisions addObject:@(storeRevision.revisionNumber)];
+        }
+        
+        // If revisions are not unique, should get different count to baselines
+        result = baselineRevisions.count != baselines.count;
+    }];
+    return result;
+}
+
 - (BOOL)baselineNeedsConsolidation
 {
     __block BOOL result = NO;
@@ -62,6 +93,8 @@
 
 - (void)consolidateBaselineWithCompletion:(CDECompletionBlock)completion
 {
+    CDELog(CDELoggingLevelVerbose, @"Consolidating baselines");
+
     NSManagedObjectContext *context = self.eventStore.managedObjectContext;
     [context performBlock:^{
         // Fetch existing baselines, ordered beginning with most recent
@@ -88,6 +121,7 @@
         // Delete redundant baselines
         [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:baselinesToEliminate.allObjects];
         for (CDEStoreModificationEvent *baseline in baselinesToEliminate) {
+            CDELog(CDELoggingLevelVerbose, @"Deleting redundant baseline with unique id: %@", baseline.uniqueIdentifier);
             [context deleteObject:baseline];
         }
         
@@ -101,6 +135,7 @@
         // Merge surviving baselines
         NSMutableArray *survivingBaselines = [NSMutableArray arrayWithArray:baselineEvents];
         [survivingBaselines removeObjectsInArray:baselinesToEliminate.allObjects];
+        CDELog(CDELoggingLevelVerbose, @"Merging baselines with unique ids: %@", [survivingBaselines valueForKeyPath:@"uniqueIdentifier"]);
         CDEStoreModificationEvent *newBaseline = [self mergedBaselineFromOrderedBaselineEvents:survivingBaselines error:&error];
         if (!newBaseline) {
             [self failWithCompletion:completion error:error];
@@ -121,6 +156,7 @@
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{
+            CDELog(CDELoggingLevelVerbose, @"Finishing baseline consolidation");
             if (completion) completion(nil);
         });
     }];

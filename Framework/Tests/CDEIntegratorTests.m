@@ -9,9 +9,17 @@
 #import <XCTest/XCTest.h>
 #import "CDEIntegratorTestCase.h"
 
+@interface CDEEventIntegrator (TestMethods)
+
+- (BOOL)needsFullIntegration;
+
+@end
+
+
 @interface CDEIntegratorTests : CDEIntegratorTestCase
 
 @end
+
 
 @implementation CDEIntegratorTests {
     CDEStoreModificationEvent *modEvent;
@@ -53,7 +61,7 @@
 
 - (void)testInsertGeneratesObjects
 {
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
     NSArray *parents = [self.testManagedObjectContext executeFetchRequest:fetch error:NULL];
     XCTAssertEqual(parents.count, (NSUInteger)2, @"Wrong number of parents");
@@ -61,7 +69,7 @@
 
 - (void)testInsertSetsAttribute
 {
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
     NSArray *parents = [self.testManagedObjectContext executeFetchRequest:fetch error:NULL];
     parents = [parents filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"name = \"parent1\""]];
@@ -71,7 +79,7 @@
 
 - (void)testInsertSetsNilAttribute
 {
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
     NSArray *parents = [self.testManagedObjectContext executeFetchRequest:fetch error:NULL];
     parents = [parents filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"name = \"parent2\""]];
@@ -81,7 +89,7 @@
 
 - (void)testInsertSetsRelationship
 {
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
     NSArray *parents = [self.testManagedObjectContext executeFetchRequest:fetch error:NULL];
     parents = [parents filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"name = \"parent1\""]];
@@ -91,7 +99,7 @@
 
 - (void)testMergeWithNoRepairGeneratesAStoreModificationEvent
 {
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
     NSManagedObjectContext *moc = self.eventStore.managedObjectContext;
     [self.eventStore.managedObjectContext performBlockAndWait:^{
         NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
@@ -107,7 +115,7 @@
         return YES;
     };
     
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
     
     NSManagedObjectContext *moc = self.eventStore.managedObjectContext;
     [self.eventStore.managedObjectContext performBlockAndWait:^{
@@ -119,6 +127,28 @@
         XCTAssertEqual(merge.globalCount, (CDEGlobalCount)1, @"Wrong global count");
         XCTAssertEqual(merge.eventRevision.revisionNumber, (CDERevisionNumber)1, @"Wrong revision number");
     }];
+}
+
+- (void)testNilBaselineIdRequiresFullIntegration
+{
+    self.eventStore.persistentStoreBaselineIdentifier = nil;
+    self.eventStore.currentBaselineIdentifier = @"1";
+    XCTAssertTrue([self.integrator needsFullIntegration], @"With nil as id, should do full integration");
+}
+
+
+- (void)testNonMatchingBaselineIdsRequireFullIntegration
+{
+    self.eventStore.persistentStoreBaselineIdentifier = @"2";
+    self.eventStore.currentBaselineIdentifier = @"1";
+    XCTAssertTrue([self.integrator needsFullIntegration], @"With different ids, should do full integration");
+}
+
+- (void)testMatchingBaselineIdsDoNotRequireFullIntegration
+{
+    self.eventStore.persistentStoreBaselineIdentifier = @"2";
+    self.eventStore.currentBaselineIdentifier = @"2";
+    XCTAssertFalse([self.integrator needsFullIntegration], @"With same ids, should not do full integration");
 }
 
 @end

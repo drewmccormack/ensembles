@@ -29,4 +29,13 @@
     }
 }
 
+- (NSArray *)cde_arrayByTransformingObjectsWithBlock:(id(^)(id))block
+{
+    NSMutableArray *result = [[NSMutableArray alloc] init];
+    for (id object in self) {
+        [result addObject:block(object)];
+    }
+    return result;
+}
+
 @end

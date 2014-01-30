@@ -253,44 +253,44 @@
     // Adds
     NSMutableSet *newAdded = [[NSMutableSet alloc] initWithSet:self.addedIdentifiers];
     [newAdded unionSet:propertyValue.addedIdentifiers];
-    [newAdded minusSet:self.removedIdentifiers]; // self removes override adds in other value
-    
-    // Removes
-    NSMutableSet *newRemoved = [[NSMutableSet alloc] initWithSet:self.removedIdentifiers];
-    [newRemoved unionSet:propertyValue.removedIdentifiers];
-    [newRemoved minusSet:self.addedIdentifiers]; // self adds override removes in other value
+    [newAdded minusSet:self.removedIdentifiers]; // removes override adds in other value
     
     // Set
-    if (![newAdded isEqualToSet:self.addedIdentifiers]) self.addedIdentifiers = newAdded;
-    if (![newRemoved isEqualToSet:self.removedIdentifiers]) self.removedIdentifiers = newRemoved;
+    self.addedIdentifiers = newAdded;
+    self.removedIdentifiers = [[NSSet alloc] init];
     
     // Non-ordered relationships are done
     if (propertyValue.type != CDEPropertyChangeTypeOrderedToManyRelationship) return;
     
     // If it is an ordered to-many, update ordering.
-    NSSet *indexesSet = [[NSSet alloc] initWithArray:self.movedIdentifiersByIndex.allKeys];
-    indexesSet = [indexesSet setByAddingObjectsFromArray:propertyValue.movedIdentifiersByIndex.allKeys];
-    NSArray *indexNumbers = [indexesSet.allObjects sortedArrayUsingSelector:@selector(compare:)];
-    NSMutableDictionary *newMovedIdentifiersByIndex = [[NSMutableDictionary alloc] init];
-    NSMutableSet *usedIdentifiers = [[NSMutableSet alloc] init];
-    __block NSUInteger count = 0;
-    [indexNumbers enumerateObjectsUsingBlock:^(NSNumber *indexNumber, NSUInteger i, BOOL *stop) {
-        NSString *identifier = self.movedIdentifiersByIndex[indexNumber];
-        if (identifier && ![usedIdentifiers containsObject:identifier] && ![self.removedIdentifiers containsObject:identifier]) {
-            newMovedIdentifiersByIndex[@(count++)] = identifier;
-            [usedIdentifiers addObject:identifier];
-        }
-        
-        identifier = propertyValue.movedIdentifiersByIndex[indexNumber];
-        if (identifier && ![usedIdentifiers containsObject:identifier] && ![self.removedIdentifiers containsObject:identifier]) {
-            newMovedIdentifiersByIndex[@(count++)] = identifier;
-            [usedIdentifiers addObject:identifier];
-        }
+    NSMutableDictionary *indexesByGlobalId = [[NSMutableDictionary alloc] init];
+    for (NSNumber *indexNum in propertyValue.movedIdentifiersByIndex) {
+        NSString *globalId = propertyValue.movedIdentifiersByIndex[indexNum];
+        indexesByGlobalId[globalId] = indexNum;
+    }
+    
+    for (NSNumber *indexNum in self.movedIdentifiersByIndex) {
+        NSString *globalId = self.movedIdentifiersByIndex[indexNum];
+        indexesByGlobalId[globalId] = indexNum;
+    }
+    
+    // Sort first on index, and use global id to resolve conflicts.
+    NSMutableArray *sortedIdentifiers = [self.addedIdentifiers.allObjects mutableCopy];
+    [sortedIdentifiers sortUsingComparator:^NSComparisonResult(NSString *globalId1, NSString *globalId2) {
+        NSNumber *index1 = [indexesByGlobalId objectForKey:globalId1];
+        NSNumber *index2 = [indexesByGlobalId objectForKey:globalId2];
+        NSComparisonResult indexResult = [index1 compare:index2];
+        if (indexResult != NSOrderedSame) return indexResult;
+        NSComparisonResult globalIdResult = [globalId1 compare:globalId2];
+        return globalIdResult;
     }];
     
-    if (![newMovedIdentifiersByIndex isEqualToDictionary:self.movedIdentifiersByIndex]) {
-        self.movedIdentifiersByIndex = newMovedIdentifiersByIndex;
-    }
+    NSMutableDictionary *newMovedIdentifiersByIndex = [[NSMutableDictionary alloc] init];
+    [sortedIdentifiers enumerateObjectsUsingBlock:^(NSString *globalId, NSUInteger i, BOOL *stop) {
+        newMovedIdentifiersByIndex[@(i)] = globalId;
+    }];
+    
+    self.movedIdentifiersByIndex = newMovedIdentifiersByIndex;
 }
 
 

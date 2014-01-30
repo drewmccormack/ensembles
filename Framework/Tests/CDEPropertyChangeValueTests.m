@@ -204,4 +204,44 @@
     XCTAssertTrue([copiedChangeValue.addedIdentifiers isEqualToSet:childSet], @"Wrong added identifiers");
 }
 
+- (void)testMergingToManyRelationship
+{
+    CDEPropertyChangeValue *value1 = [[CDEPropertyChangeValue alloc] initWithType:CDEPropertyChangeTypeToManyRelationship propertyName:@"property"];
+    value1.addedIdentifiers = [NSSet setWithObjects:@"11", @"12", nil];
+    value1.removedIdentifiers = [NSSet set];
+    
+    CDEPropertyChangeValue *value2 = [[CDEPropertyChangeValue alloc] initWithType:CDEPropertyChangeTypeToManyRelationship propertyName:@"property"];
+    value2.addedIdentifiers = [NSSet setWithObjects:@"11", nil];
+    value2.removedIdentifiers = [NSSet setWithObjects:@"12", nil];
+    
+    [value2 mergeToManyRelationshipFromSubordinatePropertyChangeValue:value1];
+    
+    NSSet *added = [NSSet setWithObjects:@"11", nil];
+    
+    XCTAssertEqualObjects(value2.addedIdentifiers, added, @"Wrong added ids");
+    XCTAssertEqualObjects(value2.removedIdentifiers, [NSSet new], @"Removes should always end up empty");
+}
+
+- (void)testMergingOrderedToManyRelationship
+{
+    CDEPropertyChangeValue *value1 = [[CDEPropertyChangeValue alloc] initWithType:CDEPropertyChangeTypeOrderedToManyRelationship propertyName:@"property"];
+    value1.addedIdentifiers = [NSSet setWithObjects:@"11", @"12", @"13", nil];
+    value1.removedIdentifiers = [NSSet set];
+    value1.movedIdentifiersByIndex = @{@0 : @"12", @1 : @"13", @2 : @"11"};
+    
+    CDEPropertyChangeValue *value2 = [[CDEPropertyChangeValue alloc] initWithType:CDEPropertyChangeTypeOrderedToManyRelationship propertyName:@"property"];
+    value2.addedIdentifiers = [NSSet setWithObjects:@"11", nil];
+    value2.removedIdentifiers = [NSSet setWithObjects:@"12", nil];
+    value2.movedIdentifiersByIndex = @{@0 : @"11"};
+    
+    [value2 mergeToManyRelationshipFromSubordinatePropertyChangeValue:value1];
+    
+    NSSet *added = [NSSet setWithObjects:@"11", @"13", nil];
+    NSDictionary *moved = @{@0 : @"11", @1 : @"13"};
+
+    XCTAssertEqualObjects(value2.addedIdentifiers, added, @"Wrong added ids");
+    XCTAssertEqualObjects(value2.removedIdentifiers, [NSSet set], @"Removes should be empty");
+    XCTAssertEqualObjects(value2.movedIdentifiersByIndex, moved, @"Wrong removed ids");
+}
+
 @end

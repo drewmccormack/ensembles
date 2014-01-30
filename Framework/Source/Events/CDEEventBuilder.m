@@ -51,7 +51,6 @@
     __block CDERevision *returnRevision = nil;
     [eventManagedObjectContext performBlockAndWait:^{
         CDERevisionNumber lastRevision = eventStore.lastRevision;
-        CDERevisionNumber lastMergeRevision = eventStore.lastMergeRevision;
         NSString *persistentStoreId = self.eventStore.persistentStoreIdentifier;
         
         CDERevisionManager *revisionManager = [[CDERevisionManager alloc] initWithEventStore:eventStore];
@@ -72,11 +71,9 @@
         
         // Set the state of other stores
         if (type == CDEStoreModificationEventTypeSave) {
-            CDEStoreModificationEvent *lastMergeEvent = [CDEStoreModificationEvent fetchStoreModificationEventForPersistentStoreIdentifier:persistentStoreId revisionNumber:lastMergeRevision inManagedObjectContext:eventManagedObjectContext];
-            CDERevisionSet *lastMergeRevisionsSet = lastMergeEvent.revisionSet;
-            [lastMergeRevisionsSet removeRevisionForPersistentStoreIdentifier:persistentStoreId];
-            if (!lastMergeRevisionsSet) lastMergeRevisionsSet = [[CDERevisionSet alloc] init]; // No previous merge exists
-            event.revisionSetOfOtherStoresAtCreation = lastMergeRevisionsSet;
+            CDERevisionSet *newRevisionSet = [revisionManager revisionSetForLastMergeOrBaseline];
+            [newRevisionSet removeRevisionForPersistentStoreIdentifier:persistentStoreId];
+            event.revisionSetOfOtherStoresAtCreation = newRevisionSet;
         }
         else if (type == CDEStoreModificationEventTypeMerge) {
             CDERevisionSet *mostRecentSet = [revisionManager revisionSetOfMostRecentEvents];

@@ -29,7 +29,6 @@
 @implementation CDEEventIntegrator {
     CDECompletionBlock completion;
     NSManagedObjectContext *eventStoreChildContext;
-    CDERevisionNumber fromRevisionNumber;
     NSDictionary *saveInfoDictionary;
     dispatch_queue_t queue;
     id eventStoreChildContextSaveObserver;
@@ -140,12 +139,11 @@
 
 #pragma mark Merging Store Modification Events
 
-- (void)mergeEventsImportedSinceRevision:(CDERevisionNumber)revision completion:(CDECompletionBlock)newCompletion
+- (void)mergeEventsWithCompletion:(CDECompletionBlock)newCompletion
 {
     NSAssert([NSThread isMainThread], @"mergeEvents... called off main thread");
     
     completion = [newCompletion copy];
-    fromRevisionNumber = revision;
     
     // Setup child context of the event store
     eventStoreChildContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
@@ -286,6 +284,16 @@
 
 #pragma mark Integrating Changes
 
+- (BOOL)needsFullIntegration
+{
+    // Determine if we need to do a full integration of all data.
+    // This is the case if the baseline identity has changed.
+    NSString *storeBaselineId = self.eventStore.persistentStoreBaselineIdentifier;
+    NSString *currentBaselineId = self.eventStore.currentBaselineIdentifier;
+    BOOL needFullIntegration = !storeBaselineId || ![storeBaselineId isEqualToString:currentBaselineId];
+    return needFullIntegration;
+}
+
 // Called on background queue.
 - (BOOL)integrate:(NSError * __autoreleasing *)error
 {
@@ -300,27 +308,40 @@
     
     // Move to the child event store queue
     __block BOOL success = YES;
+    BOOL needFullIntegration = [self needsFullIntegration];
     [eventStoreChildContext performBlockAndWait:^{
-        // Get all modification events added since the last merge
-        NSArray *storeModEvents = [revisionManager fetchUncommittedStoreModificationEvents:error];
-        if (!storeModEvents) {
-            success = NO;
-            return;
+        // Get events
+        NSArray *storeModEvents = nil;
+        if (needFullIntegration) {
+            // All events, including baseline
+            NSMutableArray *events = [[CDEStoreModificationEvent fetchNonBaselineEventsInManagedObjectContext:eventStoreChildContext] mutableCopy];
+            CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:eventStoreChildContext];
+            if (baseline) [events insertObject:baseline atIndex:0];
+            storeModEvents = events;
         }
-        if (storeModEvents.count == 0) return;
-        
-        // Add any modification events concurrent with the new events. Results are ordered.
-        // We repeat this until there is no change in the set. This will be when there are
-        // no events existing outside the set that are concurrent with the events in the set.
-        storeModEvents = [revisionManager recursivelyFetchStoreModificationEventsConcurrentWithEvents:storeModEvents error:error];
+        else {
+            // Get all modification events added since the last merge
+            storeModEvents = [revisionManager fetchUncommittedStoreModificationEvents:error];
+            if (!storeModEvents) {
+                success = NO;
+                return;
+            }
+            if (storeModEvents.count == 0) return;
+            
+            // Add any modification events concurrent with the new events. Results are ordered.
+            // We repeat this until there is no change in the set. This will be when there are
+            // no events existing outside the set that are concurrent with the events in the set.
+            storeModEvents = [revisionManager recursivelyFetchStoreModificationEventsConcurrentWithEvents:storeModEvents error:error];
+        }
         if (storeModEvents == nil) success = NO;
         if (storeModEvents.count == 0) return;
         
         // If all events are from this device, don't merge
         NSArray *storeIds = [storeModEvents valueForKeyPath:@"@distinctUnionOfObjects.eventRevision.persistentStoreIdentifier"];
-        if (storeIds.count == 1 && [storeIds.lastObject isEqualToString:self.eventStore.persistentStoreIdentifier]) return;
+        if (!needFullIntegration && storeIds.count == 1 && [storeIds.lastObject isEqualToString:self.eventStore.persistentStoreIdentifier]) return;
         
         // Apply changes in the events, in order.
+        NSMutableDictionary *insertedObjectIDsByEntity = needFullIntegration ? [[NSMutableDictionary alloc] init] : nil;
         for (CDEStoreModificationEvent *storeModEvent in storeModEvents) {
             @autoreleasepool {
                 // Insertions are split into two parts: first, we perform an insert without applying property changes,
@@ -336,6 +357,9 @@
                         return;
                     }
                     appliedInsertsByEntity[entity.name] = appliedInsertChanges;
+                    
+                    // If full integration, track all inserted object ids, so we can delete unreferenced objects
+                    if (needFullIntegration) [self updateObjectIDsByEntity:insertedObjectIDsByEntity forEntity:entity insertChanges:appliedInsertChanges];
                 }
                 
                 // Now that all objects exist, we can apply property changes.
@@ -353,6 +377,9 @@
                 }
             }
         }
+        
+        // In a full integration, remove any objects that didn't get inserted
+        if (needFullIntegration) [self deleteUnreferencedObjectsInObjectIDsByEntity:insertedObjectIDsByEntity];
     }];
     
     return success;
@@ -407,6 +434,39 @@
     NSSortDescriptor *storeDesc = [NSSortDescriptor sortDescriptorWithKey:@"storeModificationEvent.eventRevision.persistentStoreIdentifier" ascending:YES];
     NSSortDescriptor *typeDesc = [NSSortDescriptor sortDescriptorWithKey:@"type" ascending:YES];
     return @[countDesc, timestampDesc, storeDesc, typeDesc];
+}
+
+
+#pragma mark Tracking Deletions of Unreferenced Objects in Full Integrations
+
+- (void)updateObjectIDsByEntity:(NSMutableDictionary *)objectIDsByEntity forEntity:(NSEntityDescription *)entity insertChanges:(NSArray *)changes
+{
+    NSMutableSet *objectIDs = objectIDsByEntity[entity.name];
+    if (!objectIDs) objectIDs = [NSMutableSet set];
+    NSArray *storeURIs = [changes valueForKeyPath:@"globalIdentifier.storeURI"];
+    [managedObjectContext performBlockAndWait:^{
+        for (NSString *uri in storeURIs) {
+            NSURL *url = [NSURL URLWithString:uri];
+            NSManagedObjectID *objectID = [managedObjectContext.persistentStoreCoordinator managedObjectIDForURIRepresentation:url];
+            if (objectID) [objectIDs addObject:objectID];
+        }
+    }];
+    objectIDsByEntity[entity.name] = objectIDs;
+}
+
+- (void)deleteUnreferencedObjectsInObjectIDsByEntity:(NSDictionary *)objectIDsByEntity
+{
+    [managedObjectContext performBlockAndWait:^{
+        [objectIDsByEntity enumerateKeysAndObjectsUsingBlock:^(NSString *entityName, NSSet *objectIDs, BOOL *stop) {
+            NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:entityName];
+            fetch.predicate = [NSPredicate predicateWithFormat:@"NOT (SELF IN %@)", objectIDs];
+            NSError *error;
+            NSArray *unreferencedObjects = [managedObjectContext executeFetchRequest:fetch error:&error];
+            for (NSManagedObject *object in unreferencedObjects) {
+                [self nullifyRelationshipsAndDeleteObject:object];
+            }
+        }];
+    }];
 }
 
 
@@ -493,38 +553,43 @@
         
         // Clear the store URI in the global id
         change.globalIdentifier.storeURI = nil;
-        
-        if (!object) continue;
-        
-        [managedObjectContext performBlockAndWait:^{
-            if (object.isDeleted || object.managedObjectContext == nil) return;
 
-            // Nullify relationships first to prevent cascading
-            NSEntityDescription *entity = object.entity;
-            for (NSString *relationshipName in entity.relationshipsByName) {
-                id related = [self valueForKey:relationshipName inObject:object];
-                if (related == nil) continue;
-                
-                NSRelationshipDescription *description = entity.relationshipsByName[relationshipName];
-                if (description.isToMany && [related count] > 0) {
-                    if (description.isOrdered) {
-                        related = [object mutableOrderedSetValueForKey:relationshipName];
-                        [related removeAllObjects];
-                    } else {
-                        related = [object mutableSetValueForKey:relationshipName];
-                        [related removeAllObjects];
-                    }
-                }
-                else {
-                    [self setValue:nil forKey:relationshipName inObject:object];
-                }
-            }
-            
-            [managedObjectContext deleteObject:object];
+        [managedObjectContext performBlockAndWait:^{
+            [self nullifyRelationshipsAndDeleteObject:object];
         }];
     }
     
     return YES;
+}
+
+// Called on managedObjectContext thread
+- (void)nullifyRelationshipsAndDeleteObject:(NSManagedObject *)object
+{
+    if (!object) return;
+    if (object.isDeleted || object.managedObjectContext == nil) return;
+    
+    // Nullify relationships first to prevent cascading
+    NSEntityDescription *entity = object.entity;
+    for (NSString *relationshipName in entity.relationshipsByName) {
+        id related = [self valueForKey:relationshipName inObject:object];
+        if (related == nil) continue;
+        
+        NSRelationshipDescription *description = entity.relationshipsByName[relationshipName];
+        if (description.isToMany && [related count] > 0) {
+            if (description.isOrdered) {
+                related = [object mutableOrderedSetValueForKey:relationshipName];
+                [related removeAllObjects];
+            } else {
+                related = [object mutableSetValueForKey:relationshipName];
+                [related removeAllObjects];
+            }
+        }
+        else {
+            [self setValue:nil forKey:relationshipName inObject:object];
+        }
+    }
+    
+    [managedObjectContext deleteObject:object];
 }
 
 
@@ -763,7 +828,7 @@
                 }
 
                 merged = [reparationContext save:error];
-                if (!merged) CDELog(CDELoggingLevelError, @"Saving merge context after willSave changes failed: %@", error);
+                if (!merged) CDELog(CDELoggingLevelError, @"Saving merge context after willSave changes failed: %@", *error);
             }
         }];
     }
@@ -1005,14 +1070,14 @@
             return;
         }
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(mergeChangesFromContextDidSaveNotification:) name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(storeChangesFromContextDidSaveNotification:) name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
         saved = [managedObjectContext save:error];
         [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
     }];
     return saved;
 }
 
-- (void)mergeChangesFromContextDidSaveNotification:(NSNotification *)notif
+- (void)storeChangesFromContextDidSaveNotification:(NSNotification *)notif
 {
     saveInfoDictionary = notif.userInfo;
 }

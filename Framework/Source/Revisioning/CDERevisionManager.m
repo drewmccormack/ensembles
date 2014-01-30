@@ -53,24 +53,31 @@
 {
     __block NSArray *result = nil;
     [eventManagedObjectContext performBlockAndWait:^{
-        CDEStoreModificationEvent *lastMergeEvent = [CDEStoreModificationEvent fetchStoreModificationEventForPersistentStoreIdentifier:eventStore.persistentStoreIdentifier revisionNumber:eventStore.lastMergeRevision inManagedObjectContext:eventManagedObjectContext];
-        CDERevisionSet *lastMergeRevisionSet = lastMergeEvent.revisionSet;
-        if (!lastMergeRevisionSet) lastMergeRevisionSet = [CDERevisionSet new]; // No previous merge
+        CDEStoreModificationEvent *lastMergeEvent = [CDEStoreModificationEvent fetchNonBaselineEventForPersistentStoreIdentifier:eventStore.persistentStoreIdentifier revisionNumber:eventStore.lastMergeRevision inManagedObjectContext:eventManagedObjectContext];
+        CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:eventManagedObjectContext];
+        CDERevisionSet *baselineRevisionSet = baseline.revisionSet;
+
+        CDERevisionSet *fromRevisionSet = lastMergeEvent.revisionSet;
+        if (!fromRevisionSet) { // No previous merge
+            fromRevisionSet = baselineRevisionSet ? : [CDERevisionSet new];
+        }
         
         // Determine which stores have appeared since last merge
         NSSet *allStoreIds = [CDEEventRevision fetchPersistentStoreIdentifiersInManagedObjectContext:eventManagedObjectContext];
-        NSSet *lastMergeStoreIds = lastMergeRevisionSet.persistentStoreIdentifiers;
+        NSSet *lastMergeStoreIds = fromRevisionSet.persistentStoreIdentifiers;
         NSMutableSet *missingStoreIds = [NSMutableSet setWithSet:allStoreIds];
         [missingStoreIds minusSet:lastMergeStoreIds];
         
         NSMutableArray *events = [[NSMutableArray alloc] init];
-        for (CDEEventRevision *revision in lastMergeRevisionSet.revisions) {
-            NSArray *recentEvents = [CDEStoreModificationEvent fetchStoreModificationEventsForPersistentStoreIdentifier:revision.persistentStoreIdentifier sinceRevisionNumber:revision.revisionNumber inManagedObjectContext:eventManagedObjectContext];
+        for (CDEEventRevision *revision in fromRevisionSet.revisions) {
+            NSArray *recentEvents = [CDEStoreModificationEvent fetchNonBaselineEventsForPersistentStoreIdentifier:revision.persistentStoreIdentifier sinceRevisionNumber:revision.revisionNumber inManagedObjectContext:eventManagedObjectContext];
             [events addObjectsFromArray:recentEvents];
         }
         
         for (NSString *persistentStoreId in missingStoreIds) {
-            NSArray *recentEvents = [CDEStoreModificationEvent fetchStoreModificationEventsForPersistentStoreIdentifier:persistentStoreId sinceRevisionNumber:-1 inManagedObjectContext:eventManagedObjectContext];
+            CDERevision *baselineRevision = [baselineRevisionSet revisionForPersistentStoreIdentifier:persistentStoreId];
+            CDERevisionNumber revNumber = baselineRevision ? baselineRevision.revisionNumber : -1;
+            NSArray *recentEvents = [CDEStoreModificationEvent fetchNonBaselineEventsForPersistentStoreIdentifier:persistentStoreId sinceRevisionNumber:revNumber inManagedObjectContext:eventManagedObjectContext];
             [events addObjectsFromArray:recentEvents];
         }
         
@@ -85,6 +92,9 @@
     
     __block NSArray *result = nil;
     [eventManagedObjectContext performBlockAndWait:^{
+        CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:eventManagedObjectContext];
+        CDERevisionSet *baselineRevisionSet = baseline.revisionSet;
+
         CDERevisionSet *minSet = [[CDERevisionSet alloc] init];
         for (CDEStoreModificationEvent *event in events) {
             CDERevisionSet *revSet = event.revisionSet;
@@ -95,7 +105,7 @@
         NSManagedObjectContext *context = [events.lastObject managedObjectContext];
         NSMutableSet *concurrentEvents = [[NSMutableSet alloc] initWithArray:events]; // Events are concurrent with themselves
         for (CDERevision *minRevision in minSet.revisions) {
-            NSArray *recentEvents = [CDEStoreModificationEvent fetchStoreModificationEventsForPersistentStoreIdentifier:minRevision.persistentStoreIdentifier sinceRevisionNumber:minRevision.revisionNumber inManagedObjectContext:context];
+            NSArray *recentEvents = [CDEStoreModificationEvent fetchNonBaselineEventsForPersistentStoreIdentifier:minRevision.persistentStoreIdentifier sinceRevisionNumber:minRevision.revisionNumber inManagedObjectContext:context];
             [concurrentEvents addObjectsFromArray:recentEvents];
         }
         
@@ -106,7 +116,9 @@
         
         // Add events from the missing stores
         for (NSString *persistentStoreId in missingStoreIds) {
-            NSArray *recentEvents = [CDEStoreModificationEvent fetchStoreModificationEventsForPersistentStoreIdentifier:persistentStoreId sinceRevisionNumber:-1 inManagedObjectContext:context];
+            CDERevision *baselineRevision = [baselineRevisionSet revisionForPersistentStoreIdentifier:persistentStoreId];
+            CDERevisionNumber revNumber = baselineRevision ? baselineRevision.revisionNumber : -1;
+            NSArray *recentEvents = [CDEStoreModificationEvent fetchNonBaselineEventsForPersistentStoreIdentifier:persistentStoreId sinceRevisionNumber:revNumber inManagedObjectContext:context];
             [concurrentEvents addObjectsFromArray:recentEvents];
         }
         
@@ -129,6 +141,36 @@
 }
 
 #pragma mark Checks
+
+- (BOOL)checkRebasingPrerequisitesForEvents:(NSArray *)events error:(NSError * __autoreleasing *)error
+{
+    __block BOOL result = YES;
+    [eventManagedObjectContext performBlockAndWait:^{
+        CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:eventManagedObjectContext];
+        
+        if (![self checkAllDependenciesExistForStoreModificationEvents:events]) {
+            if (error) *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeMissingDependencies userInfo:nil];
+            result = NO;
+            return;
+        }
+        
+        NSArray *eventsWithBaseline = events;
+        if (baseline) eventsWithBaseline = [eventsWithBaseline arrayByAddingObject:baseline];
+        if (![self checkContinuityOfStoreModificationEvents:eventsWithBaseline]) {
+            if (error) *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeDiscontinuousRevisions userInfo:nil];
+            result = NO;
+            return;
+        }
+        
+        if (![self checkModelVersionsOfStoreModificationEvents:eventsWithBaseline]) {
+            if (error) *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeUnknownModelVersion userInfo:nil];
+            result = NO;
+            return;
+        }
+    }];
+    
+    return result;
+}
 
 - (BOOL)checkIntegrationPrequisites:(NSError * __autoreleasing *)error
 {
@@ -211,10 +253,18 @@
 {
     __block BOOL result = YES;
     [eventManagedObjectContext performBlockAndWait:^{
+        CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:eventManagedObjectContext];
+        CDERevisionSet *baselineRevisionSet = baseline.revisionSet;
         for (CDEStoreModificationEvent *event in events) {
             NSSet *otherStoreRevs = event.eventRevisionsOfOtherStores;
             for (CDEEventRevision *otherStoreRev in otherStoreRevs) {
-                CDEStoreModificationEvent *dependency = [CDEStoreModificationEvent fetchStoreModificationEventForPersistentStoreIdentifier:otherStoreRev.persistentStoreIdentifier revisionNumber:otherStoreRev.revisionNumber inManagedObjectContext:event.managedObjectContext];
+                // Check to see if baseline is after this event. If so, we don't need to check it, because it
+                // is presumably now in the baseline.
+                CDERevision *baselineRevision = [baselineRevisionSet revisionForPersistentStoreIdentifier:otherStoreRev.persistentStoreIdentifier];
+                if (baselineRevision && baselineRevision.revisionNumber >= otherStoreRev.revisionNumber) continue;
+                
+                // Do the check
+                CDEStoreModificationEvent *dependency = [CDEStoreModificationEvent fetchNonBaselineEventForPersistentStoreIdentifier:otherStoreRev.persistentStoreIdentifier revisionNumber:otherStoreRev.revisionNumber inManagedObjectContext:event.managedObjectContext];
                 if (!dependency) {
                     result = NO;
                     return;
@@ -277,7 +327,7 @@
     __block CDERevisionSet *set = nil;
     [eventManagedObjectContext performBlockAndWait:^{
         NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"CDEEventRevision"];
-        request.predicate = [NSPredicate predicateWithFormat:@"storeModificationEvent != NIL"];
+        request.predicate = [NSPredicate predicateWithFormat:@"storeModificationEvent != NIL OR storeModificationEventForOtherStores.type = %d", CDEStoreModificationEventTypeBaseline];
         
         NSError *error;
         NSArray *allRevisions = [eventManagedObjectContext executeFetchRequest:request error:&error];
@@ -294,6 +344,29 @@
         }
     }];
     return set;
+}
+
+#pragma mark Checkpoint Revisions
+
+- (CDERevisionSet *)revisionSetForLastMergeOrBaseline
+{
+    __block CDERevisionSet *newRevisionSet = nil;
+    [eventManagedObjectContext performBlockAndWait:^{
+        CDERevisionNumber lastMergeRevision = eventStore.lastMergeRevision;
+        NSString *persistentStoreId = self.eventStore.persistentStoreIdentifier;
+        CDEStoreModificationEvent *lastMergeEvent = [CDEStoreModificationEvent fetchNonBaselineEventForPersistentStoreIdentifier:persistentStoreId revisionNumber:lastMergeRevision inManagedObjectContext:eventManagedObjectContext];
+        
+        newRevisionSet = lastMergeEvent.revisionSet;
+        if (!newRevisionSet) {
+            // No previous merge exists. Try baseline.
+            CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:eventManagedObjectContext];
+            if (baseline)
+                newRevisionSet = baseline.revisionSet;
+            else
+                newRevisionSet = [[CDERevisionSet alloc] init];
+        }
+    }];
+    return newRevisionSet;
 }
 
 #pragma mark Persistent Stores

@@ -10,6 +10,10 @@
 #import "CDEPersistentStoreEnsemble.h"
 #import "CDELocalCloudFileSystem.h"
 
+@interface CDESyncTest () <CDEPersistentStoreEnsembleDelegate>
+
+@end
+
 @implementation CDESyncTest
 
 - (void)setUp
@@ -32,13 +36,15 @@
     context1 = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
     context1.persistentStoreCoordinator = testPSC1;
     context1.stalenessInterval = 0.0;
+    context1.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy;
     
     cloudRootDir = [testRootDirectory stringByAppendingPathComponent:@"cloudfiles"];
     [[NSFileManager defaultManager] createDirectoryAtPath:cloudRootDir withIntermediateDirectories:YES attributes:nil error:NULL];
     
     cloudFileSystem1 = [[CDELocalCloudFileSystem alloc] initWithRootDirectory:cloudRootDir];
     eventDataRoot1 = [testRootDirectory stringByAppendingPathComponent:@"eventData1"];
-    ensemble1 = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"com.onewaytest" persistentStorePath:testStoreURL1.path managedObjectModelURL:testModelURL cloudFileSystem:cloudFileSystem1 localDataRootDirectory:eventDataRoot1];
+    ensemble1 = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"com.ensembles.synctest" persistentStorePath:testStoreURL1.path managedObjectModelURL:testModelURL cloudFileSystem:cloudFileSystem1 localDataRootDirectory:eventDataRoot1];
+    ensemble1.delegate = self;
     
     // Second store
     testStoreFile2 = [testRootDirectory stringByAppendingPathComponent:@"store2.sql"];
@@ -50,15 +56,16 @@
     context2 = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
     context2.persistentStoreCoordinator = testPSC2;
     context2.stalenessInterval = 0.0;
+    context2.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy;
     
-    cloudRootDir = [testRootDirectory stringByAppendingPathComponent:@"cloudfiles"];
     cloudFileSystem2 = [[CDELocalCloudFileSystem alloc] initWithRootDirectory:cloudRootDir];
     eventDataRoot2 = [testRootDirectory stringByAppendingPathComponent:@"eventData2"];
-    ensemble2 = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"com.onewaytest" persistentStorePath:testStoreURL2.path managedObjectModelURL:testModelURL cloudFileSystem:cloudFileSystem2 localDataRootDirectory:eventDataRoot2];
+    ensemble2 = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"com.ensembles.synctest" persistentStorePath:testStoreURL2.path managedObjectModelURL:testModelURL cloudFileSystem:cloudFileSystem2 localDataRootDirectory:eventDataRoot2];
+    ensemble2.delegate = self;
 }
 
 - (void)tearDown
-{
+{    
     [ensemble1 stopMonitoringSaves];
     [ensemble2 stopMonitoringSaves];
     
@@ -68,6 +75,18 @@
     [[NSFileManager defaultManager] removeItemAtPath:testRootDirectory error:NULL];
     
     [super tearDown];
+}
+
+- (void)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didSaveMergeChangesWithNotification:(NSNotification *)notif
+{
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        if (ensemble == ensemble1) {
+            [context1 mergeChangesFromContextDidSaveNotification:notif];
+        }
+        else if (ensemble == ensemble2) {
+            [context2 mergeChangesFromContextDidSaveNotification:notif];
+        }
+    });
 }
 
 - (void)waitForAsync

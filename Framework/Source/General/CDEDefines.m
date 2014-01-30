@@ -18,12 +18,9 @@ void CDESetCurrentLoggingLevel(NSUInteger newLevel)
     currentLoggingLevel = newLevel;
 }
 
-void CDELog(NSUInteger level, NSString *format, ...)
+NSUInteger CDECurrentLoggingLevel(void)
 {
-    va_list arglist;
-    va_start(arglist, format);
-    if (currentLoggingLevel >= level) NSLogv(format, arglist);
-    va_end(arglist);
+    return currentLoggingLevel;
 }
 
 void CDEDispatchCompletionBlockToMainQueue(CDECompletionBlock block, NSError *error)

@@ -9,6 +9,8 @@
 #import "CDEEventStore.h"
 #import "CDEDefines.h"
 #import "CDEStoreModificationEvent.h"
+#import "CDERevisionSet.h"
+#import "CDERevision.h"
 
 
 NSString * const kCDEPersistentStoreIdentifierKey = @"persistentStoreIdentifier";
@@ -27,8 +29,6 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 @property (nonatomic, strong, readonly) NSString *pathToBlobsDirectory;
 @property (nonatomic, strong, readonly) NSString *pathToStoreInfoFile;
 @property (nonatomic, copy, readwrite) NSString *persistentStoreIdentifier;
-@property (nonatomic, assign, readwrite) CDERevisionNumber lastSaveRevision;
-@property (nonatomic, assign, readwrite) CDERevisionNumber lastMergeRevision;
 
 @end
 
@@ -235,9 +235,20 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 
 - (CDERevisionNumber)lastRevision
 {
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"persistentStoreIdentifier = %@", self.persistentStoreIdentifier];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"persistentStoreIdentifier = %@ AND (storeModificationEvent != NIL OR storeModificationEventForOtherStores != NIL)", self.persistentStoreIdentifier];
     CDERevisionNumber result = [self lastRevisionNumberForEventRevisionPredicate:predicate];
     return result;
+}
+
+- (CDERevisionNumber)baselineRevision
+{
+    __block CDERevisionNumber revisionNumber = -1;
+    [managedObjectContext performBlockAndWait:^{
+        CDEStoreModificationEvent *event = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:managedObjectContext];
+        CDERevision *revision = [event.revisionSet revisionForPersistentStoreIdentifier:self.persistentStoreIdentifier];
+        if (revision) revisionNumber = revision.revisionNumber;
+    }];
+    return revisionNumber;
 }
 
 
@@ -247,21 +258,18 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 {
     __block NSString *result = nil;
     [managedObjectContext performBlockAndWait:^{
-        NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
-        fetch.predicate = [NSPredicate predicateWithFormat:@"type = %d", CDEStoreModificationEventTypeBaseline];
-        NSError *error;
-        NSArray *baselines = [managedObjectContext executeFetchRequest:fetch error:&error];
-        if (!baselines) {
-            CDELog(CDELoggingLevelError, @"Failed to retrieve baselines: %@", error);
-        }
-        else if (baselines.count > 1) {
-            CDELog(CDELoggingLevelError, @"Multiple baselines found");
-        }
-        else {
-            result = baselines.lastObject;
-        }
+        CDEStoreModificationEvent *event = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:managedObjectContext];
+        result = event.uniqueIdentifier;
     }];
     return result;
+}
+
+- (void)setPersistentStoreBaselineIdentifier:(NSString *)newId
+{
+    if (![newId isEqualToString:persistentStoreBaselineIdentifier]) {
+        persistentStoreBaselineIdentifier = [newId copy];
+        [self saveStoreMetadata];
+    }
 }
 
 

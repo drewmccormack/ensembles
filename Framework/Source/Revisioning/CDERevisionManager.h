@@ -33,9 +33,13 @@
 - (BOOL)checkAllDependenciesExistForStoreModificationEvents:(NSArray *)events;
 - (BOOL)checkContinuityOfStoreModificationEvents:(NSArray *)events;
 
+- (BOOL)checkRebasingPrerequisitesForEvents:(NSArray *)events error:(NSError * __autoreleasing *)error;
+
 - (CDEGlobalCount)maximumGlobalCount;
 - (CDERevisionSet *)revisionSetOfMostRecentEvents;
 - (NSSet *)allPersistentStoreIdentifiers;
+
+- (CDERevisionSet *)revisionSetForLastMergeOrBaseline;
 
 + (NSArray *)sortStoreModificationEvents:(NSArray *)events;
 

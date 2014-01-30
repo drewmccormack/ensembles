@@ -22,7 +22,7 @@
 - (void)waitForAsyncOpToFinish;
 - (void)stopAsyncOp;
 
-- (void)mergeEventsSinceRevision:(CDERevisionNumber)revision;
+- (void)mergeEvents;
     
 - (void)addEventsFromJSONFile:(NSString *)path;
 

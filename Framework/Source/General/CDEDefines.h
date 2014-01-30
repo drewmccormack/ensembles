@@ -37,11 +37,12 @@ typedef NS_ENUM(NSInteger, CDEErrorCode) {
     CDEErrorCodeDataCorruptionDetected      = 203,
     CDEErrorCodeUnknownModelVersion         = 204,
     CDEErrorCodeStoreUnregistered           = 205,
-    CDEErrorSaveOccurredDuringLeeching      = 206,
+    CDEErrorCodeSaveOccurredDuringLeeching  = 206,
     CDEErrorCodeSaveOccurredDuringMerge     = 207,
+    CDEErrorCodeMissingCloudSnapshot        = 208,
     CDEErrorCodeNetworkError                = 1000,
     CDEErrorCodeServerError                 = 1001,
-    CDEErrorConnectionError                 = 1002,
+    CDEErrorCodeConnectionError             = 1002,
     CDEErrorCodeAuthenticationFailure       = 1003,
     CDEErrorCodeSyncDataWasReset            = 2000,
 };
@@ -56,8 +57,16 @@ typedef NS_ENUM(NSUInteger, CDELoggingLevel) {
     CDELoggingLevelVerbose
 };
 
-void CDELog(NSUInteger level, NSString *format, ...);
+#define CDELog(level, ...)                                                                                  \
+do {                                                                                                        \
+    if (CDECurrentLoggingLevel() >= level) {                                                                \
+        NSLog(@"%s line %d: %@", __PRETTY_FUNCTION__, __LINE__, [NSString stringWithFormat:__VA_ARGS__]);   \
+    }                                                                                                       \
+} while (0)
+
+
 void CDESetCurrentLoggingLevel(NSUInteger newLevel);
+NSUInteger CDECurrentLoggingLevel(void);
 
 
 #pragma mark Callbacks

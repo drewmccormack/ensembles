@@ -38,7 +38,7 @@
 - (void)testDoubleInsert
 {
     [self addEventsForFile:@"DoubleInsertFixture"];
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
     
     NSArray *parents = [self fetchParents];
     XCTAssertEqual(parents.count, (NSUInteger)1, @"Wrong number of parents");
@@ -50,7 +50,7 @@
 - (void)testUpdateFollowingDeletion
 {
     [self addEventsForFile:@"UpdateFollowingDeletion"];
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
     
     NSArray *parents = [self fetchParents];
     XCTAssertEqual(parents.count, (NSUInteger)0, @"Deletion should trump update and there should be no parents left");
@@ -59,7 +59,7 @@
 - (void)testInsertFollowingDeletion
 {
     [self addEventsForFile:@"InsertFollowingDeletion"];
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
     
     NSArray *parents = [self fetchParents];
     XCTAssertEqual(parents.count, (NSUInteger)1, @"New insert should trump deletion");
@@ -68,7 +68,7 @@
 - (void)testUpdateConcurrentWithInsert
 {
     [self addEventsForFile:@"UpdateConcurrentWithInsert"];
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
     
     NSArray *parents = [self fetchParents];
     XCTAssertEqual(parents.count, (NSUInteger)1, @"Should be a parent");
@@ -80,7 +80,7 @@
 - (void)testUpdateToUninserted
 {
     [self addEventsForFile:@"UpdateToUninserted"];
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
     
     NSArray *parents = [self fetchParents];
     XCTAssertEqual(parents.count, (NSUInteger)0, @"No insertion, so should be no object");
@@ -89,7 +89,7 @@
 - (void)testDeleteUninserted
 {
     [self addEventsForFile:@"DeleteUninserted"];
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
     
     NSArray *parents = [self fetchParents];
     XCTAssertEqual(parents.count, (NSUInteger)0, @"No insertion, so should be no object");
@@ -98,7 +98,7 @@
 - (void)testUpdateRelationshipConcurrently
 {
     [self addEventsForFile:@"UpdateRelationshipConcurrently"];
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
     
     NSArray *parents = [self fetchParents];
     XCTAssertEqual(parents.count, (NSUInteger)1, @"Should be a parent");
@@ -110,7 +110,7 @@
 - (void)testUpdateRelationshipConcurrentlyWithDeletion
 {
     [self addEventsForFile:@"UpdateRelationshipConcurrentWithDeletion"];
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
     
     NSArray *parents = [self fetchParents];
     XCTAssertEqual(parents.count, (NSUInteger)0, @"Should be no parent");

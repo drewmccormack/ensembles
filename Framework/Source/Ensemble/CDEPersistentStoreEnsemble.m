@@ -18,6 +18,8 @@
 #import "CDESaveMonitor.h"
 #import "CDEEventIntegrator.h"
 #import "CDEEventBuilder.h"
+#import "CDEBaselineConsolidator.h"
+#import "CDERebaser.h"
 
 static NSString * const kCDEIdentityTokenContext = @"kCDEIdentityTokenContext";
 
@@ -29,6 +31,8 @@ static NSString * const kCDEMergeTaskInfo = @"Merge";
 NSString * const CDEMonitoredManagedObjectContextWillSaveNotification = @"CDEMonitoredManagedObjectContextWillSaveNotification";
 NSString * const CDEMonitoredManagedObjectContextDidSaveNotification = @"CDEMonitoredManagedObjectContextDidSaveNotification";
 NSString * const CDEPersistentStoreEnsembleDidSaveMergeChangesNotification = @"CDEPersistentStoreEnsembleDidSaveMergeChangesNotification";
+
+NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectContextSaveNotification";
 
 
 @interface CDEPersistentStoreEnsemble ()
@@ -44,6 +48,8 @@ NSString * const CDEPersistentStoreEnsembleDidSaveMergeChangesNotification = @"C
 @property (nonatomic, strong, readwrite) CDEEventStore *eventStore;
 @property (nonatomic, strong, readwrite) CDESaveMonitor *saveMonitor;
 @property (nonatomic, strong, readwrite) CDEEventIntegrator *eventIntegrator;
+@property (nonatomic, strong, readwrite) CDEBaselineConsolidator *baselineConsolidator;
+@property (nonatomic, strong, readwrite) CDERebaser *rebaser;
 
 @end
 
@@ -64,6 +70,8 @@ NSString * const CDEPersistentStoreEnsembleDidSaveMergeChangesNotification = @"C
 @synthesize eventIntegrator = eventIntegrator;
 @synthesize managedObjectModel = managedObjectModel;
 @synthesize managedObjectModelURL = managedObjectModelURL;
+@synthesize baselineConsolidator = baselineConsolidator;
+@synthesize rebaser = rebaser;
 
 #pragma mark - Initialization and Deallocation
 
@@ -92,6 +100,9 @@ NSString * const CDEPersistentStoreEnsembleDidSaveMergeChangesNotification = @"C
         
         self.cloudManager = [[CDECloudManager alloc] initWithEventStore:self.eventStore cloudFileSystem:self.cloudFileSystem];
         
+        self.baselineConsolidator = [[CDEBaselineConsolidator alloc] initWithEventStore:self.eventStore];
+        self.rebaser = [[CDERebaser alloc] initWithEventStore:self.eventStore];
+        
         [self performInitialChecks];
     }
     return self;
@@ -119,7 +130,7 @@ NSString * const CDEPersistentStoreEnsembleDidSaveMergeChangesNotification = @"C
     };
     
     self.eventIntegrator.failedSaveBlock = ^(NSManagedObjectContext *savingContext, NSError *error, NSManagedObjectContext *reparationContext) {
-        CDEPersistentStoreEnsemble *strongSelf = weakSelf;
+        __strong typeof(self) strongSelf = weakSelf;
         if ([strongSelf.delegate respondsToSelector:@selector(persistentStoreEnsemble:didFailToSaveMergedChangesInManagedObjectContext:error:reparationManagedObjectContext:)]) {
             return [strongSelf.delegate persistentStoreEnsemble:strongSelf didFailToSaveMergedChangesInManagedObjectContext:savingContext error:error reparationManagedObjectContext:reparationContext];
         }
@@ -127,12 +138,12 @@ NSString * const CDEPersistentStoreEnsembleDidSaveMergeChangesNotification = @"C
     };
     
     self.eventIntegrator.didSaveBlock = ^(NSManagedObjectContext *context, NSDictionary *info) {
-        CDEPersistentStoreEnsemble *strongSelf = weakSelf;
+        __strong typeof(self) strongSelf = weakSelf;
+        NSNotification *notification = [NSNotification notificationWithName:NSManagedObjectContextDidSaveNotification object:context userInfo:info];
         if ([strongSelf.delegate respondsToSelector:@selector(persistentStoreEnsemble:didSaveMergeChangesWithNotification:)]) {
-            NSNotification *notification = [NSNotification notificationWithName:NSManagedObjectContextDidSaveNotification object:context userInfo:info];
             [strongSelf.delegate persistentStoreEnsemble:strongSelf didSaveMergeChangesWithNotification:notification];
-            [[NSNotificationCenter defaultCenter] postNotificationName:CDEPersistentStoreEnsembleDidSaveMergeChangesNotification object:notification];
         }
+        [[NSNotificationCenter defaultCenter] postNotificationName:CDEPersistentStoreEnsembleDidSaveMergeChangesNotification object:strongSelf userInfo:@{CDEManagedObjectContextSaveNotificationKey : notification}];
     };
 }
 
@@ -268,11 +279,30 @@ NSString * const CDEPersistentStoreEnsembleDidSaveMergeChangesNotification = @"C
         [importer importWithCompletion:^(NSError *error) {
             [self endObservingSaveNotifications];
             
-            if (!error && [self.delegate respondsToSelector:@selector(persistentStoreEnsembleDidImportStore:)]) {
-                [self.delegate persistentStoreEnsembleDidImportStore:self];
+            if (nil == error) {
+                // Store baseline
+                self.eventStore.persistentStoreBaselineIdentifier = [self.eventStore currentBaselineIdentifier];
+                
+                // Inform delegate
+                if ([self.delegate respondsToSelector:@selector(persistentStoreEnsembleDidImportStore:)]) {
+                    [self.delegate persistentStoreEnsembleDidImportStore:self];
+                }
             }
             
             next(error, NO);
+        }];
+    };
+    
+    CDEAsynchronousTaskBlock snapshotRemoteFilesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self.cloudManager snapshotRemoteFilesWithCompletion:^(NSError *error) {
+            next(error, NO);
+        }];
+    };
+    
+    CDEAsynchronousTaskBlock exportBaselinesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self.cloudManager exportNewLocalBaselineWithCompletion:^(NSError *error) {
+            if (error) CDELog(CDELoggingLevelError, @"Failed to export baseline file during leech. Continuing regardless.");
+            next(nil, NO); // If the export fails, continue regardless. Not essential.
         }];
     };
     
@@ -280,7 +310,7 @@ NSString * const CDEPersistentStoreEnsembleDidSaveMergeChangesNotification = @"C
         // Deleech if a save occurred during import
         if (saveOccurredDuringImport) {
             NSError *error = nil;
-            error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorSaveOccurredDuringLeeching userInfo:nil];
+            error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeSaveOccurredDuringLeeching userInfo:nil];
             [self performSelector:@selector(forceDeleechDueToError:) withObject:error afterDelay:0.0];
             next(error, NO);
             return;
@@ -293,7 +323,7 @@ NSString * const CDEPersistentStoreEnsembleDidSaveMergeChangesNotification = @"C
         }];
     };
     
-    NSMutableArray *tasks = [NSMutableArray arrayWithObjects:connectTask, remoteStructureTask, eventStoreTask, importTask, completeLeechTask, nil];
+    NSMutableArray *tasks = [NSMutableArray arrayWithObjects:connectTask, remoteStructureTask, eventStoreTask, importTask, snapshotRemoteFilesTask, exportBaselinesTask, completeLeechTask, nil];
     
     if ([self.cloudFileSystem respondsToSelector:@selector(performInitialPreparation:)]) {
         [tasks insertObject:initialPrepTask atIndex:1];
@@ -466,26 +496,86 @@ NSString * const CDEPersistentStoreEnsembleDidSaveMergeChangesNotification = @"C
         next(error, NO);
     };
     
-    CDEAsynchronousTaskBlock importRemoteEventsTask = ^(CDEAsynchronousTaskCallbackBlock next) {
-        [self.cloudManager importNewRemoteEventsWithCompletion:^(NSError *error) {
+    CDEAsynchronousTaskBlock remoteStructureTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self.cloudManager createRemoteDirectoryStructureWithCompletion:^(NSError *error) {
             next(error, NO);
         }];
     };
     
+    CDEAsynchronousTaskBlock snapshotRemoteFilesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self.cloudManager snapshotRemoteFilesWithCompletion:^(NSError *error) {
+            next(error, NO);
+        }];
+    };
+    
+    CDEAsynchronousTaskBlock importBaselinesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self.cloudManager importNewBaselineEventsWithCompletion:^(NSError *error) {
+            if (nil == error) {
+                // Check if store has been 'left behind'. If so, need full integration later
+                if ([self.baselineConsolidator persistentStoreHasBeenAbandoned]) {
+                    self.eventStore.persistentStoreBaselineIdentifier = nil;
+                }
+            }
+            next(error, NO);
+        }];
+    };
+    
+    CDEAsynchronousTaskBlock mergeBaselinesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self.baselineConsolidator consolidateBaselineWithCompletion:^(NSError *error) {
+            next(error, NO);
+        }];
+    };
+    
+    CDEAsynchronousTaskBlock importRemoteEventsTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self.cloudManager importNewRemoteNonBaselineEventsWithCompletion:^(NSError *error) {
+            next(error, NO);
+        }];
+    };
+    
+    CDEAsynchronousTaskBlock removeOutdatedEventsTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self.rebaser deleteEventsPreceedingBaselineWithCompletion:^(NSError *error) {
+            next(error, NO);
+        }];
+    };
+    
+    CDEAsynchronousTaskBlock rebaseTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        if ([self.rebaser shouldRebase]) {
+            [self.rebaser rebaseWithCompletion:^(NSError *error) {
+                next(error, NO);
+            }];
+        }
+        else {
+            next(nil, NO);
+        }
+    };
+    
     CDEAsynchronousTaskBlock mergeEventsTask = ^(CDEAsynchronousTaskCallbackBlock next) {
-        CDERevisionNumber lastMerge = [self.eventStore lastMergeRevision];
-        [self.eventIntegrator mergeEventsImportedSinceRevision:lastMerge completion:^(NSError *error) {
+        [self.eventIntegrator mergeEventsWithCompletion:^(NSError *error) {
+            // Store baseline id if everything went well
+            if (nil == error) self.eventStore.persistentStoreBaselineIdentifier = [self.eventStore currentBaselineIdentifier];
+            next(error, NO);
+        }];
+    };
+    
+    CDEAsynchronousTaskBlock exportBaselinesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self.cloudManager exportNewLocalBaselineWithCompletion:^(NSError *error) {
             next(error, NO);
         }];
     };
     
     CDEAsynchronousTaskBlock exportEventsTask = ^(CDEAsynchronousTaskCallbackBlock next) {
-        [self.cloudManager exportNewLocalEventsWithCompletion:^(NSError *error) {
+        [self.cloudManager exportNewLocalNonBaselineEventsWithCompletion:^(NSError *error) {
             next(error, NO);
         }];
     };
     
-    NSArray *tasks = @[checkIdentityTask, checkRegistrationTask, processChangesTask, importRemoteEventsTask, mergeEventsTask, exportEventsTask];
+    CDEAsynchronousTaskBlock removeRemoteFiles = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self.cloudManager removeOutdatedRemoteFilesWithCompletion:^(NSError *error) {
+            next(error, NO);
+        }];
+    };
+    
+    NSArray *tasks = @[checkIdentityTask, checkRegistrationTask, processChangesTask, remoteStructureTask, snapshotRemoteFilesTask, importBaselinesTask, mergeBaselinesTask, importRemoteEventsTask, removeOutdatedEventsTask, rebaseTask, mergeEventsTask, exportBaselinesTask, exportEventsTask, removeRemoteFiles];
     CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:tasks terminationPolicy:CDETaskQueueTerminationPolicyStopOnError completion:^(NSError *error) {
         [self dispatchCompletion:completion withError:error];
         [self.eventIntegrator stopMonitoringSaves];

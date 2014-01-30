@@ -37,6 +37,7 @@
     [moc performBlockAndWait:^{
         modEvent = [NSEntityDescription insertNewObjectForEntityForName:@"CDEStoreModificationEvent" inManagedObjectContext:moc];
         modEvent.timestamp = 123;
+        modEvent.type = CDEStoreModificationEventTypeMerge;
         
         CDEEventRevision *revision = [NSEntityDescription insertNewObjectForEntityForName:@"CDEEventRevision" inManagedObjectContext:moc];
         revision.persistentStoreIdentifier = [self.eventStore persistentStoreIdentifier];
@@ -102,7 +103,7 @@
 - (void)migrateToFileFromRevision:(CDERevisionNumber)rev
 {
     finishedAsyncOp = NO;
-    [migrator migrateLocalEventsSinceRevision:rev toFile:exportedEventsFile completion:^(NSError *error) {
+    [migrator migrateNonBaselineEventsSinceRevision:rev toFile:exportedEventsFile completion:^(NSError *error) {
         finishedAsyncOp = YES;
         XCTAssertNil(error, @"Error migrating to file");
     }];
@@ -187,6 +188,7 @@
         // In the past, this caused the migration to pull in extra events. This shouldn't happen.
         CDEStoreModificationEvent *extraEvent = [NSEntityDescription insertNewObjectForEntityForName:@"CDEStoreModificationEvent" inManagedObjectContext:moc];
         extraEvent.timestamp = 124;
+        extraEvent.type = CDEStoreModificationEventTypeSave;
         
         CDEEventRevision *revision = [NSEntityDescription insertNewObjectForEntityForName:@"CDEEventRevision" inManagedObjectContext:moc];
         revision.persistentStoreIdentifier = [self.eventStore persistentStoreIdentifier];
@@ -204,7 +206,8 @@
     }];
     
     finishedAsyncOp = NO;
-    [migrator migrateLocalEventWithRevision:0 toFile:exportedEventsFile completion:^(NSError *error) {
+    NSArray *types = @[@(CDEStoreModificationEventTypeMerge), @(CDEStoreModificationEventTypeSave)];
+    [migrator migrateLocalEventWithRevision:0 toFile:exportedEventsFile allowedTypes:types completion:^(NSError *error) {
         finishedAsyncOp = YES;
         XCTAssertNil(error, @"Error migrating to file");
     }];
@@ -232,7 +235,7 @@
 
 - (void)testReimportAddsNoNewEvents
 {
-    [migrator migrateLocalEventsSinceRevision:-1 toFile:exportedEventsFile completion:^(NSError *error) {
+    [migrator migrateNonBaselineEventsSinceRevision:-1 toFile:exportedEventsFile completion:^(NSError *error) {
         finishedAsyncOp = YES;
         XCTAssertNil(error, @"Error migrating to file");
     }];

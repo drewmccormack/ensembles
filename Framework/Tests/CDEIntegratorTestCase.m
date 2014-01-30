@@ -43,9 +43,9 @@
     CFRunLoopStop(CFRunLoopGetCurrent());
 }
 
-- (void)mergeEventsSinceRevision:(CDERevisionNumber)revision
+- (void)mergeEvents
 {
-    [integrator mergeEventsImportedSinceRevision:revision completion:^(NSError *error) {
+    [integrator mergeEventsWithCompletion:^(NSError *error) {
         [self stopAsyncOp];
     }];
     [self waitForAsyncOpToFinish];

@@ -31,10 +31,10 @@ typedef void (^CDEEventIntegratorDidSaveBlock)(NSManagedObjectContext *savingCon
 
 - (instancetype)initWithStoreURL:(NSURL *)newStoreURL managedObjectModel:(NSManagedObjectModel *)model eventStore:(CDEEventStore *)newEventStore;
 
+- (void)mergeEventsWithCompletion:(CDECompletionBlock)completion;
+
 - (void)startMonitoringSaves;
 - (void)stopMonitoringSaves;
-
-- (void)mergeEventsImportedSinceRevision:(CDERevisionNumber)revisionNumber completion:(CDECompletionBlock)completion;
 
 @end
 

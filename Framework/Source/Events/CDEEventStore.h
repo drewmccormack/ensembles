@@ -27,6 +27,7 @@
 @property (nonatomic, assign, readonly) CDERevisionNumber lastSaveRevision;
 @property (nonatomic, assign, readonly) CDERevisionNumber lastMergeRevision;
 @property (nonatomic, assign, readonly) CDERevisionNumber lastRevision;
+@property (nonatomic, assign, readonly) CDERevisionNumber baselineRevision;
 
 @property (nonatomic, copy, readwrite) NSString *persistentStoreBaselineIdentifier;
 @property (nonatomic, copy, readonly) NSString *currentBaselineIdentifier;

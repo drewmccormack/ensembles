@@ -40,12 +40,12 @@ static NSString *kCDEDefaultStoreType;
     return self;
 }
 
-- (void)migrateLocalEventWithRevision:(CDERevisionNumber)revisionNumber toFile:(NSString *)path completion:(CDECompletionBlock)completion
+- (void)migrateLocalEventWithRevision:(CDERevisionNumber)revisionNumber toFile:(NSString *)path allowedTypes:(NSArray *)types completion:(CDECompletionBlock)completion
 {
     [eventStore.managedObjectContext performBlock:^{
         NSError *error = nil;
         CDEStoreModificationEvent *event = nil;
-        event = [self localEventWithRevisionNumber:revisionNumber error:&error];
+        event = [CDEStoreModificationEvent fetchStoreModificationEventWithAllowedTypes:types persistentStoreIdentifier:eventStore.persistentStoreIdentifier revisionNumber:revisionNumber inManagedObjectContext:eventStore.managedObjectContext];
         if (!event) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (completion) completion(error);
@@ -57,7 +57,25 @@ static NSString *kCDEDefaultStoreType;
     }];
 }
 
-- (void)migrateLocalEventsSinceRevision:(CDERevisionNumber)revision toFile:(NSString *)path completion:(CDECompletionBlock)completion
+- (void)migrateLocalBaselineWithUniqueIdentifier:(NSString *)uniqueId globalCount:(CDEGlobalCount)count toFile:(NSString *)path completion:(CDECompletionBlock)completion
+{
+    [eventStore.managedObjectContext performBlock:^{
+        NSError *error = nil;
+        CDEStoreModificationEvent *baseline = nil;
+        baseline = [CDEStoreModificationEvent fetchStoreModificationEventWithUniqueIdentifier:uniqueId globalCount:count inManagedObjectContext:eventStore.managedObjectContext];
+        if (!baseline) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (completion) completion(error);
+            });
+        }
+        else {
+            NSAssert(baseline.type == CDEStoreModificationEventTypeBaseline, @"Wrong event type for baseline");
+            [self migrateStoreModificationEvents:@[baseline] toFile:path completion:completion];
+        }
+    }];
+}
+
+- (void)migrateNonBaselineEventsSinceRevision:(CDERevisionNumber)revision toFile:(NSString *)path completion:(CDECompletionBlock)completion
 {
     [eventStore.managedObjectContext performBlock:^{
         NSError *error = nil;
@@ -240,14 +258,6 @@ static NSString *kCDEDefaultStoreType;
     return migratedObject;
 }
 
-- (CDEStoreModificationEvent *)localEventWithRevisionNumber:(CDERevisionNumber)revisionNumber error:(NSError * __autoreleasing *)error
-{
-    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
-    fetch.predicate = [NSPredicate predicateWithFormat:@"eventRevision.revisionNumber = %lld AND eventRevision.persistentStoreIdentifier = %@ && type != %d", revisionNumber, eventStore.persistentStoreIdentifier, CDEStoreModificationEventTypeBaseline];
-    NSArray *storeModEvents = [eventStore.managedObjectContext executeFetchRequest:fetch error:error];
-    return [storeModEvents lastObject];
-}
-
 - (NSArray *)storeModificationEventsCreatedLocallySinceRevisionNumber:(CDERevisionNumber)revisionNumber error:(NSError * __autoreleasing *)error
 {
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
@@ -301,8 +311,8 @@ static NSString *kCDEDefaultStoreType;
     
     NSMapTable *toObjectByFromObject = [NSMapTable strongToStrongObjectsMapTable];
     for (id uniqueValue in fromStoreObjectsByUniqueValue) {
-        CDEGlobalIdentifier *toContextObject = toStoreObjectsByUniqueValue[uniqueValue];
-        CDEGlobalIdentifier *fromContextObject = fromStoreObjectsByUniqueValue[uniqueValue];
+        NSManagedObject *toContextObject = toStoreObjectsByUniqueValue[uniqueValue];
+        NSManagedObject *fromContextObject = fromStoreObjectsByUniqueValue[uniqueValue];
         
         if (toContextObject) {
             [toObjectByFromObject setObject:toContextObject forKey:fromContextObject];

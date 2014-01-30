@@ -24,14 +24,14 @@
     // Add first event
     NSString *path = [[NSBundle bundleForClass:self.class] pathForResource:@"IntegratorUpdateTestsFixture1" ofType:@"json"];
     [self addEventsFromJSONFile:path];
-    [self mergeEventsSinceRevision:-1];
+    [self mergeEvents];
     [self.testManagedObjectContext save:NULL];
     [self.testManagedObjectContext reset];
 
     // Add other events
     path = [[NSBundle bundleForClass:self.class] pathForResource:@"IntegratorUpdateTestsFixture2" ofType:@"json"];
     [self addEventsFromJSONFile:path];
-    [self mergeEventsSinceRevision:0];
+    [self mergeEvents];
     [self.testManagedObjectContext save:NULL];
     [self.testManagedObjectContext reset];
     
