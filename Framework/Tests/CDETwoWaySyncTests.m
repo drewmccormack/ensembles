@@ -7,12 +7,21 @@
 //
 
 #import "CDESyncTest.h"
+#import "CDEPersistentStoreEnsemble.h"
 
-@interface CDETwoWaySyncTests : CDESyncTest
+@interface CDETwoWaySyncTests : CDESyncTest <CDEPersistentStoreEnsembleDelegate>
 
 @end
 
-@implementation CDETwoWaySyncTests
+@implementation CDETwoWaySyncTests {
+    BOOL shouldFailMerge;
+}
+
+- (void)setUp
+{
+    [super setUp];
+    shouldFailMerge = NO;
+}
 
 - (void)testUpdateAttributeOnSecondDevice
 {
@@ -64,6 +73,79 @@
     
     XCTAssertEqualObjects([parentOnDevice1 valueForKey:@"name"], @"dave", @"Wrong name on device 1");
     XCTAssertEqualObjects([parentOnDevice2 valueForKey:@"name"], @"dave", @"Wrong name on device 2");
+}
+
+- (void)testConcurrentInsertsOfSameObject
+{
+    [self leechStores];
+    
+    ensemble1.delegate = self;
+    ensemble2.delegate = self;
+    
+    id parent1 = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context1];
+    NSDate *date = [NSDate dateWithTimeIntervalSinceReferenceDate:10.0];
+    [parent1 setValue:@"bob" forKey:@"name"];
+    [parent1 setValue:date forKey:@"date"];
+    XCTAssertTrue([context1 save:NULL], @"Could not save");
+    
+    id parent2 = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context2];
+    [parent2 setValue:@"bob" forKey:@"name"];
+    [parent2 setValue:date forKey:@"date"];
+    XCTAssertTrue([context2 save:NULL], @"Could not save");
+    
+    XCTAssertNil([self syncChanges], @"Sync failed");
+    
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
+    NSArray *parents = [context2 executeFetchRequest:fetch error:NULL];
+    XCTAssertEqual(parents.count, (NSUInteger)1, @"Wrong number of parents found");
+    
+    parents = [context1 executeFetchRequest:fetch error:NULL];
+    XCTAssertEqual(parents.count, (NSUInteger)1, @"Wrong number of parents found");
+}
+
+- (void)testConcurrentInsertsOfSameObjectWithInterruptedMerge
+{
+    [self leechStores];
+    
+    ensemble1.delegate = self;
+    ensemble2.delegate = self;
+    
+    id parent1 = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context1];
+    NSDate *date = [NSDate dateWithTimeIntervalSinceReferenceDate:10.0];
+    [parent1 setValue:@"bob" forKey:@"name"];
+    [parent1 setValue:date forKey:@"date"];
+    XCTAssertTrue([context1 save:NULL], @"Could not save");
+    
+    id parent2 = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context2];
+    [parent2 setValue:@"bob" forKey:@"name"];
+    [parent2 setValue:date forKey:@"date"];
+    XCTAssertTrue([context2 save:NULL], @"Could not save");
+    
+    [self mergeEnsemble:ensemble1];
+    
+    shouldFailMerge = YES;
+    [self mergeEnsemble:ensemble2];
+    shouldFailMerge = NO;
+    [self mergeEnsemble:ensemble2];
+    
+    [self mergeEnsemble:ensemble1];
+    
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
+    NSArray *parents = [context2 executeFetchRequest:fetch error:NULL];
+    XCTAssertEqual(parents.count, (NSUInteger)1, @"Wrong number of parents found");
+    
+    parents = [context1 executeFetchRequest:fetch error:NULL];
+    XCTAssertEqual(parents.count, (NSUInteger)1, @"Wrong number of parents found");
+}
+
+- (NSArray *)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble globalIdentifiersForManagedObjects:(NSArray *)objects
+{
+    return [objects valueForKeyPath:@"name"];
+}
+
+- (BOOL)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble shouldSaveMergedChangesInManagedObjectContext:(NSManagedObjectContext *)savingContext reparationManagedObjectContext:(NSManagedObjectContext *)reparationContext
+{
+    return !shouldFailMerge;
 }
 
 - (void)testUpdateToOneRelationship

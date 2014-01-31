@@ -139,7 +139,7 @@
         // Retrieve existing global identifiers
         NSArray *existingGlobalIdentifiers = nil;
         if (globalIdStrings) {
-            [CDEGlobalIdentifier fetchGlobalIdentifiersForIdentifierStrings:globalIdStrings withEntityNames:entityNames inManagedObjectContext:eventManagedObjectContext];
+            existingGlobalIdentifiers = [CDEGlobalIdentifier fetchGlobalIdentifiersForIdentifierStrings:globalIdStrings withEntityNames:entityNames inManagedObjectContext:eventManagedObjectContext];
         }
         
         // Make global ids for all objects first before creating object changes.

@@ -10,7 +10,7 @@
 #import "CDEPersistentStoreEnsemble.h"
 #import "CDELocalCloudFileSystem.h"
 
-@interface CDEOneWaySyncTests : CDESyncTest
+@interface CDEOneWaySyncTests : CDESyncTest <CDEPersistentStoreEnsembleDelegate>
 
 @end
 
