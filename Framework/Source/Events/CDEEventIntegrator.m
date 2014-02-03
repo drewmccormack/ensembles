@@ -112,16 +112,18 @@
 - (void)startMonitoringSaves
 {
     [self stopMonitoringSaves];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contextWillSave:) name:NSManagedObjectContextWillSaveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contextSaving:) name:NSManagedObjectContextWillSaveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contextSaving:) name:NSManagedObjectContextDidSaveNotification object:nil];
 }
 
 - (void)stopMonitoringSaves
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextWillSaveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:nil];
     saveOccurredDuringMerge = NO;
 }
 
-- (void)contextWillSave:(NSNotification *)notif
+- (void)contextSaving:(NSNotification *)notif
 {
     NSManagedObjectContext *context = notif.object;
     if (self.managedObjectContext == context) return;
