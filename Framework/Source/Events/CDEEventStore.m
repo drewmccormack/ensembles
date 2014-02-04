@@ -367,6 +367,14 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
     NSString *path = [self pathToEventStoreRootDirectory];
     if (![self createDirectoryIfNecessary:path error:error]) return NO;
     
+    // Prevent event store being backed up
+    if (NSURLIsExcludedFromBackupKey) {
+        NSURL *url = [NSURL fileURLWithPath:path];
+        NSError *metadataError;
+        BOOL success = [url setResourceValue:@YES forKey:NSURLIsExcludedFromBackupKey error:&metadataError];
+        if (!success) CDELog(CDELoggingLevelWarning, @"Could not exclude event store directory from backup");
+    }
+        
     return YES;
 }
 
