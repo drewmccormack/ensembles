@@ -475,6 +475,14 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
         return;
     }
     
+    NSFileManager *fileManager = [[NSFileManager alloc] init];
+    if (![fileManager fileExistsAtPath:storePath]) {
+        NSError *error = nil;
+        error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeMissingStore userInfo:nil];
+        [self dispatchCompletion:completion withError:error];
+        return;
+    }
+    
     self.merging = YES;
     [self.eventIntegrator startMonitoringSaves]; // Will cancel merge if save occurs
 
