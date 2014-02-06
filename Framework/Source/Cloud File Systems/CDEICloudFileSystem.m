@@ -188,11 +188,10 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
 - (void)startMonitoringMetadata
 {
     [self stopMonitoring];
- 
     if (!rootDirectoryURL) return;
     
     didStartDownloading = NO;
-    
+
     // Determine downloading key and set the appropriate predicate. This is OS dependent.
     NSPredicate *metadataPredicate = nil;
 
@@ -205,13 +204,12 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
 #endif
     
     metadataQuery = [[NSMetadataQuery alloc] init];
-    metadataQuery.notificationBatchingInterval = 0.0;
     metadataQuery.searchScopes = [NSArray arrayWithObject:NSMetadataQueryUbiquitousDataScope];
     metadataQuery.predicate = metadataPredicate;
     
     NSNotificationCenter *notifationCenter = [NSNotificationCenter defaultCenter];
-    [notifationCenter addObserver:self selector:@selector(initiateDownloads:) name:NSMetadataQueryDidFinishGatheringNotification object:metadataQuery];
-    [notifationCenter addObserver:self selector:@selector(initiateDownloads:) name:NSMetadataQueryDidUpdateNotification object:metadataQuery];
+    [notifationCenter addObserver:self selector:@selector(metadataQueryDidFinishGathering:) name:NSMetadataQueryDidFinishGatheringNotification object:metadataQuery];
+    [notifationCenter addObserver:self selector:@selector(metadataQueryDidUpdate:) name:NSMetadataQueryDidUpdateNotification object:metadataQuery];
     
     [metadataQuery startQuery];
 }
@@ -229,10 +227,24 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
     metadataQuery = nil;
 }
 
-- (void)initiateDownloads:(NSNotification *)notif
+- (void)metadataQueryDidFinishGathering:(NSNotification *)notif
 {
     [metadataQuery disableUpdates];
-    
+    [self initiateDownloads];
+    [metadataQuery enableUpdates];
+}
+
+- (void)metadataQueryDidUpdate:(NSNotification *)notif
+{
+    // Need to stop and restart the query, because for some reason, NSMetadataQuery
+    // does not remove results that no longer meet the criteria
+    [metadataQuery stopQuery];
+    [self initiateDownloads];
+    [metadataQuery startQuery];
+}
+
+- (void)initiateDownloads
+{
     // If there were downloads, and aren't anymore, fire notification
     NSUInteger count = [metadataQuery resultCount];
     if (didStartDownloading && count == 0) {
@@ -252,8 +264,6 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
             });
         }
     }
-
-    [metadataQuery enableUpdates];
 }
 
 #pragma mark - File Operations
