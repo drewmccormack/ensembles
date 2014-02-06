@@ -28,7 +28,6 @@
 
 @implementation CDEEventIntegrator {
     CDECompletionBlock completion;
-    NSManagedObjectContext *eventStoreChildContext;
     NSDictionary *saveInfoDictionary;
     dispatch_queue_t queue;
     id eventStoreChildContextSaveObserver;
@@ -147,13 +146,6 @@
     
     completion = [newCompletion copy];
     
-    // Setup child context of the event store
-    eventStoreChildContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
-    [eventStoreChildContext performBlockAndWait:^{
-        eventStoreChildContext.parentContext = eventStore.managedObjectContext;
-        eventStoreChildContext.undoManager = nil;
-    }];
-    
     // Setup a context for accessing the main store
     NSError *error;
     NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:managedObjectModel];
@@ -168,6 +160,8 @@
         self.managedObjectContext.persistentStoreCoordinator = coordinator;
         self.managedObjectContext.undoManager = nil;
     }];
+    
+    NSManagedObjectContext *eventStoreContext = self.eventStore.managedObjectContext;
     
     // Integrate on background queue
     dispatch_async(queue,^{
@@ -192,18 +186,18 @@
             }
             
             // Create a merge event
-            CDEEventBuilder *eventBuilder = [[CDEEventBuilder alloc] initWithEventStore:self.eventStore eventManagedObjectContext:eventStoreChildContext];
+            CDEEventBuilder *eventBuilder = [[CDEEventBuilder alloc] initWithEventStore:self.eventStore];
             eventBuilder.ensemble = self.ensemble;
             CDERevision *revision = [eventBuilder makeNewEventOfType:CDEStoreModificationEventTypeMerge];
             
             // Get unique id of event
             __block NSString *newEventId = nil;
-            [eventStoreChildContext performBlockAndWait:^{
+            [eventStoreContext performBlockAndWait:^{
                 newEventId = [eventBuilder.event.uniqueIdentifier copy];
             }];
             
             // Register event in case of crashes
-            [self.eventStore registerIncompleteEventIdentifier:eventBuilder.event.uniqueIdentifier isMandatory:NO];
+            [self.eventStore registerIncompleteEventIdentifier:newEventId isMandatory:NO];
             
             // Repair inconsistencies caused by integration
             BOOL repairSucceeded = [self repairWithMergeEventBuilder:eventBuilder error:&error];
@@ -219,43 +213,30 @@
                 return;
             }
             
-            // Save changes in child event context. First save child, then parent.
-            __block BOOL eventSaveSucceeded = YES;
-            [eventStoreChildContext performBlockAndWait:^{
-                hasChanges = eventStoreChildContext.hasChanges;
-                if (hasChanges) eventSaveSucceeded = [eventStoreChildContext save:&error];
+            // Save changes event context. First save child, then parent.
+            __block BOOL eventSaveSucceeded = NO;
+            [eventStoreContext performBlockAndWait:^{
+                BOOL isUnique = [self checkUniquenessOfEventWithRevision:revision];
+                if (!isUnique) {
+                    // Some other event must have been saved with same revision. Delete and fail.
+                    CDEStoreModificationEvent *event = [CDEStoreModificationEvent fetchStoreModificationEventWithUniqueIdentifier:newEventId inManagedObjectContext:eventStoreContext];
+                    [eventStoreContext deleteObject:event];
+                    eventSaveSucceeded = NO;
+                }
+                hasChanges = eventStoreContext.hasChanges;
+                if (hasChanges && isUnique) eventSaveSucceeded = [eventStoreContext save:&error];
             }];
+            if (!eventSaveSucceeded) {
+                [self failWithError:error];
+                return;
+            }
             if (!hasChanges) {
                 [self completeSuccessfully];
                 return;
             }
-            if (!eventSaveSucceeded) {
-                [self failWithError:error];
-                return;
-            }
-            
-            // Save parent event context
-            NSManagedObjectContext *eventStoreContext = self.eventStore.managedObjectContext;
-            [eventStoreContext performBlockAndWait:^{
-                // Check that the revision is unique. Perhaps a save occurred concurrently.
-                BOOL isUnique = [self checkUniquenessOfEventWithRevision:revision];
-                if (!isUnique) {
-                    CDEStoreModificationEvent *event = [CDEStoreModificationEvent fetchStoreModificationEventWithUniqueIdentifier:newEventId inManagedObjectContext:eventStoreContext];
-                    [eventStoreContext deleteObject:event];
-                    eventSaveSucceeded = NO;
-                    return;
-                }
-                
-                // Save
-                eventSaveSucceeded = [self.eventStore.managedObjectContext save:&error];
-            }];
-            if (!eventSaveSucceeded) {
-                [self failWithError:error];
-                return;
-            }
-            
+
             // Deregister event
-            [self.eventStore deregisterIncompleteEventIdentifier:eventBuilder.event.uniqueIdentifier];
+            [self.eventStore deregisterIncompleteEventIdentifier:newEventId];
             
             // Notify of save
             if (didSaveBlock) didSaveBlock(managedObjectContext, saveInfoDictionary);
@@ -301,7 +282,7 @@
 {
     CDELog(CDELoggingLevelVerbose, @"Integrating new events into main context");
 
-    CDERevisionManager *revisionManager = [[CDERevisionManager alloc] initWithEventStore:self.eventStore eventManagedObjectContext:eventStoreChildContext];
+    CDERevisionManager *revisionManager = [[CDERevisionManager alloc] initWithEventStore:self.eventStore];
     revisionManager.managedObjectModelURL = self.ensemble.managedObjectModelURL;
     
     // Check prerequisites
@@ -311,13 +292,14 @@
     // Move to the child event store queue
     __block BOOL success = YES;
     BOOL needFullIntegration = [self needsFullIntegration];
-    [eventStoreChildContext performBlockAndWait:^{
+    NSManagedObjectContext *eventStoreContext = self.eventStore.managedObjectContext;
+    [eventStoreContext performBlockAndWait:^{
         // Get events
         NSArray *storeModEvents = nil;
         if (needFullIntegration) {
             // All events, including baseline
-            NSMutableArray *events = [[CDEStoreModificationEvent fetchNonBaselineEventsInManagedObjectContext:eventStoreChildContext] mutableCopy];
-            CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:eventStoreChildContext];
+            NSMutableArray *events = [[CDEStoreModificationEvent fetchNonBaselineEventsInManagedObjectContext:eventStoreContext] mutableCopy];
+            CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:eventStoreContext];
             if (baseline) [events insertObject:baseline atIndex:0];
             storeModEvents = events;
         }
@@ -834,7 +816,7 @@
     return merged;
 }
 
-// Call on event child context queue
+// Call on event context queue
 - (NSArray *)fetchObjectChangesOfType:(CDEObjectChangeType)type fromStoreModificationEvents:(id <NSFastEnumeration>)events forEntity:(NSEntityDescription *)entity error:(NSError * __autoreleasing *)error;
 {
     NSArray *result = nil;
@@ -843,7 +825,7 @@
         fetch.predicate = [NSPredicate predicateWithFormat:@"nameOfEntity = %@ && type = %d && storeModificationEvent in %@", entity.name, type, events];
         fetch.sortDescriptors = [self objectChangeSortDescriptors];
         fetch.relationshipKeyPathsForPrefetching = @[@"globalIdentifier"];
-        result = [eventStoreChildContext executeFetchRequest:fetch error:error];
+        result = [self.eventStore.managedObjectContext executeFetchRequest:fetch error:error];
     }
     return result;
 }
@@ -947,7 +929,7 @@
     }
     
     NSArray *objectIDs = [relatedObjects valueForKeyPath:@"objectID"];
-    NSArray *globalIds = [CDEGlobalIdentifier fetchGlobalIdentifiersForObjectIDs:objectIDs inManagedObjectContext:eventStoreChildContext];
+    NSArray *globalIds = [CDEGlobalIdentifier fetchGlobalIdentifiersForObjectIDs:objectIDs inManagedObjectContext:self.eventStore.managedObjectContext];
 
     NSMapTable *relatedObjectsByGlobalId = [NSMapTable strongToStrongObjectsMapTable];
     [relatedObjects enumerateObjectsUsingBlock:^(id object, NSUInteger index, BOOL *stop) {
@@ -984,7 +966,7 @@
     NSError *error;
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEGlobalIdentifier"];
     fetch.predicate = [NSPredicate predicateWithFormat:@"globalIdentifier IN %@", idStrings];
-    NSArray *globalIds = [eventStoreChildContext executeFetchRequest:fetch error:&error];
+    NSArray *globalIds = [self.eventStore.managedObjectContext executeFetchRequest:fetch error:&error];
     if (!globalIds) NSLog(@"Error fetching ids: %@", error);
     return globalIds;
 }
