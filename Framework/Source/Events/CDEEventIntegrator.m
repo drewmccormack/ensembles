@@ -31,6 +31,7 @@
     NSDictionary *saveInfoDictionary;
     dispatch_queue_t queue;
     id eventStoreChildContextSaveObserver;
+    NSString *newEventUniqueId;
     BOOL saveOccurredDuringMerge;
 }
 
@@ -64,23 +65,6 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver:eventStoreChildContextSaveObserver];
     [self stopMonitoringSaves];
-}
-
-
-#pragma mark Completing
-
-- (void)failWithError:(NSError *)error
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (completion) completion(error);
-    });
-}
-
-- (void)completeSuccessfully
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (completion) completion(nil);
-    });
 }
 
 
@@ -145,6 +129,7 @@
     NSAssert([NSThread isMainThread], @"mergeEvents... called off main thread");
     
     completion = [newCompletion copy];
+    newEventUniqueId = nil;
     
     // Setup a context for accessing the main store
     NSError *error;
@@ -191,13 +176,12 @@
             CDERevision *revision = [eventBuilder makeNewEventOfType:CDEStoreModificationEventTypeMerge];
             
             // Get unique id of event
-            __block NSString *newEventId = nil;
             [eventStoreContext performBlockAndWait:^{
-                newEventId = [eventBuilder.event.uniqueIdentifier copy];
+                newEventUniqueId = [eventBuilder.event.uniqueIdentifier copy];
             }];
             
             // Register event in case of crashes
-            [self.eventStore registerIncompleteEventIdentifier:newEventId isMandatory:NO];
+            [self.eventStore registerIncompleteEventIdentifier:newEventUniqueId isMandatory:NO];
             
             // Repair inconsistencies caused by integration
             BOOL repairSucceeded = [self repairWithMergeEventBuilder:eventBuilder error:&error];
@@ -217,27 +201,16 @@
             __block BOOL eventSaveSucceeded = NO;
             [eventStoreContext performBlockAndWait:^{
                 BOOL isUnique = [self checkUniquenessOfEventWithRevision:revision];
-                if (!isUnique) {
-                    // Some other event must have been saved with same revision. Delete and fail.
-                    CDEStoreModificationEvent *event = [CDEStoreModificationEvent fetchStoreModificationEventWithUniqueIdentifier:newEventId inManagedObjectContext:eventStoreContext];
-                    [eventStoreContext deleteObject:event];
-                    eventSaveSucceeded = NO;
-                }
-                hasChanges = eventStoreContext.hasChanges;
-                if (hasChanges && isUnique) eventSaveSucceeded = [eventStoreContext save:&error];
+                if (isUnique)
+                    eventSaveSucceeded = [eventStoreContext save:&error];
+                else
+                    error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeSaveOccurredDuringMerge userInfo:nil];
             }];
             if (!eventSaveSucceeded) {
                 [self failWithError:error];
                 return;
             }
-            if (!hasChanges) {
-                [self completeSuccessfully];
-                return;
-            }
 
-            // Deregister event
-            [self.eventStore deregisterIncompleteEventIdentifier:newEventId];
-            
             // Notify of save
             if (didSaveBlock) didSaveBlock(managedObjectContext, saveInfoDictionary);
             saveInfoDictionary = nil;
@@ -265,6 +238,38 @@
 }
 
 
+#pragma mark Completing Merge
+
+- (void)failWithError:(NSError *)error
+{
+    NSManagedObjectContext *eventContext = self.eventStore.managedObjectContext;
+    if (newEventUniqueId) {
+        [eventContext performBlockAndWait:^{
+            CDEStoreModificationEvent *event = [CDEStoreModificationEvent fetchStoreModificationEventWithUniqueIdentifier:newEventUniqueId inManagedObjectContext:eventContext];
+            if (event) {
+                [eventContext deleteObject:event];
+                [eventContext save:NULL];
+            }
+        }];
+    }
+    if (newEventUniqueId) [self.eventStore deregisterIncompleteEventIdentifier:newEventUniqueId];
+    newEventUniqueId = nil;
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (completion) completion(error);
+    });
+}
+
+- (void)completeSuccessfully
+{
+    if (newEventUniqueId) [self.eventStore deregisterIncompleteEventIdentifier:newEventUniqueId];
+    newEventUniqueId = nil;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (completion) completion(nil);
+    });
+}
+
+
 #pragma mark Integrating Changes
 
 - (BOOL)needsFullIntegration
@@ -289,7 +294,7 @@
     BOOL canIntegrate = [revisionManager checkIntegrationPrequisites:error];
     if (!canIntegrate) return NO;
     
-    // Move to the child event store queue
+    // Move to the event store queue
     __block BOOL success = YES;
     BOOL needFullIntegration = [self needsFullIntegration];
     NSManagedObjectContext *eventStoreContext = self.eventStore.managedObjectContext;
