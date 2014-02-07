@@ -22,7 +22,8 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
     dispatch_queue_t timeOutQueue;
     dispatch_queue_t initiatingDownloadsQueue;
     id ubiquityIdentityObserver;
-    BOOL didStartDownloading;
+    NSUInteger numberOfUnfinishedDownloads;
+    NSOperationQueue *downloadTrackingQueue;
 }
 
 - (instancetype)initWithUbiquityContainerIdentifier:(NSString *)newIdentifier
@@ -34,6 +35,9 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
         operationQueue = [[NSOperationQueue alloc] init];
         operationQueue.maxConcurrentOperationCount = 1;
         
+        downloadTrackingQueue = [[NSOperationQueue alloc] init];
+        downloadTrackingQueue.maxConcurrentOperationCount = 1;
+        
         timeOutQueue = dispatch_queue_create("com.mentalfaculty.ensembles.queue.icloudtimeout", DISPATCH_QUEUE_SERIAL);
         initiatingDownloadsQueue = dispatch_queue_create("com.mentalfaculty.ensembles.queue.initiatedownloads", DISPATCH_QUEUE_SERIAL);
         
@@ -41,7 +45,6 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
         metadataQuery = nil;
         ubiquityContainerIdentifier = [newIdentifier copy];
         ubiquityIdentityObserver = nil;
-        didStartDownloading = NO;
         
         [self performInitialPreparation:NULL];
     }
@@ -190,11 +193,9 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
     [self stopMonitoring];
     if (!rootDirectoryURL) return;
     
-    didStartDownloading = NO;
-
     // Determine downloading key and set the appropriate predicate. This is OS dependent.
     NSPredicate *metadataPredicate = nil;
-
+    
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0) && (__MAC_OS_X_VERSION_MIN_REQUIRED < __MAC_10_9)
     metadataPredicate = [NSPredicate predicateWithFormat:@"%K = FALSE AND %K = FALSE AND %K ENDSWITH '.cdeevent' AND %K BEGINSWITH %@",
                          NSMetadataUbiquitousItemIsDownloadedKey, NSMetadataUbiquitousItemIsDownloadingKey, NSMetadataItemFSNameKey, NSMetadataItemPathKey, rootDirectoryURL.path];
@@ -244,33 +245,50 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
 
 - (void)metadataQueryDidUpdate:(NSNotification *)notif
 {
-    // Need to stop and restart the query, because query
+    // Need to stop and restart the query, because for some reason, NSMetadataQuery
     // does not remove results that no longer meet the criteria
-    [metadataQuery disableUpdates];
     [metadataQuery stopQuery];
     [self initiateDownloads];
     [metadataQuery startQuery];
-    [metadataQuery enableUpdates];
 }
 
 - (void)initiateDownloads
 {
     // If there were downloads, and aren't anymore, fire notification
     NSUInteger count = [metadataQuery resultCount];
-    if (didStartDownloading && count == 0) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [[NSNotificationCenter defaultCenter] postNotificationName:CDEICloudFileSystemDidDownloadFilesNotification object:self];
-        });
-    }
-    didStartDownloading = count > 0;
-    
     for ( NSUInteger i = 0; i < count; i++ ) {
         @autoreleasepool {
             NSURL *url = [metadataQuery valueOfAttribute:NSMetadataItemURLKey forResultAtIndex:i];
             dispatch_async(initiatingDownloadsQueue, ^{
                 NSError *error;
                 BOOL startedDownload = [fileManager startDownloadingUbiquitousItemAtURL:url error:&error];
-                if ( !startedDownload ) CDELog(CDELoggingLevelWarning, @"Error starting download: %@", error);
+                if ( startedDownload ) {
+                    @synchronized(self) {
+                        numberOfUnfinishedDownloads++;
+                    }
+                    
+                    [downloadTrackingQueue addOperationWithBlock:^{
+                        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+                        NSError *error = nil;
+                        [coordinator coordinateReadingItemAtURL:url options:0 error:&error byAccessor:^(NSURL *newURL) {
+                            BOOL complete = NO;
+                            @synchronized(self) {
+                                numberOfUnfinishedDownloads--;
+                                if (numberOfUnfinishedDownloads == 0) {
+                                    complete = YES;
+                                }
+                            }
+                            
+                            if (complete) {
+                                dispatch_async(dispatch_get_main_queue(), ^{
+                                    [[NSNotificationCenter defaultCenter] postNotificationName:CDEICloudFileSystemDidDownloadFilesNotification object:self];
+                                });
+                            }
+                        }];
+                    }];
+                } else {
+                    CDELog(CDELoggingLevelWarning, @"Error starting download: %@", error);
+                }
             });
         }
     }
@@ -312,7 +330,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
         __block BOOL exists = NO;
         
         NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
-
+        
         dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, CDEFileCoordinatorTimeOut * NSEC_PER_SEC);
         dispatch_after(popTime, timeOutQueue, ^{
             if (!coordinatorExecuted) {
@@ -320,7 +338,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
                 timeoutError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFileCoordinatorTimedOut userInfo:nil];
             }
         });
-
+        
         NSURL *url = [NSURL fileURLWithPath:[self fullPathForPath:path]];
         [coordinator coordinateReadingItemAtURL:url options:0 error:&fileCoordinatorError byAccessor:^(NSURL *newURL) {
             dispatch_sync(timeOutQueue, ^{ coordinatorExecuted = YES; });
@@ -402,7 +420,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
             if (block) block(contents, error);
         });
     }];
-
+    
 }
 
 - (void)createDirectoryAtPath:(NSString *)path completion:(CDECompletionBlock)block
@@ -421,7 +439,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
         __block BOOL coordinatorExecuted = NO;
         
         NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
-
+        
         dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, CDEFileCoordinatorTimeOut * NSEC_PER_SEC);
         dispatch_after(popTime, timeOutQueue, ^{
             if (!coordinatorExecuted) {
@@ -459,7 +477,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
         __block NSError *timeoutError = nil;
         __block NSError *fileManagerError = nil;
         __block BOOL coordinatorExecuted = NO;
-
+        
         NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
         
         dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, CDEFileCoordinatorTimeOut * NSEC_PER_SEC);
@@ -499,9 +517,9 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
         __block NSError *timeoutError = nil;
         __block NSError *fileManagerError = nil;
         __block BOOL coordinatorExecuted = NO;
-
+        
         NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
-
+        
         dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, CDEFileCoordinatorTimeOut * NSEC_PER_SEC);
         dispatch_after(popTime, timeOutQueue, ^{
             if (!coordinatorExecuted) {
@@ -543,7 +561,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
         __block BOOL coordinatorExecuted = NO;
         
         NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
-
+        
         dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, CDEFileCoordinatorTimeOut * NSEC_PER_SEC);
         dispatch_after(popTime, timeOutQueue, ^{
             if (!coordinatorExecuted) {
