@@ -22,7 +22,9 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
     dispatch_queue_t timeOutQueue;
     dispatch_queue_t initiatingDownloadsQueue;
     id ubiquityIdentityObserver;
-    BOOL didStartDownloading;
+    
+    NSUInteger numOutstandingDownloads;
+    NSOperationQueue *downloadTrackingQueue;
 }
 
 - (instancetype)initWithUbiquityContainerIdentifier:(NSString *)newIdentifier
@@ -41,7 +43,9 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
         metadataQuery = nil;
         ubiquityContainerIdentifier = [newIdentifier copy];
         ubiquityIdentityObserver = nil;
-        didStartDownloading = NO;
+        
+        downloadTrackingQueue = [[NSOperationQueue alloc] init];
+        downloadTrackingQueue.maxConcurrentOperationCount = 1;
         
         [self performInitialPreparation:NULL];
     }
@@ -190,8 +194,6 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
     [self stopMonitoring];
     if (!rootDirectoryURL) return;
     
-    didStartDownloading = NO;
-
     // Determine downloading key and set the appropriate predicate. This is OS dependent.
     NSPredicate *metadataPredicate = nil;
 
@@ -247,20 +249,37 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
 {
     // If there were downloads, and aren't anymore, fire notification
     NSUInteger count = [metadataQuery resultCount];
-    if (didStartDownloading && count == 0) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [[NSNotificationCenter defaultCenter] postNotificationName:CDEICloudFileSystemDidDownloadFilesNotification object:self];
-        });
-    }
-    didStartDownloading = count > 0;
-    
     for ( NSUInteger i = 0; i < count; i++ ) {
         @autoreleasepool {
             NSURL *url = [metadataQuery valueOfAttribute:NSMetadataItemURLKey forResultAtIndex:i];
             dispatch_async(initiatingDownloadsQueue, ^{
                 NSError *error;
                 BOOL startedDownload = [fileManager startDownloadingUbiquitousItemAtURL:url error:&error];
-                if ( !startedDownload ) CDELog(CDELoggingLevelWarning, @"Error starting download: %@", error);
+                if ( startedDownload ) {
+                    @synchronized(self) {
+                        numOutstandingDownloads++;
+                    }
+                    
+                    [downloadTrackingQueue addOperationWithBlock:^{
+                        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+                        NSError *error = nil;
+                        [coordinator coordinateReadingItemAtURL:url options:0 error:&error byAccessor:^(NSURL *newURL) {
+                            BOOL complete = NO;
+                            @synchronized(self) {
+                                numOutstandingDownloads--;
+                                if (numOutstandingDownloads == 0) {
+                                    complete = YES;
+                                }
+                            }
+                            
+                            if (complete) {
+                                [[NSNotificationCenter defaultCenter] postNotificationName:CDEICloudFileSystemDidDownloadFilesNotification object:self];
+                            }
+                        }];
+                    }];
+                } else {
+                    CDELog(CDELoggingLevelWarning, @"Error starting download: %@", error);
+                }
             });
         }
     }
