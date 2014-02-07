@@ -231,16 +231,26 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
 {
     [metadataQuery disableUpdates];
     [self initiateDownloads];
+    
+    if (metadataQuery.resultCount > 0) {
+        // Restart query if there are non-zero results, because updates never
+        // seem to remove results, even if they no longer pass the predicate
+        [metadataQuery stopQuery];
+        [metadataQuery startQuery];
+    }
+
     [metadataQuery enableUpdates];
 }
 
 - (void)metadataQueryDidUpdate:(NSNotification *)notif
 {
-    // Need to stop and restart the query, because for some reason, NSMetadataQuery
+    // Need to stop and restart the query, because query
     // does not remove results that no longer meet the criteria
+    [metadataQuery disableUpdates];
     [metadataQuery stopQuery];
     [self initiateDownloads];
     [metadataQuery startQuery];
+    [metadataQuery enableUpdates];
 }
 
 - (void)initiateDownloads
