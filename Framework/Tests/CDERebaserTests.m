@@ -164,6 +164,35 @@
     [self waitForAsyncOpToFinish];
 }
 
+- (void)testDeletingRedundantEvents
+{
+    NSArray *baselines = [self addEventsForType:CDEStoreModificationEventTypeBaseline storeId:@"store1" globalCounts:@[@0] revisions:@[@10]];
+    
+    [context performBlockAndWait:^{
+        CDEStoreModificationEvent *baseline = baselines.lastObject;
+        CDEEventRevision *rev;
+        rev = [CDEEventRevision makeEventRevisionForPersistentStoreIdentifier:@"123" revisionNumber:5 inManagedObjectContext:context];
+        baseline.eventRevisionsOfOtherStores = [NSSet setWithObject:rev];
+        [context save:NULL];
+    }];
+    
+    [self addEventsForType:CDEStoreModificationEventTypeSave storeId:@"123" globalCounts:@[@1, @2, @3, @4] revisions:@[@3, @4, @5, @6]];
+    [self addEventsForType:CDEStoreModificationEventTypeMerge storeId:@"store1" globalCounts:@[@1, @2, @3, @4] revisions:@[@9, @10, @11, @12]];
+    
+    [rebaser deleteEventsPreceedingBaselineWithCompletion:^(NSError *error) {
+        XCTAssertNil(error, @"Deleting failed");
+        [context performBlockAndWait:^{
+            NSArray *types = @[@(CDEStoreModificationEventTypeSave), @(CDEStoreModificationEventTypeMerge)];
+            NSArray *events123 = [CDEStoreModificationEvent fetchStoreModificationEventsWithTypes:types persistentStoreIdentifier:@"123" inManagedObjectContext:context];
+            NSArray *eventsStore1 = [CDEStoreModificationEvent fetchStoreModificationEventsWithTypes:types persistentStoreIdentifier:@"store1" inManagedObjectContext:context];
+            XCTAssertEqual(events123.count, (NSUInteger)1, @"Wrong number of events for 123 store");
+            XCTAssertEqual(eventsStore1.count, (NSUInteger)2, @"Wrong number of events for store1 store");
+        }];
+        [self stopAsyncOp];
+    }];
+    [self waitForAsyncOpToFinish];
+}
+
 - (void)testRebasingAttribute
 {
     NSArray *baselines = [self addEventsForType:CDEStoreModificationEventTypeBaseline storeId:@"store1" globalCounts:@[@10] revisions:@[@110]];
@@ -411,7 +440,6 @@
     }];
     [self waitForAsyncOpToFinish];
 }
-
 
 - (NSArray *)addEventsForType:(CDEStoreModificationEventType)type storeId:(NSString *)storeId globalCounts:(NSArray *)globalCounts revisions:(NSArray *)revisions
 {
