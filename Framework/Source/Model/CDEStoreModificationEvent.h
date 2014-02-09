@@ -55,6 +55,9 @@ typedef NS_ENUM(int16_t, CDEStoreModificationEventType) {
 // Fetching baseline events
 + (instancetype)fetchBaselineStoreModificationEventInManagedObjectContext:(NSManagedObjectContext *)context;
 
+// Predicates
++ (NSPredicate *)predicateForAllowedTypes:(NSArray *)types persistentStoreIdentifier:(NSString *)persistentStoreIdentifier;
+
 // Prefetching
 + (void)prefetchRelatedObjectsForStoreModificationEvents:(NSArray *)storeModEvents;
 

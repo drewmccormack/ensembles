@@ -44,29 +44,39 @@
     [context performBlock:^{
         CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:context];
         CDERevisionSet *baselineRevisionSet = baseline.revisionSet;
-        
-        if (baseline) {
-            CDEGlobalCount globalCountCutoff = baseline.globalCount;
-            NSArray *eventsToDelete = [CDEStoreModificationEvent fetchNonBaselineEventsUpToGlobalCount:globalCountCutoff inManagedObjectContext:context];
-            [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:eventsToDelete];
+        NSSet *storeIds = baselineRevisionSet.persistentStoreIdentifiers;
+        NSArray *types = @[@(CDEStoreModificationEventTypeMerge), @(CDEStoreModificationEventTypeSave)];
+        for (NSString *storeId in storeIds) {
+            CDERevision *baseRevision = [baselineRevisionSet revisionForPersistentStoreIdentifier:storeId];
             
-            for (CDEStoreModificationEvent *event in eventsToDelete) {
-                // Don't delete events from stores not in the baseline
-                NSString *storeId = event.eventRevision.persistentStoreIdentifier;
-                if (nil == [baselineRevisionSet revisionForPersistentStoreIdentifier:storeId]) continue;
+            NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
+            NSPredicate *storePredicate = [CDEStoreModificationEvent predicateForAllowedTypes:types persistentStoreIdentifier:storeId];
+            NSPredicate *revisionPredicate = [NSPredicate predicateWithFormat:@"eventRevision.revisionNumber <= %lld", baseRevision.revisionNumber];
+            fetch.predicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[storePredicate, revisionPredicate]];
+            
+            NSError *error;
+            NSArray *events = [context executeFetchRequest:fetch error:&error];
+            if (!events) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (completion) completion(error);
+                });
+                return;
+            }
+            
+            [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:events];
+            for (CDEStoreModificationEvent *event in events) {
                 [context deleteObject:event];
             }
         }
-
+        
         NSError *error = nil;
         BOOL saved = [context save:&error];
-        
+
         dispatch_async(dispatch_get_main_queue(), ^{
             if (completion) completion(saved ? nil : error);
         });
     }];
 }
-
 
 #pragma mark Determining When to Rebase
 
