@@ -17,7 +17,8 @@
 
 @implementation IDMTagsViewController {
     NSFetchedResultsController *tagsController;
-    IBOutlet UIBarButtonItem *syncButtonItem;
+    __weak IBOutlet UIBarButtonItem *syncButtonItem;
+    __weak IBOutlet UIBarButtonItem *enableSyncButtonItem;
     id syncDidBeginNotif, syncDidEndNotif;
 }
 
@@ -52,10 +53,21 @@
     [[NSNotificationCenter defaultCenter] removeObserver:syncDidEndNotif];
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+}
+
+#pragma mark Sync
+
 - (IBAction)sync:(id)sender
 {
     IDMAppDelegate *appDelegate = (id)[[UIApplication sharedApplication] delegate];
     [appDelegate synchronize];
+}
+
+- (IBAction)toggleSyncEnabled:(id)sender {
 }
 
 - (IDMTag *)tagAtRow:(NSUInteger)row

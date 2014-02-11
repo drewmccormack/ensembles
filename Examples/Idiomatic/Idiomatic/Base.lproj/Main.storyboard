@@ -36,17 +36,22 @@
                         </prototypes>
                     </tableView>
                     <toolbarItems>
-                        <barButtonItem style="plain" systemItem="flexibleSpace" id="nEj-jt-YZE"/>
-                        <barButtonItem title="Sync" id="eCI-Vf-SIK">
+                        <barButtonItem title="Enable Sync" id="eCI-Vf-SIK">
                             <connections>
-                                <action selector="sync:" destination="zCj-vR-p7X" id="yg8-hB-fFE"/>
+                                <action selector="toggleSyncEnabled:" destination="zCj-vR-p7X" id="r8H-HM-Gbj"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="aaO-Cp-OJx"/>
+                        <barButtonItem title="Sync Now" id="GEh-cy-FFR">
+                            <connections>
+                                <action selector="sync:" destination="zCj-vR-p7X" id="NNW-6N-8Gh"/>
+                            </connections>
+                        </barButtonItem>
                     </toolbarItems>
                     <navigationItem key="navigationItem" title="Groups" id="4bF-ER-0vB"/>
                     <connections>
-                        <outlet property="syncButtonItem" destination="eCI-Vf-SIK" id="Zbw-Hk-AO5"/>
+                        <outlet property="enableSyncButtonItem" destination="eCI-Vf-SIK" id="64K-oc-Zkg"/>
+                        <outlet property="syncButtonItem" destination="GEh-cy-FFR" id="7fa-fW-8K8"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="spn-4N-O4U" userLabel="First Responder" sceneMemberID="firstResponder"/>

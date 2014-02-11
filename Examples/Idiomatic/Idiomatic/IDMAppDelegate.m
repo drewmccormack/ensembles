@@ -7,9 +7,11 @@
 //
 
 #import <CoreData/CoreData.h>
+#import <DropboxSDK/DropboxSDK.h>
 
 #import "CoreDataEnsembles.h"
 #import "CDEICloudFileSystem.h"
+#import "CDEDropboxCloudFileSystem.h"
 #import "IDMAppDelegate.h"
 #import "IDMNotesViewController.h"
 #import "IDMTagsViewController.h"
@@ -17,7 +19,18 @@
 NSString * const IDMSyncActivityDidBeginNotification = @"IDMSyncActivityDidBegin";
 NSString * const IDMSyncActivityDidEndNotification = @"IDMSyncActivityDidEnd";
 
-@interface IDMAppDelegate () <CDEPersistentStoreEnsembleDelegate>
+NSString * const IDMCloudServiceUserDefaultKey = @"IDMCloudServiceUserDefaultKey";
+NSString * const IDMICloudService = @"icloud";
+NSString * const IDMDropboxService = @"dropbox";
+
+// Set these with your account details
+NSString * const IDMICloudContainerIdentifier = @"P7BXV6PHLD.com.mentalfaculty.idiomatic";
+NSString * const IDMDropboxAppKey = @"cieue543s8lvjvs";
+NSString * const IDMDropboxAppSecret = @"3hodguwlv6mv64b";
+
+@interface IDMAppDelegate () <CDEPersistentStoreEnsembleDelegate, DBSessionDelegate>
+
+@property (nonatomic, readonly) NSURL *storeURL;
 
 @end
 
@@ -26,6 +39,8 @@ NSString * const IDMSyncActivityDidEndNotification = @"IDMSyncActivityDidEnd";
     CDEPersistentStoreEnsemble *ensemble;
     CDEICloudFileSystem *cloudFileSystem;
     NSUInteger activeMergeCount;
+    CDECompletionBlock dropboxLinkSessionCompletion;
+    DBSession *dropboxSession;
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -33,27 +48,11 @@ NSString * const IDMSyncActivityDidEndNotification = @"IDMSyncActivityDidEnd";
     // Ensembles logging
     CDESetCurrentLoggingLevel(CDELoggingLevelVerbose);
     
-    // Store directory and URL
-    NSURL *directoryURL = [[NSFileManager defaultManager] URLForDirectory:NSApplicationSupportDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:NULL];
-    directoryURL = [directoryURL URLByAppendingPathComponent:NSBundle.mainBundle.bundleIdentifier isDirectory:YES];
-    [[NSFileManager defaultManager] createDirectoryAtURL:directoryURL withIntermediateDirectories:YES attributes:nil error:NULL];
-    NSURL *storeURL = [directoryURL URLByAppendingPathComponent:@"store.sqlite"];
-    
     // Setup Core Data Stack
-    NSError *error;
-    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"Model" withExtension:@"momd"];
-    NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
-    NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:model];
-    NSDictionary *options = @{NSMigratePersistentStoresAutomaticallyOption: @YES, NSInferMappingModelAutomaticallyOption: @YES};
-    [coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:options error:&error];
-    managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
-    managedObjectContext.persistentStoreCoordinator = coordinator;
-    managedObjectContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
+    [self setupContext];
     
     // Setup Ensemble
-    cloudFileSystem = [[CDEICloudFileSystem alloc] initWithUbiquityContainerIdentifier:@"P7BXV6PHLD.com.mentalfaculty.idiomatic"];
-    ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"MainStore" persistentStorePath:storeURL.path managedObjectModelURL:modelURL cloudFileSystem:cloudFileSystem];
-    ensemble.delegate = self;
+    [self setupEnsemble];
     
     // Setup UI
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
@@ -93,6 +92,87 @@ NSString * const IDMSyncActivityDidEndNotification = @"IDMSyncActivityDidEnd";
     [self synchronize];
 }
 
+#pragma mark - Persistent Store
+
+- (void)setupContext
+{
+    NSError *error;
+    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"Model" withExtension:@"momd"];
+    NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
+    
+    NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:model];
+    NSDictionary *options = @{NSMigratePersistentStoresAutomaticallyOption: @YES, NSInferMappingModelAutomaticallyOption: @YES};
+    [coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:self.storeURL options:options error:&error];
+    
+    managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
+    managedObjectContext.persistentStoreCoordinator = coordinator;
+    managedObjectContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
+}
+
+- (NSURL *)storeURL
+{
+    NSURL *directoryURL = [[NSFileManager defaultManager] URLForDirectory:NSApplicationSupportDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:NULL];
+    directoryURL = [directoryURL URLByAppendingPathComponent:NSBundle.mainBundle.bundleIdentifier isDirectory:YES];
+    [[NSFileManager defaultManager] createDirectoryAtURL:directoryURL withIntermediateDirectories:YES attributes:nil error:NULL];
+    NSURL *storeURL = [directoryURL URLByAppendingPathComponent:@"store.sqlite"];
+    return storeURL;
+}
+
+#pragma mark - Persistent Store Ensemble
+
+- (void)setupEnsemble
+{
+    if (!self.canSynchronize) return;
+    
+    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"Model" withExtension:@"momd"];
+    cloudFileSystem = [self makeCloudFileSystem];
+    ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"MainStore" persistentStorePath:self.storeURL.path managedObjectModelURL:modelURL cloudFileSystem:cloudFileSystem];
+    ensemble.delegate = self;
+}
+
+- (id <CDECloudFileSystem>)makeCloudFileSystem
+{
+    NSString *cloudService = [[NSUserDefaults standardUserDefaults] stringForKey:IDMCloudServiceUserDefaultKey];
+    id <CDECloudFileSystem> newSystem = nil;
+    if ([cloudService isEqualToString:IDMICloudService]) {
+        newSystem = [[CDEICloudFileSystem alloc] initWithUbiquityContainerIdentifier:IDMICloudContainerIdentifier];
+    }
+    else if ([cloudService isEqualToString:IDMDropboxService]) {
+        dropboxSession = [[DBSession alloc] initWithAppKey:IDMDropboxAppKey appSecret:IDMDropboxAppSecret root:kDBRootAppFolder];
+        dropboxSession.delegate = self;
+        newSystem = [[CDEDropboxCloudFileSystem alloc] initWithSession:dropboxSession];
+    }
+    return newSystem;
+}
+
+#pragma mark - Dropbox Session
+
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
+	if ([dropboxSession handleOpenURL:url]) {
+		if ([dropboxSession isLinked]) {
+            if (dropboxLinkSessionCompletion) dropboxLinkSessionCompletion(nil);
+		}
+        else {
+            NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeAuthenticationFailure userInfo:nil];
+            if (dropboxLinkSessionCompletion) dropboxLinkSessionCompletion(error);
+        }
+        dropboxLinkSessionCompletion = NULL;
+		return YES;
+	}
+	
+	return NO;
+}
+
+- (void)linkSessionForDropboxCloudFileSystem:(CDEDropboxCloudFileSystem *)fileSystem completion:(CDECompletionBlock)completion
+{
+    dropboxLinkSessionCompletion = [completion copy];
+    [dropboxSession linkFromController:self.window.rootViewController];
+}
+
+- (void)sessionDidReceiveAuthorizationFailure:(DBSession*)session userId:(NSString *)userId
+{
+}
+
 #pragma mark - Sync Methods
 
 - (void)decrementMergeCount
@@ -111,6 +191,12 @@ NSString * const IDMSyncActivityDidEndNotification = @"IDMSyncActivityDidEnd";
         [[NSNotificationCenter defaultCenter] postNotificationName:IDMSyncActivityDidBeginNotification object:nil];
         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     }
+}
+
+- (BOOL)canSynchronize
+{
+    NSString *cloudService = [[NSUserDefaults standardUserDefaults] stringForKey:IDMCloudServiceUserDefaultKey];
+    return cloudService != nil;
 }
 
 - (void)synchronize

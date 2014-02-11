@@ -16,5 +16,6 @@
 @property NSManagedObjectContext *managedObjectContext;
 
 - (IBAction)sync:(id)sender;
+- (IBAction)toggleSyncEnabled:(id)sender;
 
 @end

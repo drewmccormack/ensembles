@@ -8,13 +8,20 @@
 
 #import <UIKit/UIKit.h>
 
-NSString * const IDMSyncActivityDidBeginNotification;
-NSString * const IDMSyncActivityDidEndNotification;
+extern NSString * const IDMSyncActivityDidBeginNotification;
+extern NSString * const IDMSyncActivityDidEndNotification;
+
+extern NSString * const IDMCloudServiceUserDefaultKey;
+extern NSString * const IDMICloudService;
+extern NSString * const IDMDropboxService;
 
 @interface IDMAppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 
+- (void)setupEnsemble;
+
 - (void)synchronize;
+- (BOOL)canSynchronize;
 
 @end
