@@ -18,16 +18,20 @@
             <rect key="frame" x="0.0" y="0.0" width="369" height="198"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dsR-fU-If1">
-                    <rect key="frame" x="17" y="161" width="35" height="17"/>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dsR-fU-If1">
+                    <rect key="frame" x="19" y="161" width="35" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="17" id="Auw-cr-M5R"/>
+                        <constraint firstAttribute="width" constant="31" id="vgO-aG-8DD"/>
+                    </constraints>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Tags" id="xOe-Ya-AOh">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Qb8-oe-UJH">
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Qb8-oe-UJH">
                     <rect key="frame" x="20" y="130" width="34" height="17"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Note" id="oUC-8G-eVQ">
@@ -91,8 +95,8 @@
                 <constraint firstAttribute="trailing" secondItem="akW-A3-Ukm" secondAttribute="trailing" constant="20" symbolic="YES" id="JfV-6q-xC3"/>
                 <constraint firstItem="akW-A3-Ukm" firstAttribute="top" secondItem="R3d-Tf-7xb" secondAttribute="bottom" constant="11" id="MUe-yc-Dhf"/>
                 <constraint firstItem="akW-A3-Ukm" firstAttribute="leading" secondItem="1" secondAttribute="leading" constant="80" id="RtG-Vl-uG6"/>
-                <constraint firstItem="akW-A3-Ukm" firstAttribute="leading" secondItem="Qb8-oe-UJH" secondAttribute="trailing" constant="29" id="UbS-cb-Igv"/>
-                <constraint firstItem="dsR-fU-If1" firstAttribute="leading" secondItem="1" secondAttribute="leading" constant="20" symbolic="YES" id="Ue0-Oz-f58"/>
+                <constraint firstItem="akW-A3-Ukm" firstAttribute="leading" secondItem="Qb8-oe-UJH" secondAttribute="trailing" constant="28" id="UbS-cb-Igv"/>
+                <constraint firstItem="dsR-fU-If1" firstAttribute="leading" secondItem="1" secondAttribute="leading" constant="21" id="Ue0-Oz-f58"/>
                 <constraint firstItem="Qb8-oe-UJH" firstAttribute="top" secondItem="dsR-fU-If1" secondAttribute="bottom" constant="14" id="VwE-CE-qNN"/>
                 <constraint firstItem="akW-A3-Ukm" firstAttribute="top" secondItem="1" secondAttribute="top" constant="51" id="hbI-U6-p2n"/>
                 <constraint firstItem="akW-A3-Ukm" firstAttribute="trailing" secondItem="R3d-Tf-7xb" secondAttribute="trailing" id="i1n-Dy-yvA"/>
