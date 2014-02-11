@@ -1,6 +1,5 @@
 //
 //  CDEDropboxCloudFileSystem.h
-//  Test App iOS
 //
 //  Created by Drew McCormack on 4/12/13.
 //  Copyright (c) 2013 The Mental Faculty B.V. All rights reserved.
