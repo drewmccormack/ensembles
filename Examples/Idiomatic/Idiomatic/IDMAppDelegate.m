@@ -30,6 +30,7 @@ NSString * const IDMDropboxAppSecret = @"3hodguwlv6mv64b";
 
 @interface IDMAppDelegate () <CDEPersistentStoreEnsembleDelegate, DBSessionDelegate>
 
+@property (nonatomic, readonly) NSURL *storeDirectoryURL;
 @property (nonatomic, readonly) NSURL *storeURL;
 
 @end
@@ -49,6 +50,7 @@ NSString * const IDMDropboxAppSecret = @"3hodguwlv6mv64b";
     CDESetCurrentLoggingLevel(CDELoggingLevelVerbose);
     
     // Setup Core Data Stack
+    [[NSFileManager defaultManager] createDirectoryAtURL:self.storeDirectoryURL withIntermediateDirectories:YES attributes:nil error:NULL];
     [self setupContext];
     
     // Setup Ensemble
@@ -109,16 +111,39 @@ NSString * const IDMDropboxAppSecret = @"3hodguwlv6mv64b";
     managedObjectContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
 }
 
-- (NSURL *)storeURL
+- (NSURL *)storeDirectoryURL
 {
     NSURL *directoryURL = [[NSFileManager defaultManager] URLForDirectory:NSApplicationSupportDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:NULL];
     directoryURL = [directoryURL URLByAppendingPathComponent:NSBundle.mainBundle.bundleIdentifier isDirectory:YES];
-    [[NSFileManager defaultManager] createDirectoryAtURL:directoryURL withIntermediateDirectories:YES attributes:nil error:NULL];
-    NSURL *storeURL = [directoryURL URLByAppendingPathComponent:@"store.sqlite"];
+    return directoryURL;
+}
+
+- (NSURL *)storeURL
+{
+    NSURL *storeURL = [self.storeDirectoryURL URLByAppendingPathComponent:@"store.sqlite"];
     return storeURL;
 }
 
 #pragma mark - Persistent Store Ensemble
+
+- (void)connectToSyncService:(NSString *)serviceId
+{
+    [[NSUserDefaults standardUserDefaults] setObject:serviceId forKey:IDMCloudServiceUserDefaultKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self setupEnsemble];
+}
+
+- (void)disconnectFromSyncService
+{
+    [ensemble deleechPersistentStoreWithCompletion:^(NSError *error) {
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:IDMCloudServiceUserDefaultKey];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        [dropboxSession unlinkAll];
+        dropboxSession = nil;
+        ensemble.delegate = nil;
+        ensemble = nil;
+    }];
+}
 
 - (void)setupEnsemble
 {
@@ -126,6 +151,8 @@ NSString * const IDMDropboxAppSecret = @"3hodguwlv6mv64b";
     
     NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"Model" withExtension:@"momd"];
     cloudFileSystem = [self makeCloudFileSystem];
+    if (!cloudFileSystem) return;
+    
     ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"MainStore" persistentStorePath:self.storeURL.path managedObjectModelURL:modelURL cloudFileSystem:cloudFileSystem];
     ensemble.delegate = self;
 }
@@ -143,6 +170,66 @@ NSString * const IDMDropboxAppSecret = @"3hodguwlv6mv64b";
         newSystem = [[CDEDropboxCloudFileSystem alloc] initWithSession:dropboxSession];
     }
     return newSystem;
+}
+
+#pragma mark - Sync Methods
+
+- (BOOL)canSynchronize
+{
+    NSString *cloudService = [[NSUserDefaults standardUserDefaults] stringForKey:IDMCloudServiceUserDefaultKey];
+    return cloudService != nil;
+}
+
+- (void)synchronize
+{
+    if (!self.canSynchronize) return;
+    
+    [self incrementMergeCount];
+    if (!ensemble.isLeeched) {
+        [ensemble leechPersistentStoreWithCompletion:^(NSError *error) {
+            [self decrementMergeCount];
+            [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+            if (error) NSLog(@"Could not leech to ensemble: %@", error);
+        }];
+    }
+    else {
+        [ensemble mergeWithCompletion:^(NSError *error) {
+            [self decrementMergeCount];
+            if (error) NSLog(@"Error merging: %@", error);
+        }];
+    }
+}
+
+- (void)decrementMergeCount
+{
+    activeMergeCount--;
+    if (activeMergeCount == 0) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:IDMSyncActivityDidEndNotification object:nil];
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+    }
+}
+
+- (void)incrementMergeCount
+{
+    activeMergeCount++;
+    if (activeMergeCount == 1) {
+        [[NSNotificationCenter defaultCenter] postNotificationName:IDMSyncActivityDidBeginNotification object:nil];
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    }
+}
+
+#pragma mark - Persistent Store Ensemble Delegate
+
+- (void)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didSaveMergeChangesWithNotification:(NSNotification *)notification
+{
+    [managedObjectContext performBlock:^{
+        [managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
+    }];
+}
+
+- (NSArray *)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble globalIdentifiersForManagedObjects:(NSArray *)objects
+{
+    return [objects valueForKeyPath:@"uniqueIdentifier"];
 }
 
 #pragma mark - Dropbox Session
@@ -171,64 +258,6 @@ NSString * const IDMDropboxAppSecret = @"3hodguwlv6mv64b";
 
 - (void)sessionDidReceiveAuthorizationFailure:(DBSession*)session userId:(NSString *)userId
 {
-}
-
-#pragma mark - Sync Methods
-
-- (void)decrementMergeCount
-{
-    activeMergeCount--;
-    if (activeMergeCount == 0) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:IDMSyncActivityDidEndNotification object:nil];
-        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-    }
-}
-
-- (void)incrementMergeCount
-{
-    activeMergeCount++;
-    if (activeMergeCount == 1) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:IDMSyncActivityDidBeginNotification object:nil];
-        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-    }
-}
-
-- (BOOL)canSynchronize
-{
-    NSString *cloudService = [[NSUserDefaults standardUserDefaults] stringForKey:IDMCloudServiceUserDefaultKey];
-    return cloudService != nil;
-}
-
-- (void)synchronize
-{
-    [self incrementMergeCount];
-    if (!ensemble.isLeeched) {
-        [ensemble leechPersistentStoreWithCompletion:^(NSError *error) {
-            [self decrementMergeCount];
-            [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-            if (error) NSLog(@"Could not leech to ensemble: %@", error);
-        }];
-    }
-    else {
-        [ensemble mergeWithCompletion:^(NSError *error) {
-            [self decrementMergeCount];
-            if (error) NSLog(@"Error merging: %@", error);
-        }];
-    }
-}
-
-#pragma mark - Persistent Store Ensemble Delegate
-
-- (void)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didSaveMergeChangesWithNotification:(NSNotification *)notification
-{
-    [managedObjectContext performBlock:^{
-        [managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
-    }];
-}
-
-- (NSArray *)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble globalIdentifiersForManagedObjects:(NSArray *)objects
-{
-    return [objects valueForKeyPath:@"uniqueIdentifier"];
 }
 
 @end

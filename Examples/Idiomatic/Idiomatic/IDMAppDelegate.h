@@ -19,7 +19,8 @@ extern NSString * const IDMDropboxService;
 
 @property (strong, nonatomic) UIWindow *window;
 
-- (void)setupEnsemble;
+- (void)connectToSyncService:(NSString *)serviceId;
+- (void)disconnectFromSyncService;
 
 - (void)synchronize;
 - (BOOL)canSynchronize;
