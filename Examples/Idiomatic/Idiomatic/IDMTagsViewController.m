@@ -11,7 +11,7 @@
 #import "IDMAppDelegate.h"
 #import "IDMTag.h"
 
-@interface IDMTagsViewController () <NSFetchedResultsControllerDelegate>
+@interface IDMTagsViewController () <NSFetchedResultsControllerDelegate, UIActionSheetDelegate>
 
 @end
 
@@ -19,7 +19,9 @@
     NSFetchedResultsController *tagsController;
     __weak IBOutlet UIBarButtonItem *syncButtonItem;
     __weak IBOutlet UIBarButtonItem *enableSyncButtonItem;
+    UIActionSheet *syncServiceActionSheet;
     id syncDidBeginNotif, syncDidEndNotif;
+    BOOL merging;
 }
 
 - (void)viewDidLoad
@@ -37,12 +39,16 @@
     
     __weak typeof(self) weakSelf = self;
     syncDidBeginNotif = [[NSNotificationCenter defaultCenter] addObserverForName:IDMSyncActivityDidBeginNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
-        __strong typeof(weakSelf) strongSelf = weakSelf;
-        strongSelf->syncButtonItem.enabled = NO;
+        __strong typeof(self) strongSelf = weakSelf;
+        if (!strongSelf) return;
+        strongSelf->merging = YES;
+        [strongSelf updateButtons];
     }];
     syncDidEndNotif = [[NSNotificationCenter defaultCenter] addObserverForName:IDMSyncActivityDidEndNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
-        __strong typeof(weakSelf) strongSelf = weakSelf;
-        strongSelf->syncButtonItem.enabled = YES;
+        __strong typeof(self) strongSelf = weakSelf;
+        if (!strongSelf) return;
+        strongSelf->merging = NO;
+        [strongSelf updateButtons];
     }];
 }
 
@@ -56,10 +62,20 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    
+    [self updateButtons];
 }
 
-#pragma mark Sync
+#pragma mark - Views
+
+- (void)updateButtons
+{
+    IDMAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+    syncButtonItem.enabled = appDelegate.canSynchronize && !merging;
+    enableSyncButtonItem.title = appDelegate.canSynchronize ? @"Disable Sync" : @"Enable Sync";
+    enableSyncButtonItem.enabled = !merging;
+}
+
+#pragma mark - Sync
 
 - (IBAction)sync:(id)sender
 {
@@ -67,7 +83,37 @@
     [appDelegate synchronize];
 }
 
-- (IBAction)toggleSyncEnabled:(id)sender {
+- (IBAction)toggleSyncEnabled:(id)sender
+{
+    IDMAppDelegate *appDelegate = (id)[[UIApplication sharedApplication] delegate];
+    if (appDelegate.canSynchronize) {
+        enableSyncButtonItem.enabled = NO;
+        syncButtonItem.enabled = NO;
+        [appDelegate disconnectFromSyncServiceWithCompletion:^{
+            [self updateButtons];
+        }];
+    }
+    else {
+        syncServiceActionSheet = [[UIActionSheet alloc] initWithTitle:@"What service would you like?" delegate:self cancelButtonTitle:@"None" destructiveButtonTitle:nil otherButtonTitles:@"iCloud", @"Dropbox", nil];
+        [syncServiceActionSheet showFromToolbar:self.navigationController.toolbar];
+        [self updateButtons];
+    }
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+    if (syncServiceActionSheet == actionSheet) {
+        IDMAppDelegate *appDelegate = (id)[[UIApplication sharedApplication] delegate];
+        NSString *service;
+        if (buttonIndex == actionSheet.firstOtherButtonIndex)
+            service = IDMICloudService;
+        else if (buttonIndex == actionSheet.firstOtherButtonIndex+1)
+            service = IDMDropboxService;
+        [appDelegate connectToSyncService:service];
+        
+        [self updateButtons];
+        syncServiceActionSheet = nil;
+    }
 }
 
 - (IDMTag *)tagAtRow:(NSUInteger)row

@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "CoreDataEnsembles.h"
 
 extern NSString * const IDMSyncActivityDidBeginNotification;
 extern NSString * const IDMSyncActivityDidEndNotification;
@@ -20,7 +21,7 @@ extern NSString * const IDMDropboxService;
 @property (strong, nonatomic) UIWindow *window;
 
 - (void)connectToSyncService:(NSString *)serviceId;
-- (void)disconnectFromSyncService;
+- (void)disconnectFromSyncServiceWithCompletion:(CDECodeBlock)completion;
 
 - (void)synchronize;
 - (BOOL)canSynchronize;

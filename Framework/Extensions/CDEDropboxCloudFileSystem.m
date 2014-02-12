@@ -152,7 +152,7 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
 
 - (id <NSObject, NSCoding, NSCopying>)identityToken
 {
-    return self.session.userIds > 0 ? self.session.userIds[0] : nil;
+    return self.session.userIds.count > 0 ? self.session.userIds[0] : nil;
 }
 
 #pragma mark Checking File Existence

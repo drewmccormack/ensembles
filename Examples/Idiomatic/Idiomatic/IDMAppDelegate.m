@@ -28,7 +28,7 @@ NSString * const IDMICloudContainerIdentifier = @"P7BXV6PHLD.com.mentalfaculty.i
 NSString * const IDMDropboxAppKey = @"cieue543s8lvjvs";
 NSString * const IDMDropboxAppSecret = @"3hodguwlv6mv64b";
 
-@interface IDMAppDelegate () <CDEPersistentStoreEnsembleDelegate, DBSessionDelegate>
+@interface IDMAppDelegate () <CDEPersistentStoreEnsembleDelegate, DBSessionDelegate, CDEDropboxCloudFileSystemDelegate>
 
 @property (nonatomic, readonly) NSURL *storeDirectoryURL;
 @property (nonatomic, readonly) NSURL *storeURL;
@@ -131,9 +131,10 @@ NSString * const IDMDropboxAppSecret = @"3hodguwlv6mv64b";
     [[NSUserDefaults standardUserDefaults] setObject:serviceId forKey:IDMCloudServiceUserDefaultKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self setupEnsemble];
+    [self synchronize];
 }
 
-- (void)disconnectFromSyncService
+- (void)disconnectFromSyncServiceWithCompletion:(CDECodeBlock)completion
 {
     [ensemble deleechPersistentStoreWithCompletion:^(NSError *error) {
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:IDMCloudServiceUserDefaultKey];
@@ -142,6 +143,7 @@ NSString * const IDMDropboxAppSecret = @"3hodguwlv6mv64b";
         dropboxSession = nil;
         ensemble.delegate = nil;
         ensemble = nil;
+        if (completion) completion();
     }];
 }
 
@@ -149,10 +151,10 @@ NSString * const IDMDropboxAppSecret = @"3hodguwlv6mv64b";
 {
     if (!self.canSynchronize) return;
     
-    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"Model" withExtension:@"momd"];
     cloudFileSystem = [self makeCloudFileSystem];
     if (!cloudFileSystem) return;
     
+    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"Model" withExtension:@"momd"];
     ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"MainStore" persistentStorePath:self.storeURL.path managedObjectModelURL:modelURL cloudFileSystem:cloudFileSystem];
     ensemble.delegate = self;
 }
@@ -167,7 +169,9 @@ NSString * const IDMDropboxAppSecret = @"3hodguwlv6mv64b";
     else if ([cloudService isEqualToString:IDMDropboxService]) {
         dropboxSession = [[DBSession alloc] initWithAppKey:IDMDropboxAppKey appSecret:IDMDropboxAppSecret root:kDBRootAppFolder];
         dropboxSession.delegate = self;
-        newSystem = [[CDEDropboxCloudFileSystem alloc] initWithSession:dropboxSession];
+        CDEDropboxCloudFileSystem *newDropboxSystem = [[CDEDropboxCloudFileSystem alloc] initWithSession:dropboxSession];
+        newDropboxSystem.delegate = self;
+        newSystem = newDropboxSystem;
     }
     return newSystem;
 }
