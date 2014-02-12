@@ -24,7 +24,7 @@ static NSString *testStoreFile;
     _lastRevision = -1;
     _lastSaveRevision = -1;
     _lastMergeRevision = -1;
-    _persistentStoreBaselineIdentifier = @"store1";
+    _identifierOfBaselineUsedToConstructStore = @"store1baseline";
     _currentBaselineIdentifier = @"store1";
     return self;
 }

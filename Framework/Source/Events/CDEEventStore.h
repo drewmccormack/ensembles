@@ -29,7 +29,7 @@
 @property (nonatomic, assign, readonly) CDERevisionNumber lastRevision;
 @property (nonatomic, assign, readonly) CDERevisionNumber baselineRevision;
 
-@property (nonatomic, copy, readwrite) NSString *persistentStoreBaselineIdentifier;
+@property (nonatomic, copy, readwrite) NSString *identifierOfBaselineUsedToConstructStore;
 @property (nonatomic, copy, readonly) NSString *currentBaselineIdentifier;
 
 +(void)setDefaultPathToEventDataRootDirectory:(NSString *)newPath;

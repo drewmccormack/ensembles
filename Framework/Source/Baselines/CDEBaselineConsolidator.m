@@ -52,15 +52,16 @@
     NSManagedObjectContext *context = self.eventStore.managedObjectContext;
     [context performBlockAndWait:^{
         NSError *error;
-        NSString *storeId = self.eventStore.persistentStoreBaselineIdentifier;
-        if (nil == storeId) return;
+        NSString *baselineId = self.eventStore.identifierOfBaselineUsedToConstructStore;
+        if (nil == baselineId) return;
         
         NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
-        fetch.predicate = [NSPredicate predicateWithFormat:@"type = %d AND uniqueIdentifier = %@", CDEStoreModificationEventTypeBaseline, storeId];
+        fetch.predicate = [NSPredicate predicateWithFormat:@"type = %d AND uniqueIdentifier = %@", CDEStoreModificationEventTypeBaseline, baselineId];
         NSArray *baselines = [context executeFetchRequest:fetch error:&error];
         if (!baselines) CDELog(CDELoggingLevelError, @"Failed to fetch baselines: %@", error);
         if (baselines.count <= 1) return;
         
+        NSString *storeId = self.eventStore.persistentStoreIdentifier;
         NSMutableSet *baselineRevisions = [NSMutableSet set];
         for (CDEStoreModificationEvent *baseline in baselines) {
             CDERevisionSet *revSet = baseline.revisionSet;

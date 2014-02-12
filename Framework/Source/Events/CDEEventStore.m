@@ -17,7 +17,7 @@ NSString * const kCDEPersistentStoreIdentifierKey = @"persistentStoreIdentifier"
 NSString * const kCDECloudFileSystemIdentityKey = @"cloudFileSystemIdentity";
 NSString * const kCDEIncompleteEventIdentifiersKey = @"incompleteEventIdentifiers";
 NSString * const kCDEVerifiesStoreRegistrationInCloudKey = @"verifiesStoreRegistrationInCloud";
-NSString * const KCDEPersistentStoreBaselineIdentifierKey = @"persistentStoreBaselineIdentifier";
+NSString * const kCDEIdentifierOfBaselineUsedToConstructStore = @"identifierOfBaselineUsedToConstructStore";
 
 static NSString *defaultPathToEventDataRootDirectory = nil;
 
@@ -44,7 +44,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 @synthesize pathToEventDataRootDirectory = pathToEventDataRootDirectory;
 @synthesize cloudFileSystemIdentityToken = cloudFileSystemIdentityToken;
 @synthesize verifiesStoreRegistrationInCloud = verifiesStoreRegistrationInCloud;
-@synthesize persistentStoreBaselineIdentifier = persistentStoreBaselineIdentifier;
+@synthesize identifierOfBaselineUsedToConstructStore = identifierOfBaselineUsedToConstructStore;
 @synthesize currentBaselineIdentifier = currentBaselineIdentifier;
 
 + (void)initialize
@@ -113,16 +113,18 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 
 - (void)saveStoreMetadata
 {
-    NSDictionary *dictionary = @{};
+    NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
     if (self.persistentStoreIdentifier) {
         NSData *identityData = [NSKeyedArchiver archivedDataWithRootObject:self.cloudFileSystemIdentityToken];
-        dictionary = @{
+        [dictionary addEntriesFromDictionary:@{
            kCDEPersistentStoreIdentifierKey : self.persistentStoreIdentifier,
            kCDECloudFileSystemIdentityKey : identityData,
            kCDEIncompleteEventIdentifiersKey : incompleteEventIdentifiers,
-           kCDEVerifiesStoreRegistrationInCloudKey : @(self.verifiesStoreRegistrationInCloud),
-           KCDEPersistentStoreBaselineIdentifierKey : CDENilToNSNull(self.persistentStoreIdentifier)
-        };
+           kCDEVerifiesStoreRegistrationInCloudKey : @(self.verifiesStoreRegistrationInCloud)
+        }];
+        
+        NSString *baseline = self.identifierOfBaselineUsedToConstructStore;
+        if (baseline) dictionary[kCDEIdentifierOfBaselineUsedToConstructStore] = baseline;
     }
     
     if (![dictionary writeToFile:self.pathToStoreInfoFile atomically:YES]) {
@@ -139,7 +141,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
         cloudFileSystemIdentityToken = identityData ? [NSKeyedUnarchiver unarchiveObjectWithData:identityData] : nil;
         persistentStoreIdentifier = storeMetadata[kCDEPersistentStoreIdentifierKey];
         incompleteEventIdentifiers = [storeMetadata[kCDEIncompleteEventIdentifiersKey] mutableCopy];
-        persistentStoreBaselineIdentifier = CDENSNullToNil(storeMetadata[KCDEPersistentStoreBaselineIdentifierKey]);
+        identifierOfBaselineUsedToConstructStore = storeMetadata[kCDEIdentifierOfBaselineUsedToConstructStore];
         
         NSNumber *value = storeMetadata[kCDEVerifiesStoreRegistrationInCloudKey];
         verifiesStoreRegistrationInCloud = value ? value.boolValue : NO;
@@ -148,6 +150,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
         cloudFileSystemIdentityToken = nil;
         persistentStoreIdentifier = nil;
         incompleteEventIdentifiers = nil;
+        identifierOfBaselineUsedToConstructStore = nil;
         verifiesStoreRegistrationInCloud = YES;
     }
     
@@ -264,10 +267,10 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
     return result;
 }
 
-- (void)setPersistentStoreBaselineIdentifier:(NSString *)newId
+- (void)setIdentifierOfBaselineUsedToConstructStore:(NSString *)newId
 {
-    if (![newId isEqualToString:persistentStoreBaselineIdentifier]) {
-        persistentStoreBaselineIdentifier = [newId copy];
+    if (![newId isEqualToString:identifierOfBaselineUsedToConstructStore]) {
+        identifierOfBaselineUsedToConstructStore = [newId copy];
         [self saveStoreMetadata];
     }
 }
@@ -300,6 +303,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
     
     // Store store info
     persistentStoreIdentifier = [[NSProcessInfo processInfo] globallyUniqueString];
+    identifierOfBaselineUsedToConstructStore = nil;
     incompleteEventIdentifiers = [NSMutableDictionary dictionary];
     [self saveStoreMetadata];
     

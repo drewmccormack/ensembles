@@ -281,7 +281,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
             
             if (nil == error) {
                 // Store baseline
-                self.eventStore.persistentStoreBaselineIdentifier = [self.eventStore currentBaselineIdentifier];
+                self.eventStore.identifierOfBaselineUsedToConstructStore = [self.eventStore currentBaselineIdentifier];
                 
                 // Inform delegate
                 if ([self.delegate respondsToSelector:@selector(persistentStoreEnsembleDidImportStore:)]) {
@@ -521,7 +521,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
             if (nil == error) {
                 // Check if store has been 'left behind'. If so, need full integration later
                 if ([self.baselineConsolidator persistentStoreHasBeenAbandoned]) {
-                    self.eventStore.persistentStoreBaselineIdentifier = nil;
+                    self.eventStore.identifierOfBaselineUsedToConstructStore = nil;
                 }
             }
             next(error, NO);
@@ -560,7 +560,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
     CDEAsynchronousTaskBlock mergeEventsTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self.eventIntegrator mergeEventsWithCompletion:^(NSError *error) {
             // Store baseline id if everything went well
-            if (nil == error) self.eventStore.persistentStoreBaselineIdentifier = [self.eventStore currentBaselineIdentifier];
+            if (nil == error) self.eventStore.identifierOfBaselineUsedToConstructStore = [self.eventStore currentBaselineIdentifier];
             next(error, NO);
         }];
     };

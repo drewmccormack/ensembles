@@ -276,7 +276,7 @@
 {
     // Determine if we need to do a full integration of all data.
     // This is the case if the baseline identity has changed.
-    NSString *storeBaselineId = self.eventStore.persistentStoreBaselineIdentifier;
+    NSString *storeBaselineId = self.eventStore.identifierOfBaselineUsedToConstructStore;
     NSString *currentBaselineId = self.eventStore.currentBaselineIdentifier;
     BOOL needFullIntegration = !storeBaselineId || ![storeBaselineId isEqualToString:currentBaselineId];
     return needFullIntegration;
