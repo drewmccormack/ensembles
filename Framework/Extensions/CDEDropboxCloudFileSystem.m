@@ -439,11 +439,13 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
 - (void)restClient:(DBRestClient *)client createdFolder:(DBMetadata *)folder
 {
     self.completionCallback(nil);
+    [self tearDown];
 }
 
 - (void)restClient:(DBRestClient *)client createFolderFailedWithError:(NSError *)error
 {
     self.completionCallback(error);
+    [self tearDown];
 }
 
 @end
@@ -477,11 +479,13 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
 - (void)restClient:(DBRestClient *)client movedPath:(NSString *)from_path to:(DBMetadata *)result
 {
     self.completionCallback(nil);
+    [self tearDown];
 }
 
 - (void)restClient:(DBRestClient *)client movePathFailedWithError:(NSError *)error
 {
     self.completionCallback(error);
+    [self tearDown];
 }
 
 @end
@@ -515,11 +519,13 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
 - (void)restClient:(DBRestClient *)client copiedPath:(NSString *)fromPath to:(DBMetadata *)to
 {
     self.completionCallback(nil);
+    [self tearDown];
 }
 
 - (void)restClient:(DBRestClient *)client copyPathFailedWithError:(NSError *)error
 {
     self.completionCallback(error);
+    [self tearDown];
 }
 
 @end
@@ -551,11 +557,13 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
 - (void)restClient:(DBRestClient *)client deletedPath:(NSString *)path
 {
     self.completionCallback(nil);
+    [self tearDown];
 }
 
 - (void)restClient:(DBRestClient *)client deletePathFailedWithError:(NSError *)error
 {
     self.completionCallback(error);
+    [self tearDown];
 }
 
 @end
@@ -589,11 +597,13 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
 - (void)restClient:(DBRestClient *)client uploadedFile:(NSString *)destPath from:(NSString *)srcPath
 {
     self.completionCallback(nil);
+    [self tearDown];
 }
 
 - (void)restClient:(DBRestClient *)client uploadFileFailedWithError:(NSError *)error
 {
     self.completionCallback(error);
+    [self tearDown];
 }
 
 @end
@@ -627,11 +637,13 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
 - (void)restClient:(DBRestClient *)client loadedFile:(NSString *)destPath
 {
     self.completionCallback(nil);
+    [self tearDown];
 }
 
 - (void)restClient:(DBRestClient *)client loadFileFailedWithError:(NSError *)error
 {
     self.completionCallback(error);
+    [self tearDown];
 }
 
 @end

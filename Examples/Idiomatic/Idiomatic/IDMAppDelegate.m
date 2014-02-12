@@ -25,8 +25,8 @@ NSString * const IDMDropboxService = @"dropbox";
 
 // Set these with your account details
 NSString * const IDMICloudContainerIdentifier = @"P7BXV6PHLD.com.mentalfaculty.idiomatic";
-NSString * const IDMDropboxAppKey = @"cieue543s8lvjvs";
-NSString * const IDMDropboxAppSecret = @"3hodguwlv6mv64b";
+NSString * const IDMDropboxAppKey = @"fjgu077wm7qffv0";
+NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 
 @interface IDMAppDelegate () <CDEPersistentStoreEnsembleDelegate, DBSessionDelegate, CDEDropboxCloudFileSystemDelegate>
 
