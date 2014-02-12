@@ -49,11 +49,11 @@ By default, Ensembles only includes support for iCloud. To use other cloud servi
 
 If you are using Cocoapods, you should not need to do anything. The optional cloud services are included in the default install. 
 
-If you do not want to include the optional services in your project, you can replace the standard pod command in your Podfile with the following
+If you don't want to include the optional services in your project, you can replace the standard pod command in your Podfile with the following
 
 		pod "Ensembles/Core", "~> 0.3.0"
 
-If you are not using Cocoapods, and are installing Ensembles manually, you need to locate the source files and frameworks relevant to the service you want to support. You can find frameworks in the `Vendor` folder, and source files in `Framework/Extensions`.
+If you are installing Ensembles manually, rather than with Cocoapods, you need to locate the source files and frameworks relevant to the service you want to support. You can find frameworks in the `Vendor` folder, and source files in `Framework/Extensions`.
 
 By way of example, if you want to support Dropbox, you need to add the DropboxSDK Xcode project as a dependency, link to the appropriate product library, and include the files `CDEDropboxCloudFileSystem.h` and `CDEDropboxCloudFileSystem.m` in your project.
 
@@ -67,14 +67,33 @@ The Idiomatic project is a good way to get acquainted with Ensembles, and how it
 2. Select the Idiomatic Project in the source list of the Xcode project, and then select the Idiomatic target.
 3. In the General section, set the bundle identifier (eg com.yourcompany.idiomatic).
 4. Select the _Capabilities_ section, turn on the iCloud switch, and replace the existing Ubiquity Container with your own.
-5. In the IDMAppDelegate class, locate this code in application:didFinishLaunchingWithOptions:
+5. At the top of the `IDMAppDelegate` class, locate this code
 
-		// Setup Ensemble
-		cloudFileSystem = [[CDEICloudFileSystem alloc] initWithUbiquityContainerIdentifier:@"P7BXV6PHLD.com.mentalfaculty.idiomatic"];
-
+		NSString * const IDMICloudContainerIdentifier = @"P7BXV6PHLD.com.mentalfaculty.idiomatic";
+		
 6. Fill in the Ubiquity Container Identifier appropriate for your bundle identifier and team identifier. You can find this on the iOS Developer Center under the App ID you registered. Just combine the _Prefix_ entry with the _ID_.
 7. Build and install on devices and simulators that are logged into the same iCloud account.
 8. Add notes, and tag them as desired. The app will sync when it becomes active, but you can force a sync by tapping the button under the Groups table.
+
+Dropbox sync should work via The Mental Faculty account, but if you want to use your own developer account, you need to do the following:
+
+1. Sign up for a Dropbox developer account at developer.dropbox.com
+2. In the App Console, click the Create app button.
+3. Choose the Dropbox API app type.
+4. Choose to store 'Files and Datastores'
+5. Choose 'Yes &mdash; My app only needs access to files it creates'
+6. Name the app (eg Idiomatic)
+7. Click on Create app 
+8. At the top of the `IDMAppDelegate` class, locate this code, and replace the values with the strings you just created on the Dropbox site.
+
+		NSString * const IDMDropboxAppKey = @"xxxxxxxxxxxxxxx";
+		NSString * const IDMDropboxAppSecret = @"xxxxxxxxxxxxxxx";
+	
+9. Select the Idiomatic project in Xcode, and then the Idiomatic iOS target.
+10. Select the Info tab.
+11. Open the URL Types section, and change the URL Schemes entry to 
+
+		db-<Your Dropbox App Key>
 
 #### Getting to Know Ensembles
 
