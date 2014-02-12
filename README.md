@@ -5,7 +5,7 @@ Core Data Ensembles
 
 _Author:_ Drew McCormack<br>
 _Created:_ 29th September, 2013<br>
-_Last Updated:_ 30th January, 2014
+_Last Updated:_ 12th February, 2014
 
 Ensembles extends Apple's Core Data framework to add peer-to-peer synchronization for Mac OS and iOS. Multiple SQLite persistent stores can be coupled together via a file synchronization platform like iCloud or Dropbox. The framework can be readily extended to support any service capable of moving files between devices, including custom servers.
 
@@ -59,7 +59,7 @@ By way of example, if you want to support Dropbox, you need to add the DropboxSD
 
 #### Idiomatic  App
 
-Idiomatic is a relatively simple example app which incorporates Ensembles and works with iCloud to sync across devices. The app allows you to record your ideas, and add tags to group them. The Core Data model of the app includes two entities, with a many-to-many relationship.
+Idiomatic is a relatively simple example app which incorporates Ensembles and works with iCloud or Dropbox to sync across devices. The app allows you to record your ideas, and add tags to group them. The Core Data model of the app includes two entities, with a many-to-many relationship.
 
 The Idiomatic project is a good way to get acquainted with Ensembles, and how it is integrated in a Core Data app. Idiomatic can be run in the iPhone Simulator, or on a device, but in order to test it, you need to follow a few preparatory steps.
 
