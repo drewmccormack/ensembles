@@ -20,21 +20,25 @@
 
 @property (nonatomic, strong, readwrite) NSSet *snapshotBaselineFilenames;
 @property (nonatomic, strong, readwrite) NSSet *snapshotEventFilenames;
+@property (nonatomic, strong, readwrite) NSSet *snapshotDataFilenames;
 
 @property (nonatomic, strong, readonly) NSString *localEnsembleDirectory;
 
 @property (nonatomic, strong, readonly) NSString *localDownloadRoot;
 @property (nonatomic, strong, readonly) NSString *localStoresDownloadDirectory;
 @property (nonatomic, strong, readonly) NSString *localEventsDownloadDirectory;
+@property (nonatomic, strong, readonly) NSString *localDataDownloadDirectory;
 
 @property (nonatomic, strong, readonly) NSString *localUploadRoot;
 @property (nonatomic, strong, readonly) NSString *localStoresUploadDirectory;
 @property (nonatomic, strong, readonly) NSString *localEventsUploadDirectory;
+@property (nonatomic, strong, readonly) NSString *localDataUploadDirectory;
 
 @property (nonatomic, strong, readonly) NSString *remoteEnsembleDirectory;
 @property (nonatomic, strong, readonly) NSString *remoteStoresDirectory;
 @property (nonatomic, strong, readonly) NSString *remoteEventsDirectory;
 @property (nonatomic, strong, readonly) NSString *remoteBaselinesDirectory;
+@property (nonatomic, strong, readonly) NSString *remoteDataDirectory;
 
 @end
 
@@ -48,6 +52,7 @@
 @synthesize cloudFileSystem = cloudFileSystem;
 @synthesize snapshotBaselineFilenames = snapshotBaselineFilenames;
 @synthesize snapshotEventFilenames = snapshotEventFilenames;
+@synthesize snapshotDataFilenames = snapshotDataFilenames;
 
 #pragma mark Initialization
 
@@ -72,27 +77,41 @@
 - (void)snapshotRemoteFilesWithCompletion:(CDECompletionBlock)completion
 {
     [self clearSnapshot];
-    [self.cloudFileSystem contentsOfDirectoryAtPath:self.remoteBaselinesDirectory completion:^(NSArray *baselineContents, NSError *error) {
-        if (error) {
-            if (completion) completion(error);
-            return;
-        }
-        
-        [self.cloudFileSystem contentsOfDirectoryAtPath:self.remoteEventsDirectory completion:^(NSArray *eventContents, NSError *error) {
-            if (!error) {
-                snapshotEventFilenames = [NSSet setWithArray:[eventContents valueForKeyPath:@"name"]];
-                snapshotBaselineFilenames = [NSSet setWithArray:[baselineContents valueForKeyPath:@"name"]];
-            }
-            
-            if (completion) completion(error);
+    
+    CDEAsynchronousTaskBlock baselinesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self.cloudFileSystem contentsOfDirectoryAtPath:self.remoteBaselinesDirectory completion:^(NSArray *baselineContents, NSError *error) {
+            if (!error) snapshotBaselineFilenames = [NSSet setWithArray:[baselineContents valueForKeyPath:@"name"]];
+            next(error, NO);
         }];
+    };
+    
+    CDEAsynchronousTaskBlock eventsTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self.cloudFileSystem contentsOfDirectoryAtPath:self.remoteEventsDirectory completion:^(NSArray *eventContents, NSError *error) {
+            if (!error) snapshotEventFilenames = [NSSet setWithArray:[eventContents valueForKeyPath:@"name"]];
+            next(error, NO);
+        }];
+    };
+    
+    CDEAsynchronousTaskBlock dataTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self.cloudFileSystem contentsOfDirectoryAtPath:self.remoteDataDirectory completion:^(NSArray *dataContents, NSError *error) {
+            if (!error) snapshotDataFilenames = [NSSet setWithArray:[dataContents valueForKeyPath:@"name"]];
+            next(error, NO);
+        }];
+    };
+    
+    NSArray *tasks = @[baselinesTask, eventsTask, dataTask];
+    CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:tasks terminationPolicy:CDETaskQueueTerminationPolicyStopOnError completion:^(NSError *error) {
+        if (error) [self clearSnapshot];
+        if (completion) completion(error);
     }];
+    [operationQueue addOperation:taskQueue];
 }
 
 - (void)clearSnapshot
 {
     snapshotEventFilenames = nil;
     snapshotBaselineFilenames = nil;
+    snapshotDataFilenames = nil;
 }
 
 
@@ -523,16 +542,27 @@
     return [self.localUploadRoot stringByAppendingPathComponent:@"events"];
 }
 
+- (NSString *)localDataDownloadDirectory
+{
+    return [self.localDownloadRoot stringByAppendingPathComponent:@"data"];
+}
+
+- (NSString *)localDataUploadDirectory
+{
+    return [self.localUploadRoot stringByAppendingPathComponent:@"data"];
+}
+
 
 #pragma mark Local Directory Structure
 
 - (void)createTransitCacheDirectories
 {
-    [fileManager createDirectoryAtPath:localFileRoot withIntermediateDirectories:YES attributes:nil error:NULL];
-    [fileManager createDirectoryAtPath:self.localEventsDownloadDirectory withIntermediateDirectories:YES attributes:nil error:NULL];
-    [fileManager createDirectoryAtPath:self.localEventsUploadDirectory withIntermediateDirectories:YES attributes:nil error:NULL];
-    [fileManager createDirectoryAtPath:self.localStoresDownloadDirectory withIntermediateDirectories:YES attributes:nil error:NULL];
-    [fileManager createDirectoryAtPath:self.localStoresUploadDirectory withIntermediateDirectories:YES attributes:nil error:NULL];
+    NSArray *dirs = @[localFileRoot, self.localEventsDownloadDirectory, self.localEventsUploadDirectory,
+        self.localStoresDownloadDirectory, self.localStoresUploadDirectory, self.localDataDownloadDirectory,
+        self.localDataUploadDirectory];
+    for (NSString *dir in dirs) {
+        [fileManager createDirectoryAtPath:dir withIntermediateDirectories:YES attributes:nil error:NULL];
+    }
 }
 
 - (BOOL)removeFilesInDirectory:(NSString *)dir error:(NSError * __autoreleasing *)error
@@ -632,9 +662,14 @@
     return [self.remoteEnsembleDirectory stringByAppendingPathComponent:@"baselines"];
 }
 
+- (NSString *)remoteDataDirectory
+{
+    return [self.remoteEnsembleDirectory stringByAppendingPathComponent:@"data"];
+}
+
 - (void)createRemoteDirectoryStructureWithCompletion:(CDECompletionBlock)completion
 {
-    NSArray *dirs = @[self.remoteEnsembleDirectory, self.remoteStoresDirectory, self.remoteEventsDirectory, self.remoteBaselinesDirectory];
+    NSArray *dirs = @[self.remoteEnsembleDirectory, self.remoteStoresDirectory, self.remoteEventsDirectory, self.remoteBaselinesDirectory, self.remoteDataDirectory];
     [self createRemoteDirectories:dirs withCompletion:completion];
 }
 
