@@ -161,4 +161,58 @@ static NSString *rootTestDirectory;
     [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
 }
 
+- (void)testImportingDataFile
+{
+    [store prepareNewEventStore:NULL];
+    NSString *file = [NSTemporaryDirectory() stringByAppendingPathComponent:@"fileToImport"];
+    [@"Hi there" writeToFile:file atomically:NO encoding:NSUTF8StringEncoding error:NULL];
+    XCTAssertTrue([store importDataFile:file], @"Import failed");
+    
+    NSString *storePath = [store.pathToEventDataRootDirectory stringByAppendingPathComponent:@"test/data/fileToImport"];
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:storePath], @"No file found in data dir");
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:file], @"Original file should be gone");
+}
+
+- (void)testExportingDataFile
+{
+    NSString *exportPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"fileToExport"];
+    [[NSFileManager defaultManager] removeItemAtPath:exportPath error:NULL];
+    
+    [store prepareNewEventStore:NULL];
+    
+    NSString *storePath = [store.pathToEventDataRootDirectory stringByAppendingPathComponent:@"test/data/fileToExport"];
+    [@"Hi there" writeToFile:storePath atomically:NO encoding:NSUTF8StringEncoding error:NULL];
+    
+    
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:exportPath], @"File is already in temp dir");
+    [store exportDataFile:@"fileToExport" toDirectory:NSTemporaryDirectory()];
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:exportPath], @"File is not exported");
+}
+
+- (void)testRemovingDataFile
+{
+    [store prepareNewEventStore:NULL];
+    
+    NSString *storePath = [store.pathToEventDataRootDirectory stringByAppendingPathComponent:@"test/data/fileToRemove"];
+    [@"Hi there" writeToFile:storePath atomically:NO encoding:NSUTF8StringEncoding error:NULL];
+    
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:storePath], @"No file found in data dir");
+    [store removeDataFile:@"fileToRemove"];
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:storePath], @"File is not gone");
+}
+
+- (void)testRetrievingDataFilenames
+{
+    [store prepareNewEventStore:NULL];
+
+    NSString *storePath = [store.pathToEventDataRootDirectory stringByAppendingPathComponent:@"test/data/file1"];
+    [@"Hi there" writeToFile:storePath atomically:NO encoding:NSUTF8StringEncoding error:NULL];
+    storePath = [store.pathToEventDataRootDirectory stringByAppendingPathComponent:@"test/data/file2"];
+    [@"Hi there" writeToFile:storePath atomically:NO encoding:NSUTF8StringEncoding error:NULL];
+    
+    NSSet *files = store.dataFilenames;
+    XCTAssertEqual(files.count, (NSUInteger)2, @"Wrong file count");
+    XCTAssertTrue([files.anyObject hasPrefix:@"file"], @"Wrong file name prefix");
+}
+
 @end
