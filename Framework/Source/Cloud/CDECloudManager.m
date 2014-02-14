@@ -640,6 +640,7 @@
     NSArray *nonBaselineTypes = @[@(CDEStoreModificationEventTypeSave), @(CDEStoreModificationEventTypeMerge)];
     NSSet *nonBaselineFilesForEventStore = [self filenamesForEventsWithAllowedTypes:nonBaselineTypes createdInStore:nil];
     NSSet *baselineFilesForEventStore = [self filenamesForEventsWithAllowedTypes:@[@(CDEStoreModificationEventTypeBaseline)] createdInStore:nil];
+    NSSet *dataFilesForEventStore = self.eventStore.dataFilenames;
     
     // Determine baselines to remove
     NSMutableSet *baselinesToRemove = [snapshotBaselineFilenames mutableCopy];
@@ -649,17 +650,21 @@
     NSMutableSet *nonBaselinesToRemove = [snapshotEventFilenames mutableCopy];
     [nonBaselinesToRemove minusSet:nonBaselineFilesForEventStore];
     
-    // Queue up removals
-    NSArray *baselinePaths = [baselinesToRemove.allObjects cde_arrayByTransformingObjectsWithBlock:^id(NSString *file) {
-        NSString *path = [self.remoteBaselinesDirectory stringByAppendingPathComponent:file];
-        return path;
-    }];
-    NSArray *nonBaselinePaths = [nonBaselinesToRemove.allObjects cde_arrayByTransformingObjectsWithBlock:^id(NSString *file) {
-        NSString *path = [self.remoteEventsDirectory stringByAppendingPathComponent:file];
-        return path;
-    }];
-    NSArray *pathsToRemove = [baselinePaths arrayByAddingObjectsFromArray:nonBaselinePaths];
+    // Determine data files to remove
+    NSMutableSet *dataFilesToRemove = [snapshotDataFilenames mutableCopy];
+    [dataFilesToRemove minusSet:dataFilesForEventStore];
     
+    // Queue up removals
+    NSMutableArray *pathsToRemove = [NSMutableArray array];
+    [baselinesToRemove enumerateObjectsUsingBlock:^(NSString *file, BOOL *stop) {
+        [pathsToRemove addObject:[self.remoteBaselinesDirectory stringByAppendingPathComponent:file]];
+    }];
+    [nonBaselinesToRemove enumerateObjectsUsingBlock:^(NSString *file, BOOL *stop) {
+        [pathsToRemove addObject:[self.remoteEventsDirectory stringByAppendingPathComponent:file]];
+    }];
+    [dataFilesToRemove enumerateObjectsUsingBlock:^(NSString *file, BOOL *stop) {
+        [pathsToRemove addObject:[self.remoteDataDirectory stringByAppendingPathComponent:file]];
+    }];
     CDELog(CDELoggingLevelVerbose, @"Removing cloud files: %@", [pathsToRemove componentsJoinedByString:@"\n"]);
     
     // Queue up tasks
