@@ -24,15 +24,8 @@
 
 @property (nonatomic, strong, readonly) NSString *localEnsembleDirectory;
 
-@property (nonatomic, strong, readonly) NSString *localDownloadRoot;
-@property (nonatomic, strong, readonly) NSString *localStoresDownloadDirectory;
-@property (nonatomic, strong, readonly) NSString *localEventsDownloadDirectory;
-@property (nonatomic, strong, readonly) NSString *localDataDownloadDirectory;
-
-@property (nonatomic, strong, readonly) NSString *localUploadRoot;
-@property (nonatomic, strong, readonly) NSString *localStoresUploadDirectory;
-@property (nonatomic, strong, readonly) NSString *localEventsUploadDirectory;
-@property (nonatomic, strong, readonly) NSString *localDataUploadDirectory;
+@property (nonatomic, strong, readonly) NSString *localDownloadDirectory;
+@property (nonatomic, strong, readonly) NSString *localUploadDirectory;
 
 @property (nonatomic, strong, readonly) NSString *remoteEnsembleDirectory;
 @property (nonatomic, strong, readonly) NSString *remoteStoresDirectory;
@@ -174,7 +167,7 @@
 - (void)transferNewFilesToTransitCacheFromRemoteDirectory:(NSString *)remoteDirectory availableFilenames:(NSArray *)filenames forEventTypes:(NSArray *)eventTypes completion:(CDECompletionBlock)completion
 {
         NSArray *filenamesToRetrieve = [self eventFilesRequiringRetrievalFromAvailableRemoteFiles:filenames allowedEventTypes:eventTypes];
-        [self transferRemoteFiles:filenamesToRetrieve fromRemoteDirectory:remoteDirectory toLocalDirectory:self.localEventsDownloadDirectory withCompletion:completion];
+        [self transferRemoteFiles:filenamesToRetrieve fromRemoteDirectory:remoteDirectory withCompletion:completion];
 }
 
 - (void)transferNewRemoteEventFilesToTransitCacheWithCompletion:(CDECompletionBlock)completion
@@ -191,11 +184,11 @@
     [self transferNewFilesToTransitCacheFromRemoteDirectory:self.remoteBaselinesDirectory availableFilenames:snapshotBaselineFilenames.allObjects forEventTypes:types completion:completion];
 }
 
-- (void)transferRemoteFiles:(NSArray *)filenames fromRemoteDirectory:(NSString *)remoteDirectory toLocalDirectory:(NSString *)localDirectory withCompletion:(CDECompletionBlock)completion
+- (void)transferRemoteFiles:(NSArray *)filenames fromRemoteDirectory:(NSString *)remoteDirectory withCompletion:(CDECompletionBlock)completion
 {
     // Remove any existing files in the cache first
     NSError *error = nil;
-    BOOL success = [self removeFilesInDirectory:localDirectory error:&error];
+    BOOL success = [self removeFilesInDirectory:self.localDownloadDirectory error:&error];
     if (!success) {
         if (completion) completion(error);
         return;
@@ -204,7 +197,7 @@
     NSMutableArray *taskBlocks = [NSMutableArray array];
     for (NSString *filename in filenames) {
         NSString *remotePath = [remoteDirectory stringByAppendingPathComponent:filename];
-        NSString *localPath = [localDirectory stringByAppendingPathComponent:filename];
+        NSString *localPath = [self.localDownloadDirectory stringByAppendingPathComponent:filename];
         CDEAsynchronousTaskBlock block = ^(CDEAsynchronousTaskCallbackBlock next) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.cloudFileSystem downloadFromPath:remotePath toLocalFile:localPath completion:^(NSError *error) {
@@ -233,7 +226,7 @@
     NSMutableSet *toRetrieve = [self.snapshotDataFilenames mutableCopy];
     NSSet *storeFilenames = self.eventStore.dataFilenames;
     [toRetrieve minusSet:storeFilenames];
-    [self transferRemoteFiles:toRetrieve.allObjects fromRemoteDirectory:self.remoteDataDirectory toLocalDirectory:self.localDataDownloadDirectory withCompletion:completion];
+    [self transferRemoteFiles:toRetrieve.allObjects fromRemoteDirectory:self.remoteDataDirectory withCompletion:completion];
 }
 
 
@@ -242,14 +235,14 @@
 - (void)migrateNewEventsWithAllowedTypes:(NSArray *)types fromTransitCacheWithCompletion:(CDECompletionBlock)completion
 {
     NSError *error = nil;
-    NSArray *files = [fileManager contentsOfDirectoryAtPath:self.localEventsDownloadDirectory error:&error];
+    NSArray *files = [fileManager contentsOfDirectoryAtPath:self.localDownloadDirectory error:&error];
     
     NSManagedObjectContext *moc = self.eventStore.managedObjectContext;
     CDEEventMigrator *migrator = [[CDEEventMigrator alloc] initWithEventStore:self.eventStore];
     
     NSMutableArray *tasks = [[NSMutableArray alloc] initWithCapacity:files.count];
     for (NSString *file in files) {
-        NSString *path = [self.localEventsDownloadDirectory stringByAppendingPathComponent:file];
+        NSString *path = [self.localDownloadDirectory stringByAppendingPathComponent:file];
         
         CDEAsynchronousTaskBlock block = ^(CDEAsynchronousTaskCallbackBlock next) {
             BOOL isBaseline = NO;
@@ -304,11 +297,11 @@
 
 - (BOOL)migrateNewDataFilesFromTransitCache:(NSError * __autoreleasing *)error
 {
-    NSArray *files = [fileManager contentsOfDirectoryAtPath:self.localDataDownloadDirectory error:error];
+    NSArray *files = [fileManager contentsOfDirectoryAtPath:self.localDownloadDirectory error:error];
     if (!files) return NO;
     
     for (NSString *file in files) {
-        NSString *path = [self.localEventsDownloadDirectory stringByAppendingPathComponent:file];
+        NSString *path = [self.localDownloadDirectory stringByAppendingPathComponent:file];
         BOOL success = [self.eventStore importDataFile:path];
         if (!success) {
             *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFileAccessFailed userInfo:nil];
@@ -330,7 +323,7 @@
     NSArray *types = @[@(CDEStoreModificationEventTypeMerge), @(CDEStoreModificationEventTypeSave)];
     [self migrateNewLocalEventsToTransitCacheWithRemoteDirectory:self.remoteEventsDirectory existingRemoteFilenames:snapshotEventFilenames.allObjects allowedTypes:types completion:^(NSError *error) {
         if (error) CDELog(CDELoggingLevelWarning, @"Error migrating out events: %@", error);
-        [self transferFilesInTransitCacheDirectory:self.localEventsUploadDirectory toRemoteDirectory:self.remoteEventsDirectory completion:completion];
+        [self transferFilesInTransitCacheToRemoteDirectory:self.remoteEventsDirectory completion:completion];
     }];
 }
 
@@ -342,7 +335,7 @@
     NSArray *types = @[@(CDEStoreModificationEventTypeBaseline)];
     [self migrateNewLocalEventsToTransitCacheWithRemoteDirectory:self.remoteBaselinesDirectory existingRemoteFilenames:snapshotBaselineFilenames.allObjects allowedTypes:types completion:^(NSError *error) {
         if (error) CDELog(CDELoggingLevelWarning, @"Error migrating out baseline: %@", error);
-        [self transferFilesInTransitCacheDirectory:self.localEventsUploadDirectory toRemoteDirectory:self.remoteBaselinesDirectory completion:completion];
+        [self transferFilesInTransitCacheToRemoteDirectory:self.remoteBaselinesDirectory completion:completion];
     }];
 }
 
@@ -358,7 +351,7 @@
         return;
     }
     
-    [self transferFilesInTransitCacheDirectory:self.localDataUploadDirectory toRemoteDirectory:self.remoteDataDirectory completion:completion];
+    [self transferFilesInTransitCacheToRemoteDirectory:self.remoteDataDirectory completion:completion];
 }
 
 - (void)migrateNewLocalEventsToTransitCacheWithRemoteDirectory:(NSString *)remoteDirectory existingRemoteFilenames:(NSArray *)filenames allowedTypes:(NSArray *)types completion:(CDECompletionBlock)completion
@@ -371,7 +364,7 @@
 {
     // Remove any existing files in the cache first
     NSError *error = nil;
-    BOOL success = [self removeFilesInDirectory:self.localEventsUploadDirectory error:&error];
+    BOOL success = [self removeFilesInDirectory:self.localUploadDirectory error:&error];
     if (!success) {
         if (completion) completion(error);
         return;
@@ -381,7 +374,7 @@
     CDEEventMigrator *migrator = [[CDEEventMigrator alloc] initWithEventStore:self.eventStore];
     NSMutableArray *tasks = [[NSMutableArray alloc] initWithCapacity:filesToUpload.count];
     for (NSString *file in filesToUpload) {
-        NSString *path = [self.localEventsUploadDirectory stringByAppendingPathComponent:file];
+        NSString *path = [self.localUploadDirectory stringByAppendingPathComponent:file];
         
         CDEAsynchronousTaskBlock block = ^(CDEAsynchronousTaskCallbackBlock next) {
             BOOL isBaseline = NO;
@@ -437,7 +430,7 @@
     [toTransfer minusSet:snapshotDataFilenames];
     
     for (NSString *file in toTransfer) {
-        BOOL success = [self.eventStore exportDataFile:file toDirectory:self.localDataUploadDirectory];
+        BOOL success = [self.eventStore exportDataFile:file toDirectory:self.localUploadDirectory];
         if (!success) {
             *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFileAccessFailed userInfo:nil];
             return NO;
@@ -448,16 +441,16 @@
 }
 
 
-- (void)transferFilesInTransitCacheDirectory:(NSString *)transitCacheDir toRemoteDirectory:(NSString *)remoteDirectory completion:(CDECompletionBlock)completion
+- (void)transferFilesInTransitCacheToRemoteDirectory:(NSString *)remoteDirectory completion:(CDECompletionBlock)completion
 {
     NSError *error = nil;
-    NSArray *files = [fileManager contentsOfDirectoryAtPath:transitCacheDir error:&error];
+    NSArray *files = [fileManager contentsOfDirectoryAtPath:self.localUploadDirectory error:&error];
     files = [self sortFilenamesByGlobalCount:files];
     
     NSMutableArray *taskBlocks = [NSMutableArray array];
     for (NSString *filename in files) {
         NSString *remotePath = [remoteDirectory stringByAppendingPathComponent:filename];
-        NSString *localPath = [self.localEventsUploadDirectory stringByAppendingPathComponent:filename];
+        NSString *localPath = [self.localUploadDirectory stringByAppendingPathComponent:filename];
         CDEAsynchronousTaskBlock block = ^(CDEAsynchronousTaskCallbackBlock next) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.cloudFileSystem uploadLocalFile:localPath toPath:remotePath completion:^(NSError *error) {
@@ -587,44 +580,14 @@
     return [localFileRoot stringByAppendingPathComponent:self.eventStore.ensembleIdentifier];
 }
 
-- (NSString *)localUploadRoot
+- (NSString *)localUploadDirectory
 {
     return [self.localEnsembleDirectory stringByAppendingPathComponent:@"upload"];
 }
 
-- (NSString *)localDownloadRoot
+- (NSString *)localDownloadDirectory
 {
     return [self.localEnsembleDirectory stringByAppendingPathComponent:@"download"];
-}
-
-- (NSString *)localStoresDownloadDirectory
-{
-    return [self.localDownloadRoot stringByAppendingPathComponent:@"stores"];
-}
-
-- (NSString *)localStoresUploadDirectory
-{
-    return [self.localUploadRoot stringByAppendingPathComponent:@"stores"];
-}
-
-- (NSString *)localEventsDownloadDirectory
-{
-    return [self.localDownloadRoot stringByAppendingPathComponent:@"events"];
-}
-
-- (NSString *)localEventsUploadDirectory
-{
-    return [self.localUploadRoot stringByAppendingPathComponent:@"events"];
-}
-
-- (NSString *)localDataDownloadDirectory
-{
-    return [self.localDownloadRoot stringByAppendingPathComponent:@"data"];
-}
-
-- (NSString *)localDataUploadDirectory
-{
-    return [self.localUploadRoot stringByAppendingPathComponent:@"data"];
 }
 
 
@@ -632,9 +595,9 @@
 
 - (void)createTransitCacheDirectories
 {
-    NSArray *dirs = @[localFileRoot, self.localEventsDownloadDirectory, self.localEventsUploadDirectory,
-        self.localStoresDownloadDirectory, self.localStoresUploadDirectory, self.localDataDownloadDirectory,
-        self.localDataUploadDirectory];
+    NSArray *dirs = @[localFileRoot, self.localDownloadDirectory, self.localUploadDirectory,
+        self.localDownloadDirectory, self.localUploadDirectory, self.localDownloadDirectory,
+        self.localUploadDirectory];
     for (NSString *dir in dirs) {
         [fileManager createDirectoryAtPath:dir withIntermediateDirectories:YES attributes:nil error:NULL];
     }
@@ -786,14 +749,14 @@
 {
     // Remove any existing files in the cache first
     NSError *error = nil;
-    BOOL success = [self removeFilesInDirectory:self.localStoresDownloadDirectory error:&error];
+    BOOL success = [self removeFilesInDirectory:self.localDownloadDirectory error:&error];
     if (!success) {
         if (completion) completion(nil, error);
         return;
     }
     
     NSString *remotePath = [self.remoteStoresDirectory stringByAppendingPathComponent:identifier];
-    NSString *localPath = [self.localStoresDownloadDirectory stringByAppendingPathComponent:identifier];
+    NSString *localPath = [self.localDownloadDirectory stringByAppendingPathComponent:identifier];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.cloudFileSystem fileExistsAtPath:remotePath completion:^(BOOL exists, BOOL isDirectory, NSError *error) {
             if (error || !exists) {
@@ -817,13 +780,13 @@
 {
     // Remove any existing files in the cache first
     NSError *error = nil;
-    BOOL success = [self removeFilesInDirectory:self.localStoresUploadDirectory error:&error];
+    BOOL success = [self removeFilesInDirectory:self.localUploadDirectory error:&error];
     if (!success) {
         if (completion) completion(error);
         return;
     }
     
-    NSString *localPath = [self.localStoresUploadDirectory stringByAppendingPathComponent:identifier];
+    NSString *localPath = [self.localUploadDirectory stringByAppendingPathComponent:identifier];
     success = [info writeToFile:localPath atomically:YES];
     if (!success) {
         error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFailedToWriteFile userInfo:nil];
