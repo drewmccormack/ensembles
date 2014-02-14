@@ -283,6 +283,16 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
     return success;
 }
 
+- (BOOL)exportDataFile:(NSString *)filename toDirectory:(NSString *)dirPath
+{
+    NSError *error;
+    NSString *fromPath = [self.pathToDataFileDirectory stringByAppendingPathComponent:filename];
+    NSString *toPath = [dirPath stringByAppendingPathComponent:filename];
+    BOOL success = [fileManager copyItemAtPath:fromPath toPath:toPath error:&error];
+    if (!success) CDELog(CDELoggingLevelError, @"Could not move file to event store data directory: %@", error);
+    return success;
+}
+
 - (BOOL)removeDataFile:(NSString *)filename
 {
     NSString *path = [self.pathToDataFileDirectory stringByAppendingPathComponent:filename];

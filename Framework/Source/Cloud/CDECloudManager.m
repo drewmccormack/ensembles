@@ -325,27 +325,40 @@
 - (void)exportNewLocalNonBaselineEventsWithCompletion:(CDECompletionBlock)completion
 {
     NSAssert(snapshotEventFilenames, @"No snapshot");
-    
     CDELog(CDELoggingLevelVerbose, @"Transferring events from event store to cloud");
 
     NSArray *types = @[@(CDEStoreModificationEventTypeMerge), @(CDEStoreModificationEventTypeSave)];
     [self migrateNewLocalEventsToTransitCacheWithRemoteDirectory:self.remoteEventsDirectory existingRemoteFilenames:snapshotEventFilenames.allObjects allowedTypes:types completion:^(NSError *error) {
         if (error) CDELog(CDELoggingLevelWarning, @"Error migrating out events: %@", error);
-        [self transferEventFilesInTransitCacheToRemoteDirectory:self.remoteEventsDirectory completion:completion];
+        [self transferFilesInTransitCacheDirectory:self.localEventsUploadDirectory toRemoteDirectory:self.remoteEventsDirectory completion:completion];
     }];
 }
 
 - (void)exportNewLocalBaselineWithCompletion:(CDECompletionBlock)completion
 {
     NSAssert(snapshotBaselineFilenames, @"No snapshot");
-
     CDELog(CDELoggingLevelVerbose, @"Transferring baseline from event store to cloud");
     
     NSArray *types = @[@(CDEStoreModificationEventTypeBaseline)];
     [self migrateNewLocalEventsToTransitCacheWithRemoteDirectory:self.remoteBaselinesDirectory existingRemoteFilenames:snapshotBaselineFilenames.allObjects allowedTypes:types completion:^(NSError *error) {
         if (error) CDELog(CDELoggingLevelWarning, @"Error migrating out baseline: %@", error);
-        [self transferEventFilesInTransitCacheToRemoteDirectory:self.remoteBaselinesDirectory completion:completion];
+        [self transferFilesInTransitCacheDirectory:self.localEventsUploadDirectory toRemoteDirectory:self.remoteBaselinesDirectory completion:completion];
     }];
+}
+
+- (void)exportDataFilesWithCompletion:(CDECompletionBlock)completion
+{
+    NSAssert(snapshotDataFilenames, @"No snapshot");
+    CDELog(CDELoggingLevelVerbose, @"Transferring data files from event store to cloud");
+
+    NSError *error;
+    BOOL success = [self migrateNewLocalDataFilesToTransitCache:&error];
+    if (!success) {
+        if (completion) completion(error);
+        return;
+    }
+    
+    [self transferFilesInTransitCacheDirectory:self.localDataUploadDirectory toRemoteDirectory:self.remoteDataDirectory completion:completion];
 }
 
 - (void)migrateNewLocalEventsToTransitCacheWithRemoteDirectory:(NSString *)remoteDirectory existingRemoteFilenames:(NSArray *)filenames allowedTypes:(NSArray *)types completion:(CDECompletionBlock)completion
@@ -418,10 +431,27 @@
     [operationQueue addOperation:taskQueue];
 }
 
-- (void)transferEventFilesInTransitCacheToRemoteDirectory:(NSString *)remoteDirectory completion:(CDECompletionBlock)completion
+- (BOOL)migrateNewLocalDataFilesToTransitCache:(NSError * __autoreleasing *)error
+{
+    NSMutableSet *toTransfer = [self.eventStore.dataFilenames mutableCopy];
+    [toTransfer minusSet:snapshotDataFilenames];
+    
+    for (NSString *file in toTransfer) {
+        BOOL success = [self.eventStore exportDataFile:file toDirectory:self.localDataUploadDirectory];
+        if (!success) {
+            *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFileAccessFailed userInfo:nil];
+            return NO;
+        }
+    }
+    
+    return YES;
+}
+
+
+- (void)transferFilesInTransitCacheDirectory:(NSString *)transitCacheDir toRemoteDirectory:(NSString *)remoteDirectory completion:(CDECompletionBlock)completion
 {
     NSError *error = nil;
-    NSArray *files = [fileManager contentsOfDirectoryAtPath:self.localEventsUploadDirectory error:&error];
+    NSArray *files = [fileManager contentsOfDirectoryAtPath:transitCacheDir error:&error];
     files = [self sortFilenamesByGlobalCount:files];
     
     NSMutableArray *taskBlocks = [NSMutableArray array];

@@ -16,18 +16,15 @@
 
 @interface CDECloudManager (TestMethods)
 
+@property (nonatomic, strong, readonly) NSString *localEventsUploadDirectory;
 @property (nonatomic, strong, readonly) NSString *remoteEventsDirectory;
-@property (nonatomic, strong, readonly) NSString *remoteBaselinesDirectory;
-@property (nonatomic, strong, readwrite) NSSet *snapshotBaselineFilenames;
 @property (nonatomic, strong, readwrite) NSSet *snapshotEventFilenames;
 
 - (NSArray *)sortFilenamesByGlobalCount:(NSArray *)files;
 
-- (void)transferNewRemoteEventFilesToTransitCacheWithCompletion:(CDECompletionBlock)completion;
-- (void)transferNewRemoteBaselineFilesToTransitCacheWithCompletion:(CDECompletionBlock)completion;
 - (void)migrateNewEventsWithAllowedTypes:(NSArray *)types fromTransitCacheWithCompletion:(CDECompletionBlock)completion;
 
-- (void)transferEventFilesInTransitCacheToRemoteDirectory:(NSString *)remoteDirectory completion:(CDECompletionBlock)completion;
+- (void)transferFilesInTransitCacheDirectory:(NSString *)cacheDir toRemoteDirectory:(NSString *)remoteDirectory completion:(CDECompletionBlock)completion;
 - (void)migrateNewLocalEventsToTransitCacheWithRemoteDirectory:(NSString *)remoteDirectory existingRemoteFilenames:(NSArray *)filenames allowedTypes:(NSArray *)types completion:(CDECompletionBlock)completion;
 
 @end
@@ -209,7 +206,7 @@
                 NSString *eventsDir = [path stringByDeletingLastPathComponent];
                 XCTAssertEqual([[fileManager contentsOfDirectoryAtPath:eventsDir error:NULL] count], (NSUInteger)2, @"Wrong number of files exported");
                 
-                [cloudManager transferEventFilesInTransitCacheToRemoteDirectory:cloudManager.remoteEventsDirectory completion:^(NSError *error) {
+                [cloudManager transferFilesInTransitCacheDirectory:cloudManager.localEventsUploadDirectory toRemoteDirectory:cloudManager.remoteEventsDirectory completion:^(NSError *error) {
                     XCTAssertNil(error, @"Error transferring to cloud");
                     
                     NSString *remotePath = [remoteEnsemblesDir stringByAppendingPathComponent:@"events/2_store1_1.cdeevent"];
