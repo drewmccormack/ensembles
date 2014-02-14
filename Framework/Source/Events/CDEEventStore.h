@@ -10,7 +10,7 @@
 #import "CDEDefines.h"
 #import <CoreData/CoreData.h>
 
-@interface CDEEventStore : NSObject <NSLocking>
+@interface CDEEventStore : NSObject
 
 @property (nonatomic, strong, readonly) NSString *ensembleIdentifier;
 @property (nonatomic, strong, readwrite) id <NSObject, NSCopying, NSCoding> cloudFileSystemIdentityToken;
@@ -29,6 +29,8 @@
 @property (nonatomic, assign, readonly) CDERevisionNumber lastRevision;
 @property (nonatomic, assign, readonly) CDERevisionNumber baselineRevision;
 
+@property (nonatomic, strong, readonly) NSSet *dataFilenames;
+
 @property (nonatomic, copy, readwrite) NSString *identifierOfBaselineUsedToConstructStore;
 @property (nonatomic, copy, readonly) NSString *currentBaselineIdentifier;
 
@@ -44,5 +46,8 @@
 
 - (void)registerIncompleteEventIdentifier:(NSString *)identifier isMandatory:(BOOL)mandatory;
 - (void)deregisterIncompleteEventIdentifier:(NSString *)identifier;
+
+- (BOOL)importDataFile:(NSString *)path;
+- (BOOL)removeDataFile:(NSString *)filename;
 
 @end

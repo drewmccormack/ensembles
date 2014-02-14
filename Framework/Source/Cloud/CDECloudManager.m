@@ -64,8 +64,10 @@
         eventStore = newStore;
         cloudFileSystem = newSystem;
         localFileRoot = [eventStore.pathToEventDataRootDirectory stringByAppendingPathComponent:@"transitcache"];
+        
         operationQueue = [[NSOperationQueue alloc] init];
         operationQueue.maxConcurrentOperationCount = 1;
+        
         [self createTransitCacheDirectories];
     }
     return self;
@@ -149,13 +151,30 @@
     }];
 }
 
+- (void)importNewDataFilesWithCompletion:(CDECompletionBlock)completion
+{
+    NSAssert([NSThread isMainThread], @"importNewDataFilesWithCompletion... called off the main thread");
+    
+    CDELog(CDELoggingLevelVerbose, @"Transferring new data files from cloud to event store");
+    
+    [self transferNewRemoteDataFilesToTransitCacheWithCompletion:^(NSError *error) {
+        if (error) {
+            if (completion) completion(error);
+            return;
+        }
+        
+        BOOL success = [self migrateNewDataFilesFromTransitCache:&error];
+        if (completion) completion(success ? nil : error);
+    }];
+}
+
 
 #pragma mark Downloading Remote Files
 
 - (void)transferNewFilesToTransitCacheFromRemoteDirectory:(NSString *)remoteDirectory availableFilenames:(NSArray *)filenames forEventTypes:(NSArray *)eventTypes completion:(CDECompletionBlock)completion
 {
         NSArray *filenamesToRetrieve = [self eventFilesRequiringRetrievalFromAvailableRemoteFiles:filenames allowedEventTypes:eventTypes];
-        [self transferRemoteEventFiles:filenamesToRetrieve fromRemoteDirectory:remoteDirectory toTransitCacheWithCompletion:completion];
+        [self transferRemoteFiles:filenamesToRetrieve fromRemoteDirectory:remoteDirectory toLocalDirectory:self.localEventsDownloadDirectory withCompletion:completion];
 }
 
 - (void)transferNewRemoteEventFilesToTransitCacheWithCompletion:(CDECompletionBlock)completion
@@ -172,11 +191,11 @@
     [self transferNewFilesToTransitCacheFromRemoteDirectory:self.remoteBaselinesDirectory availableFilenames:snapshotBaselineFilenames.allObjects forEventTypes:types completion:completion];
 }
 
-- (void)transferRemoteEventFiles:(NSArray *)filenames fromRemoteDirectory:(NSString *)remoteDirectory toTransitCacheWithCompletion:(CDECompletionBlock)completion
+- (void)transferRemoteFiles:(NSArray *)filenames fromRemoteDirectory:(NSString *)remoteDirectory toLocalDirectory:(NSString *)localDirectory withCompletion:(CDECompletionBlock)completion
 {
     // Remove any existing files in the cache first
     NSError *error = nil;
-    BOOL success = [self removeFilesInDirectory:self.localEventsDownloadDirectory error:&error];
+    BOOL success = [self removeFilesInDirectory:localDirectory error:&error];
     if (!success) {
         if (completion) completion(error);
         return;
@@ -185,7 +204,7 @@
     NSMutableArray *taskBlocks = [NSMutableArray array];
     for (NSString *filename in filenames) {
         NSString *remotePath = [remoteDirectory stringByAppendingPathComponent:filename];
-        NSString *localPath = [self.localEventsDownloadDirectory stringByAppendingPathComponent:filename];
+        NSString *localPath = [localDirectory stringByAppendingPathComponent:filename];
         CDEAsynchronousTaskBlock block = ^(CDEAsynchronousTaskCallbackBlock next) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self.cloudFileSystem downloadFromPath:remotePath toLocalFile:localPath completion:^(NSError *error) {
@@ -206,6 +225,15 @@
     NSSet *storeFilenames = [self filenamesForEventsWithAllowedTypes:eventTypes createdInStore:nil];
     [toRetrieve minusSet:storeFilenames];
     return [self sortFilenamesByGlobalCount:toRetrieve.allObjects];
+}
+
+- (void)transferNewRemoteDataFilesToTransitCacheWithCompletion:(CDECompletionBlock)completion
+{
+    NSAssert(snapshotDataFilenames, @"No snapshot files");
+    NSMutableSet *toRetrieve = [self.snapshotDataFilenames mutableCopy];
+    NSSet *storeFilenames = self.eventStore.dataFilenames;
+    [toRetrieve minusSet:storeFilenames];
+    [self transferRemoteFiles:toRetrieve.allObjects fromRemoteDirectory:self.remoteDataDirectory toLocalDirectory:self.localDataDownloadDirectory withCompletion:completion];
 }
 
 
@@ -272,6 +300,23 @@
     
     CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:tasks terminationPolicy:CDETaskQueueTerminationPolicyCompleteAll completion:completion];
     [operationQueue addOperation:taskQueue];
+}
+
+- (BOOL)migrateNewDataFilesFromTransitCache:(NSError * __autoreleasing *)error
+{
+    NSArray *files = [fileManager contentsOfDirectoryAtPath:self.localDataDownloadDirectory error:error];
+    if (!files) return NO;
+    
+    for (NSString *file in files) {
+        NSString *path = [self.localEventsDownloadDirectory stringByAppendingPathComponent:file];
+        BOOL success = [self.eventStore importDataFile:path];
+        if (!success) {
+            *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFileAccessFailed userInfo:nil];
+            return NO;
+        }
+    }
+    
+    return YES;
 }
 
 
