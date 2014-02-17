@@ -283,6 +283,15 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
     return success;
 }
 
+- (NSString *)importData:(NSData *)data
+{
+    NSString *filename = [[NSProcessInfo processInfo] globallyUniqueString];
+    NSString *toPath = [self.pathToDataFileDirectory stringByAppendingPathComponent:filename];
+    BOOL success = [data writeToFile:toPath atomically:YES];
+    if (!success) filename = nil;
+    return filename;
+}
+
 - (BOOL)exportDataFile:(NSString *)filename toDirectory:(NSString *)dirPath
 {
     NSError *error;
@@ -291,6 +300,15 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
     BOOL success = [fileManager copyItemAtPath:fromPath toPath:toPath error:&error];
     if (!success) CDELog(CDELoggingLevelError, @"Could not move file to event store data directory: %@", error);
     return success;
+}
+
+- (NSData *)dataForFile:(NSString *)filename
+{
+    NSError *error = nil;
+    NSString *path = [self.pathToDataFileDirectory stringByAppendingPathComponent:filename];
+    NSData *data = [NSData dataWithContentsOfFile:path options:(NSDataReadingMappedIfSafe | NSDataReadingUncached) error:&error];
+    if (!data) CDELog(CDELoggingLevelError, @"Failed to get file data for file %@: %@", filename, error);
+    return data;
 }
 
 - (BOOL)removeDataFile:(NSString *)filename

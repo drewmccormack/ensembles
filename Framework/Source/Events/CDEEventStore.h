@@ -48,7 +48,9 @@
 - (void)deregisterIncompleteEventIdentifier:(NSString *)identifier;
 
 - (BOOL)importDataFile:(NSString *)path;
+- (NSString *)importData:(NSData *)data; // Returns filename
 - (BOOL)exportDataFile:(NSString *)filename toDirectory:(NSString *)dirPath;
+- (NSData *)dataForFile:(NSString *)filename;
 - (BOOL)removeDataFile:(NSString *)filename;
 
 @end

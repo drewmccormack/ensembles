@@ -16,19 +16,13 @@ typedef NS_ENUM(NSInteger, CDEPropertyChangeType) {
     CDEPropertyChangeTypeOrderedToManyRelationship
 };
 
-@class CDEPropertyChangeValue;
-
-@protocol CDEPropertyChangeValueDelegate <NSObject>
-@required
-- (NSString *)propertyChangeValue:(CDEPropertyChangeValue *)value createFileForData:(NSData *)data;
-- (NSData *)propertyChangeValue:(CDEPropertyChangeValue *)value dataForFile:(NSString *)filename;
-@end
+@class CDEEventStore;
 
 @interface CDEPropertyChangeValue : NSObject <NSCoding>
 
 @property (nonatomic, assign, readonly) CDEPropertyChangeType type;
 @property (nonatomic, strong, readonly) NSString *propertyName;
-@property (nonatomic, weak, readwrite) id <CDEPropertyChangeValueDelegate> delegate;
+@property (nonatomic, weak, readwrite) CDEEventStore *eventStore;
 
 // Relationship identifiers may be local object ids or global ids,
 // depending on the context. When saved to the event store, they are global ids.

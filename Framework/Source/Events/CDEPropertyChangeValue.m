@@ -8,6 +8,7 @@
 
 #import "CDEPropertyChangeValue.h"
 #import "CDEDefines.h"
+#import "CDEEventStore.h"
 
 @interface CDEPropertyChangeValue ()
 
@@ -176,6 +177,8 @@
 
 - (void)storeAttributeChangeForDescription:(NSAttributeDescription *)propertyDesc newValue:(id)newValue
 {
+    NSAssert(self.eventStore, @"Storing attribute requires event store");
+
     NSAttributeDescription *attribute = (id)propertyDesc;
     if ([attribute valueTransformerName]) {
         NSValueTransformer *valueTransformer = [NSValueTransformer valueTransformerForName:attribute.valueTransformerName];
@@ -183,12 +186,10 @@
     }
     
     // Put data bigger than 10KB or so in an external file
-    id <CDEPropertyChangeValueDelegate> strongDelegate = self.delegate;
-    if (strongDelegate && [newValue isKindOfClass:[NSData class]] && [(NSData *)newValue length] > 10e4) {
-        NSString *filename = [strongDelegate propertyChangeValue:self createFileForData:newValue];
-        self.filename = filename;
+    if (self.eventStore && [newValue isKindOfClass:[NSData class]] && [(NSData *)newValue length] > 10e4) {
+        self.filename = [self.eventStore importData:newValue];
         self.value = nil;
-        if (filename) return; // If success, return. Otherwise just store normally below.
+        if (self.filename) return; // If success, return. Otherwise just store normally below.
     }
 
     self.value = newValue;
@@ -269,10 +270,12 @@
 #pragma mark Extracting Values
 
 - (id)attributeValueForAttributeDescription:(NSAttributeDescription *)attribute
-{    
+{
+    NSAssert(self.eventStore, @"Retrieving attribute requires event store");
+
     id returnValue = nil;
     if (self.filename) {
-        returnValue = [self.delegate propertyChangeValue:self dataForFile:self.filename];
+        returnValue = [self.eventStore dataForFile:self.filename];
     }
     else if (self.value) {
         returnValue = self.value == [NSNull null] ? nil : self.value;
