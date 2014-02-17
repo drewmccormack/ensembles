@@ -134,6 +134,20 @@
     [self waitForAsyncOperation];
 }
 
+- (void)testCreateRemoteDataDirectory
+{
+    [cloudManager createRemoteDirectoryStructureWithCompletion:^(NSError *error) {
+        XCTAssertNil(error, @"Error creating directories");
+        NSString *eventsDir = [remoteEnsemblesDir stringByAppendingPathComponent:@"data"];
+        [cloudFileSystem fileExistsAtPath:eventsDir completion:^(BOOL exists, BOOL isDirectory, NSError *error) {
+            XCTAssert(isDirectory, @"Stores was not directory");
+            XCTAssert(exists, @"No stores dir created");
+            [self stopWaiting];
+        }];
+    }];
+    [self waitForAsyncOperation];
+}
+
 - (void)testImportFromCloudWithNoData
 {
     [cloudManager snapshotRemoteFilesWithCompletion:^(NSError *error) {
@@ -234,7 +248,7 @@
     [cloudManager createRemoteDirectoryStructureWithCompletion:^(NSError *error) {
         [cloudManager snapshotRemoteFilesWithCompletion:^(NSError *error) {
             [cloudManager exportNewLocalNonBaselineEventsWithCompletion:^(NSError *error) {
-                NSString *eventsDir = [rootDir stringByAppendingPathComponent:@"transitcache/ensemble1/upload/events"];
+                NSString *eventsDir = [rootDir stringByAppendingPathComponent:@"transitcache/ensemble1/upload"];
                 XCTAssertEqual([[fileManager contentsOfDirectoryAtPath:eventsDir error:NULL] count], (NSUInteger)0, @"Should be no files after a successful export");
                 [self stopWaiting];
             }];
