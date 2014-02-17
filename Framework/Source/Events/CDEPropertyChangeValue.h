@@ -21,6 +21,7 @@ typedef NS_ENUM(NSInteger, CDEPropertyChangeType) {
 @protocol CDEPropertyChangeValueDelegate <NSObject>
 @required
 - (NSString *)propertyChangeValue:(CDEPropertyChangeValue *)value createFileForData:(NSData *)data;
+- (NSData *)propertyChangeValue:(CDEPropertyChangeValue *)value dataForFile:(NSString *)filename;
 @end
 
 @interface CDEPropertyChangeValue : NSObject <NSCoding>
@@ -45,6 +46,8 @@ typedef NS_ENUM(NSInteger, CDEPropertyChangeType) {
 
 - (instancetype)initWithObject:(NSManagedObject *)object propertyDescription:(NSPropertyDescription *)propertyDesc isPreSave:(BOOL)isPreSave storeValues:(BOOL)storeValues;
 - (instancetype)initWithType:(CDEPropertyChangeType)type propertyName:(NSString *)name;
+
+- (id)attributeValueForAttributeDescription:(NSAttributeDescription *)attribute;
 
 - (void)updateWithObject:(NSManagedObject *)object isPreSave:(BOOL)isPreSave storeValues:(BOOL)storeValues;
 

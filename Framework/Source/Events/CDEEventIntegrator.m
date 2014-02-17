@@ -639,9 +639,6 @@
 {
     NSEntityDescription *entity = object.entity;
     for (CDEPropertyChangeValue *changeValue in properyChangeValues) {
-        id newValue = changeValue.value;
-        if (newValue == [NSNull null]) newValue = nil;
-        
         NSAttributeDescription *attribute = entity.attributesByName[changeValue.propertyName];
         if (!attribute) {
             // Likely attribute removed from model since change
@@ -649,15 +646,7 @@
             continue;
         }
         
-        if (attribute.valueTransformerName) {
-            NSValueTransformer *valueTransformer = [NSValueTransformer valueTransformerForName:attribute.valueTransformerName];
-            if (!valueTransformer) {
-                CDELog(CDELoggingLevelWarning, @"Failed to retrieve value transformer: %@", attribute.valueTransformerName);
-                continue;
-            }
-            newValue = [valueTransformer reverseTransformedValue:newValue];
-        }
-        
+        id newValue = [changeValue attributeValueForAttributeDescription:attribute];
         [self setValue:newValue forKey:changeValue.propertyName inObject:object];
     }
 }

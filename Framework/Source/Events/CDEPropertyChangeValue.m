@@ -266,6 +266,33 @@
 }
 
 
+#pragma mark Extracting Values
+
+- (id)attributeValueForAttributeDescription:(NSAttributeDescription *)attribute
+{    
+    id returnValue = nil;
+    if (self.filename) {
+        returnValue = [self.delegate propertyChangeValue:self dataForFile:self.filename];
+    }
+    else if (self.value) {
+        returnValue = self.value == [NSNull null] ? nil : self.value;
+    }
+    
+    if (attribute.valueTransformerName) {
+        NSValueTransformer *valueTransformer = [NSValueTransformer valueTransformerForName:attribute.valueTransformerName];
+        if (!valueTransformer) {
+            CDELog(CDELoggingLevelWarning, @"Failed to retrieve value transformer: %@", attribute.valueTransformerName);
+            returnValue = nil;
+        }
+        else {
+            returnValue = [valueTransformer reverseTransformedValue:returnValue];
+        }
+    }
+    
+    return returnValue;
+}
+
+
 #pragma mark Merging
 
 - (void)mergeToManyRelationshipFromSubordinatePropertyChangeValue:(CDEPropertyChangeValue *)propertyValue
