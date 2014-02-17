@@ -12,11 +12,7 @@
 #import "CDECloudFile.h"
 #import "CDECloudDirectory.h"
 
-typedef void (^CDEFileExistenceCallback)(BOOL exists, BOOL isDirectory, NSError *error);
-typedef void (^CDEDirectoryContentsCallback)(NSArray *contents, NSError *error);
-
-const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
-
+static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
 
 #pragma mark - File Operations
 
