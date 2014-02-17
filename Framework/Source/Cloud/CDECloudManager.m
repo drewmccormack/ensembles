@@ -595,9 +595,7 @@
 
 - (void)createTransitCacheDirectories
 {
-    NSArray *dirs = @[localFileRoot, self.localDownloadDirectory, self.localUploadDirectory,
-        self.localDownloadDirectory, self.localUploadDirectory, self.localDownloadDirectory,
-        self.localUploadDirectory];
+    NSArray *dirs = @[localFileRoot, self.localDownloadDirectory, self.localUploadDirectory];
     for (NSString *dir in dirs) {
         [fileManager createDirectoryAtPath:dir withIntermediateDirectories:YES attributes:nil error:NULL];
     }
