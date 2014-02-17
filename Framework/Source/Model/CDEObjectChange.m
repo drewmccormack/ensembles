@@ -18,6 +18,7 @@
 @dynamic storeModificationEvent;
 @dynamic nameOfEntity;
 @dynamic propertyChangeValues;
+@dynamic dataFiles;
 
 - (BOOL)validatePropertyChangeValues:(id *)value error:(NSError * __autoreleasing *)error
 {

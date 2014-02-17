@@ -60,6 +60,7 @@
 		075FDCE8183628F90020E1C9 /* CDEStoreModificationEventTestsModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 075FDCE3183628F90020E1C9 /* CDEStoreModificationEventTestsModel.xcdatamodeld */; };
 		07973EFE183BE40A007F48CA /* CDEICloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 07973EFB183BE40A007F48CA /* CDEICloudFileSystem.m */; };
 		07973EFF183BE40A007F48CA /* CDELocalCloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 07973EFD183BE40A007F48CA /* CDELocalCloudFileSystem.m */; };
+		07ABB5A418B24A6B006FC638 /* CDEDataFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 07ABB5A318B24A6B006FC638 /* CDEDataFile.m */; };
 		07BF374917F184DD00C56F64 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF374817F184DD00C56F64 /* Foundation.framework */; };
 		07BF37AA17F1853000C56F64 /* CDECloudDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF377017F1853000C56F64 /* CDECloudDirectory.m */; };
 		07BF37AB17F1853000C56F64 /* CDECloudFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF377217F1853000C56F64 /* CDECloudFile.m */; };
@@ -175,6 +176,9 @@
 		07973EFB183BE40A007F48CA /* CDEICloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDEICloudFileSystem.m; path = "Source/Cloud File Systems/CDEICloudFileSystem.m"; sourceTree = SOURCE_ROOT; };
 		07973EFC183BE40A007F48CA /* CDELocalCloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDELocalCloudFileSystem.h; path = "Source/Cloud File Systems/CDELocalCloudFileSystem.h"; sourceTree = SOURCE_ROOT; };
 		07973EFD183BE40A007F48CA /* CDELocalCloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDELocalCloudFileSystem.m; path = "Source/Cloud File Systems/CDELocalCloudFileSystem.m"; sourceTree = SOURCE_ROOT; };
+		07ABB5A118B245CF006FC638 /* CDEEventStoreModel_2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = file; path = CDEEventStoreModel_2.xcdatamodel; sourceTree = "<group>"; };
+		07ABB5A218B24A6B006FC638 /* CDEDataFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEDataFile.h; sourceTree = "<group>"; };
+		07ABB5A318B24A6B006FC638 /* CDEDataFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEDataFile.m; sourceTree = "<group>"; };
 		07BF374517F184DD00C56F64 /* libensembles_ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libensembles_ios.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		07BF374817F184DD00C56F64 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		07BF376F17F1853000C56F64 /* CDECloudDirectory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDECloudDirectory.h; sourceTree = "<group>"; };
@@ -501,6 +505,8 @@
 				07BF37A017F1853000C56F64 /* CDEObjectChange.m */,
 				07BF37A117F1853000C56F64 /* CDEStoreModificationEvent.h */,
 				07BF37A217F1853000C56F64 /* CDEStoreModificationEvent.m */,
+				07ABB5A218B24A6B006FC638 /* CDEDataFile.h */,
+				07ABB5A318B24A6B006FC638 /* CDEDataFile.m */,
 			);
 			name = Model;
 			path = Source/Model;
@@ -688,6 +694,7 @@
 				07D2D63B182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.m in Sources */,
 				07BF37C217F1853000C56F64 /* CDERevisionManager.m in Sources */,
 				07BF37B517F1853000C56F64 /* CDEEventStore.m in Sources */,
+				07ABB5A418B24A6B006FC638 /* CDEDataFile.m in Sources */,
 				07BF37AB17F1853000C56F64 /* CDECloudFile.m in Sources */,
 				07BF37B017F1853000C56F64 /* CDEPersistentStoreEnsemble.m in Sources */,
 				07BF37B617F1853000C56F64 /* CDEPropertyChangeValue.m in Sources */,
@@ -919,10 +926,11 @@
 		072BA97C180AACD9003AA94E /* CDEEventStoreModel.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				07ABB5A118B245CF006FC638 /* CDEEventStoreModel_2.xcdatamodel */,
 				072BA97D180AACD9003AA94E /* CDEEventStoreModel_0.xcdatamodel */,
 				072BA97E180AACD9003AA94E /* CDEEventStoreModel_1.xcdatamodel */,
 			);
-			currentVersion = 072BA97E180AACD9003AA94E /* CDEEventStoreModel_1.xcdatamodel */;
+			currentVersion = 07ABB5A118B245CF006FC638 /* CDEEventStoreModel_2.xcdatamodel */;
 			name = CDEEventStoreModel.xcdatamodeld;
 			path = ../../Resources/CDEEventStoreModel.xcdatamodeld;
 			sourceTree = "<group>";

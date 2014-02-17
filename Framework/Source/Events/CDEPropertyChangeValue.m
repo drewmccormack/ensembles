@@ -54,6 +54,7 @@
         self.type = type;
         self.objectID = nil;
         self.value = nil;
+        self.filename = nil;
         self.relatedIdentifier = nil;
         self.addedIdentifiers = nil;
         self.removedIdentifiers = nil;
@@ -75,16 +76,24 @@
         self.removedIdentifiers = [aDecoder decodeObjectForKey:@"removedIdentifiers"];
         self.movedIdentifiersByIndex = [aDecoder decodeObjectForKey:@"movedIdentifiersByIndex"];
         self.type = [aDecoder decodeIntegerForKey:@"type"];
+        
+        if ([aDecoder decodeIntegerForKey:@"classVersion"] > 0) {
+            self.filename = [aDecoder decodeObjectForKey:@"filename"];
+        }
+        else {
+            self.filename = nil;
+        }
     }
     return self;
 }
 
 - (void)encodeWithCoder:(NSCoder *)aCoder
 {
-    static const NSInteger classVersion = 0;
+    static const NSInteger classVersion = 1;
     [aCoder encodeInteger:classVersion forKey:@"classVersion"];
     [aCoder encodeObject:self.propertyName forKey:@"propertyName"];
     [aCoder encodeObject:self.value forKey:@"value"];
+    [aCoder encodeObject:self.filename forKey:@"filename"];
     [aCoder encodeObject:self.relatedIdentifier forKey:@"relatedIdentifier"];
     [aCoder encodeObject:self.addedIdentifiers forKey:@"addedIdentifiers"];
     [aCoder encodeObject:self.removedIdentifiers forKey:@"removedIdentifiers"];
@@ -172,7 +181,18 @@
         NSValueTransformer *valueTransformer = [NSValueTransformer valueTransformerForName:attribute.valueTransformerName];
         newValue = [valueTransformer transformedValue:newValue];
     }
+    
+    // Put data bigger than 10KB or so in an external file
+    id <CDEPropertyChangeValueDelegate> strongDelegate = self.delegate;
+    if (strongDelegate && [newValue isKindOfClass:[NSData class]] && [(NSData *)newValue length] > 10e4) {
+        NSString *filename = [strongDelegate propertyChangeValue:self createFileForData:newValue];
+        self.filename = filename;
+        self.value = nil;
+        if (filename) return; // If success, return. Otherwise just store normally below.
+    }
+
     self.value = newValue;
+    self.filename = nil;
 }
 
 - (void)storeToOneRelationshipChangeForDescription:(NSRelationshipDescription *)relationDesc newValue:(id)newValue
@@ -298,7 +318,7 @@
 
 - (NSString *)description
 {
-    NSString *result = [NSString stringWithFormat:@"Name: %@\rType: %d\rObjectID: %@\rValue: %@\rRelated: %@\rAdded: %@\rRemoved: %@\nMoved: %@\nRelated IDs: %@", self.propertyName, (int)self.type, self.objectID, self.value, self.relatedIdentifier, self.addedIdentifiers, self.removedIdentifiers, self.movedIdentifiersByIndex, self.relatedObjectIDs];
+    NSString *result = [NSString stringWithFormat:@"Name: %@\rType: %d\rObjectID: %@\rValue: %@\rFilename: %@\rRelated: %@\rAdded: %@\rRemoved: %@\nMoved: %@\nRelated IDs: %@", self.propertyName, (int)self.type, self.objectID, self.value, self.filename, self.relatedIdentifier, self.addedIdentifiers, self.removedIdentifiers, self.movedIdentifiersByIndex, self.relatedObjectIDs];
     return result;
 }
 
