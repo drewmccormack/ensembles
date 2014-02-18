@@ -21,26 +21,27 @@
 
 @implementation CDEPropertyChangeValue
 
-+ (NSArray *)propertyChangesForObject:(NSManagedObject *)object propertyNames:(id)names isPreSave:(BOOL)isPreSave storeValues:(BOOL)storeValues
++ (NSArray *)propertyChangesForObject:(NSManagedObject *)object eventStore:(CDEEventStore *)newEventStore propertyNames:(id)names isPreSave:(BOOL)isPreSave storeValues:(BOOL)storeValues
 {
     NSMutableArray *propertyChanges = [[NSMutableArray alloc] initWithCapacity:[names count]];
     NSEntityDescription *entity = object.entity;
     
     for (NSString *propertyName in names) {
         NSPropertyDescription *propertyDesc = entity.propertiesByName[propertyName];
-        CDEPropertyChangeValue *change = [[CDEPropertyChangeValue alloc] initWithObject:object propertyDescription:propertyDesc isPreSave:isPreSave storeValues:storeValues];
+        CDEPropertyChangeValue *change = [[CDEPropertyChangeValue alloc] initWithObject:object propertyDescription:propertyDesc eventStore:newEventStore isPreSave:isPreSave storeValues:storeValues];
         [propertyChanges addObject:change];
     }
     
     return propertyChanges;
 }
 
-- (instancetype)initWithObject:(NSManagedObject *)object propertyDescription:(NSPropertyDescription *)propertyDesc isPreSave:(BOOL)isPreSave storeValues:(BOOL)storeValues
+- (instancetype)initWithObject:(NSManagedObject *)object propertyDescription:(NSPropertyDescription *)propertyDesc eventStore:(CDEEventStore *)newEventStore isPreSave:(BOOL)isPreSave storeValues:(BOOL)storeValues
 {
     NSAssert(!object.objectID.isTemporaryID, @"Object has a temporary id in initWithObject: of CDEPropertyChangeValue");
     CDEPropertyChangeType newType = [self.class propertyChangeTypeForPropertyDescription:propertyDesc];
     self = [self initWithType:newType propertyName:propertyDesc.name];
     if (self) {
+        self.eventStore = newEventStore;
         self.objectID = object.objectID;
         [self updateWithObject:object isPreSave:isPreSave storeValues:storeValues];
     }

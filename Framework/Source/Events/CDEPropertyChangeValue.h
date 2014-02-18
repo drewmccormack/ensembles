@@ -36,9 +36,9 @@ typedef NS_ENUM(NSInteger, CDEPropertyChangeType) {
 @property (nonatomic, strong, readonly) NSManagedObjectID *objectID;
 @property (nonatomic, strong, readwrite) id relatedObjectIDs; // Used to determine to-many deltas
 
-+ (NSArray *)propertyChangesForObject:(NSManagedObject *)object propertyNames:(id)names isPreSave:(BOOL)isPreSave storeValues:(BOOL)storeValues;
++ (NSArray *)propertyChangesForObject:(NSManagedObject *)object eventStore:(CDEEventStore *)eventStore propertyNames:(id)names isPreSave:(BOOL)isPreSave storeValues:(BOOL)storeValues;
 
-- (instancetype)initWithObject:(NSManagedObject *)object propertyDescription:(NSPropertyDescription *)propertyDesc isPreSave:(BOOL)isPreSave storeValues:(BOOL)storeValues;
+- (instancetype)initWithObject:(NSManagedObject *)object propertyDescription:(NSPropertyDescription *)propertyDesc eventStore:(CDEEventStore *)eventStore isPreSave:(BOOL)isPreSave storeValues:(BOOL)storeValues;
 - (instancetype)initWithType:(CDEPropertyChangeType)type propertyName:(NSString *)name;
 
 - (id)attributeValueForAttributeDescription:(NSAttributeDescription *)attribute;

@@ -115,7 +115,7 @@
             
             NSArray *orderedInsertedObjects = insertedObjects.allObjects;
             [orderedInsertedObjects cde_enumerateObjectsDrainingEveryIterations:50 usingBlock:^(NSManagedObject *object, NSUInteger index, BOOL *stop) {
-                NSArray *propertyChanges = [CDEPropertyChangeValue propertyChangesForObject:object propertyNames:object.entity.propertiesByName.allKeys isPreSave:!saved storeValues:YES];
+                NSArray *propertyChanges = [CDEPropertyChangeValue propertyChangesForObject:object eventStore:self.eventStore propertyNames:object.entity.propertiesByName.allKeys isPreSave:!saved storeValues:YES];
                 if (!propertyChanges) return;
                 
                 [changeArrays addObject:propertyChanges];
@@ -279,7 +279,7 @@
     [updatedObjectsContext performBlockAndWait:^{
         changedValuesByObjectID = [NSMutableDictionary dictionaryWithCapacity:updatedObjects.count];
         [updatedObjects.allObjects cde_enumerateObjectsDrainingEveryIterations:50 usingBlock:^(NSManagedObject *object, NSUInteger index, BOOL *stop) {
-            NSArray *propertyChanges = [CDEPropertyChangeValue propertyChangesForObject:object propertyNames:object.changedValues.allKeys isPreSave:YES storeValues:YES];
+            NSArray *propertyChanges = [CDEPropertyChangeValue propertyChangesForObject:object eventStore:self.eventStore propertyNames:object.changedValues.allKeys isPreSave:YES storeValues:YES];
             NSManagedObjectID *objectID = object.objectID;
             changedValuesByObjectID[objectID] = propertyChanges;
         }];
