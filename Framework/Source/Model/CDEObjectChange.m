@@ -8,6 +8,7 @@
 
 #import "CDEObjectChange.h"
 #import "CDEDefines.h"
+#import "CDEDataFile.h"
 #import "CDEStoreModificationEvent.h"
 #import "CDEPropertyChangeValue.h"
 
@@ -35,6 +36,48 @@
     NSArray *values = [self.propertyChangeValues filteredArrayUsingPredicate:predicate];
     CDEPropertyChangeValue *value = values.lastObject;
     return value;
+}
+
+- (void)setPropertyChangeValues:(NSArray *)newValues
+{
+    [self willChangeValueForKey:@"propertyChangeValues"];
+    [self setPrimitiveValue:newValues forKey:@"propertyChangeValues"];
+    [self didChangeValueForKey:@"propertyChangeValues"];
+    [self updateDataFiles];
+}
+
+
+#pragma mark Data Files
+
+- (void)updateDataFiles
+{
+    NSMutableSet *newFilenames = nil;
+    for (CDEPropertyChangeValue *value in self.propertyChangeValues) {
+        if (value.filename) {
+            if (!newFilenames) newFilenames = [[NSMutableSet alloc] init];
+            [newFilenames addObject:value.filename];
+        }
+    }
+    
+    if (self.dataFiles.count == 0 && newFilenames.count == 0) return;
+    
+    NSArray *orderedFiles = self.dataFiles.allObjects;
+    NSDictionary *oldFilesByName = [[NSDictionary alloc] initWithObjects:orderedFiles forKeys:[orderedFiles valueForKeyPath:@"filename"]];
+    NSSet *oldFilenames = [[NSSet alloc] initWithArray:oldFilesByName.allKeys];
+    NSMutableSet *addedFilenames = [newFilenames mutableCopy];
+    [addedFilenames minusSet:oldFilenames];
+    for (NSString *filename in addedFilenames) {
+        CDEDataFile *file = [NSEntityDescription insertNewObjectForEntityForName:@"CDEDataFile" inManagedObjectContext:self.managedObjectContext];
+        file.filename = filename;
+        file.objectChange = self;
+    }
+    
+    NSMutableSet *removeFilenames = [oldFilenames mutableCopy];
+    [removeFilenames minusSet:newFilenames];
+    for (NSString *filename in removeFilenames) {
+        CDEDataFile *file = oldFilesByName[filename];
+        [self.managedObjectContext deleteObject:file];
+    }
 }
 
 
