@@ -61,14 +61,14 @@
         objectChange1.type = CDEObjectChangeTypeInsert;
         objectChange1.storeModificationEvent = modEvent;
         objectChange1.globalIdentifier = globalId1;
-        objectChange1.propertyChangeValues = @[@"a", @"b"];
+        objectChange1.propertyChangeValues = @[];
         
         objectChange2 = [NSEntityDescription insertNewObjectForEntityForName:@"CDEObjectChange" inManagedObjectContext:moc];
         objectChange2.nameOfEntity = @"Hello";
         objectChange2.type = CDEObjectChangeTypeUpdate;
         objectChange2.storeModificationEvent = modEvent;
         objectChange2.globalIdentifier = globalId2;
-        objectChange2.propertyChangeValues = @[@"a", @"b"];
+        objectChange2.propertyChangeValues = @[];
         
         objectChange3 = [NSEntityDescription insertNewObjectForEntityForName:@"CDEObjectChange" inManagedObjectContext:moc];
         objectChange3.nameOfEntity = @"Blah";
@@ -200,7 +200,7 @@
         objectChange.type = CDEObjectChangeTypeUpdate;
         objectChange.storeModificationEvent = extraEvent;
         objectChange.globalIdentifier = globalId1;
-        objectChange.propertyChangeValues = @[@"c", @"d"];
+        objectChange.propertyChangeValues = @[];
         
         [moc save:NULL];
     }];

@@ -178,8 +178,6 @@
 
 - (void)storeAttributeChangeForDescription:(NSAttributeDescription *)propertyDesc newValue:(id)newValue
 {
-    NSAssert(self.eventStore, @"Storing attribute requires event store");
-
     NSAttributeDescription *attribute = (id)propertyDesc;
     if ([attribute valueTransformerName]) {
         NSValueTransformer *valueTransformer = [NSValueTransformer valueTransformerForName:attribute.valueTransformerName];
@@ -187,7 +185,8 @@
     }
     
     // Put data bigger than 10KB or so in an external file
-    if (self.eventStore && [newValue isKindOfClass:[NSData class]] && [(NSData *)newValue length] > 10e4) {
+    if ([newValue isKindOfClass:[NSData class]] && [(NSData *)newValue length] > 10e4) {
+        NSAssert(self.eventStore, @"Storing large data attribute requires event store");
         self.filename = [self.eventStore importData:newValue];
         self.value = nil;
         if (self.filename) return; // If success, return. Otherwise just store normally below.
@@ -272,10 +271,9 @@
 
 - (id)attributeValueForAttributeDescription:(NSAttributeDescription *)attribute
 {
-    NSAssert(self.eventStore, @"Retrieving attribute requires event store");
-
     id returnValue = nil;
     if (self.filename) {
+        NSAssert(self.eventStore, @"Retrieving attribute requires event store");
         returnValue = [self.eventStore dataForFile:self.filename];
     }
     else if (self.value) {

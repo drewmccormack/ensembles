@@ -8,6 +8,7 @@
 
 #import <XCTest/XCTest.h>
 #import "CDEEventStoreTestCase.h"
+#import "CDEPropertyChangeValue.h"
 #import "CDEStoreModificationEvent.h"
 #import "CDEObjectChange.h"
 #import "CDEGlobalIdentifier.h"
@@ -44,13 +45,18 @@
         objectChange.type = CDEObjectChangeTypeUpdate;
         objectChange.storeModificationEvent = modEvent;
         objectChange.globalIdentifier = globalId;
-        objectChange.propertyChangeValues = @[@"a", @"b"];
+        objectChange.propertyChangeValues = @[[self propertyChangeValueForProperty:@"a"], [self propertyChangeValueForProperty:@"b"]];
     }];
 }
 
 - (void)tearDown
 {
     [super tearDown];
+}
+
+- (CDEPropertyChangeValue *)propertyChangeValueForProperty:(NSString *)property
+{
+    return [[CDEPropertyChangeValue alloc] initWithType:CDEPropertyChangeTypeAttribute propertyName:property];
 }
 
 - (void)testRequiredProperties
@@ -71,7 +77,7 @@
         success = [self.eventStore.managedObjectContext save:NULL];
         XCTAssertFalse(success, @"Should not save with no global id");
         
-        objectChange.propertyChangeValues = @[@"a", @"b"];
+        objectChange.propertyChangeValues = @[[self propertyChangeValueForProperty:@"c"]];
         objectChange.globalIdentifier = globalId;
         success = [self.eventStore.managedObjectContext save:&error];
         XCTAssertTrue(success, @"Should save with all required set: %@", error);
@@ -86,13 +92,14 @@
 - (void)testPropertyValuesSavedAndRestored
 {
     [self.eventStore.managedObjectContext performBlockAndWait:^{
-        objectChange.propertyChangeValues = @[@"val"];
+        objectChange.propertyChangeValues = @[[self propertyChangeValueForProperty:@"val"]];
         NSError *error;
         BOOL success = [self.eventStore.managedObjectContext save:&error];
         XCTAssertTrue(success, @"Failed to save: %@", error);
         [self.eventStore.managedObjectContext refreshObject:objectChange mergeChanges:NO];
         NSArray *values = objectChange.propertyChangeValues;
-        XCTAssertEqualObjects(values[0], @"val", @"Wrong values");
+        CDEPropertyChangeValue *value = values[0];
+        XCTAssertEqualObjects(value.propertyName, @"val", @"Wrong values");
     }];
 }
 

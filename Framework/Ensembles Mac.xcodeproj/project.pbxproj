@@ -47,6 +47,7 @@
 		075754B5188BC952006803FA /* CDEAvailabilityMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 075754B4188BC952006803FA /* CDEAvailabilityMacros.h */; };
 		07592CA7177F2D1000816034 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF78E9177F03320029D500 /* XCTest.framework */; };
 		07592CAD177F2D1000816034 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 07592CAB177F2D1000816034 /* InfoPlist.strings */; };
+		075C271F18B3716200A7BC25 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 07897FFA18B258A0001E8A23 /* CDEEventStoreModel.xcdatamodeld */; };
 		075FDCD518360B0E0020E1C9 /* CDEIntegratorMergeRepairTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 075FDCD418360B0E0020E1C9 /* CDEIntegratorMergeRepairTests.m */; };
 		075FDCDA183611680020E1C9 /* CDEPersistentStoreEnsembleMergeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 075FDCD9183611680020E1C9 /* CDEPersistentStoreEnsembleMergeTests.m */; };
 		075FDCDD183615C60020E1C9 /* CDEMockLocalFileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 075FDCDB183615C60020E1C9 /* CDEMockLocalFileSystem.h */; };
@@ -678,6 +679,7 @@
 				07D2D638182D65FB001D24BC /* CDEManagedObjectModelTests.m in Sources */,
 				0722B27117B770A600496F4A /* CDEObjectChangeTests.m in Sources */,
 				075FDCDA183611680020E1C9 /* CDEPersistentStoreEnsembleMergeTests.m in Sources */,
+				075C271F18B3716200A7BC25 /* CDEEventStoreModel.xcdatamodeld in Sources */,
 				072E5AEE17EB44C3002D9604 /* CDETwoWaySyncTests.m in Sources */,
 				0722B27017B770A000496F4A /* CDEEventStoreTests.m in Sources */,
 				07E2875417BF8D470008CC4F /* CDESaveMonitorRelationshipTests.m in Sources */,

@@ -44,7 +44,7 @@
 
 - (void)testFactoryMethod
 {
-    NSArray *propertyChanges = [CDEPropertyChangeValue propertyChangesForObject:parent propertyNames:parent.entity.propertiesByName.allKeys isPreSave:YES storeValues:YES];
+    NSArray *propertyChanges = [CDEPropertyChangeValue propertyChangesForObject:parent eventStore:nil propertyNames:parent.entity.propertiesByName.allKeys isPreSave:YES storeValues:YES];
     NSUInteger expectedPropertyCount = [[parent entity] properties].count;
     XCTAssertEqual(propertyChanges.count, expectedPropertyCount, @"Wrong number of property changes");
 }
@@ -55,7 +55,7 @@
     [parent setValue:newValue forKey:@"date"];
 
     NSPropertyDescription *propertyDesc = parent.entity.propertiesByName[@"date"];
-    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:parent propertyDescription:propertyDesc isPreSave:YES storeValues:YES];
+    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:parent propertyDescription:propertyDesc eventStore:nil isPreSave:YES storeValues:YES];
     XCTAssertEqual(changeValue.type, CDEPropertyChangeTypeAttribute, @"Wrong type for change value");
     XCTAssertEqualObjects(changeValue.value, newValue, @"Wrong value in change value");
 }
@@ -66,7 +66,7 @@
     [parent setValue:newValue forKey:@"date"];
     
     NSPropertyDescription *propertyDesc = parent.entity.propertiesByName[@"date"];
-    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:parent propertyDescription:propertyDesc isPreSave:YES storeValues:NO];
+    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:parent propertyDescription:propertyDesc eventStore:nil isPreSave:YES storeValues:NO];
     XCTAssertEqual(changeValue.type, CDEPropertyChangeTypeAttribute, @"Wrong type for change value");
     XCTAssertNil(changeValue.value, @"Should be no stored value");
 }
@@ -78,7 +78,7 @@
     [self.testManagedObjectContext save:NULL];
 
     NSPropertyDescription *propertyDesc = parent.entity.propertiesByName[@"date"];
-    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:parent propertyDescription:propertyDesc isPreSave:NO storeValues:YES];
+    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:parent propertyDescription:propertyDesc eventStore:nil isPreSave:NO storeValues:YES];
     XCTAssertEqual(changeValue.type, CDEPropertyChangeTypeAttribute, @"Wrong type for change value");
     XCTAssertEqualObjects(changeValue.value, newValue, @"Wrong value in change value");
 }
@@ -87,7 +87,7 @@
 {
     NSPropertyDescription *propertyDesc = child.entity.propertiesByName[@"parent"];
     
-    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:child propertyDescription:propertyDesc isPreSave:YES storeValues:YES];
+    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:child propertyDescription:propertyDesc eventStore:nil isPreSave:YES storeValues:YES];
     XCTAssertEqual(changeValue.type, CDEPropertyChangeTypeToOneRelationship, @"Wrong type for change value");
     XCTAssertEqualObjects(changeValue.propertyName, propertyDesc.name, @"Wrong property name for relationship");
     XCTAssertEqualObjects(changeValue.relatedIdentifier, parent.objectID, @"Wrong related identifier");
@@ -97,7 +97,7 @@
 {
     NSPropertyDescription *propertyDesc = child.entity.propertiesByName[@"parent"];
     
-    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:child propertyDescription:propertyDesc isPreSave:YES storeValues:NO];
+    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:child propertyDescription:propertyDesc eventStore:nil isPreSave:YES storeValues:NO];
     XCTAssertEqual(changeValue.type, CDEPropertyChangeTypeToOneRelationship, @"Wrong type for change value");
     XCTAssertEqualObjects(changeValue.propertyName, propertyDesc.name, @"Wrong property name for relationship");
     XCTAssertNil(changeValue.relatedIdentifier, @"Wrong related identifier");
@@ -108,7 +108,7 @@
     NSPropertyDescription *propertyDesc = child.entity.propertiesByName[@"parent"];
     [self.testManagedObjectContext save:NULL];
     
-    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:child propertyDescription:propertyDesc isPreSave:NO storeValues:YES];
+    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:child propertyDescription:propertyDesc eventStore:nil isPreSave:NO storeValues:YES];
     XCTAssertEqual(changeValue.type, CDEPropertyChangeTypeToOneRelationship, @"Wrong type for change value");
     XCTAssertEqualObjects(changeValue.propertyName, propertyDesc.name, @"Wrong property name for relationship");
     XCTAssertEqualObjects(changeValue.relatedIdentifier, parent.objectID, @"Wrong related identifier");
@@ -119,7 +119,7 @@
     [child setValue:nil forKey:@"parent"];
     NSPropertyDescription *propertyDesc = child.entity.propertiesByName[@"parent"];
     
-    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:child propertyDescription:propertyDesc isPreSave:YES storeValues:YES];
+    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:child propertyDescription:propertyDesc eventStore:nil isPreSave:YES storeValues:YES];
     XCTAssertNil(changeValue.relatedIdentifier, @"Wrong related identifier");
 }
 
@@ -127,7 +127,7 @@
 {
     NSPropertyDescription *propertyDesc = parent.entity.propertiesByName[@"children"];
     
-    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:parent propertyDescription:propertyDesc isPreSave:YES storeValues:YES];
+    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:parent propertyDescription:propertyDesc eventStore:nil isPreSave:YES storeValues:YES];
     XCTAssertEqual(changeValue.type, CDEPropertyChangeTypeToManyRelationship, @"Wrong type for change value");
     XCTAssertEqualObjects(changeValue.propertyName, propertyDesc.name, @"Wrong property name for relationship");
     
@@ -141,7 +141,7 @@
     NSPropertyDescription *propertyDesc = parent.entity.propertiesByName[@"children"];
     [self.testManagedObjectContext save:NULL];
 
-    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:parent propertyDescription:propertyDesc isPreSave:YES storeValues:NO];
+    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:parent propertyDescription:propertyDesc eventStore:nil isPreSave:YES storeValues:NO];
     XCTAssertEqual(changeValue.type, CDEPropertyChangeTypeToManyRelationship, @"Wrong type for change value");
     XCTAssertEqualObjects(changeValue.propertyName, propertyDesc.name, @"Wrong property name for relationship");
     
@@ -160,7 +160,7 @@
     [parent setValue:newChildrenSet forKey:@"children"];
     
     NSPropertyDescription *propertyDesc = parent.entity.propertiesByName[@"children"];
-    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:parent propertyDescription:propertyDesc isPreSave:YES storeValues:YES];
+    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:parent propertyDescription:propertyDesc eventStore:nil isPreSave:YES storeValues:YES];
 
     NSMutableSet *removedChildren = [siblingChildren mutableCopy];
     [removedChildren minusSet:newChildrenSet];
@@ -180,7 +180,7 @@
     [parent setValue:newChildrenSet forKey:@"children"];
     
     NSPropertyDescription *propertyDesc = parent.entity.propertiesByName[@"children"];
-    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:parent propertyDescription:propertyDesc isPreSave:YES storeValues:NO];
+    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:parent propertyDescription:propertyDesc eventStore:nil isPreSave:YES storeValues:NO];
     
     XCTAssertTrue([changeValue.relatedObjectIDs isEqualToSet:originalChildSet], @"Wrong related identifiers");
     XCTAssertNil(changeValue.addedIdentifiers, @"Added should be nil");
@@ -190,7 +190,7 @@
 - (void)testArchiving
 {
     NSPropertyDescription *propertyDesc = parent.entity.propertiesByName[@"children"];
-    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:parent propertyDescription:propertyDesc isPreSave:YES storeValues:YES];
+    CDEPropertyChangeValue *changeValue = [[CDEPropertyChangeValue alloc] initWithObject:parent propertyDescription:propertyDesc eventStore:nil isPreSave:YES storeValues:YES];
     
     NSSet *childSet = [siblingChildren valueForKeyPath:@"objectID.URIRepresentation"]; // Pretend global ids
     changeValue.addedIdentifiers = childSet;
