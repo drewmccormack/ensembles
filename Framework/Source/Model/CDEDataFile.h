@@ -16,4 +16,7 @@
 @property (nonatomic, strong) NSString *filename;
 @property (nonatomic, strong) CDEObjectChange *objectChange;
 
++ (NSSet *)allFilenamesInManagedObjectContext:(NSManagedObjectContext *)context;
++ (NSSet *)filenamesInStoreModificationEvents:(NSArray *)events;
+
 @end

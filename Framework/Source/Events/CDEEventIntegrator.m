@@ -290,10 +290,6 @@
     CDERevisionManager *revisionManager = [[CDERevisionManager alloc] initWithEventStore:self.eventStore];
     revisionManager.managedObjectModelURL = self.ensemble.managedObjectModelURL;
     
-    // Check prerequisites
-    BOOL canIntegrate = [revisionManager checkIntegrationPrequisites:error];
-    if (!canIntegrate) return NO;
-    
     // Move to the event store queue
     __block BOOL success = YES;
     BOOL needFullIntegration = [self needsFullIntegration];
@@ -324,6 +320,13 @@
         }
         if (storeModEvents == nil) success = NO;
         if (storeModEvents.count == 0) return;
+        
+        // Check prerequisites
+        BOOL canIntegrate = [revisionManager checkIntegrationPrequisitesForEvents:storeModEvents error:error];
+        if (!canIntegrate) {
+            success = NO;
+            return;
+        }
         
         // If all events are from this device, don't merge
         NSArray *storeIds = [storeModEvents valueForKeyPath:@"@distinctUnionOfObjects.eventRevision.persistentStoreIdentifier"];

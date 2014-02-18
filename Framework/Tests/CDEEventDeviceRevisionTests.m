@@ -52,7 +52,7 @@
     }];
 }
 
-- (void)testNilpersistentStoreIdentifier
+- (void)testNilPersistentStoreIdentifier
 {
     [moc performBlockAndWait:^{
         XCTAssertThrows([CDEEventRevision makeEventRevisionForPersistentStoreIdentifier:nil revisionNumber:0 inManagedObjectContext:moc], @"Should throw for nil store id");

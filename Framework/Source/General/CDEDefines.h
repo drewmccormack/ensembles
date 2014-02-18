@@ -41,6 +41,7 @@ typedef NS_ENUM(NSInteger, CDEErrorCode) {
     CDEErrorCodeSaveOccurredDuringMerge     = 207,
     CDEErrorCodeMissingCloudSnapshot        = 208,
     CDEErrorCodeMissingStore                = 209,
+    CDEErrorCodeMissingDataFiles            = 210,
     CDEErrorCodeNetworkError                = 1000,
     CDEErrorCodeServerError                 = 1001,
     CDEErrorCodeConnectionError             = 1002,
