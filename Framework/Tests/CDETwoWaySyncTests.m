@@ -390,15 +390,41 @@
     ensemble1.delegate = self;
     ensemble2.delegate = self;
     
+    // Create all
     [self createNamedParentsAndChildrenInContext:context1];
     XCTAssertTrue([context1 save:NULL], @"Could not save");
     
-    XCTAssertNil([self syncChanges], @"Sync failed");
-
+    // Create all 2
+    [self createNamedParentsAndChildrenInContext:context2];
+    XCTAssertTrue([context1 save:NULL], @"Could not save");
+    
+    // Make small, reversible change in 2, to try to mess things up
     NSArray *parents = [self parentsInContext:context2];
+    id parent = parents.lastObject;
+    id child = [[parent valueForKey:@"children"] anyObject];
+    [[parent mutableSetValueForKey:@"children"] removeObject:child];
+    XCTAssertTrue([context2 save:NULL], @"Could not save");
+    [[parent mutableSetValueForKey:@"children"] addObject:child];
+    XCTAssertTrue([context2 save:NULL], @"Could not save");
+
+    // Delete all
+    parents = [self parentsInContext:context1];
+    for (id parent in parents) [context1 deleteObject:parent];
+    XCTAssertTrue([context1 save:NULL], @"Could not save");
+    
+    // Create all 1
+    [self createNamedParentsAndChildrenInContext:context1];
+    XCTAssertTrue([context1 save:NULL], @"Could not save");
+    
+    // Sync
+    XCTAssertNil([self syncChanges], @"Sync failed");
+    
+    // Delete all
+    parents = [self parentsInContext:context2];
     for (id parent in parents) [context2 deleteObject:parent];
     XCTAssertTrue([context2 save:NULL], @"Could not save");
     
+    // Make sure there are no objects
     NSArray *children = [self childrenInContext:context2];
     XCTAssertEqual(children.count, (NSUInteger)0, @"Wrong number of children in context2 after full delete");
     
@@ -410,17 +436,18 @@
     
     parents = [self parentsInContext:context1];
     XCTAssertEqual(parents.count, (NSUInteger)5, @"Wrong number of parents in context1");
-    XCTAssertEqual([[parents valueForKey:@"children"] count], (NSUInteger)5, @"Wrong number of children of parent in context1");
-    
+    XCTAssertEqual([[parents.lastObject valueForKey:@"children"] count], (NSUInteger)5, @"Wrong number of children of parent in context1");
+    XCTAssertEqual([[parents.lastObject valueForKey:@"orderedChildren"] count], (NSUInteger)5, @"Wrong number of ordered children of parent in context1");
+
     children = [self childrenInContext:context1];
-    XCTAssertEqual(children.count, (NSUInteger)25, @"Wrong number of children in context1");
+    XCTAssertEqual(children.count, (NSUInteger)50, @"Wrong number of children in context1");
     
     parents = [self parentsInContext:context2];
     XCTAssertEqual(parents.count, (NSUInteger)5, @"Wrong number of parents in context2");
     XCTAssertEqual([[parents valueForKey:@"children"] count], (NSUInteger)5, @"Wrong number of children of parent in context2");
     
     children = [self childrenInContext:context2];
-    XCTAssertEqual(children.count, (NSUInteger)25, @"Wrong number of children in context2");
+    XCTAssertEqual(children.count, (NSUInteger)50, @"Wrong number of children in context2");
 }
 
 - (void)createNamedParentsAndChildrenInContext:(NSManagedObjectContext *)context
@@ -435,6 +462,13 @@
             id child = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context];
             [child setValue:[NSString stringWithFormat:@"%d_%d", i, ic] forKey:@"name"]; // Used as unique id
             [child setValue:parent forKey:@"parentWithSiblings"];
+        }
+        
+        // Ordered Children
+        for (int ic = 0; ic < 5; ic++) {
+            id child = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context];
+            [child setValue:[NSString stringWithFormat:@"ordered %d_%d", i, ic] forKey:@"name"]; // Used as unique id
+            [[parent mutableOrderedSetValueForKey:@"orderedChildren"] addObject:child];
         }
     }
 }

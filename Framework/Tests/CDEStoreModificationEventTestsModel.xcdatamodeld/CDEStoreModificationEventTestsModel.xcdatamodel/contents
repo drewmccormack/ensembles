@@ -16,7 +16,7 @@
         <relationship name="children" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Child" inverseName="parentWithSiblings" inverseEntity="Child" syncable="YES"/>
         <relationship name="friends" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Child" inverseName="testFriends" inverseEntity="Child" syncable="YES"/>
         <relationship name="maxedChildren" optional="YES" toMany="YES" maxCount="2" deletionRule="Cascade" destinationEntity="Child" inverseName="maxedParent" inverseEntity="Child" syncable="YES"/>
-        <relationship name="orderedChildren" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Child" inverseName="orderedParent" inverseEntity="Child" syncable="YES"/>
+        <relationship name="orderedChildren" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="Child" inverseName="orderedParent" inverseEntity="Child" syncable="YES"/>
     </entity>
     <elements>
         <element name="Child" positionX="0" positionY="0" width="128" height="135"/>
