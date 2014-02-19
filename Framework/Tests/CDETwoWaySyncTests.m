@@ -383,4 +383,73 @@
     XCTAssert([set1Items isEqualToString:set2Items], @"Expected consistent merge results");
 }
 
+- (void)testDeletingAllObjectsAndReinserting
+{
+    [self leechStores];
+    
+    ensemble1.delegate = self;
+    ensemble2.delegate = self;
+    
+    [self createNamedParentsAndChildrenInContext:context1];
+    XCTAssertTrue([context1 save:NULL], @"Could not save");
+    
+    XCTAssertNil([self syncChanges], @"Sync failed");
+
+    NSArray *parents = [self parentsInContext:context2];
+    for (id parent in parents) [context2 deleteObject:parent];
+    XCTAssertTrue([context2 save:NULL], @"Could not save");
+    
+    NSArray *children = [self childrenInContext:context2];
+    XCTAssertEqual(children.count, (NSUInteger)0, @"Wrong number of children in context2 after full delete");
+    
+    [self createNamedParentsAndChildrenInContext:context2];
+    XCTAssertTrue([context2 save:NULL], @"Could not save");
+
+    XCTAssertNil([self syncChanges], @"Sync failed");
+    
+    parents = [self parentsInContext:context1];
+    XCTAssertEqual(parents.count, (NSUInteger)5, @"Wrong number of parents in context1");
+    XCTAssertEqual([[parents valueForKey:@"children"] count], (NSUInteger)5, @"Wrong number of children of parent in context1");
+    
+    children = [self childrenInContext:context1];
+    XCTAssertEqual(children.count, (NSUInteger)25, @"Wrong number of children in context1");
+    
+    parents = [self parentsInContext:context2];
+    XCTAssertEqual(parents.count, (NSUInteger)5, @"Wrong number of parents in context2");
+    XCTAssertEqual([[parents valueForKey:@"children"] count], (NSUInteger)5, @"Wrong number of children of parent in context2");
+    
+    children = [self childrenInContext:context2];
+    XCTAssertEqual(children.count, (NSUInteger)25, @"Wrong number of children in context2");
+}
+
+- (void)createNamedParentsAndChildrenInContext:(NSManagedObjectContext *)context
+{
+    // Parents
+    for (int i = 0; i < 5; i++) {
+        id parent = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context];
+        [parent setValue:[NSString stringWithFormat:@"%d", i] forKey:@"name"]; // Used as unique id
+        
+        // Children
+        for (int ic = 0; ic < 5; ic++) {
+            id child = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context];
+            [child setValue:[NSString stringWithFormat:@"%d_%d", i, ic] forKey:@"name"]; // Used as unique id
+            [child setValue:parent forKey:@"parentWithSiblings"];
+        }
+    }
+}
+
+- (NSArray *)childrenInContext:(NSManagedObjectContext *)context
+{
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Child"];
+    NSArray *children = [context executeFetchRequest:fetch error:NULL];
+    return children;
+}
+
+- (NSArray *)parentsInContext:(NSManagedObjectContext *)context
+{
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
+    NSArray *parents = [context executeFetchRequest:fetch error:NULL];
+    return parents;
+}
+
 @end
