@@ -402,6 +402,7 @@
     NSArray *children = [self childrenInContext:context2];
     XCTAssertEqual(children.count, (NSUInteger)0, @"Wrong number of children in context2 after full delete");
     
+    // Recreate objects in second context
     [self createNamedParentsAndChildrenInContext:context2];
     XCTAssertTrue([context2 save:NULL], @"Could not save");
 

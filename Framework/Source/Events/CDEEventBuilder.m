@@ -367,20 +367,24 @@
 
 - (void)convertToManyRelationshipValuesToGlobalIdentifiersInPropertyChangeValue:(CDEPropertyChangeValue *)propertyChange withGlobalIdentifiersByObjectID:(NSDictionary *)globalIdentifiersByObjectID
 {
+    NSPredicate *notNullPredicate = [NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
+        return evaluatedObject != [NSNull null];
+    }];
+    
     NSArray *addedGlobalIdentifiers = [globalIdentifiersByObjectID objectsForKeys:propertyChange.addedIdentifiers.allObjects notFoundMarker:[NSNull null]];
+    NSArray *notNullAdded = [addedGlobalIdentifiers filteredArrayUsingPredicate:notNullPredicate];
+    if (addedGlobalIdentifiers.count != notNullAdded.count) {
+        CDELog(CDELoggingLevelWarning, @"Missing global ids for added ids in a to-many relationship. Target objectIDs: %@ %@", propertyChange.addedIdentifiers, addedGlobalIdentifiers);
+    }
+    
     NSArray *removedGlobalIdentifiers = [globalIdentifiersByObjectID objectsForKeys:propertyChange.removedIdentifiers.allObjects notFoundMarker:[NSNull null]];
-    
-    BOOL foundAllAddedIds = ![addedGlobalIdentifiers containsObject:[NSNull null]];
-    BOOL foundAllRemovedIds = ![removedGlobalIdentifiers containsObject:[NSNull null]];
-    if (!foundAllAddedIds) {
-        CDELog(CDELoggingLevelError, @"Missing global ids for added ids in a to-many relationship. Target objectIDs: %@ %@", propertyChange.addedIdentifiers, addedGlobalIdentifiers);
-    }
-    if (!foundAllRemovedIds) {
-        CDELog(CDELoggingLevelError, @"Missing global ids for removed ids in a to-many relationship. Target objectIDs with global ids: %@ %@", propertyChange.removedIdentifiers, removedGlobalIdentifiers);
+    NSArray *notNullRemoved = [removedGlobalIdentifiers filteredArrayUsingPredicate:notNullPredicate];
+    if (removedGlobalIdentifiers.count != notNullRemoved.count) {
+        CDELog(CDELoggingLevelWarning, @"Missing global ids for removed ids in a to-many relationship. Target objectIDs with global ids: %@ %@", propertyChange.removedIdentifiers, removedGlobalIdentifiers);
     }
     
-    propertyChange.addedIdentifiers = [NSSet setWithArray:[addedGlobalIdentifiers valueForKeyPath:@"globalIdentifier"]];
-    propertyChange.removedIdentifiers = [NSSet setWithArray:[removedGlobalIdentifiers valueForKeyPath:@"globalIdentifier"]];
+    propertyChange.addedIdentifiers = [NSSet setWithArray:[notNullAdded valueForKeyPath:@"globalIdentifier"]];
+    propertyChange.removedIdentifiers = [NSSet setWithArray:[notNullRemoved valueForKeyPath:@"globalIdentifier"]];
     
     if (propertyChange.type != CDEPropertyChangeTypeOrderedToManyRelationship) return;
     
@@ -388,6 +392,10 @@
     for (NSNumber *index in propertyChange.movedIdentifiersByIndex.allKeys) {
         id objectID = propertyChange.movedIdentifiersByIndex[index];
         id globalIdentifier = [[globalIdentifiersByObjectID objectForKey:objectID] globalIdentifier];
+        if (!globalIdentifier) {
+            CDELog(CDELoggingLevelWarning, @"Missing global id for moved object with objectID: %@", objectID);
+            continue;
+        }
         newMovedIdentifiers[index] = globalIdentifier;
     }
     propertyChange.movedIdentifiersByIndex = newMovedIdentifiers;
