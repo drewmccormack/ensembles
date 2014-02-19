@@ -586,6 +586,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
     [tasks addObject:mergeEventsTask];
     
     CDEAsynchronousTaskBlock exportDataFilesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self.eventStore removeUnreferencedDataFiles];
         [self.cloudManager exportDataFilesWithCompletion:^(NSError *error) {
             next(error, NO);
         }];

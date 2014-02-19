@@ -52,5 +52,6 @@
 - (BOOL)exportDataFile:(NSString *)filename toDirectory:(NSString *)dirPath;
 - (NSData *)dataForFile:(NSString *)filename;
 - (BOOL)removeDataFile:(NSString *)filename;
+- (void)removeUnreferencedDataFiles;
 
 @end

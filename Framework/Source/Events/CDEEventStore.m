@@ -11,6 +11,7 @@
 #import "CDEStoreModificationEvent.h"
 #import "CDERevisionSet.h"
 #import "CDERevision.h"
+#import "CDEDataFile.h"
 
 
 NSString * const kCDEPersistentStoreIdentifierKey = @"persistentStoreIdentifier";
@@ -318,6 +319,16 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
     BOOL success = [fileManager removeItemAtPath:path error:&error];
     if (!success) CDELog(CDELoggingLevelError, @"Could not remove file: %@", error);
     return success;
+}
+
+- (void)removeUnreferencedDataFiles
+{
+    [self.managedObjectContext performBlockAndWait:^{
+        NSSet *contextFilenames = [CDEDataFile allFilenamesInManagedObjectContext:self.managedObjectContext];
+        NSMutableSet *filenames = [self.dataFilenames mutableCopy];
+        [filenames minusSet:contextFilenames];
+        for (NSString *filename in filenames) [self removeDataFile:filename];
+    }];
 }
 
 
