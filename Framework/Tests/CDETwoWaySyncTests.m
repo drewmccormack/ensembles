@@ -444,7 +444,8 @@
     
     parents = [self parentsInContext:context2];
     XCTAssertEqual(parents.count, (NSUInteger)5, @"Wrong number of parents in context2");
-    XCTAssertEqual([[parents valueForKey:@"children"] count], (NSUInteger)5, @"Wrong number of children of parent in context2");
+    XCTAssertEqual([[parents.lastObject valueForKey:@"children"] count], (NSUInteger)5, @"Wrong number of children of parent in context2");
+    XCTAssertEqual([[parents.lastObject valueForKey:@"orderedChildren"] count], (NSUInteger)5, @"Wrong number of ordered children of parent in context2");
     
     children = [self childrenInContext:context2];
     XCTAssertEqual(children.count, (NSUInteger)50, @"Wrong number of children in context2");
