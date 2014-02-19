@@ -8,6 +8,8 @@
 
 #import <XCTest/XCTest.h>
 #import "CDEEventStore.h"
+#import "CDEObjectChange.h"
+#import "CDEDataFile.h"
 
 static NSString *rootTestDirectory;
 
@@ -213,6 +215,37 @@ static NSString *rootTestDirectory;
     NSSet *files = store.dataFilenames;
     XCTAssertEqual(files.count, (NSUInteger)2, @"Wrong file count");
     XCTAssertTrue([files.anyObject hasPrefix:@"file"], @"Wrong file name prefix");
+}
+
+- (void)testRemovingOutdatedDataFiles
+{
+    [store prepareNewEventStore:NULL];
+    [store.managedObjectContext performBlockAndWait:^{
+        CDEObjectChange *change = [NSEntityDescription insertNewObjectForEntityForName:@"CDEObjectChange" inManagedObjectContext:store.managedObjectContext];
+        CDEDataFile *dataFile1 = [NSEntityDescription insertNewObjectForEntityForName:@"CDEDataFile" inManagedObjectContext:store.managedObjectContext];
+        dataFile1.objectChange = change;
+        dataFile1.filename = @"123";
+        
+        CDEDataFile *dataFile2 = [NSEntityDescription insertNewObjectForEntityForName:@"CDEDataFile" inManagedObjectContext:store.managedObjectContext];
+        dataFile2.filename = @"345";
+
+        [store.managedObjectContext save:NULL];
+    }];
+    
+    NSString *storePath1 = [store.pathToEventDataRootDirectory stringByAppendingPathComponent:@"test/data/123"];
+    [@"Hi" writeToFile:storePath1 atomically:NO encoding:NSUTF8StringEncoding error:NULL];
+    
+    NSString *storePath2 = [store.pathToEventDataRootDirectory stringByAppendingPathComponent:@"test/data/234"];
+    [@"Hi" writeToFile:storePath2 atomically:NO encoding:NSUTF8StringEncoding error:NULL];
+    
+    NSString *storePath3 = [store.pathToEventDataRootDirectory stringByAppendingPathComponent:@"test/data/345"];
+    [@"Hi" writeToFile:storePath3 atomically:NO encoding:NSUTF8StringEncoding error:NULL];
+    
+    [store removeUnreferencedDataFiles];
+    
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:storePath1], @"Should have file 123");
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:storePath2], @"Should not have file 234");
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:storePath3], @"Should not have file 345, because it is not attached to a CDEObjectChange");
 }
 
 @end
