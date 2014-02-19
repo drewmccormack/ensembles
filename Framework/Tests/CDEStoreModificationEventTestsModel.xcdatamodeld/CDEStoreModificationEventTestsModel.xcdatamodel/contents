@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="3401" systemVersion="13A603" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="3401" systemVersion="13B42" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="Child" syncable="YES">
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="maxedParent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Parent" inverseName="maxedChildren" inverseEntity="Parent" syncable="YES"/>
@@ -13,7 +13,7 @@
         <attribute name="invalidatingAttribute" attributeType="Integer 16" minValueString="0" defaultValueString="0" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="child" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Child" inverseName="parent" inverseEntity="Child" syncable="YES"/>
-        <relationship name="children" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Child" inverseName="parentWithSiblings" inverseEntity="Child" syncable="YES"/>
+        <relationship name="children" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Child" inverseName="parentWithSiblings" inverseEntity="Child" syncable="YES"/>
         <relationship name="friends" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Child" inverseName="testFriends" inverseEntity="Child" syncable="YES"/>
         <relationship name="maxedChildren" optional="YES" toMany="YES" maxCount="2" deletionRule="Cascade" destinationEntity="Child" inverseName="maxedParent" inverseEntity="Child" syncable="YES"/>
         <relationship name="orderedChildren" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Child" inverseName="orderedParent" inverseEntity="Child" syncable="YES"/>
