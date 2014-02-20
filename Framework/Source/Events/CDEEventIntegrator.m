@@ -649,6 +649,7 @@
             continue;
         }
         
+        changeValue.eventStore = self.eventStore; // Needed to retrieve data files
         id newValue = [changeValue attributeValueForAttributeDescription:attribute];
         [self setValue:newValue forKey:changeValue.propertyName inObject:object];
     }
