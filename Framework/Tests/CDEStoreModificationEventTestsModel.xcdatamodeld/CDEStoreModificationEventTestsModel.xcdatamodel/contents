@@ -9,6 +9,7 @@
         <relationship name="testFriends" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Parent" inverseName="friends" inverseEntity="Parent" syncable="YES"/>
     </entity>
     <entity name="Parent" syncable="YES">
+        <attribute name="data" optional="YES" attributeType="Binary" storedInTruthFile="YES" syncable="YES"/>
         <attribute name="date" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="invalidatingAttribute" attributeType="Integer 16" minValueString="0" defaultValueString="0" syncable="YES"/>
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
@@ -20,6 +21,6 @@
     </entity>
     <elements>
         <element name="Child" positionX="0" positionY="0" width="128" height="135"/>
-        <element name="Parent" positionX="-549" positionY="0" width="128" height="163"/>
+        <element name="Parent" positionX="-549" positionY="0" width="128" height="178"/>
     </elements>
 </model>

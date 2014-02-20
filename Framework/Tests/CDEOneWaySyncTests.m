@@ -162,4 +162,32 @@
     XCTAssertEqualObjects([[syncedParent valueForKey:@"children"] anyObject], syncedChild, @"Relationship not set");
 }
 
+- (void)testSmallDataAttributeLeadsToNoExternalDataFiles
+{
+    [self leechStores];
+
+    const uint8_t bytes[10000];
+    id parent = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context1];
+    [parent setValue:[[NSData alloc] initWithBytes:bytes length:10000] forKey:@"data"];
+    [context1 save:NULL];
+    
+    NSString *eventStoreDataDir = [eventDataRoot1 stringByAppendingPathComponent:@"com.ensembles.synctest/data"];
+    NSArray *contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:eventStoreDataDir error:NULL];
+    XCTAssertEqual(contents.count, (NSUInteger)0, @"Should be no external files in event store. File too small.");
+}
+
+- (void)testLargeDataAttributeLeadsToExternalDataFile
+{
+    [self leechStores];
+    
+    const uint8_t bytes[10001];
+    id parent = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context1];
+    [parent setValue:[[NSData alloc] initWithBytes:bytes length:10001] forKey:@"data"];
+    [context1 save:NULL];
+    
+    NSString *eventStoreDataDir = [eventDataRoot1 stringByAppendingPathComponent:@"com.ensembles.synctest/data"];
+    NSArray *contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:eventStoreDataDir error:NULL];
+    XCTAssertEqual(contents.count, (NSUInteger)1, @"Should be an external file.");
+}
+
 @end

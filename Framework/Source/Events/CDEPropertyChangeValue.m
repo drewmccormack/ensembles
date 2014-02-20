@@ -185,7 +185,7 @@
     }
     
     // Put data bigger than 10KB or so in an external file
-    if ([newValue isKindOfClass:[NSData class]] && [(NSData *)newValue length] > 10e4) {
+    if ([newValue isKindOfClass:[NSData class]] && [(NSData *)newValue length] > 10e3) {
         NSAssert(self.eventStore, @"Storing large data attribute requires event store");
         self.filename = [self.eventStore importData:newValue];
         self.value = nil;
