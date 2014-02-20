@@ -367,24 +367,28 @@
 
 - (void)convertToManyRelationshipValuesToGlobalIdentifiersInPropertyChangeValue:(CDEPropertyChangeValue *)propertyChange withGlobalIdentifiersByObjectID:(NSDictionary *)globalIdentifiersByObjectID
 {
-    NSPredicate *notNullPredicate = [NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
+    static NSPredicate *notNullPredicate = nil;
+    static NSString *globalIdIsNullErrorMessage = @"Missing global ids for added ids in a to-many relationship. This is usually caused by saving multiple objects with the same global id at once.";
+    if (!notNullPredicate) notNullPredicate = [NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
         return evaluatedObject != [NSNull null];
     }];
     
     NSArray *addedGlobalIdentifiers = [globalIdentifiersByObjectID objectsForKeys:propertyChange.addedIdentifiers.allObjects notFoundMarker:[NSNull null]];
-    NSArray *notNullAdded = [addedGlobalIdentifiers filteredArrayUsingPredicate:notNullPredicate];
-    if (addedGlobalIdentifiers.count != notNullAdded.count) {
-        CDELog(CDELoggingLevelWarning, @"Missing global ids for added ids in a to-many relationship. Target objectIDs: %@ %@", propertyChange.addedIdentifiers, addedGlobalIdentifiers);
+    BOOL containsNull = [addedGlobalIdentifiers containsObject:[NSNull null]];
+    if (containsNull) {
+        addedGlobalIdentifiers = [addedGlobalIdentifiers filteredArrayUsingPredicate:notNullPredicate];
+        CDELog(CDELoggingLevelError, @"%@", globalIdIsNullErrorMessage);
     }
     
     NSArray *removedGlobalIdentifiers = [globalIdentifiersByObjectID objectsForKeys:propertyChange.removedIdentifiers.allObjects notFoundMarker:[NSNull null]];
-    NSArray *notNullRemoved = [removedGlobalIdentifiers filteredArrayUsingPredicate:notNullPredicate];
-    if (removedGlobalIdentifiers.count != notNullRemoved.count) {
-        CDELog(CDELoggingLevelWarning, @"Missing global ids for removed ids in a to-many relationship. Target objectIDs with global ids: %@ %@", propertyChange.removedIdentifiers, removedGlobalIdentifiers);
+    containsNull = [removedGlobalIdentifiers containsObject:[NSNull null]];
+    if (containsNull) {
+        removedGlobalIdentifiers = [removedGlobalIdentifiers filteredArrayUsingPredicate:notNullPredicate];
+        CDELog(CDELoggingLevelError, @"%@", globalIdIsNullErrorMessage);
     }
     
-    propertyChange.addedIdentifiers = [NSSet setWithArray:[notNullAdded valueForKeyPath:@"globalIdentifier"]];
-    propertyChange.removedIdentifiers = [NSSet setWithArray:[notNullRemoved valueForKeyPath:@"globalIdentifier"]];
+    propertyChange.addedIdentifiers = [NSSet setWithArray:[addedGlobalIdentifiers valueForKeyPath:@"globalIdentifier"]];
+    propertyChange.removedIdentifiers = [NSSet setWithArray:[removedGlobalIdentifiers valueForKeyPath:@"globalIdentifier"]];
     
     if (propertyChange.type != CDEPropertyChangeTypeOrderedToManyRelationship) return;
     
