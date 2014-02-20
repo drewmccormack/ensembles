@@ -207,6 +207,52 @@
     
     contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:eventStoreDataDir error:NULL];
     XCTAssertEqual(contents.count, (NSUInteger)1, @"Should be an external file.");
+    
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
+    NSArray *parents = [context2 executeFetchRequest:fetch error:NULL];
+    id parentInContext2 = parents.lastObject;
+    XCTAssertEqual([[parentInContext2 valueForKey:@"data"] length], (NSUInteger)10001, @"Wrong data length after sync");
+}
+
+- (void)testImportOfLargeData
+{
+    const uint8_t bytes[10001];
+    id parent = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context1];
+    [parent setValue:[[NSData alloc] initWithBytes:bytes length:10001] forKey:@"data"];
+    [context1 save:NULL];
+    
+    [self leechStores];
+    
+    NSString *eventStoreDataDir = [eventDataRoot1 stringByAppendingPathComponent:@"com.ensembles.synctest/data"];
+    NSArray *contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:eventStoreDataDir error:NULL];
+    XCTAssertEqual(contents.count, (NSUInteger)1, @"Should be an external file after import.");
+}
+
+- (void)testRebasingWithLargeData
+{
+    [self leechStores];
+
+    const uint8_t bytes[10001];
+    NSMutableArray *parents = [NSMutableArray array];
+    for (NSUInteger i = 0; i < 50; i++) {
+        // 50 saves forces a rebase
+        id parent = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context1];
+        [parent setValue:[[NSData alloc] initWithBytes:bytes length:10001] forKey:@"data"];
+        [parents addObject:parent];
+        [context1 save:NULL];
+    }
+    
+    [context1 deleteObject:parents[0]]; // Delete one parent
+    [context1 save:NULL];
+    
+    NSString *eventStoreDataDir = [eventDataRoot1 stringByAppendingPathComponent:@"com.ensembles.synctest/data"];
+    NSArray *contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:eventStoreDataDir error:NULL];
+    XCTAssertEqual(contents.count, (NSUInteger)50, @"Should be a 50 data files. Delete has no affect before rebase.");
+
+    [self syncChanges]; // Should rebase due to many saves
+    
+    contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:eventStoreDataDir error:NULL];
+    XCTAssertEqual(contents.count, (NSUInteger)49, @"Rebase should clean up one of the data files");
 }
 
 @end

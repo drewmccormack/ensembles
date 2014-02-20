@@ -125,19 +125,19 @@
 - (NSError *)syncChanges
 {
     __block NSError *returnError = nil;
-    [self mergeEnsemble:ensemble1];
+    returnError = [self mergeEnsemble:ensemble1];
     if (returnError) return returnError;
     
-    [self mergeEnsemble:ensemble2];
+    returnError = [self mergeEnsemble:ensemble2];
     if (returnError) return returnError;
     
-    [self mergeEnsemble:ensemble1];
+    returnError = [self mergeEnsemble:ensemble1];
     if (returnError) return returnError;
     
-    [self mergeEnsemble:ensemble2];
+    returnError = [self mergeEnsemble:ensemble2];
     if (returnError) return returnError;
     
-    return returnError;
+    return nil;
 }
 
 @end

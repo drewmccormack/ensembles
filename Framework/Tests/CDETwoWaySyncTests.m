@@ -488,4 +488,40 @@
     return parents;
 }
 
+- (void)testBaselineConsolidationWithLargeData
+{
+    const uint8_t bytes[10010];
+    id parent1 = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context1];
+    [parent1 setValue:[[NSData alloc] initWithBytes:bytes length:10001] forKey:@"data"];
+    [parent1 setValue:@"1" forKey:@"name"];
+    [context1 save:NULL];
+    
+    id parent2 = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context2];
+    [parent2 setValue:[[NSData alloc] initWithBytes:bytes length:10002] forKey:@"data"];
+    [parent2 setValue:@"2" forKey:@"name"];
+    [context2 save:NULL];
+    
+    [self leechStores];
+    XCTAssertNil([self syncChanges], @"Error syncing");
+    
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
+    fetch.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES]];
+    
+    NSArray *parents = [context1 executeFetchRequest:fetch error:NULL];
+    XCTAssertEqual([[parents[0] valueForKey:@"data"] length], (NSUInteger) 10001, @"Wrong data length parent 1");
+    XCTAssertEqual([[parents[1] valueForKey:@"data"] length], (NSUInteger) 10002, @"Wrong data length parent 2");
+    
+    NSString *eventStoreDataDir = [eventDataRoot1 stringByAppendingPathComponent:@"com.ensembles.synctest/data"];
+    NSArray *contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:eventStoreDataDir error:NULL];
+    XCTAssertEqual(contents.count, (NSUInteger)2, @"Should be a 2 data files for event store 1.");
+    
+    parents = [context2 executeFetchRequest:fetch error:NULL];
+    XCTAssertEqual([[parents[0] valueForKey:@"data"] length], (NSUInteger) 10001, @"Wrong data length parent 1");
+    XCTAssertEqual([[parents[1] valueForKey:@"data"] length], (NSUInteger) 10002, @"Wrong data length parent 2");
+    
+    eventStoreDataDir = [eventDataRoot2 stringByAppendingPathComponent:@"com.ensembles.synctest/data"];
+    contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:eventStoreDataDir error:NULL];
+    XCTAssertEqual(contents.count, (NSUInteger)2, @"Should be a 2 data files for event store 2.");
+}
+
 @end
