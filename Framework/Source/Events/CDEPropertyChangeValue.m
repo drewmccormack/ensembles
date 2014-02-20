@@ -299,10 +299,18 @@
 
 - (void)mergeToManyRelationshipFromSubordinatePropertyChangeValue:(CDEPropertyChangeValue *)propertyValue
 {
+    static NSString *globalIdErrorMessage = @"Encountered NSNull in relationship merge. This should not arise. It usually indicates that at some point, multiple objects were saved at once with the same global id.";
+    
     // Adds
     NSMutableSet *newAdded = [[NSMutableSet alloc] initWithSet:self.addedIdentifiers];
     [newAdded unionSet:propertyValue.addedIdentifiers];
     [newAdded minusSet:self.removedIdentifiers]; // removes override adds in other value
+    
+    // Check for NSNull. Should not be there.
+    if ([newAdded containsObject:[NSNull null]]) {
+        CDELog(CDELoggingLevelError, @"%@", globalIdErrorMessage);
+        [newAdded removeObject:[NSNull null]];
+    }
     
     // Set
     self.addedIdentifiers = newAdded;
@@ -315,11 +323,19 @@
     NSMutableDictionary *indexesByGlobalId = [[NSMutableDictionary alloc] init];
     for (NSNumber *indexNum in propertyValue.movedIdentifiersByIndex) {
         NSString *globalId = propertyValue.movedIdentifiersByIndex[indexNum];
+        if ((id)globalId == [NSNull null]) {
+            CDELog(CDELoggingLevelError, @"%@", globalIdErrorMessage);
+            continue;
+        }
         indexesByGlobalId[globalId] = indexNum;
     }
     
     for (NSNumber *indexNum in self.movedIdentifiersByIndex) {
         NSString *globalId = self.movedIdentifiersByIndex[indexNum];
+        if ((id)globalId == [NSNull null]) {
+            CDELog(CDELoggingLevelError, @"%@", globalIdErrorMessage);
+            continue;
+        }
         indexesByGlobalId[globalId] = indexNum;
     }
     
