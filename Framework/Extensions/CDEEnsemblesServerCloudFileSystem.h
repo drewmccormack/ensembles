@@ -18,7 +18,7 @@
 @interface CDEEnsemblesServerCloudFileSystem : NSObject <CDECloudFileSystem>
 
 @property (nonatomic, readonly) NSString *username;
-@property (nonatomic, readonly) NSString * password;
+@property (nonatomic, readonly) NSString *password;
 
 @property (readwrite, weak) id <CDEEnsemblesServerCloudFileSystemDelegate> delegate;
 
