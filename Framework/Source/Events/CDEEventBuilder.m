@@ -200,7 +200,7 @@
             NSManagedObjectID *objectID = orderedObjectIDs[i];
             
             if (globalId == (id)[NSNull null]) {
-                CDELog(CDELoggingLevelWarning, @"Deleted object with no global identifier. Skipping. ObjectID: %@", objectID);
+                CDELog(CDELoggingLevelError, @"Deleted object with no global identifier. This is usually due to creating and deleting two separate objects with the same global id in a single save operation. ObjectID: %@", objectID);
                 return;
             }
             
