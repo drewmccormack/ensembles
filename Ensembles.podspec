@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "Ensembles"
-  s.version      = "0.3.0"
+  s.version      = "0.4.0"
   s.summary      = "A peer-to-peer synchronization framework for Core Data."
 
   s.description  =  <<-DESC
