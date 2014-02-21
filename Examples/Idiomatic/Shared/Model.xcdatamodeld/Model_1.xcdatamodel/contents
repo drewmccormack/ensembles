@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="3401" systemVersion="13B42" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="IDMMediaFile" representedClassName="IDMMediaFile" syncable="YES">
+        <attribute name="data" attributeType="Binary" allowsExternalBinaryDataStorage="YES" syncable="YES"/>
+        <attribute name="uniqueIdentifier" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="IDMNote" representedClassName="IDMNote" syncable="YES">
+        <attribute name="creationDate" attributeType="Date" syncable="YES"/>
+        <attribute name="text" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="uniqueIdentifier" attributeType="String" syncable="YES"/>
+        <relationship name="imageFile" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="IDMMediaFile" syncable="YES"/>
+        <relationship name="tags" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="IDMTag" inverseName="notes" inverseEntity="IDMTag" syncable="YES"/>
+    </entity>
+    <entity name="IDMTag" representedClassName="IDMTag" syncable="YES">
+        <attribute name="text" attributeType="String" minValueString="1" syncable="YES"/>
+        <relationship name="notes" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="IDMNote" inverseName="tags" inverseEntity="IDMNote" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="IDMNote" positionX="0" positionY="0" width="128" height="118"/>
+        <element name="IDMTag" positionX="-407" positionY="18" width="128" height="75"/>
+        <element name="IDMMediaFile" positionX="178" positionY="216" width="128" height="73"/>
+    </elements>
+</model>

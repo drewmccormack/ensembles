@@ -16,6 +16,7 @@
 @dynamic creationDate;
 @dynamic tags;
 @dynamic uniqueIdentifier;
+@dynamic imageFile;
 
 - (void)awakeFromInsert
 {

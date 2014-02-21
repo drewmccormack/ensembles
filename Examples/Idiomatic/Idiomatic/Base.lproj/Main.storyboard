@@ -133,21 +133,42 @@
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                 <dataDetectorType key="dataDetectorTypes" phoneNumber="YES" link="YES" address="YES" calendarEvent="YES"/>
                             </textView>
-                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Add to Groups" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="CCT-Yd-DPP">
-                                <rect key="frame" x="20" y="222" width="280" height="30"/>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Groups" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="CCT-Yd-DPP">
+                                <rect key="frame" x="20" y="222" width="223" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7h3-KR-z9W">
+                                <rect key="frame" x="261" y="221" width="41" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Photo">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="changePhoto:" destination="37f-Jb-4mS" eventType="touchUpInside" id="nTa-5r-PO5"/>
+                                </connections>
+                            </button>
+                            <imageView opaque="NO" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="IBs-YR-tiT">
+                                <rect key="frame" x="20" y="274" width="282" height="274"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                            </imageView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="OJt-jf-Vis" firstAttribute="centerX" secondItem="CCT-Yd-DPP" secondAttribute="centerX" id="0ah-mR-rgl"/>
                             <constraint firstAttribute="centerX" secondItem="OJt-jf-Vis" secondAttribute="centerX" id="7lo-0q-Zaa"/>
                             <constraint firstItem="CCT-Yd-DPP" firstAttribute="leading" secondItem="m4t-sa-8Nr" secondAttribute="leading" constant="20" id="89z-yl-AXM"/>
+                            <constraint firstItem="IBs-YR-tiT" firstAttribute="leading" secondItem="m4t-sa-8Nr" secondAttribute="leading" constant="20" id="SkJ-bm-fqS"/>
                             <constraint firstItem="OJt-jf-Vis" firstAttribute="leading" secondItem="m4t-sa-8Nr" secondAttribute="leading" constant="26" id="YaQ-jd-zYc"/>
                             <constraint firstItem="OJt-jf-Vis" firstAttribute="top" secondItem="srZ-ZP-lqS" secondAttribute="bottom" id="dHs-Tq-gHg"/>
+                            <constraint firstItem="7h3-KR-z9W" firstAttribute="centerY" secondItem="CCT-Yd-DPP" secondAttribute="centerY" constant="-1" id="e1T-jS-SXb"/>
+                            <constraint firstItem="7h3-KR-z9W" firstAttribute="leading" secondItem="CCT-Yd-DPP" secondAttribute="trailing" constant="18" id="faF-cO-zwl"/>
+                            <constraint firstItem="NQG-fC-rcR" firstAttribute="top" secondItem="IBs-YR-tiT" secondAttribute="bottom" constant="20" id="jKo-fU-Rl9"/>
+                            <constraint firstAttribute="trailing" secondItem="CCT-Yd-DPP" secondAttribute="trailing" constant="77" id="jX6-lU-1Er"/>
+                            <constraint firstAttribute="trailing" secondItem="IBs-YR-tiT" secondAttribute="trailing" constant="18" id="mHO-yD-C2g"/>
                             <constraint firstItem="CCT-Yd-DPP" firstAttribute="top" secondItem="OJt-jf-Vis" secondAttribute="bottom" constant="8" id="pas-cQ-KrQ"/>
+                            <constraint firstItem="IBs-YR-tiT" firstAttribute="top" secondItem="srZ-ZP-lqS" secondAttribute="bottom" constant="210" id="xVw-oc-Rnm"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Edit" id="bMG-9q-qbd">
@@ -164,6 +185,8 @@
                     </navigationItem>
                     <connections>
                         <outlet property="cancelBarButtonItem" destination="fco-s1-327" id="MnF-ps-K8Z"/>
+                        <outlet property="imageView" destination="IBs-YR-tiT" id="Pj7-5Y-7aW"/>
+                        <outlet property="photoButton" destination="7h3-KR-z9W" id="5jL-wi-iKv"/>
                         <outlet property="saveBarButtonItem" destination="zKl-JR-BGM" id="4te-AX-P64"/>
                         <outlet property="tagsTextField" destination="CCT-Yd-DPP" id="qUm-jt-7Jl"/>
                         <outlet property="textView" destination="OJt-jf-Vis" id="0d3-bS-t0K"/>

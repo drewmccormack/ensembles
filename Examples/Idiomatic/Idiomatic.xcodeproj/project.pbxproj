@@ -28,6 +28,8 @@
 		074B95DE17EC7DDF0016F84D /* IDMNotesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 074B95DD17EC7DDF0016F84D /* IDMNotesViewController.m */; };
 		074B95E117EC9F470016F84D /* IDMNoteEditingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 074B95E017EC9F470016F84D /* IDMNoteEditingViewController.m */; };
 		075157581805D7FD00C4D4F1 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 070F46F71805D51400EE36E5 /* Model.xcdatamodeld */; };
+		0751809918B743C500CE4264 /* IDMMediaFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 0751809818B743C500CE4264 /* IDMMediaFile.m */; };
+		0751809A18B743C500CE4264 /* IDMMediaFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 0751809818B743C500CE4264 /* IDMMediaFile.m */; };
 		075C271D18B3694B00A7BC25 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 075C271918B3694B00A7BC25 /* CDEEventStoreModel.xcdatamodeld */; };
 		075C271E18B3694B00A7BC25 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 075C271918B3694B00A7BC25 /* CDEEventStoreModel.xcdatamodeld */; };
 		0791BCE317F6F58C00E7C31B /* Ensembles iOS.xcodeproj in Resources */ = {isa = PBXBuildFile; fileRef = 0791BCE217F6F58C00E7C31B /* Ensembles iOS.xcodeproj */; };
@@ -102,7 +104,7 @@
 		070F46F41805D51400EE36E5 /* IDMNote.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IDMNote.m; path = Shared/IDMNote.m; sourceTree = SOURCE_ROOT; };
 		070F46F51805D51400EE36E5 /* IDMTag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IDMTag.h; path = Shared/IDMTag.h; sourceTree = SOURCE_ROOT; };
 		070F46F61805D51400EE36E5 /* IDMTag.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IDMTag.m; path = Shared/IDMTag.m; sourceTree = SOURCE_ROOT; };
-		070F46F81805D51400EE36E5 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		070F46F81805D51400EE36E5 /* Model_0.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model_0.xcdatamodel; sourceTree = "<group>"; };
 		0726FDB318AA476800670262 /* CDEDropboxCloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDEDropboxCloudFileSystem.h; path = ../../Framework/Extensions/CDEDropboxCloudFileSystem.h; sourceTree = "<group>"; };
 		0726FDB418AA476800670262 /* CDEDropboxCloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDEDropboxCloudFileSystem.m; path = ../../Framework/Extensions/CDEDropboxCloudFileSystem.m; sourceTree = "<group>"; };
 		0726FDBB18AA47C700670262 /* DropboxSDK.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = DropboxSDK.xcodeproj; path = ../../Vendor/DropboxSDK/DropboxSDK/DropboxSDK.xcodeproj; sourceTree = "<group>"; };
@@ -125,6 +127,9 @@
 		074B95DD17EC7DDF0016F84D /* IDMNotesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDMNotesViewController.m; sourceTree = "<group>"; };
 		074B95DF17EC9F470016F84D /* IDMNoteEditingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IDMNoteEditingViewController.h; sourceTree = "<group>"; };
 		074B95E017EC9F470016F84D /* IDMNoteEditingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDMNoteEditingViewController.m; sourceTree = "<group>"; };
+		0751808F18B7418A00CE4264 /* Model_1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = file; path = Model_1.xcdatamodel; sourceTree = "<group>"; };
+		0751809718B743C500CE4264 /* IDMMediaFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IDMMediaFile.h; path = Shared/IDMMediaFile.h; sourceTree = "<group>"; };
+		0751809818B743C500CE4264 /* IDMMediaFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IDMMediaFile.m; path = Shared/IDMMediaFile.m; sourceTree = "<group>"; };
 		075C271A18B3694B00A7BC25 /* CDEEventStoreModel_0.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_0.xcdatamodel; sourceTree = "<group>"; };
 		075C271B18B3694B00A7BC25 /* CDEEventStoreModel_1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_1.xcdatamodel; sourceTree = "<group>"; };
 		075C271C18B3694B00A7BC25 /* CDEEventStoreModel_2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_2.xcdatamodel; sourceTree = "<group>"; };
@@ -190,6 +195,8 @@
 				070F46F41805D51400EE36E5 /* IDMNote.m */,
 				070F46F51805D51400EE36E5 /* IDMTag.h */,
 				070F46F61805D51400EE36E5 /* IDMTag.m */,
+				0751809718B743C500CE4264 /* IDMMediaFile.h */,
+				0751809818B743C500CE4264 /* IDMMediaFile.m */,
 				070F46F71805D51400EE36E5 /* Model.xcdatamodeld */,
 			);
 			name = Shared;
@@ -526,6 +533,7 @@
 			files = (
 				0726FDB518AA476800670262 /* CDEDropboxCloudFileSystem.m in Sources */,
 				074B95A817EC783B0016F84D /* main.m in Sources */,
+				0751809918B743C500CE4264 /* IDMMediaFile.m in Sources */,
 				070F46FA1805D51400EE36E5 /* IDMTag.m in Sources */,
 				074B95DB17EC7DCD0016F84D /* IDMTagsViewController.m in Sources */,
 				074B95E117EC9F470016F84D /* IDMNoteEditingViewController.m in Sources */,
@@ -544,6 +552,7 @@
 				9477ED441800137300C2A419 /* IDMAppDelegateMac.m in Sources */,
 				9477ED6B18001B7000C2A419 /* IDMAddNoteViewController.m in Sources */,
 				075157581805D7FD00C4D4F1 /* Model.xcdatamodeld in Sources */,
+				0751809A18B743C500CE4264 /* IDMMediaFile.m in Sources */,
 				075C271E18B3694B00A7BC25 /* CDEEventStoreModel.xcdatamodeld in Sources */,
 				0726FDB618AA476800670262 /* CDEDropboxCloudFileSystem.m in Sources */,
 				9477ED3D1800137300C2A419 /* main.m in Sources */,
@@ -825,9 +834,10 @@
 		070F46F71805D51400EE36E5 /* Model.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				070F46F81805D51400EE36E5 /* Model.xcdatamodel */,
+				0751808F18B7418A00CE4264 /* Model_1.xcdatamodel */,
+				070F46F81805D51400EE36E5 /* Model_0.xcdatamodel */,
 			);
-			currentVersion = 070F46F81805D51400EE36E5 /* Model.xcdatamodel */;
+			currentVersion = 0751808F18B7418A00CE4264 /* Model_1.xcdatamodel */;
 			name = Model.xcdatamodeld;
 			path = Shared/Model.xcdatamodeld;
 			sourceTree = "<group>";
