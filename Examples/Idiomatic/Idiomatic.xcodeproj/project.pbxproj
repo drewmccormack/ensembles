@@ -127,7 +127,7 @@
 		074B95DD17EC7DDF0016F84D /* IDMNotesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDMNotesViewController.m; sourceTree = "<group>"; };
 		074B95DF17EC9F470016F84D /* IDMNoteEditingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IDMNoteEditingViewController.h; sourceTree = "<group>"; };
 		074B95E017EC9F470016F84D /* IDMNoteEditingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDMNoteEditingViewController.m; sourceTree = "<group>"; };
-		0751808F18B7418A00CE4264 /* Model_1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = file; path = Model_1.xcdatamodel; sourceTree = "<group>"; };
+		0751808F18B7418A00CE4264 /* Model_1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model_1.xcdatamodel; sourceTree = "<group>"; };
 		0751809718B743C500CE4264 /* IDMMediaFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IDMMediaFile.h; path = Shared/IDMMediaFile.h; sourceTree = "<group>"; };
 		0751809818B743C500CE4264 /* IDMMediaFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IDMMediaFile.m; path = Shared/IDMMediaFile.m; sourceTree = "<group>"; };
 		075C271A18B3694B00A7BC25 /* CDEEventStoreModel_0.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_0.xcdatamodel; sourceTree = "<group>"; };
@@ -638,6 +638,7 @@
 					"$(SRCROOT)/../Framework/**",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				MOMC_NO_INVERSE_RELATIONSHIP_WARNINGS = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "-ObjC";
 				SDKROOT = iphoneos;
@@ -677,6 +678,7 @@
 					"$(SRCROOT)/../Framework/**",
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				MOMC_NO_INVERSE_RELATIONSHIP_WARNINGS = YES;
 				OTHER_LDFLAGS = "-ObjC";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
