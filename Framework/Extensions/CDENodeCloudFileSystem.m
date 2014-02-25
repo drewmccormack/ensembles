@@ -13,19 +13,22 @@
 
 @implementation CDENodeCloudFileSystem
 
-- (instancetype)initWithUsername:(NSString *)newUsername andPassword:(NSString *)newPassword;
+@synthesize username = username;
+@synthesize password = password;
+@synthesize baseURL = baseURL;
+
+- (instancetype)initWithBaseURL:(NSURL *)newBaseURL
 {
     self = [super init];
     if (self) {
-        self.username = newUsername;
-        self.password = newPassword;
+        baseURL = newBaseURL;
     }
     return self;
 }
 
-- (instancetype)init
+- (instancetype) init
 {
-    return [self initWithUsername:nil andPassword:nil];
+    return [self initWithBaseURL:nil];
 }
 
 #pragma mark KVO
@@ -90,9 +93,12 @@
         NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
 		NSInteger statusCode = httpResponse.statusCode;
         BOOL statusOK = (statusCode >= 200 && statusCode < 300);
+        BOOL authFailed = (statusCode == 401);
+        if (authFailed) self.password = nil;
         if (!statusOK) {
+            NSInteger code = authFailed ? CDEErrorCodeAuthenticationFailure : CDEErrorCodeServerError;
             NSDictionary *userInfo = @{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"HTTP status code was %d", statusCode]};
-            error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeServerError userInfo:userInfo];
+            error = [NSError errorWithDomain:CDEErrorDomain code:code userInfo:userInfo];
             if (completion) completion(error, nil);
             return;
         }
@@ -117,7 +123,7 @@
 
 - (void)fileExistsAtPath:(NSString *)path completion:(CDEFileExistenceCallback)completion
 {
-    NSURL *url = [NSURL URLWithString:@"https://ensembles.herokuapp.com/uploadurls"];
+    NSURL *url = [self.baseURL URLByAppendingPathComponent:@"uploadurls" isDirectory:NO];
     [self sendRequestForURL:url HTTPMethod:@"POST" completion:^(NSError *error, NSDictionary *responseDict) {
         if (error) {
             if (completion) completion(NO, NO, error);

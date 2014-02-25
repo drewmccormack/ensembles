@@ -22,10 +22,12 @@
 
 @interface CDENodeCloudFileSystem : NSObject <CDECloudFileSystem>
 
-@property (nonatomic, readwrite) NSString *username;
-@property (nonatomic, readwrite) NSString *password;
-@property (readwrite, weak) id <CDENodeCloudFileSystemDelegate> delegate;
+@property (nonatomic, readwrite, copy) NSString *username;
+@property (nonatomic, readwrite, copy) NSString *password;
+@property (nonatomic, readonly, copy) NSURL *baseURL;
 
-- (id)initWithUsername:(NSString *)newUsername andPassword:(NSString *)newPassword;
+@property (nonatomic, readwrite, weak) id <CDENodeCloudFileSystemDelegate> delegate;
+
+- (id)initWithBaseURL:(NSURL *)baseURL;
 
 @end
