@@ -15,3 +15,10 @@
 - (NSArray *)cde_arrayByTransformingObjectsWithBlock:(id(^)(id))block;
 
 @end
+
+
+@interface NSData (CDEFoundationAdditions)
+
+- (NSString *)cde_base64String;
+
+@end

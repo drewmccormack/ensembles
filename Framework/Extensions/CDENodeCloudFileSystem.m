@@ -1,33 +1,45 @@
 //
-//  CDEEnsemblesServerCloudFileSystem.m
+//  CDENodeCloudFileSystem.m
 //
 //  Created by Drew McCormack on 2/17/14.
 //  Copyright (c) 2014 The Mental Faculty B.V. All rights reserved.
 //
 
-#import "CDEEnsemblesServerCloudFileSystem.h"
+#import "CDENodeCloudFileSystem.h"
 #import "CDEDefines.h"
+#import "CDEFoundationAdditions.h"
 #import "CDECloudFile.h"
 #import "CDECloudDirectory.h"
 
-static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
+@implementation CDENodeCloudFileSystem
 
-
-@implementation CDEEnsemblesServerCloudFileSystem
-
-- (instancetype)init
+- (instancetype)initWithUsername:(NSString *)newUsername andPassword:(NSString *)newPassword;
 {
     self = [super init];
     if (self) {
+        self.username = newUsername;
+        self.password = newPassword;
     }
     return self;
+}
+
+- (instancetype)init
+{
+    return [self initWithUsername:nil andPassword:nil];
+}
+
+#pragma mark KVO
+
++ (NSSet *)keyPathsForValuesAffectingIdentityToken
+{
+    return [NSSet setWithObject:@"username"];
 }
 
 #pragma mark Connecting
 
 - (BOOL)isConnected
 {
-    return NO;
+    return self.username.length > 0 && self.password.length > 0;
 }
 
 - (void)connect:(CDECompletionBlock)completion
@@ -35,8 +47,8 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
     if (self.isConnected) {
         if (completion) completion(nil);
     }
-    else if ([self.delegate respondsToSelector:@selector(linkSessionForEnsemblesServerCloudFileSystem:completion:)]) {
-//        [self.delegate linkSessionForEnsemblesServerCloudFileSystem:self completion:completion];
+    else if (self.delegate) {
+        [self.delegate nodeCloudFileSystem:self updateLoginCredentialsWithCompletion:completion];
     }
     else {
         NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeConnectionError userInfo:nil];
@@ -48,19 +60,7 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
 
 - (id <NSObject, NSCoding, NSCopying>)identityToken
 {
-    return nil;
-}
-
-#pragma mark - Base 64
-
-- (NSString *)base64StringFromData:(NSData *)data
-{
-#if (__IPHONE_OS_VERSION_MIN_REQUIRED < 70000) && (__MAC_OS_X_VERSION_MIN_REQUIRED < 1090)
-    NSString *string = [data base64Encoding];
-#else
-    NSString *string = [data base64EncodedStringWithOptions:0];
-#endif
-    return string;
+    return self.username;
 }
 
 #pragma mark - Requests
@@ -74,7 +74,7 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
     // Basic Auth
     NSString *authString = [NSString stringWithFormat:@"%@:%@", self.username, self.password];
 	NSData *authData = [authString dataUsingEncoding:NSUTF8StringEncoding];
-    NSString *base64AuthString = [self base64StringFromData:authData];
+    NSString *base64AuthString = [authData cde_base64String];
 	NSString *authValue = [NSString stringWithFormat:@"Basic %@", base64AuthString];
 	[request setValue:authValue forHTTPHeaderField:@"Authorization"];
     

@@ -16,7 +16,7 @@
 		0726FDB618AA476800670262 /* CDEDropboxCloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 0726FDB418AA476800670262 /* CDEDropboxCloudFileSystem.m */; };
 		0726FDC718AA47E300670262 /* libSDropboxSDK.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0726FDC418AA47C700670262 /* libSDropboxSDK.a */; };
 		0726FDC818AA47EA00670262 /* DropboxOSX.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0726FDC618AA47C700670262 /* DropboxOSX.framework */; };
-		0726FDD118B28F4E00670262 /* CDEEnsemblesServerCloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 0726FDD018B28F4E00670262 /* CDEEnsemblesServerCloudFileSystem.m */; };
+		0726FDD118B28F4E00670262 /* CDENodeCloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 0726FDD018B28F4E00670262 /* CDENodeCloudFileSystem.m */; };
 		07334EA7180AB25300CE9EF1 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 07334EA4180AB25300CE9EF1 /* CDEEventStoreModel.xcdatamodeld */; };
 		07334EA8180AB25300CE9EF1 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 07334EA4180AB25300CE9EF1 /* CDEEventStoreModel.xcdatamodeld */; };
 		074B959C17EC783B0016F84D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 074B959B17EC783B0016F84D /* Foundation.framework */; };
@@ -107,8 +107,8 @@
 		0726FDB318AA476800670262 /* CDEDropboxCloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDEDropboxCloudFileSystem.h; path = ../../Framework/Extensions/CDEDropboxCloudFileSystem.h; sourceTree = "<group>"; };
 		0726FDB418AA476800670262 /* CDEDropboxCloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDEDropboxCloudFileSystem.m; path = ../../Framework/Extensions/CDEDropboxCloudFileSystem.m; sourceTree = "<group>"; };
 		0726FDBB18AA47C700670262 /* DropboxSDK.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = DropboxSDK.xcodeproj; path = ../../Vendor/DropboxSDK/DropboxSDK/DropboxSDK.xcodeproj; sourceTree = "<group>"; };
-		0726FDCF18B28F4E00670262 /* CDEEnsemblesServerCloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDEEnsemblesServerCloudFileSystem.h; path = ../../Framework/Extensions/CDEEnsemblesServerCloudFileSystem.h; sourceTree = "<group>"; };
-		0726FDD018B28F4E00670262 /* CDEEnsemblesServerCloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDEEnsemblesServerCloudFileSystem.m; path = ../../Framework/Extensions/CDEEnsemblesServerCloudFileSystem.m; sourceTree = "<group>"; };
+		0726FDCF18B28F4E00670262 /* CDENodeCloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDENodeCloudFileSystem.h; path = ../../Framework/Extensions/CDENodeCloudFileSystem.h; sourceTree = "<group>"; };
+		0726FDD018B28F4E00670262 /* CDENodeCloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDENodeCloudFileSystem.m; path = ../../Framework/Extensions/CDENodeCloudFileSystem.m; sourceTree = "<group>"; };
 		07334EA5180AB25300CE9EF1 /* CDEEventStoreModel_0.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_0.xcdatamodel; sourceTree = "<group>"; };
 		07334EA6180AB25300CE9EF1 /* CDEEventStoreModel_1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_1.xcdatamodel; sourceTree = "<group>"; };
 		074B959817EC783B0016F84D /* Idiomatic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Idiomatic.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -186,8 +186,8 @@
 		070F46FC1805D69E00EE36E5 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				0726FDCF18B28F4E00670262 /* CDEEnsemblesServerCloudFileSystem.h */,
-				0726FDD018B28F4E00670262 /* CDEEnsemblesServerCloudFileSystem.m */,
+				0726FDCF18B28F4E00670262 /* CDENodeCloudFileSystem.h */,
+				0726FDD018B28F4E00670262 /* CDENodeCloudFileSystem.m */,
 				0726FDB318AA476800670262 /* CDEDropboxCloudFileSystem.h */,
 				0726FDB418AA476800670262 /* CDEDropboxCloudFileSystem.m */,
 				070F46F31805D51400EE36E5 /* IDMNote.h */,
@@ -532,7 +532,7 @@
 				074B95A817EC783B0016F84D /* main.m in Sources */,
 				070F46FA1805D51400EE36E5 /* IDMTag.m in Sources */,
 				074B95DB17EC7DCD0016F84D /* IDMTagsViewController.m in Sources */,
-				0726FDD118B28F4E00670262 /* CDEEnsemblesServerCloudFileSystem.m in Sources */,
+				0726FDD118B28F4E00670262 /* CDENodeCloudFileSystem.m in Sources */,
 				074B95E117EC9F470016F84D /* IDMNoteEditingViewController.m in Sources */,
 				070F46F91805D51400EE36E5 /* IDMNote.m in Sources */,
 				074B95AC17EC783B0016F84D /* IDMAppDelegate.m in Sources */,
