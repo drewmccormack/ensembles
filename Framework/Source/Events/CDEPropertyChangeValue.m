@@ -8,6 +8,7 @@
 
 #import "CDEPropertyChangeValue.h"
 #import "CDEDefines.h"
+#import "CDEEventStore.h"
 
 @interface CDEPropertyChangeValue ()
 
@@ -20,26 +21,27 @@
 
 @implementation CDEPropertyChangeValue
 
-+ (NSArray *)propertyChangesForObject:(NSManagedObject *)object propertyNames:(id)names isPreSave:(BOOL)isPreSave storeValues:(BOOL)storeValues
++ (NSArray *)propertyChangesForObject:(NSManagedObject *)object eventStore:(CDEEventStore *)newEventStore propertyNames:(id)names isPreSave:(BOOL)isPreSave storeValues:(BOOL)storeValues
 {
     NSMutableArray *propertyChanges = [[NSMutableArray alloc] initWithCapacity:[names count]];
     NSEntityDescription *entity = object.entity;
     
     for (NSString *propertyName in names) {
         NSPropertyDescription *propertyDesc = entity.propertiesByName[propertyName];
-        CDEPropertyChangeValue *change = [[CDEPropertyChangeValue alloc] initWithObject:object propertyDescription:propertyDesc isPreSave:isPreSave storeValues:storeValues];
+        CDEPropertyChangeValue *change = [[CDEPropertyChangeValue alloc] initWithObject:object propertyDescription:propertyDesc eventStore:newEventStore isPreSave:isPreSave storeValues:storeValues];
         [propertyChanges addObject:change];
     }
     
     return propertyChanges;
 }
 
-- (instancetype)initWithObject:(NSManagedObject *)object propertyDescription:(NSPropertyDescription *)propertyDesc isPreSave:(BOOL)isPreSave storeValues:(BOOL)storeValues
+- (instancetype)initWithObject:(NSManagedObject *)object propertyDescription:(NSPropertyDescription *)propertyDesc eventStore:(CDEEventStore *)newEventStore isPreSave:(BOOL)isPreSave storeValues:(BOOL)storeValues
 {
     NSAssert(!object.objectID.isTemporaryID, @"Object has a temporary id in initWithObject: of CDEPropertyChangeValue");
     CDEPropertyChangeType newType = [self.class propertyChangeTypeForPropertyDescription:propertyDesc];
     self = [self initWithType:newType propertyName:propertyDesc.name];
     if (self) {
+        self.eventStore = newEventStore;
         self.objectID = object.objectID;
         [self updateWithObject:object isPreSave:isPreSave storeValues:storeValues];
     }
@@ -54,6 +56,7 @@
         self.type = type;
         self.objectID = nil;
         self.value = nil;
+        self.filename = nil;
         self.relatedIdentifier = nil;
         self.addedIdentifiers = nil;
         self.removedIdentifiers = nil;
@@ -75,16 +78,24 @@
         self.removedIdentifiers = [aDecoder decodeObjectForKey:@"removedIdentifiers"];
         self.movedIdentifiersByIndex = [aDecoder decodeObjectForKey:@"movedIdentifiersByIndex"];
         self.type = [aDecoder decodeIntegerForKey:@"type"];
+        
+        if ([aDecoder decodeIntegerForKey:@"classVersion"] > 0) {
+            self.filename = [aDecoder decodeObjectForKey:@"filename"];
+        }
+        else {
+            self.filename = nil;
+        }
     }
     return self;
 }
 
 - (void)encodeWithCoder:(NSCoder *)aCoder
 {
-    static const NSInteger classVersion = 0;
+    static const NSInteger classVersion = 1;
     [aCoder encodeInteger:classVersion forKey:@"classVersion"];
     [aCoder encodeObject:self.propertyName forKey:@"propertyName"];
     [aCoder encodeObject:self.value forKey:@"value"];
+    [aCoder encodeObject:self.filename forKey:@"filename"];
     [aCoder encodeObject:self.relatedIdentifier forKey:@"relatedIdentifier"];
     [aCoder encodeObject:self.addedIdentifiers forKey:@"addedIdentifiers"];
     [aCoder encodeObject:self.removedIdentifiers forKey:@"removedIdentifiers"];
@@ -172,7 +183,17 @@
         NSValueTransformer *valueTransformer = [NSValueTransformer valueTransformerForName:attribute.valueTransformerName];
         newValue = [valueTransformer transformedValue:newValue];
     }
+    
+    // Put data bigger than 10KB or so in an external file
+    if ([newValue isKindOfClass:[NSData class]] && [(NSData *)newValue length] > 10e3) {
+        NSAssert(self.eventStore, @"Storing large data attribute requires event store");
+        self.filename = [self.eventStore importData:newValue];
+        self.value = nil;
+        if (self.filename) return; // If success, return. Otherwise just store normally below.
+    }
+
     self.value = newValue;
+    self.filename = nil;
 }
 
 - (void)storeToOneRelationshipChangeForDescription:(NSRelationshipDescription *)relationDesc newValue:(id)newValue
@@ -180,7 +201,7 @@
     NSManagedObject *relatedObject = newValue;
     NSError *error = nil;
     if (relatedObject && ![relatedObject.managedObjectContext obtainPermanentIDsForObjects:@[relatedObject] error:&error]) {
-        NSLog(@"Could not get permanent ID for object: %@", error);
+        CDELog(CDELoggingLevelError, @"Could not get permanent ID for object: %@", error);
     }
     
     self.relatedIdentifier = relatedObject.objectID;
@@ -194,7 +215,7 @@
     NSSet *newRelatedObjects = newValue;
     NSManagedObjectContext *context = [newRelatedObjects.anyObject managedObjectContext];
     if (context && ![context obtainPermanentIDsForObjects:newRelatedObjects.allObjects error:&error]) {
-        NSLog(@"Failed to get permanent ids: %@", error);
+        CDELog(CDELoggingLevelError, @"Failed to get permanent ids: %@", error);
     }
     NSSet *newRelatedObjectIDs = [newValue valueForKeyPath:@"objectID"];
     
@@ -235,7 +256,7 @@
     NSError *error;
     NSManagedObjectContext *context = [[orderedIndexes.allValues lastObject] managedObjectContext];
     if (context && ![context obtainPermanentIDsForObjects:orderedIndexes.allValues error:&error]) {
-        NSLog(@"Failed to get permanent ids: %@", error);
+        CDELog(CDELoggingLevelError, @"Failed to get permanent ids: %@", error);
     }
 
     NSMutableDictionary *finalMovedObjects = [[NSMutableDictionary alloc] initWithCapacity:orderedIndexes.count];
@@ -246,14 +267,50 @@
 }
 
 
+#pragma mark Extracting Values
+
+- (id)attributeValueForAttributeDescription:(NSAttributeDescription *)attribute
+{
+    id returnValue = nil;
+    if (self.filename) {
+        NSAssert(self.eventStore, @"Retrieving attribute requires event store");
+        returnValue = [self.eventStore dataForFile:self.filename];
+    }
+    else if (self.value) {
+        returnValue = self.value == [NSNull null] ? nil : self.value;
+    }
+    
+    if (attribute.valueTransformerName) {
+        NSValueTransformer *valueTransformer = [NSValueTransformer valueTransformerForName:attribute.valueTransformerName];
+        if (!valueTransformer) {
+            CDELog(CDELoggingLevelWarning, @"Failed to retrieve value transformer: %@", attribute.valueTransformerName);
+            returnValue = nil;
+        }
+        else {
+            returnValue = [valueTransformer reverseTransformedValue:returnValue];
+        }
+    }
+    
+    return returnValue;
+}
+
+
 #pragma mark Merging
 
 - (void)mergeToManyRelationshipFromSubordinatePropertyChangeValue:(CDEPropertyChangeValue *)propertyValue
 {
+    static NSString *globalIdErrorMessage = @"Encountered NSNull in relationship merge. This should not arise. It usually indicates that at some point, multiple objects were saved at once with the same global id.";
+    
     // Adds
     NSMutableSet *newAdded = [[NSMutableSet alloc] initWithSet:self.addedIdentifiers];
     [newAdded unionSet:propertyValue.addedIdentifiers];
     [newAdded minusSet:self.removedIdentifiers]; // removes override adds in other value
+    
+    // Check for NSNull. Should not be there.
+    if ([newAdded containsObject:[NSNull null]]) {
+        CDELog(CDELoggingLevelError, @"%@", globalIdErrorMessage);
+        [newAdded removeObject:[NSNull null]];
+    }
     
     // Set
     self.addedIdentifiers = newAdded;
@@ -266,11 +323,19 @@
     NSMutableDictionary *indexesByGlobalId = [[NSMutableDictionary alloc] init];
     for (NSNumber *indexNum in propertyValue.movedIdentifiersByIndex) {
         NSString *globalId = propertyValue.movedIdentifiersByIndex[indexNum];
+        if ((id)globalId == [NSNull null]) {
+            CDELog(CDELoggingLevelError, @"%@", globalIdErrorMessage);
+            continue;
+        }
         indexesByGlobalId[globalId] = indexNum;
     }
     
     for (NSNumber *indexNum in self.movedIdentifiersByIndex) {
         NSString *globalId = self.movedIdentifiersByIndex[indexNum];
+        if ((id)globalId == [NSNull null]) {
+            CDELog(CDELoggingLevelError, @"%@", globalIdErrorMessage);
+            continue;
+        }
         indexesByGlobalId[globalId] = indexNum;
     }
     
@@ -298,7 +363,7 @@
 
 - (NSString *)description
 {
-    NSString *result = [NSString stringWithFormat:@"Name: %@\rType: %d\rObjectID: %@\rValue: %@\rRelated: %@\rAdded: %@\rRemoved: %@\nMoved: %@\nRelated IDs: %@", self.propertyName, (int)self.type, self.objectID, self.value, self.relatedIdentifier, self.addedIdentifiers, self.removedIdentifiers, self.movedIdentifiersByIndex, self.relatedObjectIDs];
+    NSString *result = [NSString stringWithFormat:@"Name: %@\rType: %d\rObjectID: %@\rValue: %@\rFilename: %@\rRelated: %@\rAdded: %@\rRemoved: %@\nMoved: %@\nRelated IDs: %@", self.propertyName, (int)self.type, self.objectID, self.value, self.filename, self.relatedIdentifier, self.addedIdentifiers, self.removedIdentifiers, self.movedIdentifiersByIndex, self.relatedObjectIDs];
     return result;
 }
 

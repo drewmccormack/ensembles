@@ -26,6 +26,7 @@ static NSString *testStoreFile;
     _lastMergeRevision = -1;
     _identifierOfBaselineUsedToConstructStore = @"store1baseline";
     _currentBaselineIdentifier = @"store1";
+    _dataFilenames = [NSSet set];
     return self;
 }
 

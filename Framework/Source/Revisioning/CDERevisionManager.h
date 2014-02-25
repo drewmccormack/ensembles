@@ -27,11 +27,12 @@
 - (NSArray *)fetchStoreModificationEventsConcurrentWithEvents:(NSArray *)events error:(NSError * __autoreleasing *)error;
 - (NSArray *)recursivelyFetchStoreModificationEventsConcurrentWithEvents:(NSArray *)events error:(NSError *__autoreleasing *)error;
 
-- (BOOL)checkIntegrationPrequisites:(NSError * __autoreleasing *)error;
+- (BOOL)checkIntegrationPrequisitesForEvents:(NSArray *)events error:(NSError * __autoreleasing *)error;
 
 - (BOOL)checkModelVersionsOfStoreModificationEvents:(NSArray *)events;
 - (BOOL)checkAllDependenciesExistForStoreModificationEvents:(NSArray *)events;
 - (BOOL)checkContinuityOfStoreModificationEvents:(NSArray *)events;
+- (BOOL)checkAllDataFilesExistForStoreModificationEvents:(NSArray *)events;
 
 - (BOOL)checkRebasingPrerequisitesForEvents:(NSArray *)events error:(NSError * __autoreleasing *)error;
 

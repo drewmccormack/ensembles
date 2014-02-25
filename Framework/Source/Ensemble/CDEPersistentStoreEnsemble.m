@@ -239,30 +239,38 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
         [self dispatchCompletion:completion withError:error];
         return;
     }
+
+    NSMutableArray *tasks = [NSMutableArray array];
     
     CDEAsynchronousTaskBlock connectTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self.cloudFileSystem connect:^(NSError *error) {
             next(error, NO);
         }];
     };
+    [tasks addObject:connectTask];
     
-    CDEAsynchronousTaskBlock initialPrepTask = ^(CDEAsynchronousTaskCallbackBlock next) {
-        [self.cloudFileSystem performInitialPreparation:^(NSError *error) {
-            next(error, NO);
-        }];
-    };
-    
+    if ([self.cloudFileSystem respondsToSelector:@selector(performInitialPreparation:)]) {
+        CDEAsynchronousTaskBlock initialPrepTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+            [self.cloudFileSystem performInitialPreparation:^(NSError *error) {
+                next(error, NO);
+            }];
+        };
+        [tasks addObject:initialPrepTask];
+    }
+
     CDEAsynchronousTaskBlock remoteStructureTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self.cloudManager createRemoteDirectoryStructureWithCompletion:^(NSError *error) {
             next(error, NO);
         }];
     };
+    [tasks addObject:remoteStructureTask];
     
     CDEAsynchronousTaskBlock eventStoreTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self setupEventStoreWithCompletion:^(NSError *error) {
             next(error, NO);
         }];
     };
+    [tasks addObject:eventStoreTask];
     
     CDEAsynchronousTaskBlock importTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         // Listen for save notifications, and fail if a save to the store happens during the import
@@ -292,12 +300,21 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
             next(error, NO);
         }];
     };
+    [tasks addObject:importTask];
     
     CDEAsynchronousTaskBlock snapshotRemoteFilesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self.cloudManager snapshotRemoteFilesWithCompletion:^(NSError *error) {
             next(error, NO);
         }];
     };
+    [tasks addObject:snapshotRemoteFilesTask];
+    
+    CDEAsynchronousTaskBlock exportDataFilesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self.cloudManager exportDataFilesWithCompletion:^(NSError *error) {
+            next(error, NO);
+        }];
+    };
+    [tasks addObject:exportDataFilesTask];
     
     CDEAsynchronousTaskBlock exportBaselinesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self.cloudManager exportNewLocalBaselineWithCompletion:^(NSError *error) {
@@ -305,6 +322,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
             next(nil, NO); // If the export fails, continue regardless. Not essential.
         }];
     };
+    [tasks addObject:exportBaselinesTask];
     
     CDEAsynchronousTaskBlock completeLeechTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         // Deleech if a save occurred during import
@@ -322,12 +340,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
             next(error, NO);
         }];
     };
-    
-    NSMutableArray *tasks = [NSMutableArray arrayWithObjects:connectTask, remoteStructureTask, eventStoreTask, importTask, snapshotRemoteFilesTask, exportBaselinesTask, completeLeechTask, nil];
-    
-    if ([self.cloudFileSystem respondsToSelector:@selector(performInitialPreparation:)]) {
-        [tasks insertObject:initialPrepTask atIndex:1];
-    }
+    [tasks addObject:completeLeechTask];
     
     CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:tasks terminationPolicy:CDETaskQueueTerminationPolicyStopOnError completion:^(NSError *error) {
         [self dispatchCompletion:completion withError:error];
@@ -486,36 +499,50 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
     self.merging = YES;
     [self.eventIntegrator startMonitoringSaves]; // Will cancel merge if save occurs
 
+    NSMutableArray *tasks = [NSMutableArray array];
+    
     CDEAsynchronousTaskBlock checkIdentityTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self checkCloudFileSystemIdentityWithCompletion:^(NSError *error) {
             next(error, NO);
         }];
     };
+    [tasks addObject:checkIdentityTask];
     
     CDEAsynchronousTaskBlock checkRegistrationTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self checkStoreRegistrationInCloudWithCompletion:^(NSError *error) {
             next(error, NO);
         }];
     };
+    [tasks addObject:checkRegistrationTask];
     
     CDEAsynchronousTaskBlock processChangesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         NSError *error = nil;
         [eventStore flush:&error];
         next(error, NO);
     };
+    [tasks addObject:processChangesTask];
     
     CDEAsynchronousTaskBlock remoteStructureTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self.cloudManager createRemoteDirectoryStructureWithCompletion:^(NSError *error) {
             next(error, NO);
         }];
     };
+    [tasks addObject:remoteStructureTask];
     
     CDEAsynchronousTaskBlock snapshotRemoteFilesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self.cloudManager snapshotRemoteFilesWithCompletion:^(NSError *error) {
             next(error, NO);
         }];
     };
+    [tasks addObject:snapshotRemoteFilesTask];
     
+    CDEAsynchronousTaskBlock importDataFilesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self.cloudManager importNewDataFilesWithCompletion:^(NSError *error) {
+            next(error, NO);
+        }];
+    };
+    [tasks addObject:importDataFilesTask];
+
     CDEAsynchronousTaskBlock importBaselinesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self.cloudManager importNewBaselineEventsWithCompletion:^(NSError *error) {
             if (nil == error) {
@@ -527,24 +554,28 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
             next(error, NO);
         }];
     };
+    [tasks addObject:importBaselinesTask];
     
     CDEAsynchronousTaskBlock mergeBaselinesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self.baselineConsolidator consolidateBaselineWithCompletion:^(NSError *error) {
             next(error, NO);
         }];
     };
+    [tasks addObject:mergeBaselinesTask];
     
     CDEAsynchronousTaskBlock importRemoteEventsTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self.cloudManager importNewRemoteNonBaselineEventsWithCompletion:^(NSError *error) {
             next(error, NO);
         }];
     };
+    [tasks addObject:importRemoteEventsTask];
     
     CDEAsynchronousTaskBlock removeOutdatedEventsTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self.rebaser deleteEventsPreceedingBaselineWithCompletion:^(NSError *error) {
             next(error, NO);
         }];
     };
+    [tasks addObject:removeOutdatedEventsTask];
     
     CDEAsynchronousTaskBlock rebaseTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         if ([self.rebaser shouldRebase]) {
@@ -556,6 +587,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
             next(nil, NO);
         }
     };
+    [tasks addObject:rebaseTask];
     
     CDEAsynchronousTaskBlock mergeEventsTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self.eventIntegrator mergeEventsWithCompletion:^(NSError *error) {
@@ -564,26 +596,37 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
             next(error, NO);
         }];
     };
+    [tasks addObject:mergeEventsTask];
+    
+    CDEAsynchronousTaskBlock exportDataFilesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self.eventStore removeUnreferencedDataFiles];
+        [self.cloudManager exportDataFilesWithCompletion:^(NSError *error) {
+            next(error, NO);
+        }];
+    };
+    [tasks addObject:exportDataFilesTask];
     
     CDEAsynchronousTaskBlock exportBaselinesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self.cloudManager exportNewLocalBaselineWithCompletion:^(NSError *error) {
             next(error, NO);
         }];
     };
+    [tasks addObject:exportBaselinesTask];
     
     CDEAsynchronousTaskBlock exportEventsTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self.cloudManager exportNewLocalNonBaselineEventsWithCompletion:^(NSError *error) {
             next(error, NO);
         }];
     };
+    [tasks addObject:exportEventsTask];
     
     CDEAsynchronousTaskBlock removeRemoteFiles = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self.cloudManager removeOutdatedRemoteFilesWithCompletion:^(NSError *error) {
             next(error, NO);
         }];
     };
+    [tasks addObject:removeRemoteFiles];
     
-    NSArray *tasks = @[checkIdentityTask, checkRegistrationTask, processChangesTask, remoteStructureTask, snapshotRemoteFilesTask, importBaselinesTask, mergeBaselinesTask, importRemoteEventsTask, removeOutdatedEventsTask, rebaseTask, mergeEventsTask, exportBaselinesTask, exportEventsTask, removeRemoteFiles];
     CDEAsynchronousTaskQueue *taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTasks:tasks terminationPolicy:CDETaskQueueTerminationPolicyStopOnError completion:^(NSError *error) {
         [self dispatchCompletion:completion withError:error];
         [self.eventIntegrator stopMonitoringSaves];

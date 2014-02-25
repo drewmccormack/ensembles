@@ -290,10 +290,6 @@
     CDERevisionManager *revisionManager = [[CDERevisionManager alloc] initWithEventStore:self.eventStore];
     revisionManager.managedObjectModelURL = self.ensemble.managedObjectModelURL;
     
-    // Check prerequisites
-    BOOL canIntegrate = [revisionManager checkIntegrationPrequisites:error];
-    if (!canIntegrate) return NO;
-    
     // Move to the event store queue
     __block BOOL success = YES;
     BOOL needFullIntegration = [self needsFullIntegration];
@@ -324,6 +320,13 @@
         }
         if (storeModEvents == nil) success = NO;
         if (storeModEvents.count == 0) return;
+        
+        // Check prerequisites
+        BOOL canIntegrate = [revisionManager checkIntegrationPrequisitesForEvents:storeModEvents error:error];
+        if (!canIntegrate) {
+            success = NO;
+            return;
+        }
         
         // If all events are from this device, don't merge
         NSArray *storeIds = [storeModEvents valueForKeyPath:@"@distinctUnionOfObjects.eventRevision.persistentStoreIdentifier"];
@@ -639,9 +642,6 @@
 {
     NSEntityDescription *entity = object.entity;
     for (CDEPropertyChangeValue *changeValue in properyChangeValues) {
-        id newValue = changeValue.value;
-        if (newValue == [NSNull null]) newValue = nil;
-        
         NSAttributeDescription *attribute = entity.attributesByName[changeValue.propertyName];
         if (!attribute) {
             // Likely attribute removed from model since change
@@ -649,15 +649,8 @@
             continue;
         }
         
-        if (attribute.valueTransformerName) {
-            NSValueTransformer *valueTransformer = [NSValueTransformer valueTransformerForName:attribute.valueTransformerName];
-            if (!valueTransformer) {
-                CDELog(CDELoggingLevelWarning, @"Failed to retrieve value transformer: %@", attribute.valueTransformerName);
-                continue;
-            }
-            newValue = [valueTransformer reverseTransformedValue:newValue];
-        }
-        
+        changeValue.eventStore = self.eventStore; // Needed to retrieve data files
+        id newValue = [changeValue attributeValueForAttributeDescription:attribute];
         [self setValue:newValue forKey:changeValue.propertyName inObject:object];
     }
 }
@@ -972,7 +965,7 @@
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEGlobalIdentifier"];
     fetch.predicate = [NSPredicate predicateWithFormat:@"globalIdentifier IN %@", idStrings];
     NSArray *globalIds = [self.eventStore.managedObjectContext executeFetchRequest:fetch error:&error];
-    if (!globalIds) NSLog(@"Error fetching ids: %@", error);
+    if (!globalIds) CDELog(CDELoggingLevelError, @"Error fetching ids: %@", error);
     return globalIds;
 }
 

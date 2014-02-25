@@ -383,4 +383,145 @@
     XCTAssert([set1Items isEqualToString:set2Items], @"Expected consistent merge results");
 }
 
+- (void)testDeletingAllObjectsAndReinserting
+{
+    [self leechStores];
+    
+    ensemble1.delegate = self;
+    ensemble2.delegate = self;
+    
+    // Create all
+    [self createNamedParentsAndChildrenInContext:context1];
+    XCTAssertTrue([context1 save:NULL], @"Could not save");
+    
+    // Create all 2
+    [self createNamedParentsAndChildrenInContext:context2];
+    XCTAssertTrue([context1 save:NULL], @"Could not save");
+    
+    // Make small, reversible change in 2, to try to mess things up
+    NSArray *parents = [self parentsInContext:context2];
+    id parent = parents.lastObject;
+    id child = [[parent valueForKey:@"children"] anyObject];
+    [[parent mutableSetValueForKey:@"children"] removeObject:child];
+    XCTAssertTrue([context2 save:NULL], @"Could not save");
+    [[parent mutableSetValueForKey:@"children"] addObject:child];
+    XCTAssertTrue([context2 save:NULL], @"Could not save");
+
+    // Delete all
+    parents = [self parentsInContext:context1];
+    for (id parent in parents) [context1 deleteObject:parent];
+    XCTAssertTrue([context1 save:NULL], @"Could not save");
+    
+    // Create all 1
+    [self createNamedParentsAndChildrenInContext:context1];
+    XCTAssertTrue([context1 save:NULL], @"Could not save");
+    
+    // Sync
+    XCTAssertNil([self syncChanges], @"Sync failed");
+    
+    // Delete all
+    parents = [self parentsInContext:context2];
+    for (id parent in parents) [context2 deleteObject:parent];
+    XCTAssertTrue([context2 save:NULL], @"Could not save");
+    
+    // Make sure there are no objects
+    NSArray *children = [self childrenInContext:context2];
+    XCTAssertEqual(children.count, (NSUInteger)0, @"Wrong number of children in context2 after full delete");
+    
+    // Recreate objects in second context
+    [self createNamedParentsAndChildrenInContext:context2];
+    XCTAssertTrue([context2 save:NULL], @"Could not save");
+
+    XCTAssertNil([self syncChanges], @"Sync failed");
+    
+    parents = [self parentsInContext:context1];
+    XCTAssertEqual(parents.count, (NSUInteger)5, @"Wrong number of parents in context1");
+    XCTAssertEqual([[parents.lastObject valueForKey:@"children"] count], (NSUInteger)5, @"Wrong number of children of parent in context1");
+    XCTAssertEqual([[parents.lastObject valueForKey:@"orderedChildren"] count], (NSUInteger)5, @"Wrong number of ordered children of parent in context1");
+
+    children = [self childrenInContext:context1];
+    XCTAssertEqual(children.count, (NSUInteger)50, @"Wrong number of children in context1");
+    
+    parents = [self parentsInContext:context2];
+    XCTAssertEqual(parents.count, (NSUInteger)5, @"Wrong number of parents in context2");
+    XCTAssertEqual([[parents.lastObject valueForKey:@"children"] count], (NSUInteger)5, @"Wrong number of children of parent in context2");
+    XCTAssertEqual([[parents.lastObject valueForKey:@"orderedChildren"] count], (NSUInteger)5, @"Wrong number of ordered children of parent in context2");
+    
+    children = [self childrenInContext:context2];
+    XCTAssertEqual(children.count, (NSUInteger)50, @"Wrong number of children in context2");
+}
+
+- (void)createNamedParentsAndChildrenInContext:(NSManagedObjectContext *)context
+{
+    // Parents
+    for (int i = 0; i < 5; i++) {
+        id parent = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context];
+        [parent setValue:[NSString stringWithFormat:@"%d", i] forKey:@"name"]; // Used as unique id
+        
+        // Children
+        for (int ic = 0; ic < 5; ic++) {
+            id child = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context];
+            [child setValue:[NSString stringWithFormat:@"%d_%d", i, ic] forKey:@"name"]; // Used as unique id
+            [child setValue:parent forKey:@"parentWithSiblings"];
+        }
+        
+        // Ordered Children
+        for (int ic = 0; ic < 5; ic++) {
+            id child = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context];
+            [child setValue:[NSString stringWithFormat:@"ordered %d_%d", i, ic] forKey:@"name"]; // Used as unique id
+            [[parent mutableOrderedSetValueForKey:@"orderedChildren"] addObject:child];
+        }
+    }
+}
+
+- (NSArray *)childrenInContext:(NSManagedObjectContext *)context
+{
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Child"];
+    NSArray *children = [context executeFetchRequest:fetch error:NULL];
+    return children;
+}
+
+- (NSArray *)parentsInContext:(NSManagedObjectContext *)context
+{
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
+    NSArray *parents = [context executeFetchRequest:fetch error:NULL];
+    return parents;
+}
+
+- (void)testBaselineConsolidationWithLargeData
+{
+    const uint8_t bytes[10010];
+    id parent1 = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context1];
+    [parent1 setValue:[[NSData alloc] initWithBytes:bytes length:10001] forKey:@"data"];
+    [parent1 setValue:@"1" forKey:@"name"];
+    [context1 save:NULL];
+    
+    id parent2 = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context2];
+    [parent2 setValue:[[NSData alloc] initWithBytes:bytes length:10002] forKey:@"data"];
+    [parent2 setValue:@"2" forKey:@"name"];
+    [context2 save:NULL];
+    
+    [self leechStores];
+    XCTAssertNil([self syncChanges], @"Error syncing");
+    
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
+    fetch.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES]];
+    
+    NSArray *parents = [context1 executeFetchRequest:fetch error:NULL];
+    XCTAssertEqual([[parents[0] valueForKey:@"data"] length], (NSUInteger) 10001, @"Wrong data length parent 1");
+    XCTAssertEqual([[parents[1] valueForKey:@"data"] length], (NSUInteger) 10002, @"Wrong data length parent 2");
+    
+    NSString *eventStoreDataDir = [eventDataRoot1 stringByAppendingPathComponent:@"com.ensembles.synctest/data"];
+    NSArray *contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:eventStoreDataDir error:NULL];
+    XCTAssertEqual(contents.count, (NSUInteger)2, @"Should be a 2 data files for event store 1.");
+    
+    parents = [context2 executeFetchRequest:fetch error:NULL];
+    XCTAssertEqual([[parents[0] valueForKey:@"data"] length], (NSUInteger) 10001, @"Wrong data length parent 1");
+    XCTAssertEqual([[parents[1] valueForKey:@"data"] length], (NSUInteger) 10002, @"Wrong data length parent 2");
+    
+    eventStoreDataDir = [eventDataRoot2 stringByAppendingPathComponent:@"com.ensembles.synctest/data"];
+    contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:eventStoreDataDir error:NULL];
+    XCTAssertEqual(contents.count, (NSUInteger)2, @"Should be a 2 data files for event store 2.");
+}
+
 @end

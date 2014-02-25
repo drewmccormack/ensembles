@@ -9,6 +9,7 @@
 #import "CDERevisionManager.h"
 #import "NSManagedObjectModel+CDEAdditions.h"
 #import "CDEEventStore.h"
+#import "CDEDataFile.h"
 #import "CDERevision.h"
 #import "CDERevisionSet.h"
 #import "CDEEventRevision.h"
@@ -148,14 +149,21 @@
     [eventManagedObjectContext performBlockAndWait:^{
         CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:eventManagedObjectContext];
         
+        NSArray *eventsWithBaseline = events;
+        if (baseline) eventsWithBaseline = [@[baseline] arrayByAddingObjectsFromArray:events];
+        
+        if (![self checkAllDataFilesExistForStoreModificationEvents:eventsWithBaseline]) {
+            if (error) *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeMissingDataFiles userInfo:nil];
+            result = NO;
+            return;
+        }
+        
         if (![self checkAllDependenciesExistForStoreModificationEvents:events]) {
             if (error) *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeMissingDependencies userInfo:nil];
             result = NO;
             return;
         }
         
-        NSArray *eventsWithBaseline = events;
-        if (baseline) eventsWithBaseline = [eventsWithBaseline arrayByAddingObject:baseline];
         if (![self checkContinuityOfStoreModificationEvents:eventsWithBaseline]) {
             if (error) *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeDiscontinuousRevisions userInfo:nil];
             result = NO;
@@ -172,35 +180,29 @@
     return result;
 }
 
-- (BOOL)checkIntegrationPrequisites:(NSError * __autoreleasing *)error
+- (BOOL)checkIntegrationPrequisitesForEvents:(NSArray *)events error:(NSError * __autoreleasing *)error
 {
     __block BOOL result = YES;
     [eventManagedObjectContext performBlockAndWait:^{
-        NSArray *uncommittedEvents = [self fetchUncommittedStoreModificationEvents:error];
-        if (!uncommittedEvents) {
+        if (![self checkAllDataFilesExistForStoreModificationEvents:events]) {
+            if (error) *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeMissingDataFiles userInfo:nil];
             result = NO;
             return;
         }
         
-        if (![self checkAllDependenciesExistForStoreModificationEvents:uncommittedEvents]) {
+        if (![self checkAllDependenciesExistForStoreModificationEvents:events]) {
             if (error) *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeMissingDependencies userInfo:nil];
             result = NO;
             return;
         }
         
-        NSArray *concurrentEvents = [self recursivelyFetchStoreModificationEventsConcurrentWithEvents:uncommittedEvents error:error];
-        if (!concurrentEvents) {
-            result = NO;
-            return;
-        }
-        
-        if (![self checkContinuityOfStoreModificationEvents:concurrentEvents]) {
+        if (![self checkContinuityOfStoreModificationEvents:events]) {
             if (error) *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeDiscontinuousRevisions userInfo:nil];
             result = NO;
             return;
         }
         
-        if (![self checkModelVersionsOfStoreModificationEvents:concurrentEvents]) {
+        if (![self checkModelVersionsOfStoreModificationEvents:events]) {
             if (error) *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeUnknownModelVersion userInfo:nil];
             result = NO;
             return;
@@ -256,6 +258,8 @@
         CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:eventManagedObjectContext];
         CDERevisionSet *baselineRevisionSet = baseline.revisionSet;
         for (CDEStoreModificationEvent *event in events) {
+            if (event == baseline) continue;
+            
             NSSet *otherStoreRevs = event.eventRevisionsOfOtherStores;
             for (CDEEventRevision *otherStoreRev in otherStoreRevs) {
                 // Check to see if baseline is after this event. If so, we don't need to check it, because it
@@ -282,9 +286,10 @@
         NSSet *stores = [NSSet setWithArray:[events valueForKeyPath:@"eventRevision.persistentStoreIdentifier"]];
         NSArray *sortDescs = @[[NSSortDescriptor sortDescriptorWithKey:@"eventRevision.revisionNumber" ascending:YES]];
         for (NSString *persistentStoreId in stores) {
-            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"eventRevision.persistentStoreIdentifier = %@", persistentStoreId];
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"eventRevision.persistentStoreIdentifier = %@ AND type != %d", persistentStoreId, CDEStoreModificationEventTypeBaseline];
             NSArray *storeEvents = [events filteredArrayUsingPredicate:predicate];
             storeEvents = [storeEvents sortedArrayUsingDescriptors:sortDescs];
+            if (storeEvents.count == 0) continue;
             
             CDEStoreModificationEvent *firstEvent = storeEvents[0];
             CDERevisionNumber revision = firstEvent.eventRevision.revisionNumber;
@@ -299,6 +304,18 @@
         }
     }];
     return result;
+}
+
+- (BOOL)checkAllDataFilesExistForStoreModificationEvents:(NSArray *)events
+{
+    __block BOOL result = YES;
+    [eventManagedObjectContext performBlockAndWait:^{
+        NSSet *filenamesInEvents = [CDEDataFile filenamesInStoreModificationEvents:events];
+        NSSet *filenames = self.eventStore.dataFilenames;
+        result = [filenamesInEvents isSubsetOfSet:filenames];
+    }];
+    return result;
+
 }
 
 #pragma mark Global Count

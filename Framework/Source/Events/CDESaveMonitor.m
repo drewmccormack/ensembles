@@ -127,7 +127,7 @@
     
     NSMutableDictionary *changedValuesByObjectID = [NSMutableDictionary dictionaryWithCapacity:monitoredObjects.count];
     [monitoredObjects.allObjects cde_enumerateObjectsDrainingEveryIterations:50 usingBlock:^(NSManagedObject *object, NSUInteger index, BOOL *stop) {
-        NSArray *propertyChanges = [CDEPropertyChangeValue propertyChangesForObject:object propertyNames:object.changedValues.allKeys isPreSave:YES storeValues:NO];
+        NSArray *propertyChanges = [CDEPropertyChangeValue propertyChangesForObject:object eventStore:self.eventStore propertyNames:object.changedValues.allKeys isPreSave:YES storeValues:NO];
         NSManagedObjectID *objectID = object.objectID;
         changedValuesByObjectID[objectID] = propertyChanges;
     }];
@@ -144,7 +144,7 @@
     NSManagedObjectContext *eventContext = self.eventStore.managedObjectContext;
     [eventContext performBlock:^{
         NSError *error;
-        if (![eventContext save:&error]) NSLog(@"Error saving event store: %@", error);
+        if (![eventContext save:&error]) CDELog(CDELoggingLevelError, @"Error saving event store: %@", error);
     }];
 }
 

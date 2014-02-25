@@ -11,6 +11,7 @@
 #import "CDEStoreModificationEvent.h"
 #import "CDERevisionSet.h"
 #import "CDERevision.h"
+#import "CDEDataFile.h"
 
 
 NSString * const kCDEPersistentStoreIdentifierKey = @"persistentStoreIdentifier";
@@ -26,7 +27,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 
 @property (nonatomic, copy, readwrite) NSString *pathToEventStoreRootDirectory;
 @property (nonatomic, strong, readonly) NSString *pathToEventStore;
-@property (nonatomic, strong, readonly) NSString *pathToBlobsDirectory;
+@property (nonatomic, strong, readonly) NSString *pathToDataFileDirectory;
 @property (nonatomic, strong, readonly) NSString *pathToStoreInfoFile;
 @property (nonatomic, copy, readwrite) NSString *persistentStoreIdentifier;
 
@@ -35,7 +36,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 
 @implementation CDEEventStore {
     NSMutableDictionary *incompleteEventIdentifiers;
-    NSRecursiveLock *lock;
+    NSFileManager *fileManager;
 }
 
 @synthesize ensembleIdentifier = ensembleIdentifier;
@@ -66,6 +67,8 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
     NSParameterAssert(newIdentifier != nil);
     self = [super init];
     if (self) {
+        fileManager = [[NSFileManager alloc] init];
+        
         pathToEventDataRootDirectory = [rootDirectory copy];
         if (!pathToEventDataRootDirectory) pathToEventDataRootDirectory = [self.class defaultPathToEventDataRootDirectory];
         
@@ -73,14 +76,17 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
         incompleteEventIdentifiers = nil;
         
         [self restoreStoreMetadata];
-
-        NSError *error;
-        if (self.persistentStoreIdentifier && ![self setupCoreDataStack:&error] ) {
-            CDELog(CDELoggingLevelError, @"Could not setup core data stack for event store: %@", error);
-            return nil;
-        }
         
-        lock = [[NSRecursiveLock alloc] init];
+        NSError *error;
+        if (self.persistentStoreIdentifier) {
+            BOOL success = [self createEventStoreDirectoriesIfNecessary:&error];
+            if (!success) return nil;
+            
+            if ( ![self setupCoreDataStack:&error]) {
+                CDELog(CDELoggingLevelError, @"Could not setup core data stack for event store: %@", error);
+                return nil;
+            }
+        }
     }
     return self;
 }
@@ -88,24 +94,6 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-
-
-#pragma mark - Locking
-
-- (void)lock
-{
-    [lock lock];
-}
-
-- (void)unlock
-{
-    [lock unlock];
-}
-
-- (BOOL)tryLock
-{
-    return [lock tryLock];
 }
 
 
@@ -276,6 +264,74 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 }
 
 
+#pragma mark - Data Files
+
+- (NSSet *)dataFilenames
+{
+    NSError *error;
+    NSArray *filenames = [fileManager contentsOfDirectoryAtPath:self.pathToDataFileDirectory error:&error];
+    if (!filenames) CDELog(CDELoggingLevelError, @"Could not get data filenames: %@", error);
+    return [NSSet setWithArray:filenames];
+}
+
+- (BOOL)importDataFile:(NSString *)fromPath
+{
+    NSError *error;
+    NSString *filename = [fromPath lastPathComponent];
+    NSString *toPath = [self.pathToDataFileDirectory stringByAppendingPathComponent:filename];
+    BOOL success = [fileManager moveItemAtPath:fromPath toPath:toPath error:&error];
+    if (!success) CDELog(CDELoggingLevelError, @"Could not move file to event store data directory: %@", error);
+    return success;
+}
+
+- (NSString *)importData:(NSData *)data
+{
+    NSString *filename = [[NSProcessInfo processInfo] globallyUniqueString];
+    NSString *toPath = [self.pathToDataFileDirectory stringByAppendingPathComponent:filename];
+    BOOL success = [data writeToFile:toPath atomically:YES];
+    if (!success) filename = nil;
+    return filename;
+}
+
+- (BOOL)exportDataFile:(NSString *)filename toDirectory:(NSString *)dirPath
+{
+    NSError *error;
+    NSString *fromPath = [self.pathToDataFileDirectory stringByAppendingPathComponent:filename];
+    NSString *toPath = [dirPath stringByAppendingPathComponent:filename];
+    BOOL success = [fileManager copyItemAtPath:fromPath toPath:toPath error:&error];
+    if (!success) CDELog(CDELoggingLevelError, @"Could not move file to event store data directory: %@", error);
+    return success;
+}
+
+- (NSData *)dataForFile:(NSString *)filename
+{
+    NSError *error = nil;
+    NSString *path = [self.pathToDataFileDirectory stringByAppendingPathComponent:filename];
+    NSData *data = [NSData dataWithContentsOfFile:path options:(NSDataReadingMappedIfSafe | NSDataReadingUncached) error:&error];
+    if (!data) CDELog(CDELoggingLevelError, @"Failed to get file data for file %@: %@", filename, error);
+    return data;
+}
+
+- (BOOL)removeDataFile:(NSString *)filename
+{
+    NSString *path = [self.pathToDataFileDirectory stringByAppendingPathComponent:filename];
+    NSError *error;
+    BOOL success = [fileManager removeItemAtPath:path error:&error];
+    if (!success) CDELog(CDELoggingLevelError, @"Could not remove file: %@", error);
+    return success;
+}
+
+- (void)removeUnreferencedDataFiles
+{
+    [self.managedObjectContext performBlockAndWait:^{
+        NSSet *contextFilenames = [CDEDataFile allFilenamesInManagedObjectContext:self.managedObjectContext];
+        NSMutableSet *filenames = [self.dataFilenames mutableCopy];
+        [filenames minusSet:contextFilenames];
+        for (NSString *filename in filenames) [self removeDataFile:filename];
+    }];
+}
+
+
 #pragma mark - Flushing out queued operations
 
 - (void)flush:(NSError * __autoreleasing *)error
@@ -315,7 +371,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
     self.persistentStoreIdentifier = nil;
     incompleteEventIdentifiers = nil;
     [self tearDownCoreDataStack];
-    return [[NSFileManager defaultManager] removeItemAtPath:self.pathToEventStoreRootDirectory error:NULL];
+    return [fileManager removeItemAtPath:self.pathToEventStoreRootDirectory error:NULL];
 }
 
 - (BOOL)containsEventData
@@ -353,12 +409,17 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
     return [self.pathToEventStoreRootDirectory stringByAppendingPathComponent:@"store.plist"];
 }
 
+- (NSString *)pathToDataFileDirectory
+{
+    return [self.pathToEventStoreRootDirectory stringByAppendingPathComponent:@"data"];
+}
+
 - (BOOL)createDirectoryIfNecessary:(NSString *)path error:(NSError * __autoreleasing *)error
 {
     BOOL success = YES;
     BOOL isDir;
-    if ( ![[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDir] ) {
-        success = [[NSFileManager defaultManager] createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:error];
+    if ( ![fileManager fileExistsAtPath:path isDirectory:&isDir] ) {
+        success = [fileManager createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:error];
     }
     else if (!isDir) {
         success = NO;
@@ -368,12 +429,14 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 
 - (BOOL)createEventStoreDirectoriesIfNecessary:(NSError * __autoreleasing *)error
 {
-    NSString *path = [self pathToEventStoreRootDirectory];
-    if (![self createDirectoryIfNecessary:path error:error]) return NO;
+    NSArray *paths = @[self.pathToEventStoreRootDirectory, self.pathToDataFileDirectory];
+    for (NSString *path in paths) {
+        if (![self createDirectoryIfNecessary:path error:error]) return NO;
+    }
     
     // Prevent event store being backed up
     if (NSURLIsExcludedFromBackupKey) {
-        NSURL *url = [NSURL fileURLWithPath:path];
+        NSURL *url = [NSURL fileURLWithPath:self.pathToEventStoreRootDirectory];
         NSError *metadataError;
         BOOL success = [url setResourceValue:@YES forKey:NSURLIsExcludedFromBackupKey error:&metadataError];
         if (!success) CDELog(CDELoggingLevelWarning, @"Could not exclude event store directory from backup");

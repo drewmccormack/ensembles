@@ -115,7 +115,7 @@
             
             NSArray *orderedInsertedObjects = insertedObjects.allObjects;
             [orderedInsertedObjects cde_enumerateObjectsDrainingEveryIterations:50 usingBlock:^(NSManagedObject *object, NSUInteger index, BOOL *stop) {
-                NSArray *propertyChanges = [CDEPropertyChangeValue propertyChangesForObject:object propertyNames:object.entity.propertiesByName.allKeys isPreSave:!saved storeValues:YES];
+                NSArray *propertyChanges = [CDEPropertyChangeValue propertyChangesForObject:object eventStore:self.eventStore propertyNames:object.entity.propertiesByName.allKeys isPreSave:!saved storeValues:YES];
                 if (!propertyChanges) return;
                 
                 [changeArrays addObject:propertyChanges];
@@ -200,7 +200,7 @@
             NSManagedObjectID *objectID = orderedObjectIDs[i];
             
             if (globalId == (id)[NSNull null]) {
-                CDELog(CDELoggingLevelWarning, @"Deleted object with no global identifier. Skipping.");
+                CDELog(CDELoggingLevelError, @"Deleted object with no global identifier. This is usually due to creating and deleting two separate objects with the same global id in a single save operation. ObjectID: %@", objectID);
                 return;
             }
             
@@ -279,7 +279,7 @@
     [updatedObjectsContext performBlockAndWait:^{
         changedValuesByObjectID = [NSMutableDictionary dictionaryWithCapacity:updatedObjects.count];
         [updatedObjects.allObjects cde_enumerateObjectsDrainingEveryIterations:50 usingBlock:^(NSManagedObject *object, NSUInteger index, BOOL *stop) {
-            NSArray *propertyChanges = [CDEPropertyChangeValue propertyChangesForObject:object propertyNames:object.changedValues.allKeys isPreSave:YES storeValues:YES];
+            NSArray *propertyChanges = [CDEPropertyChangeValue propertyChangesForObject:object eventStore:self.eventStore propertyNames:object.changedValues.allKeys isPreSave:YES storeValues:YES];
             NSManagedObjectID *objectID = object.objectID;
             changedValuesByObjectID[objectID] = propertyChanges;
         }];
@@ -367,16 +367,24 @@
 
 - (void)convertToManyRelationshipValuesToGlobalIdentifiersInPropertyChangeValue:(CDEPropertyChangeValue *)propertyChange withGlobalIdentifiersByObjectID:(NSDictionary *)globalIdentifiersByObjectID
 {
-    NSArray *addedGlobalIdentifiers = [globalIdentifiersByObjectID objectsForKeys:propertyChange.addedIdentifiers.allObjects notFoundMarker:[NSNull null]];
-    NSArray *removedGlobalIdentifiers = [globalIdentifiersByObjectID objectsForKeys:propertyChange.removedIdentifiers.allObjects notFoundMarker:[NSNull null]];
+    static NSPredicate *notNullPredicate = nil;
+    static NSString *globalIdIsNullErrorMessage = @"Missing global ids for added ids in a to-many relationship. This is usually caused by saving multiple objects with the same global id at once.";
+    if (!notNullPredicate) notNullPredicate = [NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
+        return evaluatedObject != [NSNull null];
+    }];
     
-    BOOL foundAllAddedIds = ![addedGlobalIdentifiers containsObject:[NSNull null]];
-    BOOL foundAllRemovedIds = ![removedGlobalIdentifiers containsObject:[NSNull null]];
-    if (!foundAllAddedIds) {
-        CDELog(CDELoggingLevelError, @"Missing global ids for added ids in a to-many relationship. Target objectIDs: %@ %@", propertyChange.addedIdentifiers, addedGlobalIdentifiers);
+    NSArray *addedGlobalIdentifiers = [globalIdentifiersByObjectID objectsForKeys:propertyChange.addedIdentifiers.allObjects notFoundMarker:[NSNull null]];
+    BOOL containsNull = [addedGlobalIdentifiers containsObject:[NSNull null]];
+    if (containsNull) {
+        addedGlobalIdentifiers = [addedGlobalIdentifiers filteredArrayUsingPredicate:notNullPredicate];
+        CDELog(CDELoggingLevelError, @"%@", globalIdIsNullErrorMessage);
     }
-    if (!foundAllRemovedIds) {
-        CDELog(CDELoggingLevelError, @"Missing global ids for removed ids in a to-many relationship. Target objectIDs with global ids: %@ %@", propertyChange.removedIdentifiers, removedGlobalIdentifiers);
+    
+    NSArray *removedGlobalIdentifiers = [globalIdentifiersByObjectID objectsForKeys:propertyChange.removedIdentifiers.allObjects notFoundMarker:[NSNull null]];
+    containsNull = [removedGlobalIdentifiers containsObject:[NSNull null]];
+    if (containsNull) {
+        removedGlobalIdentifiers = [removedGlobalIdentifiers filteredArrayUsingPredicate:notNullPredicate];
+        CDELog(CDELoggingLevelError, @"%@", globalIdIsNullErrorMessage);
     }
     
     propertyChange.addedIdentifiers = [NSSet setWithArray:[addedGlobalIdentifiers valueForKeyPath:@"globalIdentifier"]];
@@ -388,6 +396,10 @@
     for (NSNumber *index in propertyChange.movedIdentifiersByIndex.allKeys) {
         id objectID = propertyChange.movedIdentifiersByIndex[index];
         id globalIdentifier = [[globalIdentifiersByObjectID objectForKey:objectID] globalIdentifier];
+        if (!globalIdentifier) {
+            CDELog(CDELoggingLevelWarning, @"Missing global id for moved object with objectID: %@", objectID);
+            continue;
+        }
         newMovedIdentifiers[index] = globalIdentifier;
     }
     propertyChange.movedIdentifiersByIndex = newMovedIdentifiers;

@@ -22,10 +22,11 @@ typedef NS_ENUM(int16_t, CDEObjectChangeType) {
 @interface CDEObjectChange : NSManagedObject
 
 @property (nonatomic) CDEObjectChangeType type;
-@property (nonatomic, retain) CDEGlobalIdentifier *globalIdentifier;
-@property (nonatomic, retain) CDEStoreModificationEvent *storeModificationEvent;
-@property (nonatomic, retain) NSString *nameOfEntity;
-@property (nonatomic, retain) NSArray *propertyChangeValues;
+@property (nonatomic, strong) CDEGlobalIdentifier *globalIdentifier;
+@property (nonatomic, strong) CDEStoreModificationEvent *storeModificationEvent;
+@property (nonatomic, strong) NSString *nameOfEntity;
+@property (nonatomic, strong) NSArray *propertyChangeValues;
+@property (nonatomic, strong) NSSet *dataFiles;
 
 - (CDEPropertyChangeValue *)propertyChangeValueForPropertyName:(NSString *)name;
 

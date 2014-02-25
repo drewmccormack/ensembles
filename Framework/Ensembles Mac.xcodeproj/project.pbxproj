@@ -47,17 +47,19 @@
 		075754B5188BC952006803FA /* CDEAvailabilityMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 075754B4188BC952006803FA /* CDEAvailabilityMacros.h */; };
 		07592CA7177F2D1000816034 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF78E9177F03320029D500 /* XCTest.framework */; };
 		07592CAD177F2D1000816034 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 07592CAB177F2D1000816034 /* InfoPlist.strings */; };
+		075C271F18B3716200A7BC25 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 07897FFA18B258A0001E8A23 /* CDEEventStoreModel.xcdatamodeld */; };
 		075FDCD518360B0E0020E1C9 /* CDEIntegratorMergeRepairTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 075FDCD418360B0E0020E1C9 /* CDEIntegratorMergeRepairTests.m */; };
 		075FDCDA183611680020E1C9 /* CDEPersistentStoreEnsembleMergeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 075FDCD9183611680020E1C9 /* CDEPersistentStoreEnsembleMergeTests.m */; };
 		075FDCDD183615C60020E1C9 /* CDEMockLocalFileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 075FDCDB183615C60020E1C9 /* CDEMockLocalFileSystem.h */; };
 		075FDCDE183615C60020E1C9 /* CDEMockLocalFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 075FDCDC183615C60020E1C9 /* CDEMockLocalFileSystem.m */; };
-		0760274217F8672200329299 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 078ABF4917F19195008C9B27 /* CDEEventStoreModel.xcdatamodeld */; };
 		07697A7817E0BD0800A9BB63 /* CDEMockCloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 07697A7717E0BD0800A9BB63 /* CDEMockCloudFileSystem.m */; };
 		077B555317D1E5A0008AA7F7 /* DoubleInsertFixture.json in Resources */ = {isa = PBXBuildFile; fileRef = 077B555217D1E5A0008AA7F7 /* DoubleInsertFixture.json */; };
 		077B555517D1E5CF008AA7F7 /* CDEIntegratorCornerCases.m in Sources */ = {isa = PBXBuildFile; fileRef = 077B555417D1E5CF008AA7F7 /* CDEIntegratorCornerCases.m */; };
+		07897FF818B25880001E8A23 /* CDEDataFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 07897FF618B25880001E8A23 /* CDEDataFile.h */; };
+		07897FF918B25880001E8A23 /* CDEDataFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 07897FF718B25880001E8A23 /* CDEDataFile.m */; };
+		07897FFE18B258A0001E8A23 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 07897FFA18B258A0001E8A23 /* CDEEventStoreModel.xcdatamodeld */; };
 		078A3F82178C9B32009C8821 /* CDEEventRevision.h in Headers */ = {isa = PBXBuildFile; fileRef = 078A3F80178C9B32009C8821 /* CDEEventRevision.h */; };
 		078A3F84178C9B32009C8821 /* CDEEventRevision.m in Sources */ = {isa = PBXBuildFile; fileRef = 078A3F81178C9B32009C8821 /* CDEEventRevision.m */; };
-		078ABF4B17F19195008C9B27 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 078ABF4917F19195008C9B27 /* CDEEventStoreModel.xcdatamodeld */; };
 		07973F05183BE44A007F48CA /* CDEICloudFileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 07973F01183BE44A007F48CA /* CDEICloudFileSystem.h */; };
 		07973F06183BE44A007F48CA /* CDEICloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 07973F02183BE44A007F48CA /* CDEICloudFileSystem.m */; };
 		07973F07183BE44A007F48CA /* CDELocalCloudFileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 07973F03183BE44A007F48CA /* CDELocalCloudFileSystem.h */; };
@@ -138,7 +140,6 @@
 		072A87DA17EDFBB000F8B2CB /* CDEPersistentStoreImporter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEPersistentStoreImporter.m; sourceTree = "<group>"; };
 		072A87DE17EEE55600F8B2CB /* CDEEventBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEEventBuilder.h; sourceTree = "<group>"; };
 		072A87DF17EEE55600F8B2CB /* CDEEventBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEEventBuilder.m; sourceTree = "<group>"; };
-		072BA971180AA695003AA94E /* CDEEventStoreModel_1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_1.xcdatamodel; sourceTree = "<group>"; };
 		072BD7BE17F30A1E00D19306 /* CDEPersistentStoreEnsembleTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEPersistentStoreEnsembleTests.m; sourceTree = "<group>"; };
 		072E5AEA17EB4332002D9604 /* CDESyncTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDESyncTest.h; sourceTree = "<group>"; };
 		072E5AEB17EB4332002D9604 /* CDESyncTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDESyncTest.m; sourceTree = "<group>"; };
@@ -177,9 +178,13 @@
 		077B555217D1E5A0008AA7F7 /* DoubleInsertFixture.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = DoubleInsertFixture.json; sourceTree = "<group>"; };
 		077B555417D1E5CF008AA7F7 /* CDEIntegratorCornerCases.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEIntegratorCornerCases.m; sourceTree = "<group>"; };
 		077C87D61792AB00007A0919 /* CDEEventDeviceRevisionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEEventDeviceRevisionTests.m; sourceTree = "<group>"; };
+		07897FF618B25880001E8A23 /* CDEDataFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEDataFile.h; sourceTree = "<group>"; };
+		07897FF718B25880001E8A23 /* CDEDataFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEDataFile.m; sourceTree = "<group>"; };
+		07897FFB18B258A0001E8A23 /* CDEEventStoreModel_0.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_0.xcdatamodel; sourceTree = "<group>"; };
+		07897FFC18B258A0001E8A23 /* CDEEventStoreModel_1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_1.xcdatamodel; sourceTree = "<group>"; };
+		07897FFD18B258A0001E8A23 /* CDEEventStoreModel_2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_2.xcdatamodel; sourceTree = "<group>"; };
 		078A3F80178C9B32009C8821 /* CDEEventRevision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEEventRevision.h; sourceTree = "<group>"; };
 		078A3F81178C9B32009C8821 /* CDEEventRevision.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEEventRevision.m; sourceTree = "<group>"; };
-		078ABF4A17F19195008C9B27 /* CDEEventStoreModel_0.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_0.xcdatamodel; sourceTree = "<group>"; };
 		0796B5A8179F5FAE0005264D /* CDERevisionSetTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDERevisionSetTests.m; sourceTree = "<group>"; };
 		07973F01183BE44A007F48CA /* CDEICloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEICloudFileSystem.h; sourceTree = "<group>"; };
 		07973F02183BE44A007F48CA /* CDEICloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEICloudFileSystem.m; sourceTree = "<group>"; };
@@ -475,7 +480,7 @@
 		07BF7A0C177F0A9D0029D500 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				078ABF4917F19195008C9B27 /* CDEEventStoreModel.xcdatamodeld */,
+				07897FFA18B258A0001E8A23 /* CDEEventStoreModel.xcdatamodeld */,
 				078A3F80178C9B32009C8821 /* CDEEventRevision.h */,
 				078A3F81178C9B32009C8821 /* CDEEventRevision.m */,
 				07BF7A15177F0A9D0029D500 /* CDEGlobalIdentifier.h */,
@@ -486,6 +491,8 @@
 				07BF7A02177F0A9D0029D500 /* CDEPropertyChangeValue.m */,
 				07BF7A1D177F0A9D0029D500 /* CDEStoreModificationEvent.h */,
 				07BF7A1E177F0A9D0029D500 /* CDEStoreModificationEvent.m */,
+				07897FF618B25880001E8A23 /* CDEDataFile.h */,
+				07897FF718B25880001E8A23 /* CDEDataFile.m */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -547,6 +554,7 @@
 				07BF7A41177F0A9D0029D500 /* CDEPropertyChangeValue.h in Headers */,
 				07973F11183BE466007F48CA /* CDECloudDirectory.h in Headers */,
 				07973F13183BE466007F48CA /* CDECloudFile.h in Headers */,
+				07897FF818B25880001E8A23 /* CDEDataFile.h in Headers */,
 				07BAB4BD184677640096318D /* CDEBaselineConsolidator.h in Headers */,
 				075FDCDD183615C60020E1C9 /* CDEMockLocalFileSystem.h in Headers */,
 				07973F05183BE44A007F48CA /* CDEICloudFileSystem.h in Headers */,
@@ -671,6 +679,7 @@
 				07D2D638182D65FB001D24BC /* CDEManagedObjectModelTests.m in Sources */,
 				0722B27117B770A600496F4A /* CDEObjectChangeTests.m in Sources */,
 				075FDCDA183611680020E1C9 /* CDEPersistentStoreEnsembleMergeTests.m in Sources */,
+				075C271F18B3716200A7BC25 /* CDEEventStoreModel.xcdatamodeld in Sources */,
 				072E5AEE17EB44C3002D9604 /* CDETwoWaySyncTests.m in Sources */,
 				0722B27017B770A000496F4A /* CDEEventStoreTests.m in Sources */,
 				07E2875417BF8D470008CC4F /* CDESaveMonitorRelationshipTests.m in Sources */,
@@ -684,7 +693,6 @@
 				0754307717F20BEE00FA4946 /* CDECloudManagerTests.m in Sources */,
 				0747CDA517C3E0A300221ED7 /* CDEIntegratorTestCase.m in Sources */,
 				07DDA7E917CA256E009C6F94 /* CDERevisionManagerTests.m in Sources */,
-				0760274217F8672200329299 /* CDEEventStoreModel.xcdatamodeld in Sources */,
 				072E7AE117BFC1D30076117D /* CDEIntegratorTests.m in Sources */,
 				0722B27417B7713D00496F4A /* CDESaveMonitorTests.m in Sources */,
 				0747CDA217C3DCE300221ED7 /* CDEBasicIntegratorRelationshipTests.m in Sources */,
@@ -709,12 +717,13 @@
 			files = (
 				075FDCDE183615C60020E1C9 /* CDEMockLocalFileSystem.m in Sources */,
 				07BF7A43177F0A9D0029D500 /* CDEPropertyChangeValue.m in Sources */,
+				07897FF918B25880001E8A23 /* CDEDataFile.m in Sources */,
 				07D2D633182D627E001D24BC /* NSManagedObjectModel+CDEAdditions.m in Sources */,
 				0722B26C17B76B2400496F4A /* CDERevisionSet.m in Sources */,
 				9477ED641800146900C2A419 /* CDERevisionManager.m in Sources */,
 				07BF7A34177F0A9D0029D500 /* CDEPersistentStoreEnsemble.m in Sources */,
+				07897FFE18B258A0001E8A23 /* CDEEventStoreModel.xcdatamodeld in Sources */,
 				07BF7A4F177F0A9D0029D500 /* CDEFoundationAdditions.m in Sources */,
-				078ABF4B17F19195008C9B27 /* CDEEventStoreModel.xcdatamodeld in Sources */,
 				072A87E217EEE55600F8B2CB /* CDEEventBuilder.m in Sources */,
 				07BF7A69177F0A9D0029D500 /* CDEStoreModificationEvent.m in Sources */,
 				07973F12183BE466007F48CA /* CDECloudDirectory.m in Sources */,
@@ -977,13 +986,14 @@
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};
-		078ABF4917F19195008C9B27 /* CDEEventStoreModel.xcdatamodeld */ = {
+		07897FFA18B258A0001E8A23 /* CDEEventStoreModel.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				072BA971180AA695003AA94E /* CDEEventStoreModel_1.xcdatamodel */,
-				078ABF4A17F19195008C9B27 /* CDEEventStoreModel_0.xcdatamodel */,
+				07897FFB18B258A0001E8A23 /* CDEEventStoreModel_0.xcdatamodel */,
+				07897FFC18B258A0001E8A23 /* CDEEventStoreModel_1.xcdatamodel */,
+				07897FFD18B258A0001E8A23 /* CDEEventStoreModel_2.xcdatamodel */,
 			);
-			currentVersion = 072BA971180AA695003AA94E /* CDEEventStoreModel_1.xcdatamodel */;
+			currentVersion = 07897FFD18B258A0001E8A23 /* CDEEventStoreModel_2.xcdatamodel */;
 			name = CDEEventStoreModel.xcdatamodeld;
 			path = ../../Resources/CDEEventStoreModel.xcdatamodeld;
 			sourceTree = "<group>";

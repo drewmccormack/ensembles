@@ -25,6 +25,7 @@
 @property (nonatomic) NSString *currentBaselineIdentifier;
 @property (readwrite) CDERevisionNumber lastRevision, lastSaveRevision, lastMergeRevision;
 @property (readwrite) NSString *pathToEventDataRootDirectory;
+@property (readwrite) NSSet *dataFilenames;
 
 - (void)updateRevisionsForSave;
 - (void)updateRevisionsForMerge;

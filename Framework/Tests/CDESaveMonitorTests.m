@@ -258,6 +258,7 @@
         eventRevision.persistentStoreIdentifier = store;
         eventRevision.revisionNumber = revision;
         otherStoreEvent.eventRevision = eventRevision;
+        otherStoreEvent.timestamp = 10.0;
     }];
 }
 
@@ -284,6 +285,7 @@
     [eventMOC performBlockAndWait:^{
         CDEStoreModificationEvent *mergeEvent = [NSEntityDescription insertNewObjectForEntityForName:@"CDEStoreModificationEvent" inManagedObjectContext:eventMOC];
         mergeEvent.type = CDEStoreModificationEventTypeMerge;
+        mergeEvent.timestamp = 10.0;
         mergeEvent.eventRevision = [CDEEventRevision makeEventRevisionForPersistentStoreIdentifier:@"store1" revisionNumber:self.eventStore.lastMergeRevision inManagedObjectContext:eventMOC];
         
         NSMutableSet *revs = [[NSMutableSet alloc] init];

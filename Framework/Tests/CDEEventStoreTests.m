@@ -8,6 +8,8 @@
 
 #import <XCTest/XCTest.h>
 #import "CDEEventStore.h"
+#import "CDEObjectChange.h"
+#import "CDEDataFile.h"
 
 static NSString *rootTestDirectory;
 
@@ -159,6 +161,91 @@ static NSString *rootTestDirectory;
     CDEEventStore *secondStore = [[CDEEventStore alloc] initWithEnsembleIdentifier:@"test" pathToEventDataRootDirectory:nil];
     XCTAssertTrue([secondStore prepareNewEventStore:NULL], @"Install failed in non standard location");
     [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
+}
+
+- (void)testImportingDataFile
+{
+    [store prepareNewEventStore:NULL];
+    NSString *file = [NSTemporaryDirectory() stringByAppendingPathComponent:@"fileToImport"];
+    [@"Hi there" writeToFile:file atomically:NO encoding:NSUTF8StringEncoding error:NULL];
+    XCTAssertTrue([store importDataFile:file], @"Import failed");
+    
+    NSString *storePath = [store.pathToEventDataRootDirectory stringByAppendingPathComponent:@"test/data/fileToImport"];
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:storePath], @"No file found in data dir");
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:file], @"Original file should be gone");
+}
+
+- (void)testExportingDataFile
+{
+    NSString *exportPath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"fileToExport"];
+    [[NSFileManager defaultManager] removeItemAtPath:exportPath error:NULL];
+    
+    [store prepareNewEventStore:NULL];
+    
+    NSString *storePath = [store.pathToEventDataRootDirectory stringByAppendingPathComponent:@"test/data/fileToExport"];
+    [@"Hi there" writeToFile:storePath atomically:NO encoding:NSUTF8StringEncoding error:NULL];
+    
+    
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:exportPath], @"File is already in temp dir");
+    [store exportDataFile:@"fileToExport" toDirectory:NSTemporaryDirectory()];
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:exportPath], @"File is not exported");
+}
+
+- (void)testRemovingDataFile
+{
+    [store prepareNewEventStore:NULL];
+    
+    NSString *storePath = [store.pathToEventDataRootDirectory stringByAppendingPathComponent:@"test/data/fileToRemove"];
+    [@"Hi there" writeToFile:storePath atomically:NO encoding:NSUTF8StringEncoding error:NULL];
+    
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:storePath], @"No file found in data dir");
+    [store removeDataFile:@"fileToRemove"];
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:storePath], @"File is not gone");
+}
+
+- (void)testRetrievingDataFilenames
+{
+    [store prepareNewEventStore:NULL];
+
+    NSString *storePath = [store.pathToEventDataRootDirectory stringByAppendingPathComponent:@"test/data/file1"];
+    [@"Hi there" writeToFile:storePath atomically:NO encoding:NSUTF8StringEncoding error:NULL];
+    storePath = [store.pathToEventDataRootDirectory stringByAppendingPathComponent:@"test/data/file2"];
+    [@"Hi there" writeToFile:storePath atomically:NO encoding:NSUTF8StringEncoding error:NULL];
+    
+    NSSet *files = store.dataFilenames;
+    XCTAssertEqual(files.count, (NSUInteger)2, @"Wrong file count");
+    XCTAssertTrue([files.anyObject hasPrefix:@"file"], @"Wrong file name prefix");
+}
+
+- (void)testRemovingOutdatedDataFiles
+{
+    [store prepareNewEventStore:NULL];
+    [store.managedObjectContext performBlockAndWait:^{
+        CDEObjectChange *change = [NSEntityDescription insertNewObjectForEntityForName:@"CDEObjectChange" inManagedObjectContext:store.managedObjectContext];
+        CDEDataFile *dataFile1 = [NSEntityDescription insertNewObjectForEntityForName:@"CDEDataFile" inManagedObjectContext:store.managedObjectContext];
+        dataFile1.objectChange = change;
+        dataFile1.filename = @"123";
+        
+        CDEDataFile *dataFile2 = [NSEntityDescription insertNewObjectForEntityForName:@"CDEDataFile" inManagedObjectContext:store.managedObjectContext];
+        dataFile2.filename = @"345";
+
+        [store.managedObjectContext save:NULL];
+    }];
+    
+    NSString *storePath1 = [store.pathToEventDataRootDirectory stringByAppendingPathComponent:@"test/data/123"];
+    [@"Hi" writeToFile:storePath1 atomically:NO encoding:NSUTF8StringEncoding error:NULL];
+    
+    NSString *storePath2 = [store.pathToEventDataRootDirectory stringByAppendingPathComponent:@"test/data/234"];
+    [@"Hi" writeToFile:storePath2 atomically:NO encoding:NSUTF8StringEncoding error:NULL];
+    
+    NSString *storePath3 = [store.pathToEventDataRootDirectory stringByAppendingPathComponent:@"test/data/345"];
+    [@"Hi" writeToFile:storePath3 atomically:NO encoding:NSUTF8StringEncoding error:NULL];
+    
+    [store removeUnreferencedDataFiles];
+    
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:storePath1], @"Should have file 123");
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:storePath2], @"Should not have file 234");
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:storePath3], @"Should not have file 345, because it is not attached to a CDEObjectChange");
 }
 
 @end

@@ -16,12 +16,16 @@
 
 @interface CDECloudManager (TestMethods)
 
+@property (nonatomic, strong, readonly) NSString *localUploadDirectory;
 @property (nonatomic, strong, readonly) NSString *remoteEventsDirectory;
-@property (nonatomic, strong, readonly) NSString *remoteBaselinesDirectory;
-@property (nonatomic, strong, readwrite) NSSet *snapshotBaselineFilenames;
 @property (nonatomic, strong, readwrite) NSSet *snapshotEventFilenames;
 
 - (NSArray *)sortFilenamesByGlobalCount:(NSArray *)files;
+
+- (void)migrateNewEventsWithAllowedTypes:(NSArray *)types fromTransitCacheWithCompletion:(CDECompletionBlock)completion;
+
+- (void)transferFilesInTransitCacheToRemoteDirectory:(NSString *)remoteDirectory completion:(CDECompletionBlock)completion;
+- (void)migrateNewLocalEventsToTransitCacheWithRemoteDirectory:(NSString *)remoteDirectory existingRemoteFilenames:(NSArray *)filenames allowedTypes:(NSArray *)types completion:(CDECompletionBlock)completion;
 
 @end
 
@@ -130,6 +134,20 @@
     [self waitForAsyncOperation];
 }
 
+- (void)testCreateRemoteDataDirectory
+{
+    [cloudManager createRemoteDirectoryStructureWithCompletion:^(NSError *error) {
+        XCTAssertNil(error, @"Error creating directories");
+        NSString *eventsDir = [remoteEnsemblesDir stringByAppendingPathComponent:@"data"];
+        [cloudFileSystem fileExistsAtPath:eventsDir completion:^(BOOL exists, BOOL isDirectory, NSError *error) {
+            XCTAssert(isDirectory, @"Stores was not directory");
+            XCTAssert(exists, @"No stores dir created");
+            [self stopWaiting];
+        }];
+    }];
+    [self waitForAsyncOperation];
+}
+
 - (void)testImportFromCloudWithNoData
 {
     [cloudManager snapshotRemoteFilesWithCompletion:^(NSError *error) {
@@ -196,13 +214,13 @@
             NSArray *types = @[@(CDEStoreModificationEventTypeMerge), @(CDEStoreModificationEventTypeSave)];
             [cloudManager migrateNewLocalEventsToTransitCacheWithRemoteDirectory:cloudManager.remoteEventsDirectory existingRemoteFilenames:cloudManager.snapshotEventFilenames.allObjects allowedTypes:types completion:^(NSError *error) {
                 BOOL isDir;
-                NSString *path = [rootDir stringByAppendingPathComponent:@"transitcache/ensemble1/upload/events/2_store1_1.cdeevent"];
+                NSString *path = [rootDir stringByAppendingPathComponent:@"transitcache/ensemble1/upload/2_store1_1.cdeevent"];
                 XCTAssertTrue([fileManager fileExistsAtPath:path isDirectory:&isDir], @"Transit file missing");
                 
                 NSString *eventsDir = [path stringByDeletingLastPathComponent];
                 XCTAssertEqual([[fileManager contentsOfDirectoryAtPath:eventsDir error:NULL] count], (NSUInteger)2, @"Wrong number of files exported");
                 
-                [cloudManager transferEventFilesInTransitCacheToRemoteDirectory:cloudManager.remoteEventsDirectory completion:^(NSError *error) {
+                [cloudManager transferFilesInTransitCacheToRemoteDirectory:cloudManager.remoteEventsDirectory completion:^(NSError *error) {
                     XCTAssertNil(error, @"Error transferring to cloud");
                     
                     NSString *remotePath = [remoteEnsemblesDir stringByAppendingPathComponent:@"events/2_store1_1.cdeevent"];
@@ -230,7 +248,7 @@
     [cloudManager createRemoteDirectoryStructureWithCompletion:^(NSError *error) {
         [cloudManager snapshotRemoteFilesWithCompletion:^(NSError *error) {
             [cloudManager exportNewLocalNonBaselineEventsWithCompletion:^(NSError *error) {
-                NSString *eventsDir = [rootDir stringByAppendingPathComponent:@"transitcache/ensemble1/upload/events"];
+                NSString *eventsDir = [rootDir stringByAppendingPathComponent:@"transitcache/ensemble1/upload"];
                 XCTAssertEqual([[fileManager contentsOfDirectoryAtPath:eventsDir error:NULL] count], (NSUInteger)0, @"Should be no files after a successful export");
                 [self stopWaiting];
             }];
@@ -254,8 +272,8 @@
         [cloudManager snapshotRemoteFilesWithCompletion:^(NSError *error) {
             [cloudManager migrateNewLocalEventsToTransitCacheWithRemoteDirectory:cloudManager.remoteEventsDirectory existingRemoteFilenames:cloudManager.snapshotEventFilenames.allObjects allowedTypes:types completion:^(NSError *error) {
                 // Move cached file from the upload to the download folder
-                NSString *uploadEventsDir = [rootDir stringByAppendingPathComponent:@"transitcache/ensemble1/upload/events"];
-                NSString *downloadEventsDir = [rootDir stringByAppendingPathComponent:@"transitcache/ensemble1/download/events"];
+                NSString *uploadEventsDir = [rootDir stringByAppendingPathComponent:@"transitcache/ensemble1/upload"];
+                NSString *downloadEventsDir = [rootDir stringByAppendingPathComponent:@"transitcache/ensemble1/download"];
                 NSString *uploadFile = [uploadEventsDir stringByAppendingPathComponent:@"2_store1_1.cdeevent"];
                 NSString *downloadFile = [downloadEventsDir stringByAppendingPathComponent:@"2_store1_1.cdeevent"];
                 XCTAssertTrue([fileManager moveItemAtPath:uploadFile toPath:downloadFile error:NULL], @"Failed to move file");
