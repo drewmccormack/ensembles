@@ -1,0 +1,1 @@
+We welcome contributions to the Ensembles project, but to protect all parties from unforeseen legal implications, we ask that you electronically <a href="http://www.clahub.com/agreements/drewmccormack/ensembles">sign our Contributor License Agreement</a> when you submit pull requests.
