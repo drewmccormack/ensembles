@@ -13,6 +13,8 @@ NSString * const CDEErrorDomain = @"CDEErrorDomain";
 
 NSUInteger currentLoggingLevel = CDELoggingLevelError;
 
+CDELogCallbackFunction CDECurrentLogCallbackFunction = NSLog;
+
 void CDESetCurrentLoggingLevel(NSUInteger newLevel)
 {
     currentLoggingLevel = newLevel;
@@ -21,6 +23,16 @@ void CDESetCurrentLoggingLevel(NSUInteger newLevel)
 NSUInteger CDECurrentLoggingLevel(void)
 {
     return currentLoggingLevel;
+}
+
+void CDESetLogCallback(CDELogCallbackFunction logFunction)
+{
+    CDECurrentLogCallbackFunction = logFunction;
+}
+
+CDELogCallbackFunction CDEGetLogCallback()
+{
+    return CDECurrentLogCallbackFunction;
 }
 
 void CDEDispatchCompletionBlockToMainQueue(CDECompletionBlock block, NSError *error)

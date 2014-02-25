@@ -59,10 +59,16 @@ typedef NS_ENUM(NSUInteger, CDELoggingLevel) {
     CDELoggingLevelVerbose
 };
 
+// Log callback support. Use CDESetLogCallback to supply a function that
+// will receive all Ensembles logging.  Default log output goes to NSLog().
+typedef void (*CDELogCallbackFunction)(NSString *format, ...);
+void CDESetLogCallback(CDELogCallbackFunction callback);
+extern CDELogCallbackFunction CDECurrentLogCallbackFunction;
+
 #define CDELog(level, ...)                                                                                  \
 do {                                                                                                        \
     if (CDECurrentLoggingLevel() >= level) {                                                                \
-        NSLog(@"%s line %d: %@", __PRETTY_FUNCTION__, __LINE__, [NSString stringWithFormat:__VA_ARGS__]);   \
+CDECurrentLogCallbackFunction(@"%s line %d: %@", __PRETTY_FUNCTION__, __LINE__, [NSString stringWithFormat:__VA_ARGS__]);   \
     }                                                                                                       \
 } while (0)
 

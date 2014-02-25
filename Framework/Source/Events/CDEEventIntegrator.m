@@ -965,7 +965,7 @@
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEGlobalIdentifier"];
     fetch.predicate = [NSPredicate predicateWithFormat:@"globalIdentifier IN %@", idStrings];
     NSArray *globalIds = [self.eventStore.managedObjectContext executeFetchRequest:fetch error:&error];
-    if (!globalIds) NSLog(@"Error fetching ids: %@", error);
+    if (!globalIds) CDELog(CDELoggingLevelError, @"Error fetching ids: %@", error);
     return globalIds;
 }
 

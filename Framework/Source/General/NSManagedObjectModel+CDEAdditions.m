@@ -7,6 +7,7 @@
 //
 
 #import "NSManagedObjectModel+CDEAdditions.h"
+#import "CDEDefines.h"
 
 @implementation NSManagedObjectModel (CDEAdditions)
 
@@ -27,7 +28,7 @@
 {
     NSString *error = nil;
     NSData *data = [NSPropertyListSerialization dataFromPropertyList:self.entityVersionHashesByName format:NSPropertyListXMLFormat_v1_0 errorDescription:&error];
-    if (!data) NSLog(@"Error generating property list: %@", error);
+    if (!data) CDELog(CDELoggingLevelError, @"Error generating property list: %@", error);
     
     NSString *string = nil;
     if (data) string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
@@ -43,7 +44,7 @@
     NSString *error;
     NSPropertyListFormat format;
     NSDictionary *entitiesByName = [NSPropertyListSerialization propertyListFromData:data mutabilityOption:NSPropertyListImmutable format:&format errorDescription:&error];
-    if (!entitiesByName) NSLog(@"Error reading property list: %@", error);
+    if (!entitiesByName) CDELog(CDELoggingLevelError, @"Error reading property list: %@", error);
     
     return entitiesByName;
 }
