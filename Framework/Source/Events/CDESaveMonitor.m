@@ -144,7 +144,7 @@
     NSManagedObjectContext *eventContext = self.eventStore.managedObjectContext;
     [eventContext performBlock:^{
         NSError *error;
-        if (![eventContext save:&error]) NSLog(@"Error saving event store: %@", error);
+        if (![eventContext save:&error]) CDELog(CDELoggingLevelError, @"Error saving event store: %@", error);
     }];
 }
 

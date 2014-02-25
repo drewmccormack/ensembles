@@ -201,7 +201,7 @@
     NSManagedObject *relatedObject = newValue;
     NSError *error = nil;
     if (relatedObject && ![relatedObject.managedObjectContext obtainPermanentIDsForObjects:@[relatedObject] error:&error]) {
-        NSLog(@"Could not get permanent ID for object: %@", error);
+        CDELog(CDELoggingLevelError, @"Could not get permanent ID for object: %@", error);
     }
     
     self.relatedIdentifier = relatedObject.objectID;
@@ -215,7 +215,7 @@
     NSSet *newRelatedObjects = newValue;
     NSManagedObjectContext *context = [newRelatedObjects.anyObject managedObjectContext];
     if (context && ![context obtainPermanentIDsForObjects:newRelatedObjects.allObjects error:&error]) {
-        NSLog(@"Failed to get permanent ids: %@", error);
+        CDELog(CDELoggingLevelError, @"Failed to get permanent ids: %@", error);
     }
     NSSet *newRelatedObjectIDs = [newValue valueForKeyPath:@"objectID"];
     
@@ -256,7 +256,7 @@
     NSError *error;
     NSManagedObjectContext *context = [[orderedIndexes.allValues lastObject] managedObjectContext];
     if (context && ![context obtainPermanentIDsForObjects:orderedIndexes.allValues error:&error]) {
-        NSLog(@"Failed to get permanent ids: %@", error);
+        CDELog(CDELoggingLevelError, @"Failed to get permanent ids: %@", error);
     }
 
     NSMutableDictionary *finalMovedObjects = [[NSMutableDictionary alloc] initWithCapacity:orderedIndexes.count];
