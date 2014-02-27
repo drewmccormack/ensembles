@@ -27,6 +27,10 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
 
 - (id)initWithSession:(DBSession *)newSession;
 
+- (void)prepareForNetworkRequests;
+- (void)initiateNetworkRequest; // Abstract
+- (void)completeWithError:(NSError *)error; // Abstract
+
 @end
 
 
@@ -219,6 +223,8 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
 
 
 @implementation CDEDropboxOperation {
+    CDEAsynchronousTaskQueue *taskQueue;
+    CDEAsynchronousTaskCallbackBlock retryCallbackBlock;
     BOOL isFinished, isExecuting;
 }
 
@@ -274,6 +280,28 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
     return YES;
 }
 
+- (void)start
+{
+    BOOL setup = [self setupForStart];
+    if (!setup) return;
+    
+    [self prepareForNetworkRequests];
+    taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTask:^(CDEAsynchronousTaskCallbackBlock next) {
+            CDELog(CDELoggingLevelVerbose, @"Attempting network request for operation class: %@", NSStringFromClass(self.class));
+            retryCallbackBlock = [next copy];
+            [self initiateNetworkRequest];
+        }
+        repeatCount:kCDENumberOfRetriesForFailedAttempt
+        terminationPolicy:CDETaskQueueTerminationPolicyStopOnSuccess
+        completion:^(NSError *error) {
+            if (error) CDELog(CDELoggingLevelVerbose, @"Cloud file system operation failed: %@ %@", NSStringFromClass(self.class), error);
+            [self completeWithError:error];
+            retryCallbackBlock = NULL;
+            [self tearDown];
+        }];
+    [taskQueue start];
+}
+
 - (void)tearDown
 {
     [restClient cancelAllRequests];
@@ -288,12 +316,30 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
     }
 }
 
+- (void)prepareForNetworkRequests
+{
+}
+
+- (void)initiateNetworkRequest
+{
+    [self doesNotRecognizeSelector:_cmd];
+}
+
+- (void)completeNetworkRequestWithError:(NSError *)error
+{
+    if (error) CDELog(CDELoggingLevelVerbose, @"Network request failed with error: %@ %@", NSStringFromClass(self.class), error);
+    retryCallbackBlock(error, NO);
+}
+
+- (void)completeWithError:(NSError *)error
+{
+    [self doesNotRecognizeSelector:_cmd];
+}
+
 @end
 
 
 @implementation CDEDropboxFileExistenceOperation {
-    CDEAsynchronousTaskCallbackBlock retryCallbackBlock;
-    CDEAsynchronousTaskQueue *taskQueue;
     BOOL fileExists, isDirectory;
 }
 
@@ -310,32 +356,27 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
     return self;
 }
 
-- (void)start
+- (void)prepareForNetworkRequests
 {
-    BOOL setup = [self setupForStart];
-    if (!setup) return;
-    
     fileExists = NO;
     isDirectory = NO;
-    taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTask:^(CDEAsynchronousTaskCallbackBlock next) {
-            retryCallbackBlock = [next copy];
-            [self.restClient loadMetadata:path];
-        }
-        repeatCount:kCDENumberOfRetriesForFailedAttempt
-        terminationPolicy:CDETaskQueueTerminationPolicyStopOnSuccess
-        completion:^(NSError *error) {
-            fileExistenceCallback(fileExists, isDirectory, error);
-            retryCallbackBlock = NULL;
-            [self tearDown];
-        }];
-    [taskQueue start];
+}
+
+- (void)initiateNetworkRequest
+{
+    [self.restClient loadMetadata:path];
+}
+
+- (void)completeWithError:(NSError *)error
+{
+    fileExistenceCallback(fileExists, isDirectory, error);
 }
 
 - (void)restClient:(DBRestClient *)client loadedMetadata:(DBMetadata *)metadata
 {
     fileExists = !metadata.isDeleted;
     isDirectory = metadata.isDirectory;
-    retryCallbackBlock(nil, YES);
+    [self completeNetworkRequestWithError:nil];
 }
 
 - (void)restClient:(DBRestClient *)client loadMetadataFailedWithError:(NSError *)error
@@ -343,17 +384,19 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
     if (error.code == 404) {
         fileExists = NO;
         isDirectory = NO;
-        retryCallbackBlock(nil, YES);
+        [self completeNetworkRequestWithError:nil];
     }
     else {
-        retryCallbackBlock(error, NO);
+        [self completeNetworkRequestWithError:error];
     }
 }
 
 @end
 
 
-@implementation CDEDropboxDirectoryContentsOperation
+@implementation CDEDropboxDirectoryContentsOperation {
+    CDECloudDirectory *directory;
+}
 
 @synthesize path = path;
 @synthesize directoryContentsCallback = directoryContentsCallback;
@@ -368,17 +411,19 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
     return self;
 }
 
-- (void)start
+- (void)initiateNetworkRequest
 {
-    BOOL setup = [self setupForStart];
-    if (!setup) return;
-    
     [self.restClient loadMetadata:path];
+}
+
+- (void)completeWithError:(NSError *)error
+{
+    directoryContentsCallback(directory.contents, error);
 }
 
 - (void)restClient:(DBRestClient *)client loadedMetadata:(DBMetadata *)metadata
 {
-    CDECloudDirectory *directory = [CDECloudDirectory new];
+    directory = [CDECloudDirectory new];
     directory.path = metadata.path;
     directory.name = metadata.filename;
     
@@ -399,15 +444,13 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
         }
     }
     directory.contents = contents;
-    directoryContentsCallback(directory.contents, nil);
-    
-    [self tearDown];
+    [self completeNetworkRequestWithError:nil];
 }
 
 - (void)restClient:(DBRestClient *)client loadMetadataFailedWithError:(NSError *)error
 {
-    directoryContentsCallback(nil, error);
-    [self tearDown];
+    directory = nil;
+    [self completeNetworkRequestWithError:error];
 }
 
 @end
@@ -428,24 +471,24 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
     return self;
 }
 
-- (void)start
+- (void)initiateNetworkRequest
 {
-    BOOL setup = [self setupForStart];
-    if (!setup) return;
-    
     [self.restClient createFolder:self.path];
+}
+
+- (void)completeWithError:(NSError *)error
+{
+    self.completionCallback(error);
 }
 
 - (void)restClient:(DBRestClient *)client createdFolder:(DBMetadata *)folder
 {
-    self.completionCallback(nil);
-    [self tearDown];
+    [self completeNetworkRequestWithError:nil];
 }
 
 - (void)restClient:(DBRestClient *)client createFolderFailedWithError:(NSError *)error
 {
-    self.completionCallback(error);
-    [self tearDown];
+    [self completeNetworkRequestWithError:error];
 }
 
 @end
@@ -468,24 +511,24 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
     return self;
 }
 
-- (void)start
+- (void)initiateNetworkRequest
 {
-    BOOL setup = [self setupForStart];
-    if (!setup) return;
-    
     [self.restClient moveFrom:self.fromPath toPath:self.toPath];
 }
 
-- (void)restClient:(DBRestClient *)client movedPath:(NSString *)from_path to:(DBMetadata *)result
+- (void)completeWithError:(NSError *)error
 {
-    self.completionCallback(nil);
-    [self tearDown];
+    self.completionCallback(error);
+}
+
+- (void)restClient:(DBRestClient *)client movedPath:(NSString *)fromPath to:(DBMetadata *)toMetadata
+{
+    [self completeNetworkRequestWithError:nil];
 }
 
 - (void)restClient:(DBRestClient *)client movePathFailedWithError:(NSError *)error
 {
-    self.completionCallback(error);
-    [self tearDown];
+    [self completeNetworkRequestWithError:error];
 }
 
 @end
@@ -508,24 +551,24 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
     return self;
 }
 
-- (void)start
+- (void)initiateNetworkRequest
 {
-    BOOL setup = [self setupForStart];
-    if (!setup) return;
-    
     [self.restClient copyFrom:self.fromPath toPath:self.toPath];
+}
+
+- (void)completeWithError:(NSError *)error
+{
+    self.completionCallback(error);
 }
 
 - (void)restClient:(DBRestClient *)client copiedPath:(NSString *)fromPath to:(DBMetadata *)to
 {
-    self.completionCallback(nil);
-    [self tearDown];
+    [self completeNetworkRequestWithError:nil];
 }
 
 - (void)restClient:(DBRestClient *)client copyPathFailedWithError:(NSError *)error
 {
-    self.completionCallback(error);
-    [self tearDown];
+    [self completeNetworkRequestWithError:error];
 }
 
 @end
@@ -546,24 +589,24 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
     return self;
 }
 
-- (void)start
+- (void)initiateNetworkRequest
 {
-    BOOL setup = [self setupForStart];
-    if (!setup) return;
-    
     [self.restClient deletePath:self.path];
+}
+
+- (void)completeWithError:(NSError *)error
+{
+    self.completionCallback(error);
 }
 
 - (void)restClient:(DBRestClient *)client deletedPath:(NSString *)path
 {
-    self.completionCallback(nil);
-    [self tearDown];
+    [self completeNetworkRequestWithError:nil];
 }
 
 - (void)restClient:(DBRestClient *)client deletePathFailedWithError:(NSError *)error
 {
-    self.completionCallback(error);
-    [self tearDown];
+    [self completeNetworkRequestWithError:error];
 }
 
 @end
@@ -586,24 +629,24 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
     return self;
 }
 
-- (void)start
+- (void)initiateNetworkRequest
 {
-    BOOL setup = [self setupForStart];
-    if (!setup) return;
-    
     [self.restClient uploadFile:[toPath lastPathComponent] toPath:[toPath stringByDeletingLastPathComponent] withParentRev:nil fromPath:localPath];
+}
+
+- (void)completeWithError:(NSError *)error
+{
+    self.completionCallback(error);
 }
 
 - (void)restClient:(DBRestClient *)client uploadedFile:(NSString *)destPath from:(NSString *)srcPath
 {
-    self.completionCallback(nil);
-    [self tearDown];
+    [self completeNetworkRequestWithError:nil];
 }
 
 - (void)restClient:(DBRestClient *)client uploadFileFailedWithError:(NSError *)error
 {
-    self.completionCallback(error);
-    [self tearDown];
+    [self completeNetworkRequestWithError:error];
 }
 
 @end
@@ -626,24 +669,24 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
     return self;
 }
 
-- (void)start
+- (void)initiateNetworkRequest
 {
-    BOOL setup = [self setupForStart];
-    if (!setup) return;
-    
     [self.restClient loadFile:fromPath atRev:nil intoPath:localPath];
+}
+
+- (void)completeWithError:(NSError *)error
+{
+    self.completionCallback(error);
 }
 
 - (void)restClient:(DBRestClient *)client loadedFile:(NSString *)destPath
 {
-    self.completionCallback(nil);
-    [self tearDown];
+    [self completeNetworkRequestWithError:nil];
 }
 
 - (void)restClient:(DBRestClient *)client loadFileFailedWithError:(NSError *)error
 {
-    self.completionCallback(error);
-    [self tearDown];
+    [self completeNetworkRequestWithError:error];
 }
 
 @end
