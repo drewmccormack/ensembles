@@ -16,17 +16,19 @@
 @synthesize username = username;
 @synthesize password = password;
 @synthesize baseURL = baseURL;
+@synthesize loggedIn = loggedIn;
 
 - (instancetype)initWithBaseURL:(NSURL *)newBaseURL
 {
     self = [super init];
     if (self) {
         baseURL = newBaseURL;
+        loggedIn = NO;
     }
     return self;
 }
 
-- (instancetype) init
+- (instancetype)init
 {
     return [self initWithBaseURL:nil];
 }
@@ -42,7 +44,7 @@
 
 - (BOOL)isConnected
 {
-    return self.username.length > 0 && self.password.length > 0;
+    return self.isLoggedIn;
 }
 
 - (void)connect:(CDECompletionBlock)completion
@@ -50,13 +52,33 @@
     if (self.isConnected) {
         if (completion) completion(nil);
     }
-    else if (self.delegate) {
-        [self.delegate nodeCloudFileSystem:self updateLoginCredentialsWithCompletion:completion];
-    }
     else {
-        NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeConnectionError userInfo:nil];
-        if (completion) completion(error);
+        [self loginWithCompletion:^(NSError *error) {
+            if (error.code == CDEErrorCodeAuthenticationFailure && self.delegate) {
+                [self.delegate nodeCloudFileSystem:self updateLoginCredentialsWithCompletion:^(NSError *error) {
+                    if (error) {
+                        if (completion) completion(error);
+                    }
+                    else {
+                        // Try the whole process again with new credentials
+                        [self connect:completion];
+                    }
+                }];
+            }
+            else {
+                if (completion) completion(error);
+            }
+        }];
     }
+}
+
+- (void)loginWithCompletion:(CDECompletionBlock)completion
+{
+    NSURL *url = [self.baseURL URLByAppendingPathComponent:@"login" isDirectory:NO];
+    [self sendRequestForURL:url HTTPMethod:@"POST" completion:^(NSError *error, NSDictionary *responseDict) {
+        loggedIn = !error;
+        if (completion) completion(error);
+    }];
 }
 
 #pragma mark - User Identity

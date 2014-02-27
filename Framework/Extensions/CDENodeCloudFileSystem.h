@@ -24,10 +24,13 @@
 
 @property (nonatomic, readwrite, copy) NSString *username;
 @property (nonatomic, readwrite, copy) NSString *password;
+@property (nonatomic, readonly, assign, getter = isLoggedIn) BOOL loggedIn;
 @property (nonatomic, readonly, copy) NSURL *baseURL;
 
 @property (nonatomic, readwrite, weak) id <CDENodeCloudFileSystemDelegate> delegate;
 
 - (id)initWithBaseURL:(NSURL *)baseURL;
+
+- (void)loginWithCompletion:(CDECompletionBlock)completion;
 
 @end
