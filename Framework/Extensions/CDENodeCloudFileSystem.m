@@ -75,7 +75,7 @@
 - (void)loginWithCompletion:(CDECompletionBlock)completion
 {
     NSURL *url = [self.baseURL URLByAppendingPathComponent:@"login" isDirectory:NO];
-    [self sendRequestForURL:url HTTPMethod:@"POST" completion:^(NSError *error, NSDictionary *responseDict) {
+    [self postJSONObject:nil toURL:url completion:^(NSError *error, NSDictionary *responseDict) {
         loggedIn = !error;
         if (completion) completion(error);
     }];
@@ -88,20 +88,103 @@
     return self.username;
 }
 
+#pragma mark - Checking File Existence
+
+- (void)fileExistsAtPath:(NSString *)path completion:(CDEFileExistenceCallback)completion
+{
+    NSURL *url = [self.baseURL URLByAppendingPathComponent:@"fileexists" isDirectory:NO];
+    [self postJSONObject:@{@"path":path} toURL:url completion:^(NSError *error, NSDictionary *responseDict) {
+        if (error) {
+            if (completion) completion(NO, NO, error);
+            return;
+        }
+        
+        BOOL exists = [responseDict[@"exists"] boolValue];
+        BOOL isDir = [responseDict[@"isdir"] boolValue];
+        if (completion) completion(exists, isDir, nil);
+    }];
+}
+
+#pragma mark - Getting Directory Contents
+
+- (void)contentsOfDirectoryAtPath:(NSString *)path completion:(CDEDirectoryContentsCallback)completion
+{
+    NSURL *url = [self.baseURL URLByAppendingPathComponent:@"listdir" isDirectory:NO];
+    [self postJSONObject:@{@"path":path} toURL:url completion:^(NSError *error, NSDictionary *responseDict) {
+        NSArray *files = responseDict[@"files"];
+        if (completion) completion(files, error);
+    }];
+}
+
+#pragma mark - Creating Directories
+
+- (void)createDirectoryAtPath:(NSString *)path completion:(CDECompletionBlock)block
+{
+    // S3 doesn't have directories, so just indicate success
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (block) block(nil);
+    });
+}
+
+#pragma mark - Deleting
+
+- (void)removeItemAtPath:(NSString *)path completion:(CDECompletionBlock)completion
+{
+    NSURL *url = [self.baseURL URLByAppendingPathComponent:@"deleteurls" isDirectory:NO];
+    [self postJSONObject:@{@"paths" : @[path]} toURL:url completion:^(NSError *error, NSDictionary *responseDict) {
+        if (error) {
+            if (completion) completion(error);
+            return;
+        }
+        
+        NSArray *urls = responseDict[@"urls"];
+        NSURL *url = [NSURL URLWithString:urls.lastObject];
+        [self sendRequestForURL:url HTTPMethod:@"DELETE" authenticate:NO contentType:nil body:nil completion:^(NSError *error, NSDictionary *responseDict) {
+            if (completion) completion(error);
+        }];
+    }];
+}
+
+#pragma mark - Uploading and Downloading
+
+- (void)uploadLocalFile:(NSString *)fromPath toPath:(NSString *)toPath completion:(CDECompletionBlock)block
+{
+}
+
+- (void)downloadFromPath:(NSString *)fromPath toLocalFile:(NSString *)toPath completion:(CDECompletionBlock)block
+{
+}
+
 #pragma mark - Requests
 
-- (void)sendRequestForURL:(NSURL *)url HTTPMethod:(NSString *)method completion:(void(^)(NSError *error, NSDictionary *responseDict))completion
+- (void)postJSONObject:(id)JSONObject toURL:(NSURL *)url completion:(void(^)(NSError *error, NSDictionary *responseDict))completion
+{
+    NSError *error;
+    NSData *data = nil;
+    if (JSONObject) data = [NSJSONSerialization dataWithJSONObject:JSONObject options:0 error:&error];
+    if (JSONObject && !data) {
+        if (completion) completion(error, nil);
+        return;
+    }
+    [self sendRequestForURL:url HTTPMethod:@"POST" authenticate:YES contentType:@"application/json" body:data completion:completion];
+}
+
+- (void)sendRequestForURL:(NSURL *)url HTTPMethod:(NSString *)method authenticate:(BOOL)authenticate contentType:(NSString *)contentType body:(NSData *)bodyObject completion:(void(^)(NSError *error, NSDictionary *responseDict))completion
 {
     // Create request
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:20.0];
     request.HTTPMethod = method;
+    if (bodyObject) request.HTTPBody = bodyObject;
+    if (contentType) [request setValue:contentType forKey:@"Content-Type"];
     
     // Basic Auth
-    NSString *authString = [NSString stringWithFormat:@"%@:%@", self.username, self.password];
-	NSData *authData = [authString dataUsingEncoding:NSUTF8StringEncoding];
-    NSString *base64AuthString = [authData cde_base64String];
-	NSString *authValue = [NSString stringWithFormat:@"Basic %@", base64AuthString];
-	[request setValue:authValue forHTTPHeaderField:@"Authorization"];
+    if (authenticate) {
+        NSString *authString = [NSString stringWithFormat:@"%@:%@", self.username, self.password];
+        NSData *authData = [authString dataUsingEncoding:NSUTF8StringEncoding];
+        NSString *base64AuthString = [authData cde_base64String];
+        NSString *authValue = [NSString stringWithFormat:@"Basic %@", base64AuthString];
+        [request setValue:authValue forHTTPHeaderField:@"Authorization"];
+    }
     
     // Send request
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
@@ -127,8 +210,7 @@
         
         // Parse Body
         NSDictionary *responseDict = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
-        if (completion) completion(error, responseDict);
-
+        
         // Check for JSON error
         if ([responseDict[@"success"] boolValue]) {
             if (completion) completion(nil, responseDict);
@@ -139,61 +221,6 @@
             if (completion) completion(error, nil);
         }
     }];
-}
-
-#pragma mark - Checking File Existence
-
-- (void)fileExistsAtPath:(NSString *)path completion:(CDEFileExistenceCallback)completion
-{
-    NSURL *url = [self.baseURL URLByAppendingPathComponent:@"uploadurls" isDirectory:NO];
-    [self sendRequestForURL:url HTTPMethod:@"POST" completion:^(NSError *error, NSDictionary *responseDict) {
-        if (error) {
-            if (completion) completion(NO, NO, error);
-            return;
-        }
-        
-        BOOL exists = [responseDict[@"exists"] boolValue];
-        BOOL isDir = NO;
-        if (completion) completion(exists, isDir, nil);
-    }];
-}
-
-#pragma mark - Getting Directory Contents
-
-- (void)contentsOfDirectoryAtPath:(NSString *)path completion:(CDEDirectoryContentsCallback)block
-{
-}
-
-#pragma mark - Creating Directories
-
-- (void)createDirectoryAtPath:(NSString *)path completion:(CDECompletionBlock)block
-{
-}
-
-#pragma mark - Moving and Copying
-
-- (void)moveItemAtPath:(NSString *)fromPath toPath:(NSString *)toPath completion:(CDECompletionBlock)block
-{
-}
-
-- (void)copyItemAtPath:(NSString *)fromPath toPath:(NSString *)toPath completion:(CDECompletionBlock)block
-{
-}
-
-#pragma mark - Deleting
-
-- (void)removeItemAtPath:(NSString *)path completion:(CDECompletionBlock)block
-{
-}
-
-#pragma mark - Uploading and Downloading
-
-- (void)uploadLocalFile:(NSString *)fromPath toPath:(NSString *)toPath completion:(CDECompletionBlock)block
-{
-}
-
-- (void)downloadFromPath:(NSString *)fromPath toLocalFile:(NSString *)toPath completion:(CDECompletionBlock)block
-{
 }
 
 @end
