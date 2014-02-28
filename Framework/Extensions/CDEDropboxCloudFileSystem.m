@@ -53,24 +53,6 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
 
 @end
 
-@interface CDEDropboxMoveItemOperation : CDEDropboxOperation
-
-@property (readonly) NSString *fromPath, *toPath;
-@property (readonly) CDECompletionBlock completionCallback;
-
-- (id)initWithSession:(DBSession *)newSession fromPath:(NSString *)newFromPath toPath:(NSString *)newToPath completionCallback:(CDECompletionBlock)block;
-
-@end
-
-@interface CDEDropboxCopyItemOperation : CDEDropboxOperation
-
-@property (readonly) NSString *fromPath, *toPath;
-@property (readonly) CDECompletionBlock completionCallback;
-
-- (id)initWithSession:(DBSession *)newSession fromPath:(NSString *)newFromPath toPath:(NSString *)newToPath completionCallback:(CDECompletionBlock)block;
-
-@end
-
 @interface CDEDropboxRemoveItemOperation : CDEDropboxOperation
 
 @property (readonly) NSString *path;
@@ -172,20 +154,6 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
 - (void)createDirectoryAtPath:(NSString *)path completion:(CDECompletionBlock)block
 {
     CDEDropboxCreateDirectoryOperation *operation = [[CDEDropboxCreateDirectoryOperation alloc] initWithSession:session path:path completionCallback:block];
-    [queue addOperation:operation];
-}
-
-#pragma mark Moving and Copying
-
-- (void)moveItemAtPath:(NSString *)fromPath toPath:(NSString *)toPath completion:(CDECompletionBlock)block
-{
-    CDEDropboxMoveItemOperation *operation = [[CDEDropboxMoveItemOperation alloc] initWithSession:session fromPath:fromPath toPath:toPath completionCallback:block];
-    [queue addOperation:operation];
-}
-
-- (void)copyItemAtPath:(NSString *)fromPath toPath:(NSString *)toPath completion:(CDECompletionBlock)block
-{
-    CDEDropboxCopyItemOperation *operation = [[CDEDropboxCopyItemOperation alloc] initWithSession:session fromPath:fromPath toPath:toPath completionCallback:block];
     [queue addOperation:operation];
 }
 
@@ -445,87 +413,6 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
 }
 
 @end
-
-
-@implementation CDEDropboxMoveItemOperation
-
-@synthesize fromPath = fromPath;
-@synthesize toPath = toPath;
-@synthesize completionCallback = completionCallback;
-
-- (id)initWithSession:(DBSession *)newSession fromPath:(NSString *)newFromPath toPath:(NSString *)newToPath completionCallback:(CDECompletionBlock)newCallback
-{
-    self = [super initWithSession:newSession];
-    if (self) {
-        fromPath = [newFromPath copy];
-        toPath = [newToPath copy];
-        completionCallback = [newCallback copy];
-    }
-    return self;
-}
-
-- (void)start
-{
-    BOOL setup = [self setupForStart];
-    if (!setup) return;
-    
-    [self.restClient moveFrom:self.fromPath toPath:self.toPath];
-}
-
-- (void)restClient:(DBRestClient *)client movedPath:(NSString *)from_path to:(DBMetadata *)result
-{
-    self.completionCallback(nil);
-    [self tearDown];
-}
-
-- (void)restClient:(DBRestClient *)client movePathFailedWithError:(NSError *)error
-{
-    self.completionCallback(error);
-    [self tearDown];
-}
-
-@end
-
-
-@implementation CDEDropboxCopyItemOperation
-
-@synthesize fromPath = fromPath;
-@synthesize toPath = toPath;
-@synthesize completionCallback = completionCallback;
-
-- (id)initWithSession:(DBSession *)newSession fromPath:(NSString *)newFromPath toPath:(NSString *)newToPath completionCallback:(CDECompletionBlock)newCallback
-{
-    self = [super initWithSession:newSession];
-    if (self) {
-        fromPath = [newFromPath copy];
-        toPath = [newToPath copy];
-        completionCallback = [newCallback copy];
-    }
-    return self;
-}
-
-- (void)start
-{
-    BOOL setup = [self setupForStart];
-    if (!setup) return;
-    
-    [self.restClient copyFrom:self.fromPath toPath:self.toPath];
-}
-
-- (void)restClient:(DBRestClient *)client copiedPath:(NSString *)fromPath to:(DBMetadata *)to
-{
-    self.completionCallback(nil);
-    [self tearDown];
-}
-
-- (void)restClient:(DBRestClient *)client copyPathFailedWithError:(NSError *)error
-{
-    self.completionCallback(error);
-    [self tearDown];
-}
-
-@end
-
 
 @implementation CDEDropboxRemoveItemOperation
 
