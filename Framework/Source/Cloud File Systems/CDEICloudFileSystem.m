@@ -207,6 +207,7 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
     metadataQuery = [[NSMetadataQuery alloc] init];
     metadataQuery.searchScopes = [NSArray arrayWithObject:NSMetadataQueryUbiquitousDataScope];
     metadataQuery.predicate = metadataPredicate;
+    metadataQuery.notificationBatchingInterval = 0.0;
     
     NSNotificationCenter *notifationCenter = [NSNotificationCenter defaultCenter];
     [notifationCenter addObserver:self selector:@selector(metadataQueryDidFinishGathering:) name:NSMetadataQueryDidFinishGatheringNotification object:metadataQuery];
@@ -232,28 +233,22 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
 {
     [metadataQuery disableUpdates];
     [self initiateDownloads];
-    
-    if (metadataQuery.resultCount > 0) {
-        // Restart query if there are non-zero results, because updates never
-        // seem to remove results, even if they no longer pass the predicate
-        [metadataQuery stopQuery];
-        [metadataQuery startQuery];
-    }
-
     [metadataQuery enableUpdates];
 }
 
 - (void)metadataQueryDidUpdate:(NSNotification *)notif
 {
-    // Need to stop and restart the query, because for some reason, NSMetadataQuery
-    // does not remove results that no longer meet the criteria
-    [metadataQuery stopQuery];
+    [metadataQuery disableUpdates];
     [self initiateDownloads];
-    [metadataQuery startQuery];
+    [metadataQuery enableUpdates];
 }
 
 - (void)initiateDownloads
 {
+    // Suspend to acumulate file downloads before checking whether they are complete.
+    // This prevents excessive notifications
+    [downloadTrackingQueue setSuspended:YES];
+    
     NSUInteger count = [metadataQuery resultCount];
     for ( NSUInteger i = 0; i < count; i++ ) {
         @autoreleasepool {
@@ -292,6 +287,8 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
             });
         }
     }
+    
+    [downloadTrackingQueue setSuspended:NO];
 }
 
 #pragma mark - File Operations
