@@ -15,6 +15,7 @@ extern NSString * const IDMSyncActivityDidEndNotification;
 extern NSString * const IDMCloudServiceUserDefaultKey;
 extern NSString * const IDMICloudService;
 extern NSString * const IDMDropboxService;
+extern NSString * const IDMNodeS3Service;
 
 @interface IDMAppDelegate : UIResponder <UIApplicationDelegate>
 

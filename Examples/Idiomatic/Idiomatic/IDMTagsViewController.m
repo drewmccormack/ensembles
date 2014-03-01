@@ -94,7 +94,7 @@
         }];
     }
     else {
-        syncServiceActionSheet = [[UIActionSheet alloc] initWithTitle:@"What service would you like?" delegate:self cancelButtonTitle:@"None" destructiveButtonTitle:nil otherButtonTitles:@"iCloud", @"Dropbox", nil];
+        syncServiceActionSheet = [[UIActionSheet alloc] initWithTitle:@"What service would you like?" delegate:self cancelButtonTitle:@"None" destructiveButtonTitle:nil otherButtonTitles:@"iCloud", @"Dropbox", @"IdioSync", nil];
         [syncServiceActionSheet showFromToolbar:self.navigationController.toolbar];
         [self updateButtons];
     }
@@ -109,6 +109,8 @@
             service = IDMICloudService;
         else if (buttonIndex == actionSheet.firstOtherButtonIndex+1)
             service = IDMDropboxService;
+        else if (buttonIndex == actionSheet.firstOtherButtonIndex+2)
+            service = IDMNodeS3Service;
         [appDelegate connectToSyncService:service];
         
         [self updateButtons];

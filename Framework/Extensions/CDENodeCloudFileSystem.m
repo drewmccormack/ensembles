@@ -39,6 +39,11 @@
     return [self initWithBaseURL:nil];
 }
 
+- (void)dealloc
+{
+    [operationQueue cancelAllOperations];
+}
+
 #pragma mark KVO
 
 + (NSSet *)keyPathsForValuesAffectingIdentityToken
@@ -207,7 +212,7 @@
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:20.0];
     request.HTTPMethod = method;
     if (bodyObject) request.HTTPBody = bodyObject;
-    if (contentType) [request setValue:contentType forKey:@"Content-Type"];
+    if (contentType) [request setValue:contentType forHTTPHeaderField:@"Content-Type"];
     
     // Basic Auth
     if (authenticate) {

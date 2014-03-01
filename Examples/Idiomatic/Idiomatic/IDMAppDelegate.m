@@ -12,6 +12,7 @@
 #import "CoreDataEnsembles.h"
 #import "CDEICloudFileSystem.h"
 #import "CDEDropboxCloudFileSystem.h"
+#import "CDENodeCloudFileSystem.h"
 #import "IDMAppDelegate.h"
 #import "IDMNotesViewController.h"
 #import "IDMTagsViewController.h"
@@ -22,13 +23,14 @@ NSString * const IDMSyncActivityDidEndNotification = @"IDMSyncActivityDidEnd";
 NSString * const IDMCloudServiceUserDefaultKey = @"IDMCloudServiceUserDefaultKey";
 NSString * const IDMICloudService = @"icloud";
 NSString * const IDMDropboxService = @"dropbox";
+NSString * const IDMNodeS3Service = @"node";
 
 // Set these with your account details
 NSString * const IDMICloudContainerIdentifier = @"P7BXV6PHLD.com.mentalfaculty.idiomatic";
 NSString * const IDMDropboxAppKey = @"fjgu077wm7qffv0";
 NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 
-@interface IDMAppDelegate () <CDEPersistentStoreEnsembleDelegate, DBSessionDelegate, CDEDropboxCloudFileSystemDelegate>
+@interface IDMAppDelegate () <CDEPersistentStoreEnsembleDelegate, DBSessionDelegate, CDEDropboxCloudFileSystemDelegate, CDENodeCloudFileSystemDelegate>
 
 @property (nonatomic, readonly) NSURL *storeDirectoryURL;
 @property (nonatomic, readonly) NSURL *storeURL;
@@ -173,6 +175,12 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
         newDropboxSystem.delegate = self;
         newSystem = newDropboxSystem;
     }
+    else if ([cloudService isEqualToString:IDMNodeS3Service]) {
+        NSURL *url = [NSURL URLWithString:@"https://ensembles.herokuapp.com"];
+        CDENodeCloudFileSystem *newNodeFileSystem = [[CDENodeCloudFileSystem alloc] initWithBaseURL:url];
+        newNodeFileSystem.delegate = self;
+        newSystem = newNodeFileSystem;
+    }
     return newSystem;
 }
 
@@ -262,6 +270,13 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 
 - (void)sessionDidReceiveAuthorizationFailure:(DBSession*)session userId:(NSString *)userId
 {
+}
+
+#pragma mark - Node Server Delegate Methods
+
+- (void)nodeCloudFileSystem:(CDENodeCloudFileSystem *)fileSystem updateLoginCredentialsWithCompletion:(CDECompletionBlock)completion
+{
+    completion(nil);
 }
 
 @end
