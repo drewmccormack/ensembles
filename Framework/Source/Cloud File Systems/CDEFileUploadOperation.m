@@ -1,24 +1,23 @@
 //
-//  CDEFileDownloadOperation.m
-//  Ensembles iOS
+//  CDEFileUploadOperation.m
+//  Ensembles Mac
 //
 //  Created by Drew McCormack on 01/03/14.
-//  Copyright (c) 2014 The Mental Faculty B.V. All rights reserved.
+//  Copyright (c) 2014 Drew McCormack. All rights reserved.
 //
 
-#import "CDEFileDownloadOperation.h"
+#import "CDEFileUploadOperation.h"
 
-@interface CDEFileDownloadOperation () <NSURLConnectionDelegate, NSURLConnectionDataDelegate>
+@interface CDEFileUploadOperation () <NSURLConnectionDelegate, NSURLConnectionDataDelegate>
 @end
 
-@implementation CDEFileDownloadOperation {
-    NSFileManager *fileManager;
-    NSFileHandle *fileHandle;
+@implementation CDEFileUploadOperation {
     NSURLConnection *connection;
 }
 
 @synthesize url = url;
 @synthesize localPath = localPath;
+@synthesize request = request;
 @synthesize completion = completion;
 
 - (instancetype)initWithURL:(NSURL *)newURL localPath:(NSString *)newPath
@@ -29,17 +28,16 @@
     if (self) {
         url = [newURL copy];
         localPath = [newPath copy];
-        fileManager = [[NSFileManager alloc] init];
+        
+        request = [NSMutableURLRequest requestWithURL:url];
+        request.HTTPMethod = @"PUT";
+        request.HTTPBodyStream = [NSInputStream inputStreamWithFileAtPath:localPath];
     }
     return self;
 }
 
 - (void)beginAsynchronousTask
 {
-    [fileManager removeItemAtPath:localPath error:NULL];
-    fileHandle = [NSFileHandle fileHandleForWritingAtPath:localPath];
-    
-    NSURLRequest *request = [NSURLRequest requestWithURL:url];
     connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
 }
 
@@ -52,25 +50,16 @@
 - (void)cancel
 {
     [super cancel];
-    
     [connection cancel];
-    [fileHandle closeFile];
-    [fileManager removeItemAtPath:localPath error:NULL];
-
+    
     NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeCancelled userInfo:nil];
     if (completion) completion(error);
-
+    
     [self endAsynchronousTask];
-}
-
-- (void)connection:(NSURLConnection *)aConnection didReceiveData:(NSData *)data
-{
-    [fileHandle writeData:data];
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-    [fileHandle closeFile];
     if (completion) completion(nil);
     [self endAsynchronousTask];
 }

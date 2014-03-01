@@ -11,6 +11,8 @@
 		0701770A18C1EF7400C4DA01 /* CDEAsynchronousOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 0701770818C1EF7400C4DA01 /* CDEAsynchronousOperation.m */; };
 		0701770D18C1EF8300C4DA01 /* CDEFileDownloadOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 0701770B18C1EF8300C4DA01 /* CDEFileDownloadOperation.h */; };
 		0701770E18C1EF8300C4DA01 /* CDEFileDownloadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 0701770C18C1EF8300C4DA01 /* CDEFileDownloadOperation.m */; };
+		0701771118C2543D00C4DA01 /* CDEFileUploadOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 0701770F18C2543D00C4DA01 /* CDEFileUploadOperation.h */; };
+		0701771218C2543D00C4DA01 /* CDEFileUploadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 0701771018C2543D00C4DA01 /* CDEFileUploadOperation.m */; };
 		070D33D018019A680054BA23 /* CDEGlobalIdentifierTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D33CF18019A680054BA23 /* CDEGlobalIdentifierTests.m */; };
 		071B9F9717E30ECB00E6977A /* IntegratorUpdateTestsFixture1.json in Resources */ = {isa = PBXBuildFile; fileRef = 071B9F9517E30ECB00E6977A /* IntegratorUpdateTestsFixture1.json */; };
 		071B9F9817E30ECB00E6977A /* IntegratorUpdateTestsFixture2.json in Resources */ = {isa = PBXBuildFile; fileRef = 071B9F9617E30ECB00E6977A /* IntegratorUpdateTestsFixture2.json */; };
@@ -136,6 +138,8 @@
 		0701770818C1EF7400C4DA01 /* CDEAsynchronousOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEAsynchronousOperation.m; sourceTree = "<group>"; };
 		0701770B18C1EF8300C4DA01 /* CDEFileDownloadOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEFileDownloadOperation.h; sourceTree = "<group>"; };
 		0701770C18C1EF8300C4DA01 /* CDEFileDownloadOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEFileDownloadOperation.m; sourceTree = "<group>"; };
+		0701770F18C2543D00C4DA01 /* CDEFileUploadOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEFileUploadOperation.h; sourceTree = "<group>"; };
+		0701771018C2543D00C4DA01 /* CDEFileUploadOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEFileUploadOperation.m; sourceTree = "<group>"; };
 		070D33CF18019A680054BA23 /* CDEGlobalIdentifierTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEGlobalIdentifierTests.m; sourceTree = "<group>"; };
 		07157A2217B555A4004AAD22 /* CDEEventMigratorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEEventMigratorTests.m; sourceTree = "<group>"; };
 		071B9F9517E30ECB00E6977A /* IntegratorUpdateTestsFixture1.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = IntegratorUpdateTestsFixture1.json; sourceTree = "<group>"; };
@@ -401,6 +405,8 @@
 				07973F04183BE44A007F48CA /* CDELocalCloudFileSystem.m */,
 				0701770B18C1EF8300C4DA01 /* CDEFileDownloadOperation.h */,
 				0701770C18C1EF8300C4DA01 /* CDEFileDownloadOperation.m */,
+				0701770F18C2543D00C4DA01 /* CDEFileUploadOperation.h */,
+				0701771018C2543D00C4DA01 /* CDEFileUploadOperation.m */,
 			);
 			path = "Cloud File Systems";
 			sourceTree = "<group>";
@@ -573,6 +579,7 @@
 				07D2D632182D627E001D24BC /* NSManagedObjectModel+CDEAdditions.h in Headers */,
 				07BF7A5B177F0A9D0029D500 /* CDEGlobalIdentifier.h in Headers */,
 				07BF7A4A177F0A9D0029D500 /* CDEDefines.h in Headers */,
+				0701771118C2543D00C4DA01 /* CDEFileUploadOperation.h in Headers */,
 				07BF7A32177F0A9D0029D500 /* CDEPersistentStoreEnsemble.h in Headers */,
 				0722B26A17B76B2400496F4A /* CDERevisionSet.h in Headers */,
 				07973F07183BE44A007F48CA /* CDELocalCloudFileSystem.h in Headers */,
@@ -733,6 +740,7 @@
 				07BF7A43177F0A9D0029D500 /* CDEPropertyChangeValue.m in Sources */,
 				0701770A18C1EF7400C4DA01 /* CDEAsynchronousOperation.m in Sources */,
 				07897FF918B25880001E8A23 /* CDEDataFile.m in Sources */,
+				0701771218C2543D00C4DA01 /* CDEFileUploadOperation.m in Sources */,
 				07D2D633182D627E001D24BC /* NSManagedObjectModel+CDEAdditions.m in Sources */,
 				0722B26C17B76B2400496F4A /* CDERevisionSet.m in Sources */,
 				9477ED641800146900C2A419 /* CDERevisionManager.m in Sources */,

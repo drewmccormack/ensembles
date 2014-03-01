@@ -10,6 +10,8 @@
 #import "CDEFoundationAdditions.h"
 #import "CDECloudFile.h"
 #import "CDECloudDirectory.h"
+#import "CDEFileDownloadOperation.h"
+#import "CDEFileUploadOperation.h"
 
 @implementation CDENodeCloudFileSystem {
     NSOperationQueue *operationQueue;
@@ -151,8 +153,21 @@
 
 #pragma mark - Uploading and Downloading
 
-- (void)uploadLocalFile:(NSString *)fromPath toPath:(NSString *)toPath completion:(CDECompletionBlock)block
+- (void)uploadLocalFile:(NSString *)fromPath toPath:(NSString *)toPath completion:(CDECompletionBlock)completion
 {
+    NSURL *url = [self.baseURL URLByAppendingPathComponent:@"uploadurls" isDirectory:NO];
+    [self postJSONObject:@{@"paths" : @[toPath]} toURL:url completion:^(NSError *error, NSDictionary *responseDict) {
+        if (error) {
+            if (completion) completion(error);
+            return;
+        }
+        
+        NSArray *urls = responseDict[@"urls"];
+        NSURL *url = [NSURL URLWithString:urls.lastObject];
+        CDEFileUploadOperation *operation = [[CDEFileUploadOperation alloc] initWithURL:url localPath:fromPath];
+        operation.completion = completion;
+        [operationQueue addOperation:operation];
+    }];
 }
 
 - (void)downloadFromPath:(NSString *)fromPath toLocalFile:(NSString *)toPath completion:(CDECompletionBlock)completion
@@ -166,9 +181,9 @@
         
         NSArray *urls = responseDict[@"urls"];
         NSURL *url = [NSURL URLWithString:urls.lastObject];
-        [self sendRequestForURL:url HTTPMethod:@"GET" authenticate:NO contentType:nil body:nil completion:^(NSError *error, NSDictionary *responseDict) {
-            if (completion) completion(error);
-        }];
+        CDEFileDownloadOperation *operation = [[CDEFileDownloadOperation alloc] initWithURL:url localPath:toPath];
+        operation.completion = completion;
+        [operationQueue addOperation:operation];
     }];
 }
 
