@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0701770318C1EC4B00C4DA01 /* CDEFileDownloadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 0701770218C1EC4B00C4DA01 /* CDEFileDownloadOperation.m */; };
+		0701770618C1EDE700C4DA01 /* CDEAsynchronousOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 0701770518C1EDE700C4DA01 /* CDEAsynchronousOperation.m */; };
 		070D336318018A960054BA23 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 070D336218018A960054BA23 /* XCTest.framework */; };
 		070D336418018A960054BA23 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF374817F184DD00C56F64 /* Foundation.framework */; };
 		070D33A418018AAD0054BA23 /* CDEBasicIntegratorRelationshipTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D337618018AAD0054BA23 /* CDEBasicIntegratorRelationshipTests.m */; };
@@ -118,6 +120,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0701770118C1EC4B00C4DA01 /* CDEFileDownloadOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDEFileDownloadOperation.h; path = "Source/Cloud File Systems/CDEFileDownloadOperation.h"; sourceTree = SOURCE_ROOT; };
+		0701770218C1EC4B00C4DA01 /* CDEFileDownloadOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDEFileDownloadOperation.m; path = "Source/Cloud File Systems/CDEFileDownloadOperation.m"; sourceTree = SOURCE_ROOT; };
+		0701770418C1EDE700C4DA01 /* CDEAsynchronousOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEAsynchronousOperation.h; sourceTree = "<group>"; };
+		0701770518C1EDE700C4DA01 /* CDEAsynchronousOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEAsynchronousOperation.m; sourceTree = "<group>"; };
 		070D336118018A960054BA23 /* Tests iOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests iOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		070D336218018A960054BA23 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		070D337618018AAD0054BA23 /* CDEBasicIntegratorRelationshipTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEBasicIntegratorRelationshipTests.m; sourceTree = "<group>"; };
@@ -176,7 +182,7 @@
 		07973EFB183BE40A007F48CA /* CDEICloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDEICloudFileSystem.m; path = "Source/Cloud File Systems/CDEICloudFileSystem.m"; sourceTree = SOURCE_ROOT; };
 		07973EFC183BE40A007F48CA /* CDELocalCloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDELocalCloudFileSystem.h; path = "Source/Cloud File Systems/CDELocalCloudFileSystem.h"; sourceTree = SOURCE_ROOT; };
 		07973EFD183BE40A007F48CA /* CDELocalCloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDELocalCloudFileSystem.m; path = "Source/Cloud File Systems/CDELocalCloudFileSystem.m"; sourceTree = SOURCE_ROOT; };
-		07ABB5A118B245CF006FC638 /* CDEEventStoreModel_2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = file; path = CDEEventStoreModel_2.xcdatamodel; sourceTree = "<group>"; };
+		07ABB5A118B245CF006FC638 /* CDEEventStoreModel_2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_2.xcdatamodel; sourceTree = "<group>"; };
 		07ABB5A218B24A6B006FC638 /* CDEDataFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEDataFile.h; sourceTree = "<group>"; };
 		07ABB5A318B24A6B006FC638 /* CDEDataFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEDataFile.m; sourceTree = "<group>"; };
 		07BF374517F184DD00C56F64 /* libensembles_ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libensembles_ios.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -488,6 +494,8 @@
 				07BF379717F1853000C56F64 /* NSMapTable+CDEAdditions.m */,
 				07D2D639182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.h */,
 				07D2D63A182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.m */,
+				0701770418C1EDE700C4DA01 /* CDEAsynchronousOperation.h */,
+				0701770518C1EDE700C4DA01 /* CDEAsynchronousOperation.m */,
 			);
 			name = General;
 			path = Source/General;
@@ -533,6 +541,8 @@
 				07973EFB183BE40A007F48CA /* CDEICloudFileSystem.m */,
 				07973EFC183BE40A007F48CA /* CDELocalCloudFileSystem.h */,
 				07973EFD183BE40A007F48CA /* CDELocalCloudFileSystem.m */,
+				0701770118C1EC4B00C4DA01 /* CDEFileDownloadOperation.h */,
+				0701770218C1EC4B00C4DA01 /* CDEFileDownloadOperation.m */,
 			);
 			path = "Cloud File Systems";
 			sourceTree = SOURCE_ROOT;
@@ -687,7 +697,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0701770318C1EC4B00C4DA01 /* CDEFileDownloadOperation.m in Sources */,
 				07BF37BC17F1853000C56F64 /* CDEEventRevision.m in Sources */,
+				0701770618C1EDE700C4DA01 /* CDEAsynchronousOperation.m in Sources */,
 				07973EFE183BE40A007F48CA /* CDEICloudFileSystem.m in Sources */,
 				07BF37B917F1853000C56F64 /* CDEDefines.m in Sources */,
 				07BF37BF17F1853000C56F64 /* CDEObjectChange.m in Sources */,

@@ -9,6 +9,7 @@
 #import "DBMetadata.h"
 #import "CDEDefines.h"
 #import "CDEAsynchronousTaskQueue.h"
+#import "CDEAsynchronousOperation.h"
 #import "CDECloudFile.h"
 #import "CDECloudDirectory.h"
 
@@ -16,7 +17,7 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
 
 #pragma mark - File Operations
 
-@interface CDEDropboxOperation : NSOperation <DBRestClientDelegate>
+@interface CDEDropboxOperation : CDEAsynchronousOperation <DBRestClientDelegate>
 
 @property (readonly) DBSession *session;
 @property (readonly) DBRestClient *restClient;
@@ -182,9 +183,7 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
 @end
 
 
-@implementation CDEDropboxOperation {
-    BOOL isFinished, isExecuting;
-}
+@implementation CDEDropboxOperation
 
 @synthesize session = session;
 @synthesize restClient = restClient;
@@ -200,56 +199,10 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
     return self;
 }
 
-- (BOOL)isConcurrent
-{
-    return YES;
-}
-
-- (BOOL)isExecuting
-{
-    @synchronized (self) {
-        return isExecuting;
-    }
-}
-
-- (BOOL)isFinished
-{
-    @synchronized (self) {
-        return isFinished;
-    }
-}
-
-- (BOOL)setupForStart
-{
-    if (![NSThread isMainThread]) {
-        [self performSelectorOnMainThread:@selector(start) withObject:nil waitUntilDone:NO];
-        return NO;
-    }
-    
-    @synchronized (self) {
-        [self willChangeValueForKey:@"isFinished"];
-        [self willChangeValueForKey:@"isExecuting"];
-        isFinished = NO;
-        isExecuting = YES;
-        [self didChangeValueForKey:@"isExecuting"];
-        [self didChangeValueForKey:@"isFinished"];
-    }
-    
-    return YES;
-}
-
-- (void)tearDown
+- (void)endAsynchronousTask
 {
     [restClient cancelAllRequests];
-    
-    @synchronized (self) {
-        [self willChangeValueForKey:@"isFinished"];
-        [self willChangeValueForKey:@"isExecuting"];
-        isFinished = YES;
-        isExecuting = NO;
-        [self didChangeValueForKey:@"isExecuting"];
-        [self didChangeValueForKey:@"isFinished"];
-    }
+    [super endAsynchronousTask];
 }
 
 @end
@@ -274,11 +227,8 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
     return self;
 }
 
-- (void)start
+- (void)beginAsynchronousTask
 {
-    BOOL setup = [self setupForStart];
-    if (!setup) return;
-    
     fileExists = NO;
     isDirectory = NO;
     taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTask:^(CDEAsynchronousTaskCallbackBlock next) {
@@ -290,7 +240,7 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
         completion:^(NSError *error) {
             fileExistenceCallback(fileExists, isDirectory, error);
             retryCallbackBlock = NULL;
-            [self tearDown];
+            [self endAsynchronousTask];
         }];
     [taskQueue start];
 }
@@ -332,11 +282,8 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
     return self;
 }
 
-- (void)start
+- (void)beginAsynchronousTask
 {
-    BOOL setup = [self setupForStart];
-    if (!setup) return;
-    
     [self.restClient loadMetadata:path];
 }
 
@@ -365,13 +312,13 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
     directory.contents = contents;
     directoryContentsCallback(directory.contents, nil);
     
-    [self tearDown];
+    [self endAsynchronousTask];
 }
 
 - (void)restClient:(DBRestClient *)client loadMetadataFailedWithError:(NSError *)error
 {
     directoryContentsCallback(nil, error);
-    [self tearDown];
+    [self endAsynchronousTask];
 }
 
 @end
@@ -392,24 +339,21 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
     return self;
 }
 
-- (void)start
+- (void)beginAsynchronousTask
 {
-    BOOL setup = [self setupForStart];
-    if (!setup) return;
-    
     [self.restClient createFolder:self.path];
 }
 
 - (void)restClient:(DBRestClient *)client createdFolder:(DBMetadata *)folder
 {
     self.completionCallback(nil);
-    [self tearDown];
+    [self endAsynchronousTask];
 }
 
 - (void)restClient:(DBRestClient *)client createFolderFailedWithError:(NSError *)error
 {
     self.completionCallback(error);
-    [self tearDown];
+    [self endAsynchronousTask];
 }
 
 @end
@@ -429,24 +373,21 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
     return self;
 }
 
-- (void)start
+- (void)beginAsynchronousTask
 {
-    BOOL setup = [self setupForStart];
-    if (!setup) return;
-    
     [self.restClient deletePath:self.path];
 }
 
 - (void)restClient:(DBRestClient *)client deletedPath:(NSString *)path
 {
     self.completionCallback(nil);
-    [self tearDown];
+    [self endAsynchronousTask];
 }
 
 - (void)restClient:(DBRestClient *)client deletePathFailedWithError:(NSError *)error
 {
     self.completionCallback(error);
-    [self tearDown];
+    [self endAsynchronousTask];
 }
 
 @end
@@ -469,24 +410,21 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
     return self;
 }
 
-- (void)start
+- (void)beginAsynchronousTask
 {
-    BOOL setup = [self setupForStart];
-    if (!setup) return;
-    
     [self.restClient uploadFile:[toPath lastPathComponent] toPath:[toPath stringByDeletingLastPathComponent] withParentRev:nil fromPath:localPath];
 }
 
 - (void)restClient:(DBRestClient *)client uploadedFile:(NSString *)destPath from:(NSString *)srcPath
 {
     self.completionCallback(nil);
-    [self tearDown];
+    [self endAsynchronousTask];
 }
 
 - (void)restClient:(DBRestClient *)client uploadFileFailedWithError:(NSError *)error
 {
     self.completionCallback(error);
-    [self tearDown];
+    [self endAsynchronousTask];
 }
 
 @end
@@ -509,24 +447,21 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
     return self;
 }
 
-- (void)start
+- (void)beginAsynchronousTask
 {
-    BOOL setup = [self setupForStart];
-    if (!setup) return;
-    
     [self.restClient loadFile:fromPath atRev:nil intoPath:localPath];
 }
 
 - (void)restClient:(DBRestClient *)client loadedFile:(NSString *)destPath
 {
     self.completionCallback(nil);
-    [self tearDown];
+    [self endAsynchronousTask];
 }
 
 - (void)restClient:(DBRestClient *)client loadFileFailedWithError:(NSError *)error
 {
     self.completionCallback(error);
-    [self tearDown];
+    [self endAsynchronousTask];
 }
 
 @end

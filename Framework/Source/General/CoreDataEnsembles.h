@@ -7,6 +7,8 @@
 //
 
 #import "CDEAsynchronousTaskQueue.h"
+#import "CDEAsynchronousOperation.h"
+#import "CDEFileDownloadOperation.h"
 #import "CDECloudDirectory.h"
 #import "CDECloudFile.h"
 #import "CDECloudFileSystem.h"

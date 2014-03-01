@@ -11,7 +11,9 @@
 #import "CDECloudFile.h"
 #import "CDECloudDirectory.h"
 
-@implementation CDENodeCloudFileSystem
+@implementation CDENodeCloudFileSystem {
+    NSOperationQueue *operationQueue;
+}
 
 @synthesize username = username;
 @synthesize password = password;
@@ -24,6 +26,8 @@
     if (self) {
         baseURL = newBaseURL;
         loggedIn = NO;
+        operationQueue = [[NSOperationQueue alloc] init];
+        operationQueue.maxConcurrentOperationCount = 1;
     }
     return self;
 }
@@ -118,11 +122,11 @@
 
 #pragma mark - Creating Directories
 
-- (void)createDirectoryAtPath:(NSString *)path completion:(CDECompletionBlock)block
+- (void)createDirectoryAtPath:(NSString *)path completion:(CDECompletionBlock)completion
 {
     // S3 doesn't have directories, so just indicate success
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (block) block(nil);
+        if (completion) completion(nil);
     });
 }
 
@@ -151,8 +155,21 @@
 {
 }
 
-- (void)downloadFromPath:(NSString *)fromPath toLocalFile:(NSString *)toPath completion:(CDECompletionBlock)block
+- (void)downloadFromPath:(NSString *)fromPath toLocalFile:(NSString *)toPath completion:(CDECompletionBlock)completion
 {
+    NSURL *url = [self.baseURL URLByAppendingPathComponent:@"downloadurls" isDirectory:NO];
+    [self postJSONObject:@{@"paths" : @[fromPath]} toURL:url completion:^(NSError *error, NSDictionary *responseDict) {
+        if (error) {
+            if (completion) completion(error);
+            return;
+        }
+        
+        NSArray *urls = responseDict[@"urls"];
+        NSURL *url = [NSURL URLWithString:urls.lastObject];
+        [self sendRequestForURL:url HTTPMethod:@"GET" authenticate:NO contentType:nil body:nil completion:^(NSError *error, NSDictionary *responseDict) {
+            if (completion) completion(error);
+        }];
+    }];
 }
 
 #pragma mark - Requests
