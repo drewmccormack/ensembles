@@ -21,10 +21,10 @@ extern NSString * const IDMNodeS3Service;
 
 @property (strong, nonatomic) UIWindow *window;
 
-- (void)connectToSyncService:(NSString *)serviceId;
+- (void)connectToSyncService:(NSString *)serviceId withCompletion:(CDECompletionBlock)completion;
 - (void)disconnectFromSyncServiceWithCompletion:(CDECodeBlock)completion;
 
-- (void)synchronize;
+- (void)synchronizeWithCompletion:(CDECompletionBlock)completion;
 - (BOOL)canSynchronize;
 
 @end

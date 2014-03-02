@@ -80,7 +80,9 @@
 - (IBAction)sync:(id)sender
 {
     IDMAppDelegate *appDelegate = (id)[[UIApplication sharedApplication] delegate];
-    [appDelegate synchronize];
+    [appDelegate synchronizeWithCompletion:^(NSError *error) {
+        [self updateButtons];
+    }];
 }
 
 - (IBAction)toggleSyncEnabled:(id)sender
@@ -111,7 +113,9 @@
             service = IDMDropboxService;
         else if (buttonIndex == actionSheet.firstOtherButtonIndex+2)
             service = IDMNodeS3Service;
-        [appDelegate connectToSyncService:service];
+        [appDelegate connectToSyncService:service withCompletion:^(NSError *error){
+            [self updateButtons];
+        }];
         
         [self updateButtons];
         syncServiceActionSheet = nil;

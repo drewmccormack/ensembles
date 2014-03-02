@@ -453,8 +453,10 @@
         NSString *localPath = [self.localUploadDirectory stringByAppendingPathComponent:filename];
         CDEAsynchronousTaskBlock block = ^(CDEAsynchronousTaskCallbackBlock next) {
             dispatch_async(dispatch_get_main_queue(), ^{
+                CDELog(CDELoggingLevelVerbose, @"Uploading file to remote path: %@", remotePath);
                 [self.cloudFileSystem uploadLocalFile:localPath toPath:remotePath completion:^(NSError *error) {
                     [fileManager removeItemAtPath:localPath error:NULL];
+                    if (error) CDELog(CDELoggingLevelError, @"Failed file upload with error: %@", error);
                     next(error, NO);
                 }];
             });
@@ -716,6 +718,8 @@
 
 - (void)createRemoteDirectories:(NSArray *)paths withCompletion:(CDECompletionBlock)completion
 {
+    CDELog(CDELoggingLevelVerbose, @"Creating remote directories");
+
     NSMutableArray *taskBlocks = [NSMutableArray array];
     for (NSString *path in paths) {
         CDEAsynchronousTaskBlock block = ^(CDEAsynchronousTaskCallbackBlock next) {
@@ -750,6 +754,8 @@
 
 - (void)retrieveRegistrationInfoForStoreWithIdentifier:(NSString *)identifier completion:(void(^)(NSDictionary *info, NSError *error))completion
 {
+    CDELog(CDELoggingLevelVerbose, @"Retrieving registration info");
+    
     // Remove any existing files in the cache first
     NSError *error = nil;
     BOOL success = [self removeFilesInDirectory:self.localDownloadDirectory error:&error];
@@ -767,12 +773,14 @@
                 return;
             }
             
+            CDELog(CDELoggingLevelVerbose, @"Downloading file at remote path: %@", remotePath);
             [self.cloudFileSystem downloadFromPath:remotePath toLocalFile:localPath completion:^(NSError *error) {
                 NSDictionary *info = nil;
                 if (!error) {
                     info = [NSDictionary dictionaryWithContentsOfFile:localPath];
                     [fileManager removeItemAtPath:localPath error:NULL];
                 }
+                if (error) CDELog(CDELoggingLevelError, @"Download failed for with error: %@", error);
                 if (completion) completion(info, error);
             }];
         }];

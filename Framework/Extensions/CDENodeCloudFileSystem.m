@@ -13,6 +13,13 @@
 #import "CDEFileDownloadOperation.h"
 #import "CDEFileUploadOperation.h"
 
+@interface CDENodeCloudFileSystem ()
+
+@property (nonatomic, readwrite, assign, getter = isLoggedIn) BOOL loggedIn;
+
+@end
+
+
 @implementation CDENodeCloudFileSystem {
     NSOperationQueue *operationQueue;
 }
@@ -87,7 +94,7 @@
 {
     NSURL *url = [self.baseURL URLByAppendingPathComponent:@"login" isDirectory:NO];
     [self postJSONObject:nil toURL:url completion:^(NSError *error, NSDictionary *responseDict) {
-        loggedIn = !error;
+        self.loggedIn = (nil == error);
         if (completion) completion(error);
     }];
 }

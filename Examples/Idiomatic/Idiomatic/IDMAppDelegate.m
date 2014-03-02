@@ -93,7 +93,7 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
-    [self synchronize];
+    [self synchronizeWithCompletion:NULL];
 }
 
 #pragma mark - Persistent Store
@@ -128,12 +128,12 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 
 #pragma mark - Persistent Store Ensemble
 
-- (void)connectToSyncService:(NSString *)serviceId
+- (void)connectToSyncService:(NSString *)serviceId withCompletion:(CDECompletionBlock)completion
 {
     [[NSUserDefaults standardUserDefaults] setObject:serviceId forKey:IDMCloudServiceUserDefaultKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self setupEnsemble];
-    [self synchronize];
+    [self synchronizeWithCompletion:completion];
 }
 
 - (void)disconnectFromSyncServiceWithCompletion:(CDECodeBlock)completion
@@ -192,7 +192,7 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
     return cloudService != nil;
 }
 
-- (void)synchronize
+- (void)synchronizeWithCompletion:(CDECompletionBlock)completion
 {
     if (!self.canSynchronize) return;
     
@@ -201,13 +201,22 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
         [ensemble leechPersistentStoreWithCompletion:^(NSError *error) {
             [self decrementMergeCount];
             [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-            if (error) NSLog(@"Could not leech to ensemble: %@", error);
+            if (error) {
+                NSLog(@"Could not leech to ensemble: %@", error);
+                [self disconnectFromSyncServiceWithCompletion:^{
+                    if (completion) completion(error);
+                }];
+            }
+            else {
+                if (completion) completion(error);
+            }
         }];
     }
     else {
         [ensemble mergeWithCompletion:^(NSError *error) {
             [self decrementMergeCount];
             if (error) NSLog(@"Error merging: %@", error);
+            if (completion) completion(error);
         }];
     }
 }
@@ -242,6 +251,11 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 - (NSArray *)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble globalIdentifiersForManagedObjects:(NSArray *)objects
 {
     return [objects valueForKeyPath:@"uniqueIdentifier"];
+}
+
+- (void)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didDeleechWithError:(NSError *)error
+{
+    NSLog(@"Store did deleech with error: %@", error);
 }
 
 #pragma mark - Dropbox Session
