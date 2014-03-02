@@ -13,6 +13,7 @@
 
 @implementation CDEFileUploadOperation {
     NSURLConnection *connection;
+    NSError *responseError;
 }
 
 @synthesize url = url;
@@ -28,15 +29,19 @@
     if (self) {
         url = [newURL copy];
         localPath = [newPath copy];
+        responseError = nil;
         
-        request = [NSMutableURLRequest requestWithURL:url];
+        request = [NSMutableURLRequest requestWithURL:url
+            cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+            timeoutInterval:300.0];
         request.HTTPMethod = @"PUT";
         request.HTTPBodyStream = [NSInputStream inputStreamWithFileAtPath:localPath];
         
         NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:localPath error:NULL];
         unsigned long long result = attributes.fileSize;
         NSString *lengthAsString = [NSString stringWithFormat:@"%llu", result];
-        [request addValue:lengthAsString forHTTPHeaderField:@"Content-Length"];
+        [request setValue:lengthAsString forHTTPHeaderField:@"Content-Length"];
+        [request setValue:@"application/octet-stream" forHTTPHeaderField:@"Content-Type"];
     }
     return self;
 }
@@ -44,6 +49,24 @@
 - (void)beginAsynchronousTask
 {
     connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
+{
+    NSHTTPURLResponse *httpResponse = (id)response;
+    BOOL success = (httpResponse.statusCode >= 200 && httpResponse.statusCode < 300);
+    if (!success) {
+        CDELog(CDELoggingLevelError, @"Error uploading file. Response: %@", response);
+        NSDictionary *info = @{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Status code: %d", httpResponse.statusCode]};
+        responseError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeServerError userInfo:info];
+    }
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
+{
+    if (!responseError) return;
+    NSString *string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    CDELog(CDELoggingLevelError, @"Response XML: %@", string);
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
@@ -65,7 +88,7 @@
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-    if (completion) completion(nil);
+    if (completion) completion(responseError);
     [self endAsynchronousTask];
 }
 
