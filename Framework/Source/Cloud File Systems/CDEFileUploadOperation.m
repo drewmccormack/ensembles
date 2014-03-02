@@ -32,6 +32,11 @@
         request = [NSMutableURLRequest requestWithURL:url];
         request.HTTPMethod = @"PUT";
         request.HTTPBodyStream = [NSInputStream inputStreamWithFileAtPath:localPath];
+        
+        NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:localPath error:NULL];
+        unsigned long long result = attributes.fileSize;
+        NSString *lengthAsString = [NSString stringWithFormat:@"%llu", result];
+        [request addValue:lengthAsString forHTTPHeaderField:@"Content-Length"];
     }
     return self;
 }
