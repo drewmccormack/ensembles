@@ -20,7 +20,7 @@
     __weak IBOutlet UIBarButtonItem *syncButtonItem;
     __weak IBOutlet UIBarButtonItem *enableSyncButtonItem;
     UIActionSheet *syncServiceActionSheet;
-    id syncDidBeginNotif, syncDidEndNotif;
+    id syncDidBeginNotif, syncDidEndNotif, userDefaultsUpdateNotif;
     BOOL merging;
 }
 
@@ -48,6 +48,11 @@
         __strong typeof(self) strongSelf = weakSelf;
         if (!strongSelf) return;
         strongSelf->merging = NO;
+        [strongSelf updateButtons];
+    }];
+    userDefaultsUpdateNotif = [[NSNotificationCenter defaultCenter] addObserverForName:NSUserDefaultsDidChangeNotification object:nil queue:nil usingBlock:^(NSNotification *note) {
+        __strong typeof(self) strongSelf = weakSelf;
+        if (!strongSelf) return;
         [strongSelf updateButtons];
     }];
 }

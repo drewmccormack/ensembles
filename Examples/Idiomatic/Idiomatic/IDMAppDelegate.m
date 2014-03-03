@@ -139,14 +139,19 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 - (void)disconnectFromSyncServiceWithCompletion:(CDECodeBlock)completion
 {
     [ensemble deleechPersistentStoreWithCompletion:^(NSError *error) {
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:IDMCloudServiceUserDefaultKey];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        [dropboxSession unlinkAll];
-        dropboxSession = nil;
-        ensemble.delegate = nil;
-        ensemble = nil;
+        [self resetSync];
         if (completion) completion();
     }];
+}
+
+- (void)resetSync
+{
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:IDMCloudServiceUserDefaultKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [dropboxSession unlinkAll];
+    dropboxSession = nil;
+    ensemble.delegate = nil;
+    ensemble = nil;
 }
 
 - (void)setupEnsemble
@@ -256,6 +261,7 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 - (void)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didDeleechWithError:(NSError *)error
 {
     NSLog(@"Store did deleech with error: %@", error);
+    [self resetSync];
 }
 
 #pragma mark - Dropbox Session
