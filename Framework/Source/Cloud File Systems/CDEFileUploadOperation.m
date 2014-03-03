@@ -41,7 +41,6 @@
         unsigned long long result = attributes.fileSize;
         NSString *lengthAsString = [NSString stringWithFormat:@"%llu", result];
         [request setValue:lengthAsString forHTTPHeaderField:@"Content-Length"];
-        [request setValue:@"application/octet-stream" forHTTPHeaderField:@"Content-Type"];
     }
     return self;
 }

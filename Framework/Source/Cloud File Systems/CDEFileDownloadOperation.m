@@ -15,6 +15,7 @@
     NSFileManager *fileManager;
     NSFileHandle *fileHandle;
     NSURLConnection *connection;
+    NSError *responseError;
 }
 
 @synthesize url = url;
@@ -30,6 +31,7 @@
         url = [newURL copy];
         localPath = [newPath copy];
         fileManager = [[NSFileManager alloc] init];
+        responseError = nil;
     }
     return self;
 }
@@ -37,7 +39,16 @@
 - (void)beginAsynchronousTask
 {
     [fileManager removeItemAtPath:localPath error:NULL];
+    [fileManager createFileAtPath:localPath contents:nil attributes:nil];
     fileHandle = [NSFileHandle fileHandleForWritingAtPath:localPath];
+    
+    if (!fileHandle) {
+        NSDictionary *info = @{NSLocalizedDescriptionKey : @"Could not create local file for downloading"};
+        NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFileAccessFailed userInfo:info];
+        if (completion) completion(error);
+        [self endAsynchronousTask];
+        return;
+    }
     
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
@@ -68,10 +79,21 @@
     [fileHandle writeData:data];
 }
 
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
+{
+    NSHTTPURLResponse *httpResponse = (id)response;
+    BOOL success = (httpResponse.statusCode >= 200 && httpResponse.statusCode < 300);
+    if (!success) {
+        CDELog(CDELoggingLevelError, @"Error uploading file. Response: %@", response);
+        NSDictionary *info = @{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Status code: %d", httpResponse.statusCode]};
+        responseError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeServerError userInfo:info];
+    }
+}
+
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
     [fileHandle closeFile];
-    if (completion) completion(nil);
+    if (completion) completion(responseError);
     [self endAsynchronousTask];
 }
 
