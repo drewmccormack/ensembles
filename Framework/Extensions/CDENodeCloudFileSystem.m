@@ -129,7 +129,13 @@
 {
     NSURL *url = [self.baseURL URLByAppendingPathComponent:@"listdir" isDirectory:NO];
     [self postJSONObject:@{@"path":path} toURL:url completion:^(NSError *error, NSDictionary *responseDict) {
-        NSArray *files = responseDict[@"files"];
+        NSArray *filenames = responseDict[@"files"];
+        NSArray *files = [filenames cde_arrayByTransformingObjectsWithBlock:^CDECloudFile* (NSString *filename) {
+            CDECloudFile *file = [[CDECloudFile alloc] init];
+            file.name = filename;
+            file.path = [path stringByAppendingPathComponent:filename];
+            return file;
+        }];
         if (completion) completion(files, error);
     }];
 }
@@ -260,7 +266,7 @@
             if (completion) completion(nil, responseDict);
         }
         else {
-            NSDictionary *userInfo = @{NSLocalizedDescriptionKey : responseDict[@"error"]};
+            NSDictionary *userInfo = @{NSLocalizedDescriptionKey : responseDict ? responseDict[@"error"] : @"No response error"};
             error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeServerError userInfo:userInfo];
             if (completion) completion(error, nil);
         }
