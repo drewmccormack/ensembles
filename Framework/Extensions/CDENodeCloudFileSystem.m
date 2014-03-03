@@ -259,14 +259,16 @@
         }
         
         // Parse Body
-        NSDictionary *responseDict = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+        NSDictionary *responseDict = nil;
+        if (data) responseDict = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
         
         // Check for JSON error
-        if ([responseDict[@"success"] boolValue]) {
+        if (!data || (responseDict && [responseDict[@"success"] boolValue])) {
             if (completion) completion(nil, responseDict);
         }
         else {
-            NSDictionary *userInfo = @{NSLocalizedDescriptionKey : responseDict ? responseDict[@"error"] : @"No response error"};
+            NSString *message = responseDict ? responseDict[@"error"] : @"No response";
+            NSDictionary *userInfo = @{NSLocalizedDescriptionKey : message};
             error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeServerError userInfo:userInfo];
             if (completion) completion(error, nil);
         }
