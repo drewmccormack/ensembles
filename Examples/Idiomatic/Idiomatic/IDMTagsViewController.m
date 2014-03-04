@@ -111,18 +111,24 @@
 {
     if (syncServiceActionSheet == actionSheet) {
         IDMAppDelegate *appDelegate = (id)[[UIApplication sharedApplication] delegate];
+        
         NSString *service;
-        if (buttonIndex == actionSheet.firstOtherButtonIndex)
+        if (buttonIndex == actionSheet.firstOtherButtonIndex) {
             service = IDMICloudService;
-        else if (buttonIndex == actionSheet.firstOtherButtonIndex+1)
+        }
+        else if (buttonIndex == actionSheet.firstOtherButtonIndex+1) {
             service = IDMDropboxService;
-        else if (buttonIndex == actionSheet.firstOtherButtonIndex+2)
+        }
+        else if (buttonIndex == actionSheet.firstOtherButtonIndex+2) {
             service = IDMNodeS3Service;
+        }
+        
+        [self updateButtons];
+
         [appDelegate connectToSyncService:service withCompletion:^(NSError *error){
             [self updateButtons];
         }];
         
-        [self updateButtons];
         syncServiceActionSheet = nil;
     }
 }

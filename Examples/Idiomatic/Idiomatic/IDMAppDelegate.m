@@ -6,11 +6,10 @@
 //  Copyright (c) 2013 The Mental Faculty B.V. All rights reserved.
 //
 
+#import <Security/Security.h>
 #import <CoreData/CoreData.h>
 #import <DropboxSDK/DropboxSDK.h>
 
-#import "CoreDataEnsembles.h"
-#import "CDEICloudFileSystem.h"
 #import "CDEDropboxCloudFileSystem.h"
 #import "CDENodeCloudFileSystem.h"
 #import "IDMAppDelegate.h"
@@ -149,6 +148,7 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:IDMCloudServiceUserDefaultKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [dropboxSession unlinkAll];
+    [self clearNodePassword];
     dropboxSession = nil;
     ensemble.delegate = nil;
     ensemble = nil;
@@ -184,6 +184,8 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
         NSURL *url = [NSURL URLWithString:@"https://ensembles.herokuapp.com"];
         CDENodeCloudFileSystem *newNodeFileSystem = [[CDENodeCloudFileSystem alloc] initWithBaseURL:url];
         newNodeFileSystem.delegate = self;
+        newNodeFileSystem.username = @"drewmccormack@mac.com";
+        newNodeFileSystem.password = @"secret";
         newSystem = newNodeFileSystem;
     }
     return newSystem;
@@ -296,7 +298,49 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 
 - (void)nodeCloudFileSystem:(CDENodeCloudFileSystem *)fileSystem updateLoginCredentialsWithCompletion:(CDECompletionBlock)completion
 {
-    completion(nil);
+    [self.window.rootViewController performSegueWithIdentifier:@"NodeSyncSettingsSegue" sender:self];
+}
+
+#pragma mark - Storing Node Password in Keychain
+
+- (NSDictionary *)keychainQuery {
+    NSString *serviceName = @"com.mentalfaculty.ensembles.idiosync";
+    return @{
+        (__bridge id)kSecClass : (__bridge id)kSecClassGenericPassword,
+        (__bridge id)kSecAttrService : serviceName,
+        (__bridge id)kSecAttrAccount : serviceName,
+        (__bridge id)kSecAttrAccessible : (__bridge id)kSecAttrAccessibleAlways
+    };
+}
+
+- (void)storeNodePassword:(NSString *)newPassword
+{
+    NSMutableDictionary *keychainQuery = [[self keychainQuery] mutableCopy];
+    SecItemDelete((__bridge CFDictionaryRef)keychainQuery);
+    keychainQuery[(__bridge id)kSecValueData] = [newPassword dataUsingEncoding:NSUTF8StringEncoding];
+    SecItemAdd((__bridge CFDictionaryRef)keychainQuery, NULL);
+}
+
+- (NSString *)retrieveNodePassword
+{
+    NSMutableDictionary *keychainQuery = [[self keychainQuery] mutableCopy];
+    keychainQuery[(__bridge id)kSecReturnData] = @YES;
+    keychainQuery[(__bridge id)kSecMatchLimit] = (__bridge id)kSecMatchLimitOne;
+
+    NSString *result = nil;
+    CFDataRef data = NULL;
+    if (noErr == SecItemCopyMatching((__bridge CFDictionaryRef)keychainQuery, (CFTypeRef *)&data)) {
+        result = [[NSString alloc] initWithData:(__bridge id)data encoding:NSUTF8StringEncoding];
+    }
+    if (data) CFRelease(data);
+    
+    return result;
+}
+
+- (void)clearNodePassword
+{
+    NSDictionary *keychainQuery = [self keychainQuery];
+    SecItemDelete((__bridge CFDictionaryRef)keychainQuery);
 }
 
 @end
