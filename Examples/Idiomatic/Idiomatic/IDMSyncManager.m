@@ -277,11 +277,11 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 - (NSDictionary *)keychainQuery {
     NSString *serviceName = @"com.mentalfaculty.ensembles.idiosync";
     return @{
-             (__bridge id)kSecClass : (__bridge id)kSecClassGenericPassword,
-             (__bridge id)kSecAttrService : serviceName,
-             (__bridge id)kSecAttrAccount : serviceName,
-             (__bridge id)kSecAttrAccessible : (__bridge id)kSecAttrAccessibleAlways
-             };
+        (__bridge id)kSecClass : (__bridge id)kSecClassGenericPassword,
+        (__bridge id)kSecAttrService : serviceName,
+        (__bridge id)kSecAttrAccount : serviceName,
+        (__bridge id)kSecAttrAccessible : (__bridge id)kSecAttrAccessibleAlways
+    };
 }
 
 - (void)storeNodePassword:(NSString *)newPassword

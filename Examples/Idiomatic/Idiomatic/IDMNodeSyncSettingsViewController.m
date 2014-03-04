@@ -36,7 +36,7 @@ NSString * const IDMNodeCredentialsDidChangeNotification = @"IDMNodeCredentialsD
         self.nodeFileSystem.username = self.emailTextField.text;
         self.nodeFileSystem.password = self.signInPasswordTextField.text;
         [[IDMSyncManager sharedSyncManager] storeNodeCredentials];
-        
+        [self dismissViewControllerAnimated:YES completion:NULL];
     }
     else if (cell == signUpCell) {
         

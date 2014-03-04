@@ -246,8 +246,8 @@
     if (contentType) [request setValue:contentType forHTTPHeaderField:@"Content-Type"];
     
     // Basic Auth
-    if (authenticate) {
-        NSString *authString = [NSString stringWithFormat:@"%@:%@", (self.username ? : @""), (self.password ? : @"")];
+    if (authenticate && self.username.length > 0 && self.password.length > 0) {
+        NSString *authString = [NSString stringWithFormat:@"%@:%@", self.username, self.password];
         NSData *authData = [authString dataUsingEncoding:NSUTF8StringEncoding];
         NSString *base64AuthString = [authData cde_base64String];
         NSString *authValue = [NSString stringWithFormat:@"Basic %@", base64AuthString];
@@ -257,7 +257,9 @@
     // Send request
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
         // Check error
-        if (error) {
+        BOOL isAuthError = NO;
+        if (error) isAuthError = ([error.domain isEqualToString:NSURLErrorDomain] && error.code == NSURLErrorUserCancelledAuthentication);
+        if (error && !isAuthError) {
             if (completion) completion(error, nil);
             return;
         }
@@ -266,7 +268,7 @@
         NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
 		NSInteger statusCode = httpResponse.statusCode;
         BOOL statusOK = (statusCode >= 200 && statusCode < 300);
-        BOOL authFailed = (statusCode == 401);
+        BOOL authFailed = (statusCode == 401 || isAuthError);
         if (authFailed) self.password = nil;
         if (!statusOK) {
             NSInteger code = authFailed ? CDEErrorCodeAuthenticationFailure : CDEErrorCodeServerError;
