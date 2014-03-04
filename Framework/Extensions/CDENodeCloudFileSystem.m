@@ -205,6 +205,24 @@
     }];
 }
 
+#pragma mark - Passwords
+
+- (void)resetPasswordWithCompletion:(CDECompletionBlock)completion
+{
+    NSURL *url = [self.baseURL URLByAppendingPathComponent:@"resetpassword" isDirectory:NO];
+    [self postJSONObject:@{@"email" : (self.username ? : @"")} toURL:url completion:^(NSError *error, NSDictionary *responseDict) {
+        if (completion) completion(error);
+    }];
+}
+
+- (void)changePasswordTo:(NSString *)newPassword withCompletion:(CDECompletionBlock)completion
+{
+    NSURL *url = [self.baseURL URLByAppendingPathComponent:@"resetpassword" isDirectory:NO];
+    [self postJSONObject:@{@"newpassword" : (newPassword ? : @"")} toURL:url completion:^(NSError *error, NSDictionary *responseDict) {
+        if (completion) completion(error);
+    }];
+}
+
 #pragma mark - Requests
 
 - (void)postJSONObject:(id)JSONObject toURL:(NSURL *)url completion:(void(^)(NSError *error, NSDictionary *responseDict))completion
@@ -229,7 +247,7 @@
     
     // Basic Auth
     if (authenticate) {
-        NSString *authString = [NSString stringWithFormat:@"%@:%@", self.username, self.password];
+        NSString *authString = [NSString stringWithFormat:@"%@:%@", (self.username ? : @""), (self.password ? : @"")];
         NSData *authData = [authString dataUsingEncoding:NSUTF8StringEncoding];
         NSString *base64AuthString = [authData cde_base64String];
         NSString *authValue = [NSString stringWithFormat:@"Basic %@", base64AuthString];
