@@ -6,30 +6,13 @@
 //  Copyright (c) 2013 The Mental Faculty B.V. All rights reserved.
 //
 
-#import <Security/Security.h>
 #import <CoreData/CoreData.h>
-#import <DropboxSDK/DropboxSDK.h>
-
-#import "CDEDropboxCloudFileSystem.h"
-#import "CDENodeCloudFileSystem.h"
 #import "IDMAppDelegate.h"
 #import "IDMNotesViewController.h"
 #import "IDMTagsViewController.h"
+#import "IDMSyncManager.h"
 
-NSString * const IDMSyncActivityDidBeginNotification = @"IDMSyncActivityDidBegin";
-NSString * const IDMSyncActivityDidEndNotification = @"IDMSyncActivityDidEnd";
-
-NSString * const IDMCloudServiceUserDefaultKey = @"IDMCloudServiceUserDefaultKey";
-NSString * const IDMICloudService = @"icloud";
-NSString * const IDMDropboxService = @"dropbox";
-NSString * const IDMNodeS3Service = @"node";
-
-// Set these with your account details
-NSString * const IDMICloudContainerIdentifier = @"P7BXV6PHLD.com.mentalfaculty.idiomatic";
-NSString * const IDMDropboxAppKey = @"fjgu077wm7qffv0";
-NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
-
-@interface IDMAppDelegate () <CDEPersistentStoreEnsembleDelegate, DBSessionDelegate, CDEDropboxCloudFileSystemDelegate, CDENodeCloudFileSystemDelegate>
+@interface IDMAppDelegate ()
 
 @property (nonatomic, readonly) NSURL *storeDirectoryURL;
 @property (nonatomic, readonly) NSURL *storeURL;
@@ -37,12 +20,8 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 @end
 
 @implementation IDMAppDelegate {
+    IDMTagsViewController *tagsController;
     NSManagedObjectContext *managedObjectContext;
-    CDEPersistentStoreEnsemble *ensemble;
-    CDEICloudFileSystem *cloudFileSystem;
-    NSUInteger activeMergeCount;
-    CDECompletionBlock dropboxLinkSessionCompletion;
-    DBSession *dropboxSession;
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -54,13 +33,16 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
     [[NSFileManager defaultManager] createDirectoryAtURL:self.storeDirectoryURL withIntermediateDirectories:YES attributes:nil error:NULL];
     [self setupContext];
     
-    // Setup Ensemble
-    [self setupEnsemble];
+    // Setup Sync Manager
+    IDMSyncManager *syncManager = [IDMSyncManager sharedSyncManager];
+    syncManager.managedObjectContext = managedObjectContext;
+    syncManager.storePath = self.storeURL.path;
+    [syncManager setup];
     
     // Setup UI
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     UINavigationController *navController = (id)self.window.rootViewController;
-    IDMTagsViewController *tagsController = (id)navController.topViewController;
+    tagsController = (id)navController.topViewController;
     IDMNotesViewController *notesController = [storyboard instantiateViewControllerWithIdentifier:@"NotesViewController"];
     [navController pushViewController:notesController animated:NO];
     
@@ -80,10 +62,7 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
                 [managedObjectContext save:NULL];
             }
             
-            [self incrementMergeCount];
-            [ensemble mergeWithCompletion:^(NSError *error) {
-                [self decrementMergeCount];
-                if (error) NSLog(@"Error merging: %@", error);
+            [[IDMSyncManager sharedSyncManager] synchronizeWithCompletion:^(NSError *error) {
                 [[UIApplication sharedApplication] endBackgroundTask:identifier];
             }];
         }];
@@ -92,10 +71,15 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
-    [self synchronizeWithCompletion:NULL];
+    [[IDMSyncManager sharedSyncManager] synchronizeWithCompletion:NULL];
 }
 
-#pragma mark - Persistent Store
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url
+{
+    return [[IDMSyncManager sharedSyncManager] handleOpenURL:url];
+}
+
+#pragma mark - Core Data Stack
 
 - (void)setupContext
 {
@@ -123,224 +107,6 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 {
     NSURL *storeURL = [self.storeDirectoryURL URLByAppendingPathComponent:@"store.sqlite"];
     return storeURL;
-}
-
-#pragma mark - Persistent Store Ensemble
-
-- (void)connectToSyncService:(NSString *)serviceId withCompletion:(CDECompletionBlock)completion
-{
-    [[NSUserDefaults standardUserDefaults] setObject:serviceId forKey:IDMCloudServiceUserDefaultKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    [self setupEnsemble];
-    [self synchronizeWithCompletion:completion];
-}
-
-- (void)disconnectFromSyncServiceWithCompletion:(CDECodeBlock)completion
-{
-    [ensemble deleechPersistentStoreWithCompletion:^(NSError *error) {
-        [self resetSync];
-        if (completion) completion();
-    }];
-}
-
-- (void)resetSync
-{
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:IDMCloudServiceUserDefaultKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    [dropboxSession unlinkAll];
-    [self clearNodePassword];
-    dropboxSession = nil;
-    ensemble.delegate = nil;
-    ensemble = nil;
-}
-
-- (void)setupEnsemble
-{
-    if (!self.canSynchronize) return;
-    
-    cloudFileSystem = [self makeCloudFileSystem];
-    if (!cloudFileSystem) return;
-    
-    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"Model" withExtension:@"momd"];
-    ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"MainStore" persistentStorePath:self.storeURL.path managedObjectModelURL:modelURL cloudFileSystem:cloudFileSystem];
-    ensemble.delegate = self;
-}
-
-- (id <CDECloudFileSystem>)makeCloudFileSystem
-{
-    NSString *cloudService = [[NSUserDefaults standardUserDefaults] stringForKey:IDMCloudServiceUserDefaultKey];
-    id <CDECloudFileSystem> newSystem = nil;
-    if ([cloudService isEqualToString:IDMICloudService]) {
-        newSystem = [[CDEICloudFileSystem alloc] initWithUbiquityContainerIdentifier:IDMICloudContainerIdentifier];
-    }
-    else if ([cloudService isEqualToString:IDMDropboxService]) {
-        dropboxSession = [[DBSession alloc] initWithAppKey:IDMDropboxAppKey appSecret:IDMDropboxAppSecret root:kDBRootAppFolder];
-        dropboxSession.delegate = self;
-        CDEDropboxCloudFileSystem *newDropboxSystem = [[CDEDropboxCloudFileSystem alloc] initWithSession:dropboxSession];
-        newDropboxSystem.delegate = self;
-        newSystem = newDropboxSystem;
-    }
-    else if ([cloudService isEqualToString:IDMNodeS3Service]) {
-        NSURL *url = [NSURL URLWithString:@"https://ensembles.herokuapp.com"];
-        CDENodeCloudFileSystem *newNodeFileSystem = [[CDENodeCloudFileSystem alloc] initWithBaseURL:url];
-        newNodeFileSystem.delegate = self;
-        newNodeFileSystem.username = @"drewmccormack@mac.com";
-        newNodeFileSystem.password = @"secret";
-        newSystem = newNodeFileSystem;
-    }
-    return newSystem;
-}
-
-#pragma mark - Sync Methods
-
-- (BOOL)canSynchronize
-{
-    NSString *cloudService = [[NSUserDefaults standardUserDefaults] stringForKey:IDMCloudServiceUserDefaultKey];
-    return cloudService != nil;
-}
-
-- (void)synchronizeWithCompletion:(CDECompletionBlock)completion
-{
-    if (!self.canSynchronize) return;
-    
-    [self incrementMergeCount];
-    if (!ensemble.isLeeched) {
-        [ensemble leechPersistentStoreWithCompletion:^(NSError *error) {
-            [self decrementMergeCount];
-            [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-            if (error) {
-                NSLog(@"Could not leech to ensemble: %@", error);
-                [self disconnectFromSyncServiceWithCompletion:^{
-                    if (completion) completion(error);
-                }];
-            }
-            else {
-                if (completion) completion(error);
-            }
-        }];
-    }
-    else {
-        [ensemble mergeWithCompletion:^(NSError *error) {
-            [self decrementMergeCount];
-            if (error) NSLog(@"Error merging: %@", error);
-            if (completion) completion(error);
-        }];
-    }
-}
-
-- (void)decrementMergeCount
-{
-    activeMergeCount--;
-    if (activeMergeCount == 0) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:IDMSyncActivityDidEndNotification object:nil];
-        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-    }
-}
-
-- (void)incrementMergeCount
-{
-    activeMergeCount++;
-    if (activeMergeCount == 1) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:IDMSyncActivityDidBeginNotification object:nil];
-        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-    }
-}
-
-#pragma mark - Persistent Store Ensemble Delegate
-
-- (void)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didSaveMergeChangesWithNotification:(NSNotification *)notification
-{
-    [managedObjectContext performBlock:^{
-        [managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
-    }];
-}
-
-- (NSArray *)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble globalIdentifiersForManagedObjects:(NSArray *)objects
-{
-    return [objects valueForKeyPath:@"uniqueIdentifier"];
-}
-
-- (void)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didDeleechWithError:(NSError *)error
-{
-    NSLog(@"Store did deleech with error: %@", error);
-    [self resetSync];
-}
-
-#pragma mark - Dropbox Session
-
-- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
-	if ([dropboxSession handleOpenURL:url]) {
-		if ([dropboxSession isLinked]) {
-            if (dropboxLinkSessionCompletion) dropboxLinkSessionCompletion(nil);
-		}
-        else {
-            NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeAuthenticationFailure userInfo:nil];
-            if (dropboxLinkSessionCompletion) dropboxLinkSessionCompletion(error);
-        }
-        dropboxLinkSessionCompletion = NULL;
-		return YES;
-	}
-	
-	return NO;
-}
-
-- (void)linkSessionForDropboxCloudFileSystem:(CDEDropboxCloudFileSystem *)fileSystem completion:(CDECompletionBlock)completion
-{
-    dropboxLinkSessionCompletion = [completion copy];
-    [dropboxSession linkFromController:self.window.rootViewController];
-}
-
-- (void)sessionDidReceiveAuthorizationFailure:(DBSession*)session userId:(NSString *)userId
-{
-}
-
-#pragma mark - Node Server Delegate Methods
-
-- (void)nodeCloudFileSystem:(CDENodeCloudFileSystem *)fileSystem updateLoginCredentialsWithCompletion:(CDECompletionBlock)completion
-{
-    [self.window.rootViewController performSegueWithIdentifier:@"NodeSyncSettingsSegue" sender:self];
-}
-
-#pragma mark - Storing Node Password in Keychain
-
-- (NSDictionary *)keychainQuery {
-    NSString *serviceName = @"com.mentalfaculty.ensembles.idiosync";
-    return @{
-        (__bridge id)kSecClass : (__bridge id)kSecClassGenericPassword,
-        (__bridge id)kSecAttrService : serviceName,
-        (__bridge id)kSecAttrAccount : serviceName,
-        (__bridge id)kSecAttrAccessible : (__bridge id)kSecAttrAccessibleAlways
-    };
-}
-
-- (void)storeNodePassword:(NSString *)newPassword
-{
-    NSMutableDictionary *keychainQuery = [[self keychainQuery] mutableCopy];
-    SecItemDelete((__bridge CFDictionaryRef)keychainQuery);
-    keychainQuery[(__bridge id)kSecValueData] = [newPassword dataUsingEncoding:NSUTF8StringEncoding];
-    SecItemAdd((__bridge CFDictionaryRef)keychainQuery, NULL);
-}
-
-- (NSString *)retrieveNodePassword
-{
-    NSMutableDictionary *keychainQuery = [[self keychainQuery] mutableCopy];
-    keychainQuery[(__bridge id)kSecReturnData] = @YES;
-    keychainQuery[(__bridge id)kSecMatchLimit] = (__bridge id)kSecMatchLimitOne;
-
-    NSString *result = nil;
-    CFDataRef data = NULL;
-    if (noErr == SecItemCopyMatching((__bridge CFDictionaryRef)keychainQuery, (CFTypeRef *)&data)) {
-        result = [[NSString alloc] initWithData:(__bridge id)data encoding:NSUTF8StringEncoding];
-    }
-    if (data) CFRelease(data);
-    
-    return result;
-}
-
-- (void)clearNodePassword
-{
-    NSDictionary *keychainQuery = [self keychainQuery];
-    SecItemDelete((__bridge CFDictionaryRef)keychainQuery);
 }
 
 @end

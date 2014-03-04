@@ -7,6 +7,8 @@
 //
 
 #import "IDMTagsViewController.h"
+#import "IDMSyncManager.h"
+#import "IDMNodeSyncSettingsViewController.h"
 #import "IDMNotesViewController.h"
 #import "IDMAppDelegate.h"
 #import "IDMTag.h"
@@ -17,6 +19,7 @@
 
 @implementation IDMTagsViewController {
     NSFetchedResultsController *tagsController;
+    IDMNodeSyncSettingsViewController *nodeSyncSettingsController;
     __weak IBOutlet UIBarButtonItem *syncButtonItem;
     __weak IBOutlet UIBarButtonItem *enableSyncButtonItem;
     UIActionSheet *syncServiceActionSheet;
@@ -74,9 +77,9 @@
 
 - (void)updateButtons
 {
-    IDMAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
-    syncButtonItem.enabled = appDelegate.canSynchronize && !merging;
-    enableSyncButtonItem.title = appDelegate.canSynchronize ? @"Disable Sync" : @"Enable Sync";
+    IDMSyncManager *syncManager = [IDMSyncManager sharedSyncManager];
+    syncButtonItem.enabled = syncManager.canSynchronize && !merging;
+    enableSyncButtonItem.title = syncManager.canSynchronize ? @"Disable Sync" : @"Enable Sync";
     enableSyncButtonItem.enabled = !merging;
 }
 
@@ -84,19 +87,19 @@
 
 - (IBAction)sync:(id)sender
 {
-    IDMAppDelegate *appDelegate = (id)[[UIApplication sharedApplication] delegate];
-    [appDelegate synchronizeWithCompletion:^(NSError *error) {
+    IDMSyncManager *syncManager = [IDMSyncManager sharedSyncManager];
+    [syncManager synchronizeWithCompletion:^(NSError *error) {
         [self updateButtons];
     }];
 }
 
 - (IBAction)toggleSyncEnabled:(id)sender
 {
-    IDMAppDelegate *appDelegate = (id)[[UIApplication sharedApplication] delegate];
-    if (appDelegate.canSynchronize) {
+    IDMSyncManager *syncManager = [IDMSyncManager sharedSyncManager];
+    if (syncManager.canSynchronize) {
         enableSyncButtonItem.enabled = NO;
         syncButtonItem.enabled = NO;
-        [appDelegate disconnectFromSyncServiceWithCompletion:^{
+        [syncManager disconnectFromSyncServiceWithCompletion:^{
             [self updateButtons];
         }];
     }
@@ -110,7 +113,6 @@
 - (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
     if (syncServiceActionSheet == actionSheet) {
-        IDMAppDelegate *appDelegate = (id)[[UIApplication sharedApplication] delegate];
         
         NSString *service;
         if (buttonIndex == actionSheet.firstOtherButtonIndex) {
@@ -125,7 +127,8 @@
         
         [self updateButtons];
 
-        [appDelegate connectToSyncService:service withCompletion:^(NSError *error){
+        IDMSyncManager *syncManager = [IDMSyncManager sharedSyncManager];
+        [syncManager connectToSyncService:service withCompletion:^(NSError *error){
             [self updateButtons];
         }];
         
@@ -139,6 +142,13 @@
     return tagsController.fetchedObjects[row-1];
 }
 
+- (IBAction)showNodeServerSettings:(id)sender
+{
+    [self performSegueWithIdentifier:@"NodeSyncSettingsSegue" sender:self];
+}
+
+#pragma mark - Segues
+
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
 {
     if ([segue.identifier isEqualToString:@"ToNotes"]) {
@@ -146,6 +156,9 @@
         notesController.managedObjectContext = self.managedObjectContext;
         NSUInteger row = [[self.tableView indexPathForCell:sender] row];
         notesController.tag = [self tagAtRow:row];
+    }
+    else if ([segue.identifier isEqualToString:@"NodeSyncSettingsSegue"]) {
+        nodeSyncSettingsController = (id)[(id)segue.destinationViewController topViewController];
     }
 }
 

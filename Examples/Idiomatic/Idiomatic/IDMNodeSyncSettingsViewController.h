@@ -10,6 +10,8 @@
 
 @class CDENodeCloudFileSystem;
 
+extern NSString * const IDMNodeCredentialsDidChangeNotification;
+
 @interface IDMNodeSyncSettingsViewController : UITableViewController
 
 @property (nonatomic, readwrite, strong) CDENodeCloudFileSystem *nodeFileSystem;

@@ -7,6 +7,10 @@
 //
 
 #import "IDMNodeSyncSettingsViewController.h"
+#import "CDENodeCloudFileSystem.h"
+#import "IDMSyncManager.h"
+
+NSString * const IDMNodeCredentialsDidChangeNotification = @"IDMNodeCredentialsDidChangeNotification";
 
 @interface IDMNodeSyncSettingsViewController ()
 
@@ -29,6 +33,9 @@
 {
     UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
     if (cell == signInCell) {
+        self.nodeFileSystem.username = self.emailTextField.text;
+        self.nodeFileSystem.password = self.signInPasswordTextField.text;
+        [[IDMSyncManager sharedSyncManager] storeNodeCredentials];
         
     }
     else if (cell == signUpCell) {
