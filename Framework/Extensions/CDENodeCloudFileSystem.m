@@ -217,7 +217,7 @@
 
 - (void)changePasswordTo:(NSString *)newPassword withCompletion:(CDECompletionBlock)completion
 {
-    NSURL *url = [self.baseURL URLByAppendingPathComponent:@"resetpassword" isDirectory:NO];
+    NSURL *url = [self.baseURL URLByAppendingPathComponent:@"changepassword" isDirectory:NO];
     [self postJSONObject:@{@"newpassword" : (newPassword ? : @"")} toURL:url completion:^(NSError *error, NSDictionary *responseDict) {
         if (completion) completion(error);
     }];
