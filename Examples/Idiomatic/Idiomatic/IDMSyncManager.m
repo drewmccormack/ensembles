@@ -240,6 +240,7 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 
 - (void)nodeCloudFileSystem:(CDENodeCloudFileSystem *)fileSystem updateLoginCredentialsWithCompletion:(CDECompletionBlock)completion
 {
+    [self decrementMergeCount];
     [self clearNodePassword];
     nodeCredentialUpdateCompletion = [completion copy];
 
@@ -257,6 +258,8 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 
 - (void)storeNodeCredentials
 {
+    [self incrementMergeCount];
+
     CDENodeCloudFileSystem *nodeFileSystem = (id)self.ensemble.cloudFileSystem;
     NSString *email = nodeFileSystem.username;
     NSString *password = nodeFileSystem.password;
@@ -270,6 +273,15 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
         error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeAuthenticationFailure userInfo:info];
     }
     
+    if (nodeCredentialUpdateCompletion) nodeCredentialUpdateCompletion(error);
+    nodeCredentialUpdateCompletion = NULL;
+}
+
+- (void)cancelNodeCredentialsUpdate
+{
+    [self incrementMergeCount];
+
+    NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeCancelled userInfo:nil];
     if (nodeCredentialUpdateCompletion) nodeCredentialUpdateCompletion(error);
     nodeCredentialUpdateCompletion = NULL;
 }

@@ -33,6 +33,7 @@
 
 - (void)loginWithCompletion:(CDECompletionBlock)completion;
 
+- (void)signUpWithCompletion:(CDECompletionBlock)completion;
 - (void)resetPasswordWithCompletion:(CDECompletionBlock)completion;
 - (void)changePasswordTo:(NSString *)newPassword withCompletion:(CDECompletionBlock)completion;
 

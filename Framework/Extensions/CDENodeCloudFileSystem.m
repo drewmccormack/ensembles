@@ -205,6 +205,16 @@
     }];
 }
 
+#pragma mark - Signing Up New User
+
+- (void)signUpWithCompletion:(CDECompletionBlock)completion
+{
+    NSURL *url = [self.baseURL URLByAppendingPathComponent:@"createuser" isDirectory:NO];
+    [self postJSONObject:@{@"email" : (self.username ? : @""), @"password" : (self.password ? : @"")} toURL:url completion:^(NSError *error, NSDictionary *responseDict) {
+        if (completion) completion(error);
+    }];
+}
+
 #pragma mark - Passwords
 
 - (void)resetPasswordWithCompletion:(CDECompletionBlock)completion
@@ -219,6 +229,7 @@
 {
     NSURL *url = [self.baseURL URLByAppendingPathComponent:@"changepassword" isDirectory:NO];
     [self postJSONObject:@{@"newpassword" : (newPassword ? : @"")} toURL:url completion:^(NSError *error, NSDictionary *responseDict) {
+        if (!error) self.password = newPassword;
         if (completion) completion(error);
     }];
 }

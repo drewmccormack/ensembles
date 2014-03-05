@@ -16,4 +16,6 @@ extern NSString * const IDMNodeCredentialsDidChangeNotification;
 
 @property (nonatomic, readwrite, strong) CDENodeCloudFileSystem *nodeFileSystem;
 
+- (IBAction)cancel:(id)sender;
+
 @end

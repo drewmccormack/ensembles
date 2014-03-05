@@ -37,5 +37,6 @@ extern NSString * const IDMNodeS3Service;
 - (BOOL)handleOpenURL:(NSURL *)url;
 
 - (void)storeNodeCredentials;
+- (void)cancelNodeCredentialsUpdate;
 
 @end
