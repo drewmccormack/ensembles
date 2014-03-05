@@ -294,7 +294,7 @@
         if (data) responseDict = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
         
         // Check for JSON error
-        if (!data || (responseDict && [responseDict[@"success"] boolValue])) {
+        if (data.length == 0 || (responseDict && [responseDict[@"success"] boolValue])) {
             if (completion) completion(nil, responseDict);
         }
         else {
