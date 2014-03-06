@@ -1,5 +1,5 @@
 //
-//  CDESyncEngine.m
+//  CDEPersistentStoreEnsemble.m
 //  Ensembles
 //
 //  Created by Drew McCormack on 4/11/13.
