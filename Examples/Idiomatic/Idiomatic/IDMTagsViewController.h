@@ -18,4 +18,6 @@
 - (IBAction)sync:(id)sender;
 - (IBAction)toggleSyncEnabled:(id)sender;
 
+- (IBAction)showNodeServerSettings:(id)sender;
+
 @end

@@ -9,6 +9,9 @@
 #import <Foundation/Foundation.h>
 #import "CDEDefines.h"
 
+typedef void (^CDEFileExistenceCallback)(BOOL exists, BOOL isDirectory, NSError *error);
+typedef void (^CDEDirectoryContentsCallback)(NSArray *contents, NSError *error);
+
 @protocol CDECloudFileSystem <NSObject>
 
 @required
@@ -17,10 +20,10 @@
 
 - (void)connect:(CDECompletionBlock)completion;
 
-- (void)fileExistsAtPath:(NSString *)path completion:(void(^)(BOOL exists, BOOL isDirectory, NSError *error))block;
+- (void)fileExistsAtPath:(NSString *)path completion:(CDEFileExistenceCallback)block;
 
 - (void)createDirectoryAtPath:(NSString *)path completion:(CDECompletionBlock)block;
-- (void)contentsOfDirectoryAtPath:(NSString *)path completion:(void(^)(NSArray *contents, NSError *error))block;
+- (void)contentsOfDirectoryAtPath:(NSString *)path completion:(CDEDirectoryContentsCallback)block;
 
 - (void)removeItemAtPath:(NSString *)fromPath completion:(CDECompletionBlock)block;
 

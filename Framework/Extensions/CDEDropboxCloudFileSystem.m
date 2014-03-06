@@ -9,18 +9,15 @@
 #import "DBMetadata.h"
 #import "CDEDefines.h"
 #import "CDEAsynchronousTaskQueue.h"
+#import "CDEAsynchronousOperation.h"
 #import "CDECloudFile.h"
 #import "CDECloudDirectory.h"
 
-typedef void (^CDEFileExistenceCallback)(BOOL exists, BOOL isDirectory, NSError *error);
-typedef void (^CDEDirectoryContentsCallback)(NSArray *contents, NSError *error);
-
-const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
-
+static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
 
 #pragma mark - File Operations
 
-@interface CDEDropboxOperation : NSOperation <DBRestClientDelegate>
+@interface CDEDropboxOperation : CDEAsynchronousOperation <DBRestClientDelegate>
 
 @property (readonly) DBSession *session;
 @property (readonly) DBRestClient *restClient;
@@ -58,24 +55,6 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
 @property (readonly) CDECompletionBlock completionCallback;
 
 - (id)initWithSession:(DBSession *)newSession path:(NSString *)newPath completionCallback:(CDECompletionBlock)block;
-
-@end
-
-@interface CDEDropboxMoveItemOperation : CDEDropboxOperation
-
-@property (readonly) NSString *fromPath, *toPath;
-@property (readonly) CDECompletionBlock completionCallback;
-
-- (id)initWithSession:(DBSession *)newSession fromPath:(NSString *)newFromPath toPath:(NSString *)newToPath completionCallback:(CDECompletionBlock)block;
-
-@end
-
-@interface CDEDropboxCopyItemOperation : CDEDropboxOperation
-
-@property (readonly) NSString *fromPath, *toPath;
-@property (readonly) CDECompletionBlock completionCallback;
-
-- (id)initWithSession:(DBSession *)newSession fromPath:(NSString *)newFromPath toPath:(NSString *)newToPath completionCallback:(CDECompletionBlock)block;
 
 @end
 
@@ -183,20 +162,6 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
     [queue addOperation:operation];
 }
 
-#pragma mark Moving and Copying
-
-- (void)moveItemAtPath:(NSString *)fromPath toPath:(NSString *)toPath completion:(CDECompletionBlock)block
-{
-    CDEDropboxMoveItemOperation *operation = [[CDEDropboxMoveItemOperation alloc] initWithSession:session fromPath:fromPath toPath:toPath completionCallback:block];
-    [queue addOperation:operation];
-}
-
-- (void)copyItemAtPath:(NSString *)fromPath toPath:(NSString *)toPath completion:(CDECompletionBlock)block
-{
-    CDEDropboxCopyItemOperation *operation = [[CDEDropboxCopyItemOperation alloc] initWithSession:session fromPath:fromPath toPath:toPath completionCallback:block];
-    [queue addOperation:operation];
-}
-
 #pragma mark Deleting
 
 - (void)removeItemAtPath:(NSString *)path completion:(CDECompletionBlock)block
@@ -242,49 +207,8 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
     return self;
 }
 
-- (BOOL)isConcurrent
+- (void)beginAsynchronousTask
 {
-    return YES;
-}
-
-- (BOOL)isExecuting
-{
-    @synchronized (self) {
-        return isExecuting;
-    }
-}
-
-- (BOOL)isFinished
-{
-    @synchronized (self) {
-        return isFinished;
-    }
-}
-
-- (BOOL)setupForStart
-{
-    if (![NSThread isMainThread]) {
-        [self performSelectorOnMainThread:@selector(start) withObject:nil waitUntilDone:NO];
-        return NO;
-    }
-    
-    @synchronized (self) {
-        [self willChangeValueForKey:@"isFinished"];
-        [self willChangeValueForKey:@"isExecuting"];
-        isFinished = NO;
-        isExecuting = YES;
-        [self didChangeValueForKey:@"isExecuting"];
-        [self didChangeValueForKey:@"isFinished"];
-    }
-    
-    return YES;
-}
-
-- (void)start
-{
-    BOOL setup = [self setupForStart];
-    if (!setup) return;
-    
     [self prepareForNetworkRequests];
     taskQueue = [[CDEAsynchronousTaskQueue alloc] initWithTask:^(CDEAsynchronousTaskCallbackBlock next) {
             CDELog(CDELoggingLevelVerbose, @"Attempting network request for operation class: %@", NSStringFromClass(self.class));
@@ -297,23 +221,15 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
             if (error) CDELog(CDELoggingLevelVerbose, @"Cloud file system operation failed: %@ %@", NSStringFromClass(self.class), error);
             [self completeWithError:error];
             retryCallbackBlock = NULL;
-            [self tearDown];
+            [self endAsynchronousTask];
         }];
     [taskQueue start];
 }
 
-- (void)tearDown
+- (void)endAsynchronousTask
 {
     [restClient cancelAllRequests];
-    
-    @synchronized (self) {
-        [self willChangeValueForKey:@"isFinished"];
-        [self willChangeValueForKey:@"isExecuting"];
-        isFinished = YES;
-        isExecuting = NO;
-        [self didChangeValueForKey:@"isExecuting"];
-        [self didChangeValueForKey:@"isFinished"];
-    }
+    [super endAsynchronousTask];
 }
 
 - (void)prepareForNetworkRequests
@@ -487,86 +403,6 @@ const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
 }
 
 - (void)restClient:(DBRestClient *)client createFolderFailedWithError:(NSError *)error
-{
-    [self completeNetworkRequestWithError:error];
-}
-
-@end
-
-
-@implementation CDEDropboxMoveItemOperation
-
-@synthesize fromPath = fromPath;
-@synthesize toPath = toPath;
-@synthesize completionCallback = completionCallback;
-
-- (id)initWithSession:(DBSession *)newSession fromPath:(NSString *)newFromPath toPath:(NSString *)newToPath completionCallback:(CDECompletionBlock)newCallback
-{
-    self = [super initWithSession:newSession];
-    if (self) {
-        fromPath = [newFromPath copy];
-        toPath = [newToPath copy];
-        completionCallback = [newCallback copy];
-    }
-    return self;
-}
-
-- (void)initiateNetworkRequest
-{
-    [self.restClient moveFrom:self.fromPath toPath:self.toPath];
-}
-
-- (void)completeWithError:(NSError *)error
-{
-    self.completionCallback(error);
-}
-
-- (void)restClient:(DBRestClient *)client movedPath:(NSString *)fromPath to:(DBMetadata *)toMetadata
-{
-    [self completeNetworkRequestWithError:nil];
-}
-
-- (void)restClient:(DBRestClient *)client movePathFailedWithError:(NSError *)error
-{
-    [self completeNetworkRequestWithError:error];
-}
-
-@end
-
-
-@implementation CDEDropboxCopyItemOperation
-
-@synthesize fromPath = fromPath;
-@synthesize toPath = toPath;
-@synthesize completionCallback = completionCallback;
-
-- (id)initWithSession:(DBSession *)newSession fromPath:(NSString *)newFromPath toPath:(NSString *)newToPath completionCallback:(CDECompletionBlock)newCallback
-{
-    self = [super initWithSession:newSession];
-    if (self) {
-        fromPath = [newFromPath copy];
-        toPath = [newToPath copy];
-        completionCallback = [newCallback copy];
-    }
-    return self;
-}
-
-- (void)initiateNetworkRequest
-{
-    [self.restClient copyFrom:self.fromPath toPath:self.toPath];
-}
-
-- (void)completeWithError:(NSError *)error
-{
-    self.completionCallback(error);
-}
-
-- (void)restClient:(DBRestClient *)client copiedPath:(NSString *)fromPath to:(DBMetadata *)to
-{
-    [self completeNetworkRequestWithError:nil];
-}
-
-- (void)restClient:(DBRestClient *)client copyPathFailedWithError:(NSError *)error
 {
     [self completeNetworkRequestWithError:error];
 }

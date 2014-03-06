@@ -39,3 +39,18 @@
 }
 
 @end
+
+
+@implementation NSData (CDEFoundationAdditions)
+
+- (NSString *)cde_base64String
+{
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED < 70000) && (__MAC_OS_X_VERSION_MIN_REQUIRED < 1090)
+    NSString *string = [self base64Encoding];
+#else
+    NSString *string = [self base64EncodedStringWithOptions:0];
+#endif
+    return string;
+}
+
+@end

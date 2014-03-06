@@ -57,6 +57,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
 @implementation CDEPersistentStoreEnsemble {
     BOOL saveOccurredDuringImport;
     NSOperationQueue *operationQueue;
+    BOOL observingIdentityToken;
 }
 
 @synthesize cloudFileSystem = cloudFileSystem;
@@ -81,6 +82,8 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
     if (self) {
         operationQueue = [[NSOperationQueue alloc] init];
         operationQueue.maxConcurrentOperationCount = 1;
+        
+        observingIdentityToken = NO;
         
         self.ensembleIdentifier = identifier;
         self.storePath = path;
@@ -149,7 +152,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
 
 - (void)dealloc
 {
-    [(id)self.cloudFileSystem removeObserver:self forKeyPath:@"identityToken"];
+    if (observingIdentityToken) [(id)self.cloudFileSystem removeObserver:self forKeyPath:@"identityToken"];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [saveMonitor stopMonitoring];
 }
@@ -162,6 +165,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
         if (![self checkIncompleteEvents]) return;
         [self checkCloudFileSystemIdentityWithCompletion:^(NSError *error) {
             if (!error) {
+                observingIdentityToken = YES;
                 [(id)self.cloudFileSystem addObserver:self forKeyPath:@"identityToken" options:0 context:(__bridge void *)kCDEIdentityTokenContext];
             }
         }];

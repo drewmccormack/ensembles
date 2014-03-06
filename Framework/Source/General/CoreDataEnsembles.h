@@ -7,6 +7,7 @@
 //
 
 #import "CDEAsynchronousTaskQueue.h"
+#import "CDEAsynchronousOperation.h"
 #import "CDECloudDirectory.h"
 #import "CDECloudFile.h"
 #import "CDECloudFileSystem.h"
@@ -16,8 +17,11 @@
 #import "CDEEventMigrator.h"
 #import "CDEEventRevision.h"
 #import "CDEEventStore.h"
+#import "CDEFileDownloadOperation.h"
+#import "CDEFileUploadOperation.h"
 #import "CDEFoundationAdditions.h"
 #import "CDEGlobalIdentifier.h"
+#import "CDEICloudFileSystem.h"
 #import "CDELocalCloudFileSystem.h"
 #import "CDEObjectChange.h"
 #import "CDEPersistentStoreEnsemble.h"

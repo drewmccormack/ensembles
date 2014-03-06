@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		070176F118BD17DF00C4DA01 /* CDENodeCloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 070176F018BD17DF00C4DA01 /* CDENodeCloudFileSystem.m */; };
+		070176F218BD17DF00C4DA01 /* CDENodeCloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 070176F018BD17DF00C4DA01 /* CDENodeCloudFileSystem.m */; };
 		070F46F91805D51400EE36E5 /* IDMNote.m in Sources */ = {isa = PBXBuildFile; fileRef = 070F46F41805D51400EE36E5 /* IDMNote.m */; };
 		070F46FA1805D51400EE36E5 /* IDMTag.m in Sources */ = {isa = PBXBuildFile; fileRef = 070F46F61805D51400EE36E5 /* IDMTag.m */; };
 		070F46FB1805D51400EE36E5 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 070F46F71805D51400EE36E5 /* Model.xcdatamodeld */; };
@@ -32,6 +34,10 @@
 		0751809A18B743C500CE4264 /* IDMMediaFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 0751809818B743C500CE4264 /* IDMMediaFile.m */; };
 		075C271D18B3694B00A7BC25 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 075C271918B3694B00A7BC25 /* CDEEventStoreModel.xcdatamodeld */; };
 		075C271E18B3694B00A7BC25 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 075C271918B3694B00A7BC25 /* CDEEventStoreModel.xcdatamodeld */; };
+		077231DE18C5FCDA0065BFEE /* IDMNodeSyncSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 077231DD18C5FCDA0065BFEE /* IDMNodeSyncSettingsViewController.m */; };
+		077231E018C604610065BFEE /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 077231DF18C604610065BFEE /* Security.framework */; };
+		077231E218C6080D0065BFEE /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 077231E118C6080D0065BFEE /* MobileCoreServices.framework */; };
+		07746AAF18C6276F00A267F5 /* IDMSyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 07746AAE18C6276F00A267F5 /* IDMSyncManager.m */; };
 		0791BCE317F6F58C00E7C31B /* Ensembles iOS.xcodeproj in Resources */ = {isa = PBXBuildFile; fileRef = 0791BCE217F6F58C00E7C31B /* Ensembles iOS.xcodeproj */; };
 		07973EF9183BE32C007F48CA /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07973EF8183BE32C007F48CA /* CoreData.framework */; };
 		07BF37D517F189EB00C56F64 /* libensembles_ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF37D417F189EB00C56F64 /* libensembles_ios.a */; };
@@ -100,6 +106,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		070176EF18BD17DF00C4DA01 /* CDENodeCloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDENodeCloudFileSystem.h; path = ../../Framework/Extensions/CDENodeCloudFileSystem.h; sourceTree = "<group>"; };
+		070176F018BD17DF00C4DA01 /* CDENodeCloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDENodeCloudFileSystem.m; path = ../../Framework/Extensions/CDENodeCloudFileSystem.m; sourceTree = "<group>"; };
 		070F46F31805D51400EE36E5 /* IDMNote.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IDMNote.h; path = Shared/IDMNote.h; sourceTree = SOURCE_ROOT; };
 		070F46F41805D51400EE36E5 /* IDMNote.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IDMNote.m; path = Shared/IDMNote.m; sourceTree = SOURCE_ROOT; };
 		070F46F51805D51400EE36E5 /* IDMTag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IDMTag.h; path = Shared/IDMTag.h; sourceTree = SOURCE_ROOT; };
@@ -133,6 +141,12 @@
 		075C271A18B3694B00A7BC25 /* CDEEventStoreModel_0.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_0.xcdatamodel; sourceTree = "<group>"; };
 		075C271B18B3694B00A7BC25 /* CDEEventStoreModel_1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_1.xcdatamodel; sourceTree = "<group>"; };
 		075C271C18B3694B00A7BC25 /* CDEEventStoreModel_2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_2.xcdatamodel; sourceTree = "<group>"; };
+		077231DC18C5FCDA0065BFEE /* IDMNodeSyncSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IDMNodeSyncSettingsViewController.h; sourceTree = "<group>"; };
+		077231DD18C5FCDA0065BFEE /* IDMNodeSyncSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDMNodeSyncSettingsViewController.m; sourceTree = "<group>"; };
+		077231DF18C604610065BFEE /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		077231E118C6080D0065BFEE /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
+		07746AAD18C6276F00A267F5 /* IDMSyncManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IDMSyncManager.h; sourceTree = "<group>"; };
+		07746AAE18C6276F00A267F5 /* IDMSyncManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDMSyncManager.m; sourceTree = "<group>"; };
 		0791BCE217F6F58C00E7C31B /* Ensembles iOS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "Ensembles iOS.xcodeproj"; path = "../../Framework/Ensembles iOS.xcodeproj"; sourceTree = "<group>"; };
 		07973EF8183BE32C007F48CA /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		07BF372E17F17D4100C56F64 /* Idiomatic.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Idiomatic.entitlements; sourceTree = "<group>"; };
@@ -163,6 +177,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				077231E218C6080D0065BFEE /* MobileCoreServices.framework in Frameworks */,
+				077231E018C604610065BFEE /* Security.framework in Frameworks */,
 				0726FDC718AA47E300670262 /* libSDropboxSDK.a in Frameworks */,
 				07973EF9183BE32C007F48CA /* CoreData.framework in Frameworks */,
 				07BF37D517F189EB00C56F64 /* libensembles_ios.a in Frameworks */,
@@ -189,6 +205,8 @@
 		070F46FC1805D69E00EE36E5 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				070176EF18BD17DF00C4DA01 /* CDENodeCloudFileSystem.h */,
+				070176F018BD17DF00C4DA01 /* CDENodeCloudFileSystem.m */,
 				0726FDB318AA476800670262 /* CDEDropboxCloudFileSystem.h */,
 				0726FDB418AA476800670262 /* CDEDropboxCloudFileSystem.m */,
 				070F46F31805D51400EE36E5 /* IDMNote.h */,
@@ -248,6 +266,8 @@
 		074B959A17EC783B0016F84D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				077231E118C6080D0065BFEE /* MobileCoreServices.framework */,
+				077231DF18C604610065BFEE /* Security.framework */,
 				07973EF8183BE32C007F48CA /* CoreData.framework */,
 				9477ED611800140200C2A419 /* CoreData.framework */,
 				07BF37D417F189EB00C56F64 /* libensembles_ios.a */,
@@ -266,12 +286,16 @@
 			children = (
 				074B95AA17EC783B0016F84D /* IDMAppDelegate.h */,
 				074B95AB17EC783B0016F84D /* IDMAppDelegate.m */,
+				07746AAD18C6276F00A267F5 /* IDMSyncManager.h */,
+				07746AAE18C6276F00A267F5 /* IDMSyncManager.m */,
 				074B95D917EC7DCD0016F84D /* IDMTagsViewController.h */,
 				074B95DA17EC7DCD0016F84D /* IDMTagsViewController.m */,
 				074B95DC17EC7DDF0016F84D /* IDMNotesViewController.h */,
 				074B95DD17EC7DDF0016F84D /* IDMNotesViewController.m */,
 				074B95DF17EC9F470016F84D /* IDMNoteEditingViewController.h */,
 				074B95E017EC9F470016F84D /* IDMNoteEditingViewController.m */,
+				077231DC18C5FCDA0065BFEE /* IDMNodeSyncSettingsViewController.h */,
+				077231DD18C5FCDA0065BFEE /* IDMNodeSyncSettingsViewController.m */,
 				074B95A217EC783B0016F84D /* Supporting Files */,
 			);
 			name = "Idiomatic iOS";
@@ -532,14 +556,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				0726FDB518AA476800670262 /* CDEDropboxCloudFileSystem.m in Sources */,
+				07746AAF18C6276F00A267F5 /* IDMSyncManager.m in Sources */,
 				074B95A817EC783B0016F84D /* main.m in Sources */,
 				0751809918B743C500CE4264 /* IDMMediaFile.m in Sources */,
 				070F46FA1805D51400EE36E5 /* IDMTag.m in Sources */,
 				074B95DB17EC7DCD0016F84D /* IDMTagsViewController.m in Sources */,
 				074B95E117EC9F470016F84D /* IDMNoteEditingViewController.m in Sources */,
+				077231DE18C5FCDA0065BFEE /* IDMNodeSyncSettingsViewController.m in Sources */,
 				070F46F91805D51400EE36E5 /* IDMNote.m in Sources */,
 				074B95AC17EC783B0016F84D /* IDMAppDelegate.m in Sources */,
 				075C271D18B3694B00A7BC25 /* CDEEventStoreModel.xcdatamodeld in Sources */,
+				070176F118BD17DF00C4DA01 /* CDENodeCloudFileSystem.m in Sources */,
 				070F46FB1805D51400EE36E5 /* Model.xcdatamodeld in Sources */,
 				074B95DE17EC7DDF0016F84D /* IDMNotesViewController.m in Sources */,
 			);
@@ -554,6 +581,7 @@
 				075157581805D7FD00C4D4F1 /* Model.xcdatamodeld in Sources */,
 				0751809A18B743C500CE4264 /* IDMMediaFile.m in Sources */,
 				075C271E18B3694B00A7BC25 /* CDEEventStoreModel.xcdatamodeld in Sources */,
+				070176F218BD17DF00C4DA01 /* CDENodeCloudFileSystem.m in Sources */,
 				0726FDB618AA476800670262 /* CDEDropboxCloudFileSystem.m in Sources */,
 				9477ED3D1800137300C2A419 /* main.m in Sources */,
 				070F46FD1805D6C100EE36E5 /* IDMNote.m in Sources */,
@@ -688,6 +716,7 @@
 		074B95CB17EC783B0016F84D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = Idiomatic/Idiomatic.entitlements;
@@ -713,6 +742,7 @@
 		074B95CC17EC783B0016F84D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = Idiomatic/Idiomatic.entitlements;
