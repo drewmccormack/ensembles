@@ -19,30 +19,30 @@
  */
 
 /**
- Posted when ensembles observes that a @c NSManagedObjectContext will save to the monitored persistent store. You can monitor this notification rather than the standard @c NSManagedObjectContextWillSaveNotification if you want to be sure that the ensemble has already prepared for the save when the notification is observed. If you observe @c NSManagedObjectContextWillSaveNotification directly, you can't be sure that the ensemble has observed the notification, because order of receivers is not defined.
+ Posted when ensembles observes that a `NSManagedObjectContext` will save to the monitored persistent store. You can monitor this notification rather than the standard `NSManagedObjectContextWillSaveNotification` if you want to be sure that the ensemble has already prepared for the save when the notification is observed. If you observe `NSManagedObjectContextWillSaveNotification` directly, you can't be sure that the ensemble has observed the notification, because order of receivers is not defined.
  
- The object for the notification is not the ensemble, but the context that is saving. The ensemble observing the save is accessible in the @c userInfo dictionary via the key @c persistentStoreEnsemble.
+ The object for the notification is not the ensemble, but the context that is saving. The ensemble observing the save is accessible in the `userInfo` dictionary via the key `persistentStoreEnsemble`.
  */
 extern NSString * const CDEMonitoredManagedObjectContextWillSaveNotification;
 
 /**
- Posted when the ensemble observes that a @c NSManagedObjectContext has saved to the monitored persistent store. You can monitor this notification rather than the standard @c NSManagedObjectContexDidSaveNotification if you want to be sure that the ensemble has already processed the save when the notification is observed. If you observe @c NSManagedObjectContextDidSaveNotification directly, you can't be sure that the ensemble has observed the notification, because order of receivers is not defined.
+ Posted when the ensemble observes that a `NSManagedObjectContext` has saved to the monitored persistent store. You can monitor this notification rather than the standard `NSManagedObjectContexDidSaveNotification` if you want to be sure that the ensemble has already processed the save when the notification is observed. If you observe `NSManagedObjectContextDidSaveNotification` directly, you can't be sure that the ensemble has observed the notification, because order of receivers is not defined.
  
-  The object for the notification is not the ensemble, but the context that is saving. The ensemble observing the save is accessible in the @c userInfo dictionary via the key @c persistentStoreEnsemble.
+  The object for the notification is not the ensemble, but the context that is saving. The ensemble observing the save is accessible in the `userInfo` dictionary via the key `persistentStoreEnsemble`.
  */
 extern NSString * const CDEMonitoredManagedObjectContextDidSaveNotification;
 
 /**
- This notification is fired after the ensemble has merged changes and performed a background save into the persistent store. You can use this notification to invoke the @c mergeChangesFromContextDidSaveNotification: method on any of the contexts that depend on the content of the store. Alternatively, you can implement the @c persistentStoreEnsemble:didSaveMergeChangesWithNotification: method for this purpose.
+ This notification is fired after the ensemble has merged changes and performed a background save into the persistent store. You can use this notification to invoke the `mergeChangesFromContextDidSaveNotification`: method on any of the contexts that depend on the content of the store. Alternatively, you can implement the `persistentStoreEnsemble`:didSaveMergeChangesWithNotification: method for this purpose.
  
- The object for the notification is the ensemble. The save notification, which is what is passed to the @c mergeChangesFromContextDidSaveNotification: method, is provided in the @c userInfo dictionary with the key @c CDEManagedObjectContextSaveNotificationKey.
+ The object for the notification is the ensemble. The save notification, which is what is passed to the `mergeChangesFromContextDidSaveNotification`: method, is provided in the `userInfo` dictionary with the key `CDEManagedObjectContextSaveNotificationKey`.
  
- @warning This notification is posted on the background thread where the merge save occurred. It is important to invoke the @c mergeChangesFromContextDidSaveNotification: method on the thread/queue corresponding to the @c NSManagedObjectContext merging the changes.
+ @warning This notification is posted on the background thread where the merge save occurred. It is important to invoke the `mergeChangesFromContextDidSaveNotification`: method on the thread/queue corresponding to the `NSManagedObjectContext` merging the changes.
  */
 extern NSString * const CDEPersistentStoreEnsembleDidSaveMergeChangesNotification;
 
 /**
- Used as a key in the @c userInfo dictionary of the @c CDEPersistentStoreEnsembleDidSaveMergeChangesNotification notification. It's value is the original notification resulting from the save, and can be passed to the @c mergeChangesFromContextDidSaveNotification: method to update other contexts that access the persistent store.
+ Used as a key in the `userInfo` dictionary of the `CDEPersistentStoreEnsembleDidSaveMergeChangesNotification` notification. It's value is the original notification resulting from the save, and can be passed to the `mergeChangesFromContextDidSaveNotification`: method to update other contexts that access the persistent store.
  */
 extern NSString * const CDEManagedObjectContextSaveNotificationKey;
 
@@ -52,7 +52,7 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  */
 
 /**
- A protocol that includes methods invoked by the @c CDEPeristentStoreEnsemble. The ensemble uses this to inform of sync-related changes.
+ A protocol that includes methods invoked by the `CDEPeristentStoreEnsemble`. The ensemble uses this to inform of sync-related changes.
  */
 @protocol CDEPersistentStoreEnsembleDelegate <NSObject>
 
@@ -61,69 +61,69 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
 /**
  @brief Invoked during leeching when the contents of the persistent store are about to be migrated to the cloud.
  
- @param ensemble The @c CDEPersistentStoreEnsemble that is about to import
+ @param ensemble The `CDEPersistentStoreEnsemble` that is about to import
  */
 - (void)persistentStoreEnsembleWillImportStore:(CDEPersistentStoreEnsemble *)ensemble;
 
 /**
  @brief Invoked during leeching when the contents of the persistent store have been migrated to the cloud.
  
- @param ensemble The @c CDEPersistentStoreEnsemble that is importing the store
+ @param ensemble The `CDEPersistentStoreEnsemble` that is importing the store
  */
 - (void)persistentStoreEnsembleDidImportStore:(CDEPersistentStoreEnsemble *)ensemble;
 
 /**
  @brief Invoked when the ensemble is about to attempt to save merged changes into the persistent store.
  
- This method is invoked on a background thread. Both of the contexts passed have private queue concurrency type, and so they should only be accessed via calls to @c performBlock... methods.
+ This method is invoked on a background thread. Both of the contexts passed have private queue concurrency type, and so they should only be accessed via calls to `performBlock...` methods.
  
- You can use the saving context to check what changes have been made in the merge via @c NSManagedObjectContext methods like @c insertedObjects, @c updatedObjects, and @c deletedObjects.
+ You can use the saving context to check what changes have been made in the merge via `NSManagedObjectContext` methods like `insertedObjects`, `updatedObjects`, and `deletedObjects`.
  
  You should not make any changes directly in the saving context. If you need to make changes before the save is attempted, you can make them in the reparation context.
  
- You can force the merge to terminate altogether by returning @c NO from this method.
+ You can force the merge to terminate altogether by returning `NO` from this method.
  
- @param ensemble The @c CDEPersistentStoreEnsemble that will attempt to save
+ @param ensemble The `CDEPersistentStoreEnsemble` that will attempt to save
  @param savingContext A private-queue context which includes the unsaved changes that will be committed to the store
  @param reparationContext A private-queue context that can be used to make any changes necessary to allow the save to succeed
  @return YES if the save should be attempted, and NO to abort the merge entirely
- @warning Be careful not to nest calls to the @c performBlock... methods for the two contexts. This will very likely lead to a deadlock, because the contexts in question have a parent-child relationship.
+ @warning Be careful not to nest calls to the `performBlock...` methods for the two contexts. This will very likely lead to a deadlock, because the contexts in question have a parent-child relationship.
  */
 - (BOOL)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble shouldSaveMergedChangesInManagedObjectContext:(NSManagedObjectContext *)savingContext reparationManagedObjectContext:(NSManagedObjectContext *)reparationContext;
 
 /**
  @brief Invoked when the ensemble attempted to save merged changes into the persistent store, but the save failed.
  
- This method is invoked on a background thread. Both of the contexts passed have private queue concurrency type, and so they should only be accessed via calls to @c performBlock... methods.
+ This method is invoked on a background thread. Both of the contexts passed have private queue concurrency type, and so they should only be accessed via calls to `performBlock...` methods.
  
- You can use the saving context to check what changes failed to save via @c NSManagedObjectContext methods like @c insertedObjects, @c updatedObjects, and @c deletedObjects. The error that occurred during saving is passed and can be used to determine which objects are responsible for the failure.
+ You can use the saving context to check what changes failed to save via `NSManagedObjectContext` methods like `insertedObjects`, `updatedObjects`, and `deletedObjects`. The error that occurred during saving is passed and can be used to determine which objects are responsible for the failure.
  
- You should not make any changes directly in the saving context. If you wish to reattempt the save, make any necessary changes in the reparation context, and then return @c YES.
+ You should not make any changes directly in the saving context. If you wish to reattempt the save, make any necessary changes in the reparation context, and then return `YES`.
  
- You can force the merge to terminate altogether by returning @c NO from this method.
+ You can force the merge to terminate altogether by returning `NO` from this method.
  
- @param ensemble The @c CDEPersistentStoreEnsemble that attempted the save
+ @param ensemble The `CDEPersistentStoreEnsemble` that attempted the save
  @param savingContext A private-queue context which includes the unsaved changes that will be committed to the store
- @param error The error returned by the @c save: method
+ @param error The error returned by the `save`: method
  @param reparationContext A private-queue context that can be used to make any changes necessary to allow the save to be reattempted
  @return YES if the save should be reattempted, and NO to abort the merge entirely
- @warning Be careful not to nest calls to the @c performBlock... methods for the two contexts. This will very likely lead to a deadlock, because the contexts in question have a parent-child relationship.
+ @warning Be careful not to nest calls to the `performBlock...` methods for the two contexts. This will very likely lead to a deadlock, because the contexts in question have a parent-child relationship.
  */
 - (BOOL)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didFailToSaveMergedChangesInManagedObjectContext:(NSManagedObjectContext *)savingContext error:(NSError *)error reparationManagedObjectContext:(NSManagedObjectContext *)reparationContext;
 
 /**
  @brief Invoked after the ensemble successfully saves merged changes into the persistent store.
  
- This method is invoked on the thread used for saving the changes. The notification passed includes the @c userInfo dictionary from the notification that was posted when the context saved. It can be used to determine what object insertions, updates, and deletions occurred.
+ This method is invoked on the thread used for saving the changes. The notification passed includes the `userInfo` dictionary from the notification that was posted when the context saved. It can be used to determine what object insertions, updates, and deletions occurred.
  
- You will usually want to pass this notification to the @c mergeChangesFromContextDidSaveNotification: method of any context that accesses the persistent store, be it directly or indirectly. This will allow the context to account for the changes.
+ You will usually want to pass this notification to the `mergeChangesFromContextDidSaveNotification`: method of any context that accesses the persistent store, be it directly or indirectly. This will allow the context to account for the changes.
  
- @warning Be sure to invoke the @c mergeChangesFromContextDidSaveNotification: method on the thread/queue corresponding to the messaged context.
+ @warning Be sure to invoke the `mergeChangesFromContextDidSaveNotification`: method on the thread/queue corresponding to the messaged context.
  
- @param ensemble The @c CDEPersistentStoreEnsemble that saved the changes
- @param notification A notification object containing the @c userInfo included by the saving context in the @c NSManagedObjectContextDidSaveNotification notification
+ @param ensemble The `CDEPersistentStoreEnsemble` that saved the changes
+ @param notification A notification object containing the `userInfo` included by the saving context in the `NSManagedObjectContextDidSaveNotification` notification
  
- @see @c CDEPersistentStoreEnsembleDidSaveMergeChangesNotification
+ @see `CDEPersistentStoreEnsembleDidSaveMergeChangesNotification`
  */
 - (void)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didSaveMergeChangesWithNotification:(NSNotification *)notification;
 
@@ -152,17 +152,28 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  
  The global identifiers do not have to be stored in the persistent store, but it often works out to be the best solution. You can either determine the global identifier from existing properties (eg email, tag), or store a random identifier like a uuid.
  
- If you have certain objects in the array for which you do not wish to assign your own global identifier, you can return @c NSNull in that position.
+ If you have certain objects in the array for which you do not wish to assign your own global identifier, you can return `NSNull` in that position.
  
  @param ensemble The ensemble requesting global identifiers
  @param objects The objects for which global identifiers are requested
- @return An array of global identifiers for the objects passed, in the same order. @c NSNull can be inserted in this array where no global identifier is needed.
+ @return An array of global identifiers for the objects passed, in the same order. `NSNull` can be inserted in this array where no global identifier is needed.
  */
 - (NSArray *)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble globalIdentifiersForManagedObjects:(NSArray *)objects;
 
 @end
 
 
+/**
+ @brief The central class of Ensembles, it represents a set of synchronizing persistent stores.
+ 
+ An ensemble can be seen as a set of persistent stores that exchange data in order to reach eventual consistency. The `CDEPersistentStoreEnsemble` class is responsible for monitoring saves to a persistent store, exchanging this data with ensemble objects on other peers, and merging changes from other peers into its persistent store.
+ 
+ You typically create one `CDEPersistentStoreEnsemble` object for each persistent store that you need to sync in your app. An ensemble has an identifier, which is used to match it with other ensemble objects on peer devices. Ensemble objects with the same identifier are considered to represent corresponding persistent stores, and the data in the persistent stores will be merged.
+ 
+ The process of initially setting up an ensemble object for communication with its peers is known as 'leeching'. An ensemble begins in a deleeched state. Leeching prepares local storage needed by the framework, registers the device in the cloud, and migrates the data in the local persistent store into the cloud. Leeching is persistent, and typically only need be performed once, though it is possible to request that the ensemble deleech.
+ 
+ Once an ensemble is leeched, it can merge changes from other devices. Merging involves replaying changes from other devices, together with locally recorded changes, in order to update the persistent store. If changes are made concurrently on different devices, there is no guarantee that the data will be valid after replaying the changes. The ensemble provides delegate methods that can be used to make repairs to the data before committing. The changes made in reparation are also captured by the ensemble and transferred to other peers.
+ */
 @interface CDEPersistentStoreEnsemble : NSObject
 
 @property (nonatomic, weak, readwrite) id <CDEPersistentStoreEnsembleDelegate> delegate;
