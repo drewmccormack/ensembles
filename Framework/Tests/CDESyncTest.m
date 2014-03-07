@@ -10,6 +10,12 @@
 #import "CDEPersistentStoreEnsemble.h"
 #import "CDELocalCloudFileSystem.h"
 
+@interface CDEPersistentStoreEnsemble (CDESyncTestMethods)
+
+- (void)stopMonitoringSaves;
+
+@end
+
 @interface CDESyncTest () <CDEPersistentStoreEnsembleDelegate>
 
 @end
