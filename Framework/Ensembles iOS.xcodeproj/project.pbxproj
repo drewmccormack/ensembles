@@ -6,6 +6,20 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		0710512B18C9FB4200C23158 /* Documentation */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 0710512E18C9FB4300C23158 /* Build configuration list for PBXAggregateTarget "Documentation" */;
+			buildPhases = (
+				072C2F3618C9FBD900453E78 /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = Documentation;
+			productName = Documentation;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		0701770318C1EC4B00C4DA01 /* CDEFileDownloadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 0701770218C1EC4B00C4DA01 /* CDEFileDownloadOperation.m */; };
 		0701770618C1EDE700C4DA01 /* CDEAsynchronousOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 0701770518C1EDE700C4DA01 /* CDEAsynchronousOperation.m */; };
@@ -630,6 +644,7 @@
 			targets = (
 				07BF374417F184DD00C56F64 /* Ensembles iOS */,
 				070D336018018A960054BA23 /* Tests iOS */,
+				0710512B18C9FB4200C23158 /* Documentation */,
 			);
 		};
 /* End PBXProject section */
@@ -656,6 +671,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		072C2F3618C9FBD900453E78 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/usr/local/bin/appledoc --docset-bundle-id com.mentalfaculty.ensembles --project-name \"Ensembles\" --project-company \"The Mental Faculty B.V.\" --company-id com.mentalfaculty --output ~/Desktop/appledoc.output --create-docset --install-docset --create-html --exit-threshold 2 --no-repeat-first-par --keep-undocumented-objects --keep-undocumented-members \"${SRCROOT}/Source\"";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		070D335D18018A960054BA23 /* Sources */ = {
@@ -805,6 +836,20 @@
 			};
 			name = Release;
 		};
+		0710512C18C9FB4300C23158 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		0710512D18C9FB4300C23158 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		07BF376617F184DD00C56F64 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -906,6 +951,15 @@
 			buildConfigurations = (
 				070D337218018A960054BA23 /* Debug */,
 				070D337318018A960054BA23 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0710512E18C9FB4300C23158 /* Build configuration list for PBXAggregateTarget "Documentation" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0710512C18C9FB4300C23158 /* Debug */,
+				0710512D18C9FB4300C23158 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
