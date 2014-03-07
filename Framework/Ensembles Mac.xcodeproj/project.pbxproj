@@ -120,6 +120,74 @@
 		07E2875417BF8D470008CC4F /* CDESaveMonitorRelationshipTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07E2875317BF8D470008CC4F /* CDESaveMonitorRelationshipTests.m */; };
 		07E64F5C18799F6800305C22 /* CDERebaser.h in Headers */ = {isa = PBXBuildFile; fileRef = 07E64F5A18799F6800305C22 /* CDERebaser.h */; };
 		07E64F5D18799F6800305C22 /* CDERebaser.m in Sources */ = {isa = PBXBuildFile; fileRef = 07E64F5B18799F6800305C22 /* CDERebaser.m */; };
+		6DAD10FB18CA067900237084 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DAD10FA18CA067900237084 /* Cocoa.framework */; };
+		6DAD112318CA070A00237084 /* CDEDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF7A08177F0A9D0029D500 /* CDEDefines.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD112418CA070E00237084 /* CDEAvailabilityMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 075754B4188BC952006803FA /* CDEAvailabilityMacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD112518CA071600237084 /* CDEDefines.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF7A09177F0A9D0029D500 /* CDEDefines.m */; };
+		6DAD112618CA071600237084 /* CoreDataEnsembles.h in Headers */ = {isa = PBXBuildFile; fileRef = 07CCA9D617E49CA80017B6C4 /* CoreDataEnsembles.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD112718CA071600237084 /* CDEAsynchronousTaskQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF7A06177F0A9D0029D500 /* CDEAsynchronousTaskQueue.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD112818CA071700237084 /* CDEAsynchronousTaskQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF7A07177F0A9D0029D500 /* CDEAsynchronousTaskQueue.m */; };
+		6DAD112918CA071700237084 /* CDEFoundationAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF7A0A177F0A9D0029D500 /* CDEFoundationAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD112A18CA071700237084 /* CDEFoundationAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF7A0B177F0A9D0029D500 /* CDEFoundationAdditions.m */; };
+		6DAD112B18CA071700237084 /* NSManagedObjectModel+CDEAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 07D2D630182D627E001D24BC /* NSManagedObjectModel+CDEAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD112C18CA071700237084 /* NSManagedObjectModel+CDEAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 07D2D631182D627E001D24BC /* NSManagedObjectModel+CDEAdditions.m */; };
+		6DAD112D18CA071700237084 /* NSMapTable+CDEAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF7A04177F0A9D0029D500 /* NSMapTable+CDEAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD112E18CA071700237084 /* NSMapTable+CDEAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF7A05177F0A9D0029D500 /* NSMapTable+CDEAdditions.m */; };
+		6DAD112F18CA071700237084 /* CDEAsynchronousOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 0701770718C1EF7400C4DA01 /* CDEAsynchronousOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD113018CA071700237084 /* CDEAsynchronousOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 0701770818C1EF7400C4DA01 /* CDEAsynchronousOperation.m */; };
+		6DAD113118CA071C00237084 /* CDEICloudFileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 07973F01183BE44A007F48CA /* CDEICloudFileSystem.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD113218CA071C00237084 /* CDEICloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 07973F02183BE44A007F48CA /* CDEICloudFileSystem.m */; };
+		6DAD113318CA071C00237084 /* CDELocalCloudFileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 07973F03183BE44A007F48CA /* CDELocalCloudFileSystem.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD113418CA071C00237084 /* CDELocalCloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 07973F04183BE44A007F48CA /* CDELocalCloudFileSystem.m */; };
+		6DAD113518CA071C00237084 /* CDEFileDownloadOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 0701770B18C1EF8300C4DA01 /* CDEFileDownloadOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD113618CA071C00237084 /* CDEFileDownloadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 0701770C18C1EF8300C4DA01 /* CDEFileDownloadOperation.m */; };
+		6DAD113718CA071C00237084 /* CDEFileUploadOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 0701770F18C2543D00C4DA01 /* CDEFileUploadOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD113818CA071C00237084 /* CDEFileUploadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 0701771018C2543D00C4DA01 /* CDEFileUploadOperation.m */; };
+		6DAD113918CA072000237084 /* CDECloudDirectory.h in Headers */ = {isa = PBXBuildFile; fileRef = 07973F0A183BE466007F48CA /* CDECloudDirectory.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD113A18CA072000237084 /* CDECloudDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = 07973F0B183BE466007F48CA /* CDECloudDirectory.m */; };
+		6DAD113B18CA072000237084 /* CDECloudFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 07973F0C183BE466007F48CA /* CDECloudFile.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD113C18CA072000237084 /* CDECloudFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 07973F0D183BE466007F48CA /* CDECloudFile.m */; };
+		6DAD113D18CA072000237084 /* CDECloudFileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 07973F0E183BE466007F48CA /* CDECloudFileSystem.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD113E18CA072000237084 /* CDECloudManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 07973F0F183BE466007F48CA /* CDECloudManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD113F18CA072000237084 /* CDECloudManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 07973F10183BE466007F48CA /* CDECloudManager.m */; };
+		6DAD114018CA072300237084 /* CDEPersistentStoreEnsemble.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF79F6177F0A9D0029D500 /* CDEPersistentStoreEnsemble.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD114118CA072300237084 /* CDEPersistentStoreEnsemble.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF79F7177F0A9D0029D500 /* CDEPersistentStoreEnsemble.m */; };
+		6DAD114218CA072300237084 /* CDEPersistentStoreImporter.h in Headers */ = {isa = PBXBuildFile; fileRef = 072A87D917EDFBB000F8B2CB /* CDEPersistentStoreImporter.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD114318CA072300237084 /* CDEPersistentStoreImporter.m in Sources */ = {isa = PBXBuildFile; fileRef = 072A87DA17EDFBB000F8B2CB /* CDEPersistentStoreImporter.m */; };
+		6DAD114418CA072A00237084 /* CDEEventStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF79FD177F0A9D0029D500 /* CDEEventStore.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD114518CA072A00237084 /* CDEEventStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF79FE177F0A9D0029D500 /* CDEEventStore.m */; };
+		6DAD114618CA072A00237084 /* CDEEventIntegrator.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF79F9177F0A9D0029D500 /* CDEEventIntegrator.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD114718CA072A00237084 /* CDEEventIntegrator.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF79FA177F0A9D0029D500 /* CDEEventIntegrator.m */; };
+		6DAD114818CA072A00237084 /* CDEEventMigrator.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF79FB177F0A9D0029D500 /* CDEEventMigrator.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD114918CA072A00237084 /* CDEEventMigrator.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF79FC177F0A9D0029D500 /* CDEEventMigrator.m */; };
+		6DAD114A18CA072A00237084 /* CDESaveMonitor.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF79FF177F0A9D0029D500 /* CDESaveMonitor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD114B18CA072A00237084 /* CDESaveMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF7A00177F0A9D0029D500 /* CDESaveMonitor.m */; };
+		6DAD114C18CA072A00237084 /* CDEEventBuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 072A87DE17EEE55600F8B2CB /* CDEEventBuilder.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD114D18CA072A00237084 /* CDEEventBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 072A87DF17EEE55600F8B2CB /* CDEEventBuilder.m */; };
+		6DAD114E18CA073000237084 /* CDEEventRevision.h in Headers */ = {isa = PBXBuildFile; fileRef = 078A3F80178C9B32009C8821 /* CDEEventRevision.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD114F18CA073000237084 /* CDEEventRevision.m in Sources */ = {isa = PBXBuildFile; fileRef = 078A3F81178C9B32009C8821 /* CDEEventRevision.m */; };
+		6DAD115018CA073000237084 /* CDEGlobalIdentifier.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF7A15177F0A9D0029D500 /* CDEGlobalIdentifier.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD115118CA073000237084 /* CDEGlobalIdentifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF7A16177F0A9D0029D500 /* CDEGlobalIdentifier.m */; };
+		6DAD115218CA073000237084 /* CDEObjectChange.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF7A19177F0A9D0029D500 /* CDEObjectChange.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD115318CA073000237084 /* CDEObjectChange.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF7A1A177F0A9D0029D500 /* CDEObjectChange.m */; };
+		6DAD115418CA073000237084 /* CDEPropertyChangeValue.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF7A01177F0A9D0029D500 /* CDEPropertyChangeValue.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD115518CA073000237084 /* CDEPropertyChangeValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF7A02177F0A9D0029D500 /* CDEPropertyChangeValue.m */; };
+		6DAD115618CA073000237084 /* CDEStoreModificationEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF7A1D177F0A9D0029D500 /* CDEStoreModificationEvent.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD115718CA073000237084 /* CDEStoreModificationEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF7A1E177F0A9D0029D500 /* CDEStoreModificationEvent.m */; };
+		6DAD115818CA073000237084 /* CDEDataFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 07897FF618B25880001E8A23 /* CDEDataFile.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD115918CA073000237084 /* CDEDataFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 07897FF718B25880001E8A23 /* CDEDataFile.m */; };
+		6DAD115A18CA073300237084 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 07897FFA18B258A0001E8A23 /* CDEEventStoreModel.xcdatamodeld */; };
+		6DAD116118CA074100237084 /* CDERevisionManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 07DDA7E517C9ECF6009C6F94 /* CDERevisionManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD116218CA074100237084 /* CDERevisionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 07DDA7E617C9ECF6009C6F94 /* CDERevisionManager.m */; };
+		6DAD116318CA074100237084 /* CDERevision.h in Headers */ = {isa = PBXBuildFile; fileRef = 0722B26117B76B2400496F4A /* CDERevision.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD116418CA074100237084 /* CDERevision.m in Sources */ = {isa = PBXBuildFile; fileRef = 0722B26217B76B2400496F4A /* CDERevision.m */; };
+		6DAD116518CA074100237084 /* CDERevisionSet.h in Headers */ = {isa = PBXBuildFile; fileRef = 0722B26317B76B2400496F4A /* CDERevisionSet.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD116618CA074100237084 /* CDERevisionSet.m in Sources */ = {isa = PBXBuildFile; fileRef = 0722B26417B76B2400496F4A /* CDERevisionSet.m */; };
+		6DAD116718CA074600237084 /* CDEBaselineConsolidator.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BAB4BB184677640096318D /* CDEBaselineConsolidator.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD116818CA074600237084 /* CDEBaselineConsolidator.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BAB4BC184677640096318D /* CDEBaselineConsolidator.m */; };
+		6DAD116918CA074600237084 /* CDERebaser.h in Headers */ = {isa = PBXBuildFile; fileRef = 07E64F5A18799F6800305C22 /* CDERebaser.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD116A18CA074600237084 /* CDERebaser.m in Sources */ = {isa = PBXBuildFile; fileRef = 07E64F5B18799F6800305C22 /* CDERebaser.m */; };
+		6DAD116E18CA07B600237084 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6DAD116C18CA07B600237084 /* InfoPlist.strings */; };
 		9477ED641800146900C2A419 /* CDERevisionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 07DDA7E617C9ECF6009C6F94 /* CDERevisionManager.m */; };
 /* End PBXBuildFile section */
 
@@ -259,6 +327,14 @@
 		07E492E917172CB200FE81B5 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		07E64F5A18799F6800305C22 /* CDERebaser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDERebaser.h; sourceTree = "<group>"; };
 		07E64F5B18799F6800305C22 /* CDERebaser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDERebaser.m; sourceTree = "<group>"; };
+		6DAD10F918CA067900237084 /* Ensembles.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Ensembles.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		6DAD10FA18CA067900237084 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		6DAD10FD18CA067900237084 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		6DAD10FE18CA067A00237084 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		6DAD10FF18CA067A00237084 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		6DAD110F18CA067A00237084 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		6DAD116B18CA07B000237084 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = "Supporting Files/Info.plist"; sourceTree = SOURCE_ROOT; };
+		6DAD116D18CA07B600237084 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Supporting Files/en.lproj/InfoPlist.strings"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -275,6 +351,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6DAD10F518CA067900237084 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6DAD10FB18CA067900237084 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -531,17 +615,20 @@
 			isa = PBXGroup;
 			children = (
 				0777BF0F17183FD500F1D0D2 /* Source */,
+				6DAD110118CA067A00237084 /* Supporting Files */,
 				07592CA8177F2D1000816034 /* Tests */,
 				07E492E817172CB200FE81B5 /* Frameworks */,
 				07E492E717172CB200FE81B5 /* Products */,
 			);
 			sourceTree = "<group>";
+			usesTabs = 0;
 		};
 		07E492E717172CB200FE81B5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				07BF7933177F04B30029D500 /* libensembles_mac.a */,
 				07592CA6177F2D1000816034 /* Tests Mac.xctest */,
+				6DAD10F918CA067900237084 /* Ensembles.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -550,8 +637,31 @@
 			isa = PBXGroup;
 			children = (
 				07BF79B8177F05800029D500 /* Mac */,
+				6DAD10FA18CA067900237084 /* Cocoa.framework */,
+				6DAD110F18CA067A00237084 /* XCTest.framework */,
+				6DAD10FC18CA067900237084 /* Other Frameworks */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		6DAD10FC18CA067900237084 /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				6DAD10FD18CA067900237084 /* Foundation.framework */,
+				6DAD10FE18CA067A00237084 /* CoreData.framework */,
+				6DAD10FF18CA067A00237084 /* AppKit.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		6DAD110118CA067A00237084 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				6DAD116B18CA07B000237084 /* Info.plist */,
+				6DAD116C18CA07B600237084 /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			path = Ensembles;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -598,6 +708,47 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		6DAD10F618CA067900237084 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6DAD113718CA071C00237084 /* CDEFileUploadOperation.h in Headers */,
+				6DAD112918CA071700237084 /* CDEFoundationAdditions.h in Headers */,
+				6DAD113518CA071C00237084 /* CDEFileDownloadOperation.h in Headers */,
+				6DAD112F18CA071700237084 /* CDEAsynchronousOperation.h in Headers */,
+				6DAD114418CA072A00237084 /* CDEEventStore.h in Headers */,
+				6DAD114818CA072A00237084 /* CDEEventMigrator.h in Headers */,
+				6DAD115218CA073000237084 /* CDEObjectChange.h in Headers */,
+				6DAD112718CA071600237084 /* CDEAsynchronousTaskQueue.h in Headers */,
+				6DAD114C18CA072A00237084 /* CDEEventBuilder.h in Headers */,
+				6DAD116318CA074100237084 /* CDERevision.h in Headers */,
+				6DAD113E18CA072000237084 /* CDECloudManager.h in Headers */,
+				6DAD113118CA071C00237084 /* CDEICloudFileSystem.h in Headers */,
+				6DAD112D18CA071700237084 /* NSMapTable+CDEAdditions.h in Headers */,
+				6DAD116518CA074100237084 /* CDERevisionSet.h in Headers */,
+				6DAD116918CA074600237084 /* CDERebaser.h in Headers */,
+				6DAD112318CA070A00237084 /* CDEDefines.h in Headers */,
+				6DAD113318CA071C00237084 /* CDELocalCloudFileSystem.h in Headers */,
+				6DAD116118CA074100237084 /* CDERevisionManager.h in Headers */,
+				6DAD115618CA073000237084 /* CDEStoreModificationEvent.h in Headers */,
+				6DAD116718CA074600237084 /* CDEBaselineConsolidator.h in Headers */,
+				6DAD115418CA073000237084 /* CDEPropertyChangeValue.h in Headers */,
+				6DAD113B18CA072000237084 /* CDECloudFile.h in Headers */,
+				6DAD112B18CA071700237084 /* NSManagedObjectModel+CDEAdditions.h in Headers */,
+				6DAD114218CA072300237084 /* CDEPersistentStoreImporter.h in Headers */,
+				6DAD115818CA073000237084 /* CDEDataFile.h in Headers */,
+				6DAD112618CA071600237084 /* CoreDataEnsembles.h in Headers */,
+				6DAD114018CA072300237084 /* CDEPersistentStoreEnsemble.h in Headers */,
+				6DAD113918CA072000237084 /* CDECloudDirectory.h in Headers */,
+				6DAD112418CA070E00237084 /* CDEAvailabilityMacros.h in Headers */,
+				6DAD113D18CA072000237084 /* CDECloudFileSystem.h in Headers */,
+				6DAD114E18CA073000237084 /* CDEEventRevision.h in Headers */,
+				6DAD114618CA072A00237084 /* CDEEventIntegrator.h in Headers */,
+				6DAD114A18CA072A00237084 /* CDESaveMonitor.h in Headers */,
+				6DAD115018CA073000237084 /* CDEGlobalIdentifier.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
@@ -636,6 +787,24 @@
 			productReference = 07BF7933177F04B30029D500 /* libensembles_mac.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		6DAD10F818CA067900237084 /* Ensembles */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6DAD112118CA067A00237084 /* Build configuration list for PBXNativeTarget "Ensembles" */;
+			buildPhases = (
+				6DAD10F418CA067900237084 /* Sources */,
+				6DAD10F518CA067900237084 /* Frameworks */,
+				6DAD10F618CA067900237084 /* Headers */,
+				6DAD10F718CA067900237084 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Ensembles;
+			productName = Ensembles;
+			productReference = 6DAD10F918CA067900237084 /* Ensembles.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -647,7 +816,7 @@
 				ORGANIZATIONNAME = "Drew McCormack";
 				TargetAttributes = {
 					07592CA5177F2D1000816034 = {
-						TestTargetID = 07E492E517172CB200FE81B5;
+						TestTargetID = 6DAD10F818CA067900237084;
 					};
 				};
 			};
@@ -664,6 +833,7 @@
 			projectRoot = "";
 			targets = (
 				07BF7932177F04B30029D500 /* Ensembles Mac */,
+				6DAD10F818CA067900237084 /* Ensembles */,
 				07592CA5177F2D1000816034 /* Tests Mac */,
 			);
 		};
@@ -687,6 +857,14 @@
 				072F316C17D4C41B00541FED /* DeleteUninserted.json in Resources */,
 				072F316A17D4ABDF00541FED /* UpdateToUninserted.json in Resources */,
 				077B555317D1E5A0008AA7F7 /* DoubleInsertFixture.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6DAD10F718CA067900237084 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6DAD116E18CA07B600237084 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -772,6 +950,45 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		6DAD10F418CA067900237084 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6DAD114D18CA072A00237084 /* CDEEventBuilder.m in Sources */,
+				6DAD113618CA071C00237084 /* CDEFileDownloadOperation.m in Sources */,
+				6DAD112C18CA071700237084 /* NSManagedObjectModel+CDEAdditions.m in Sources */,
+				6DAD115A18CA073300237084 /* CDEEventStoreModel.xcdatamodeld in Sources */,
+				6DAD113218CA071C00237084 /* CDEICloudFileSystem.m in Sources */,
+				6DAD115118CA073000237084 /* CDEGlobalIdentifier.m in Sources */,
+				6DAD115318CA073000237084 /* CDEObjectChange.m in Sources */,
+				6DAD114918CA072A00237084 /* CDEEventMigrator.m in Sources */,
+				6DAD115718CA073000237084 /* CDEStoreModificationEvent.m in Sources */,
+				6DAD114518CA072A00237084 /* CDEEventStore.m in Sources */,
+				6DAD114318CA072300237084 /* CDEPersistentStoreImporter.m in Sources */,
+				6DAD116418CA074100237084 /* CDERevision.m in Sources */,
+				6DAD113018CA071700237084 /* CDEAsynchronousOperation.m in Sources */,
+				6DAD115918CA073000237084 /* CDEDataFile.m in Sources */,
+				6DAD116618CA074100237084 /* CDERevisionSet.m in Sources */,
+				6DAD114718CA072A00237084 /* CDEEventIntegrator.m in Sources */,
+				6DAD113F18CA072000237084 /* CDECloudManager.m in Sources */,
+				6DAD115518CA073000237084 /* CDEPropertyChangeValue.m in Sources */,
+				6DAD113818CA071C00237084 /* CDEFileUploadOperation.m in Sources */,
+				6DAD116818CA074600237084 /* CDEBaselineConsolidator.m in Sources */,
+				6DAD114F18CA073000237084 /* CDEEventRevision.m in Sources */,
+				6DAD113A18CA072000237084 /* CDECloudDirectory.m in Sources */,
+				6DAD112A18CA071700237084 /* CDEFoundationAdditions.m in Sources */,
+				6DAD112818CA071700237084 /* CDEAsynchronousTaskQueue.m in Sources */,
+				6DAD113418CA071C00237084 /* CDELocalCloudFileSystem.m in Sources */,
+				6DAD112518CA071600237084 /* CDEDefines.m in Sources */,
+				6DAD112E18CA071700237084 /* NSMapTable+CDEAdditions.m in Sources */,
+				6DAD116218CA074100237084 /* CDERevisionManager.m in Sources */,
+				6DAD113C18CA072000237084 /* CDECloudFile.m in Sources */,
+				6DAD116A18CA074600237084 /* CDERebaser.m in Sources */,
+				6DAD114B18CA072A00237084 /* CDESaveMonitor.m in Sources */,
+				6DAD114118CA072300237084 /* CDEPersistentStoreEnsemble.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -791,12 +1008,21 @@
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
+		6DAD116C18CA07B600237084 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6DAD116D18CA07B600237084 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		07592CB3177F2D1000816034 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Ensembles.framework/Versions/A/Ensembles";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
@@ -825,6 +1051,7 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
 			};
 			name = Debug;
@@ -832,6 +1059,7 @@
 		07592CB4177F2D1000816034 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Ensembles.framework/Versions/A/Ensembles";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
@@ -858,6 +1086,7 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
 			};
 			name = Release;
@@ -967,6 +1196,62 @@
 			};
 			name = Release;
 		};
+		6DAD111D18CA067A00237084 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				FRAMEWORK_VERSION = A;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = "Supporting Files/Info.plist";
+				INSTALL_PATH = "@rpath/";
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				WRAPPER_EXTENSION = framework;
+			};
+			name = Debug;
+		};
+		6DAD111E18CA067A00237084 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				ENABLE_NS_ASSERTIONS = NO;
+				FRAMEWORK_VERSION = A;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = "Supporting Files/Info.plist";
+				INSTALL_PATH = "@rpath/";
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				WRAPPER_EXTENSION = framework;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -996,6 +1281,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		6DAD112118CA067A00237084 /* Build configuration list for PBXNativeTarget "Ensembles" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6DAD111D18CA067A00237084 /* Debug */,
+				6DAD111E18CA067A00237084 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 
