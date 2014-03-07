@@ -14,9 +14,9 @@
 @class CDEPersistentStoreEnsemble;
 @protocol CDECloudFileSystem;
 
-/**
- @name Notifications
- */
+///
+/// @name Notifications
+///
 
 /**
  Posted when ensembles observes that a `NSManagedObjectContext` will save to the monitored persistent store. You can monitor this notification rather than the standard `NSManagedObjectContextWillSaveNotification` if you want to be sure that the ensemble has already prepared for the save when the notification is observed. If you observe `NSManagedObjectContextWillSaveNotification` directly, you can't be sure that the ensemble has observed the notification, because order of receivers is not defined.
@@ -48,32 +48,36 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
 
 
 /**
- @name Delegate
- */
-
-/**
  A protocol that includes methods invoked by the `CDEPeristentStoreEnsemble`. The ensemble uses this to inform of sync-related changes.
  */
 @protocol CDEPersistentStoreEnsembleDelegate <NSObject>
 
 @optional
 
+///
+/// @name Leeching
+///
+
 /**
- @brief Invoked during leeching when the contents of the persistent store are about to be migrated to the cloud.
+ Invoked during leeching when the contents of the persistent store are about to be migrated to the cloud.
  
  @param ensemble The `CDEPersistentStoreEnsemble` that is about to import
  */
 - (void)persistentStoreEnsembleWillImportStore:(CDEPersistentStoreEnsemble *)ensemble;
 
 /**
- @brief Invoked during leeching when the contents of the persistent store have been migrated to the cloud.
+ Invoked during leeching when the contents of the persistent store have been migrated to the cloud.
  
  @param ensemble The `CDEPersistentStoreEnsemble` that is importing the store
  */
 - (void)persistentStoreEnsembleDidImportStore:(CDEPersistentStoreEnsemble *)ensemble;
 
+///
+/// @name Merging
+///
+
 /**
- @brief Invoked when the ensemble is about to attempt to save merged changes into the persistent store.
+ Invoked when the ensemble is about to attempt to save merged changes into the persistent store.
  
  This method is invoked on a background thread. Both of the contexts passed have private queue concurrency type, and so they should only be accessed via calls to `performBlock...` methods.
  
@@ -92,7 +96,7 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
 - (BOOL)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble shouldSaveMergedChangesInManagedObjectContext:(NSManagedObjectContext *)savingContext reparationManagedObjectContext:(NSManagedObjectContext *)reparationContext;
 
 /**
- @brief Invoked when the ensemble attempted to save merged changes into the persistent store, but the save failed.
+ Invoked when the ensemble attempted to save merged changes into the persistent store, but the save failed.
  
  This method is invoked on a background thread. Both of the contexts passed have private queue concurrency type, and so they should only be accessed via calls to `performBlock...` methods.
  
@@ -112,7 +116,7 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
 - (BOOL)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didFailToSaveMergedChangesInManagedObjectContext:(NSManagedObjectContext *)savingContext error:(NSError *)error reparationManagedObjectContext:(NSManagedObjectContext *)reparationContext;
 
 /**
- @brief Invoked after the ensemble successfully saves merged changes into the persistent store.
+ Invoked after the ensemble successfully saves merged changes into the persistent store.
  
  This method is invoked on the thread used for saving the changes. The notification passed includes the `userInfo` dictionary from the notification that was posted when the context saved. It can be used to determine what object insertions, updates, and deletions occurred.
  
@@ -127,8 +131,12 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  */
 - (void)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didSaveMergeChangesWithNotification:(NSNotification *)notification;
 
+///
+/// @name Deleeching
+///
+
 /**
- @brief Invoked when the ensemble is forced to deleech due to an unexpected issue.
+ Invoked when the ensemble is forced to deleech due to an unexpected issue.
  
  In normal operation, an ensemble will not deleech unless requested to do so. However, circumstances can arise that can compromise the integrity of the sync data, in which case, the ensemble can elect to spontaneously deleech. 
  
@@ -141,8 +149,12 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  */
 - (void)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didDeleechWithError:(NSError *)error;
 
+///
+/// @name Object Identity
+///
+
 /**
- @brief Supply global identifiers for objects.
+ Supply global identifiers for objects.
  
  By default, the ensemble will generate random global identifiers for all objects. If logically-equivalent objects are inserted on multiple devices, after merging, there will be duplicates.
  
@@ -164,7 +176,7 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
 
 
 /**
- @brief The central class of Ensembles, it represents a set of synchronizing persistent stores.
+ The central class of Ensembles, it represents a set of synchronizing persistent stores.
  
  An ensemble can be seen as a set of persistent stores that exchange data in order to reach eventual consistency. The `CDEPersistentStoreEnsemble` class is responsible for monitoring saves to a persistent store, exchanging this data with ensemble objects on other peers, and merging changes from other peers into its persistent store.
  
@@ -176,28 +188,176 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  */
 @interface CDEPersistentStoreEnsemble : NSObject
 
+///
+/// @name Delegate
+///
+
+/**
+ The ensemble's delegate.
+ */
 @property (nonatomic, weak, readwrite) id <CDEPersistentStoreEnsembleDelegate> delegate;
+
+///
+/// @name Cloud File System
+///
+
+/**
+ The cloud file system, which is used to transfer files to other devices.
+ */
 @property (nonatomic, strong, readonly) id <CDECloudFileSystem> cloudFileSystem;
+
+///
+/// @name Storage for Ensemble
+///
+
+/**
+ The root of a directory used by the ensemble to store transaction logs and other data needed to sync.
+ 
+ The directory is setup when the ensemble leeches, and removed when it deleeches. The data stored includes the transaction logs, binary files, and various metadata files.
+ 
+ The default location is set by the framework to be a folder inside the user's Application Support directory. You can override this by passing a path upon initialization.
+ */
 @property (nonatomic, strong, readonly) NSString *localDataRootDirectory;
+
+///
+/// @name Ensemble Identity
+///
+
+/**
+ A global identifier for the ensemble.
+ 
+ The identifier is passed in during initialization. Ensemble objects on different devices with corresponding identifiers will sync their persistent stores.
+ */
 @property (nonatomic, strong, readonly) NSString *ensembleIdentifier;
+
+///
+/// @name Persistent Store and Model
+///
+
+/**
+ The path to the SQLite persistent store that is to be synced.
+ */
 @property (nonatomic, strong, readonly) NSString *storePath;
+
+/**
+ The file URL of the managed object model file used for the persistent store.
+ 
+ The URL is passed into upon initialization. It gives the location of the compiled model file, which has the extension `momd` or `mom`.
+ */
 @property (nonatomic, strong, readonly) NSURL *managedObjectModelURL;
+
+/**
+ The `NSManagedObjectModel` used for the monitored persistent store.
+ */
 @property (nonatomic, strong, readonly) NSManagedObjectModel *managedObjectModel;
+
+///
+/// @name Active State
+///
+
+/**
+ Whether the ensemble is currently in the process of leeching.
+ 
+ You should not attempt to merge during leeching, or attempt a second leech. Either will lead to an error.
+ */
 @property (nonatomic, assign, readonly, getter = isLeeched) BOOL leeched;
+
+/**
+ Whether the ensemble is currently in the process of merging changes from other devices.
+ 
+ Attempting to merge while another merge is in progress will lead to an error.
+ */
 @property (nonatomic, assign, readonly, getter = isMerging) BOOL merging;
 
-- (instancetype)initWithEnsembleIdentifier:(NSString *)identifier persistentStorePath:(NSString *)path managedObjectModelURL:(NSURL *)modelURL cloudFileSystem:(id <CDECloudFileSystem>)newCloudFileSystem;
-- (instancetype)initWithEnsembleIdentifier:(NSString *)identifier persistentStorePath:(NSString *)path managedObjectModelURL:(NSURL *)modelURL cloudFileSystem:(id <CDECloudFileSystem>)newCloudFileSystem localDataRootDirectory:(NSString *)dataRoot;
+///
+/// @name Initialization
+///
 
+/**
+ Initializes an ensemble with the default location for local data storage.
+ 
+ Unless you have good reason to set the local data root elsewhere, this is the initializer you should use.
+ 
+ @param identifier The global identifier for the ensemble. This must be the same for all syncing ensemble objects across devices.
+ @param path The path to the persistent store that is to be synced.
+ @param managedObjectModelURL A file URL for the location of the compiled (momd, mom) model file used in the persistent store.
+ @param cloudFileSystem The cloud file system object used to transfer files between devices.
+ */
+- (instancetype)initWithEnsembleIdentifier:(NSString *)identifier persistentStorePath:(NSString *)path managedObjectModelURL:(NSURL *)modelURL cloudFileSystem:(id <CDECloudFileSystem>)cloudFileSystem;
+
+/**
+ Initializes an ensemble.
+ 
+ This is the designated initializer.
+ 
+ @param identifier The global identifier for the ensemble. This must be the same for all syncing ensemble objects across devices.
+ @param path The path to the persistent store that is to be synced.
+ @param managedObjectModelURL A file URL for the location of the compiled (momd, mom) model file used in the persistent store.
+ @param cloudFileSystem The cloud file system object used to transfer files between devices.
+ @param dataRoot The path to the root directory used by the ensemble to store transaction logs and other metadata.
+ */
+- (instancetype)initWithEnsembleIdentifier:(NSString *)identifier persistentStorePath:(NSString *)path managedObjectModelURL:(NSURL *)modelURL cloudFileSystem:(id <CDECloudFileSystem>)cloudFileSystem localDataRootDirectory:(NSString *)dataRoot;
+
+///
+/// @name Leeching and Deleeching
+///
+
+/**
+ Attaches the ensemble to corresponding ensemble objects on other devices.
+ 
+ This method sets up local storage and metadata, and registers the persistent store with the cloud, so that ensemble objects on other devices know of its existence.
+ 
+ It also converts the contents of the persistent store into transaction logs, and adds them to the cloud for merging on other devices.
+ 
+ Because this can be a lengthy process, and can involve networking, the method is asynchronous.
+ 
+ @param completion A completion block that is executed when leeching completes, whether successful or not. The block is passed nil upon a successful merge, and an `NSError` otherwise.
+ */
 - (void)leechPersistentStoreWithCompletion:(CDECompletionBlock)completion;
+
+/**
+ Detaches the ensemble from peers, effectively terminating syncing.
+ 
+ The local data of the ensemble is deleted.
+ 
+ Because this can be a lengthy process, the method is asynchronous.
+ 
+ @param completion A completion block that is executed when deleeching completes. The block is passed nil upon a successful merge, and an `NSError` otherwise.
+ */
 - (void)deleechPersistentStoreWithCompletion:(CDECompletionBlock)completion;
 
+///
+/// @name Merging
+///
+
+/**
+ Begins merging data from other peers into the persistent store.
+ 
+ Merging involves retrieving new files from the cloud, importing them into the local data set, and applying the changes to the persistent store. This can take some time, so the method is asynchronous.
+ 
+ @param completion A block that is executed upon completion of merging, whether successful or not. The block is passed nil upon a successful merge, and an `NSError` otherwise.
+ */
 - (void)mergeWithCompletion:(CDECompletionBlock)completion;
+
+/**
+ Cancels a merge, if one is active.
+ 
+ @param completion A block that is executed upon completion. The block is passed nil if the cancellation is successful, and an `NSError` otherwise.
+ */
 - (void)cancelMergeWithCompletion:(CDECompletionBlock)completion;
 
-- (void)processPendingChangesWithCompletion:(CDECompletionBlock)block;
+///
+/// @name Waiting for Task Completion
+///
 
-- (void)stopMonitoringSaves;
+/**
+ Flushes any queued operations, and ensures all data is saved to disk.
+ 
+ You can use this method if you want to be sure ensembles has completed any backed-up tasks.
+ 
+ @param completion A block that is executed upon completion. The block is passed nil upon success, and an `NSError` otherwise.
+ */
+- (void)processPendingChangesWithCompletion:(CDECompletionBlock)block;
 
 @end
 

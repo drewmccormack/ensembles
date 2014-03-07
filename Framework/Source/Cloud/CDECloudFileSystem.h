@@ -12,17 +12,79 @@
 typedef void (^CDEFileExistenceCallback)(BOOL exists, BOOL isDirectory, NSError *error);
 typedef void (^CDEDirectoryContentsCallback)(NSArray *contents, NSError *error);
 
+/**
+ A cloud file system facilitates data transfer between devices.
+ 
+ Any backend that can store files at paths can be used. This could be a key-value store like S3, or a true file system like WebDAV. Even direct connections like the multipeer connectivity in iOS 7 can be used as a cloud file system when coupled with a local cache of files.
+ */
 @protocol CDECloudFileSystem <NSObject>
 
 @required
+
+///
+/// @name Connection
+///
+
+/**
+ Whether ensembles is considered to be connected to the file system, and thereby can make requests. 
+ 
+ Different backends may interpret this differently. What should be true is that if isConnected returns `YES`, ensembles can attempt to make file transactions.
+ 
+ If this property is `NO`, ensembles will invoke the `connect:` method before attempting further file operations.
+ */
 @property (nonatomic, assign, readonly) BOOL isConnected;
+
+/**
+ A token representing the user of the cloud file system.
+ 
+ Often this will be the user or login name.
+ 
+ When implementing a cloud file system class, it is important to fire KVO notifications when the identity changes. These are observed by the ensemble, and used to determine whether it is necessary to force a deleech.
+ */
 @property (nonatomic, strong, readonly) id <NSObject, NSCopying, NSCoding> identityToken; // Must fire KVO Notifications
 
+/**
+ Attempts to connect to the cloud backend.
+ 
+ If successful, the completion block should be called on the main thread with argument of `nil`. If the connection fails, an `NSError` instance should be passed to the completion block.
+ 
+ @param completion The completion block called when the connection succeeds or fails.
+ */
 - (void)connect:(CDECompletionBlock)completion;
 
+///
+/// @name File Existence
+///
+
+/**
+ Determines whether a file exists in the cloud, and if so, whether it is a standard file or a directory.
+ 
+ Upon determining whether the file exists, the completion block should be called on the main thread.
+ 
+ @param block The completion block, which takes `BOOL` arguments for whether the file exists and whether it is a directory. The last argument is an `NSError`, which should be `nil` if successful.
+ */
 - (void)fileExistsAtPath:(NSString *)path completion:(CDEFileExistenceCallback)block;
 
+///
+/// @name Working with Directories
+///
+
+/**
+ Creates a directory at a given path.
+ 
+ The completion block should be called on the main thread when the creation concludes, passing an error or `nil`.
+ 
+ @param block The completion block, which takes one argument, an `NSError`. It should be `nil` upon success.
+ */
 - (void)createDirectoryAtPath:(NSString *)path completion:(CDECompletionBlock)block;
+
+/**
+ Determines the contents of a directory at a given path.
+ 
+ The completion block has an `NSArray` as its first parameter. The array should contain `CDECloudFile` and `CDECloudDirectory` objects.
+ 
+ @param block The completion block, which takes two arguments. The first is an array of file/directory objects, and the second is an `NSError`. It should be `nil` upon success.
+ */
 - (void)contentsOfDirectoryAtPath:(NSString *)path completion:(CDEDirectoryContentsCallback)block;
 
 - (void)removeItemAtPath:(NSString *)fromPath completion:(CDECompletionBlock)block;

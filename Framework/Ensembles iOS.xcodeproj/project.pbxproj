@@ -684,7 +684,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/usr/local/bin/appledoc --docset-bundle-id com.mentalfaculty.ensembles --project-name \"Ensembles\" --project-company \"The Mental Faculty B.V.\" --company-id com.mentalfaculty --output ~/Desktop/appledoc.output --create-docset --install-docset --create-html --exit-threshold 2 --no-repeat-first-par --keep-undocumented-objects --keep-undocumented-members \"${SRCROOT}/Source\"";
+			shellScript = "/usr/local/bin/appledoc --docset-bundle-id com.mentalfaculty.ensembles --project-name \"Ensembles\" --project-company \"The Mental Faculty B.V.\" --company-id com.mentalfaculty --output ~/Desktop/appledoc.output --create-docset --install-docset --create-html --exit-threshold 2 --no-repeat-first-par \"${SRCROOT}/Source\"\n\n# Other useful flags: --keep-undocumented-objects --keep-undocumented-members";
 		};
 /* End PBXShellScriptBuildPhase section */
 
