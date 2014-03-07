@@ -56,7 +56,7 @@
     BOOL success = (httpResponse.statusCode >= 200 && httpResponse.statusCode < 300);
     if (!success) {
         CDELog(CDELoggingLevelError, @"Error uploading file. Response: %@", response);
-        NSDictionary *info = @{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Status code: %d", httpResponse.statusCode]};
+        NSDictionary *info = @{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Status code: %ld", (long)httpResponse.statusCode]};
         responseError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeServerError userInfo:info];
     }
 }
