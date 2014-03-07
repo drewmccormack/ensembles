@@ -188,6 +188,8 @@
 		6DAD116918CA074600237084 /* CDERebaser.h in Headers */ = {isa = PBXBuildFile; fileRef = 07E64F5A18799F6800305C22 /* CDERebaser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6DAD116A18CA074600237084 /* CDERebaser.m in Sources */ = {isa = PBXBuildFile; fileRef = 07E64F5B18799F6800305C22 /* CDERebaser.m */; };
 		6DAD116E18CA07B600237084 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6DAD116C18CA07B600237084 /* InfoPlist.strings */; };
+		6DAD11E418CA09A000237084 /* Ensembles.h in Headers */ = {isa = PBXBuildFile; fileRef = 6DAD11E218CA09A000237084 /* Ensembles.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6DAD11E518CA09A000237084 /* Ensembles.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DAD11E318CA09A000237084 /* Ensembles.m */; };
 		9477ED641800146900C2A419 /* CDERevisionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 07DDA7E617C9ECF6009C6F94 /* CDERevisionManager.m */; };
 /* End PBXBuildFile section */
 
@@ -335,6 +337,8 @@
 		6DAD110F18CA067A00237084 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		6DAD116B18CA07B000237084 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = "Supporting Files/Info.plist"; sourceTree = SOURCE_ROOT; };
 		6DAD116D18CA07B600237084 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Supporting Files/en.lproj/InfoPlist.strings"; sourceTree = SOURCE_ROOT; };
+		6DAD11E218CA09A000237084 /* Ensembles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Ensembles.h; sourceTree = "<group>"; };
+		6DAD11E318CA09A000237084 /* Ensembles.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Ensembles.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -453,6 +457,8 @@
 		0777BF0F17183FD500F1D0D2 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				6DAD11E218CA09A000237084 /* Ensembles.h */,
+				6DAD11E318CA09A000237084 /* Ensembles.m */,
 				07BF7A03177F0A9D0029D500 /* General */,
 				07973F00183BE44A007F48CA /* Cloud File Systems */,
 				07973F09183BE466007F48CA /* Cloud */,
@@ -745,6 +751,7 @@
 				6DAD114E18CA073000237084 /* CDEEventRevision.h in Headers */,
 				6DAD114618CA072A00237084 /* CDEEventIntegrator.h in Headers */,
 				6DAD114A18CA072A00237084 /* CDESaveMonitor.h in Headers */,
+				6DAD11E418CA09A000237084 /* Ensembles.h in Headers */,
 				6DAD115018CA073000237084 /* CDEGlobalIdentifier.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -982,6 +989,7 @@
 				6DAD112518CA071600237084 /* CDEDefines.m in Sources */,
 				6DAD112E18CA071700237084 /* NSMapTable+CDEAdditions.m in Sources */,
 				6DAD116218CA074100237084 /* CDERevisionManager.m in Sources */,
+				6DAD11E518CA09A000237084 /* Ensembles.m in Sources */,
 				6DAD113C18CA072000237084 /* CDECloudFile.m in Sources */,
 				6DAD116A18CA074600237084 /* CDERebaser.m in Sources */,
 				6DAD114B18CA072A00237084 /* CDESaveMonitor.m in Sources */,
@@ -1289,6 +1297,7 @@
 				6DAD111E18CA067A00237084 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
