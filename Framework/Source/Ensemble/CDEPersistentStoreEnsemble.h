@@ -311,6 +311,10 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  
  Because this can be a lengthy process, and can involve networking, the method is asynchronous.
  
+ If an error occurs during leeching, the ensemble will be left in a deleeched state. You will have to reattempt to leech at a later time.
+ 
+ You should avoid saving to the persistent store during leeching. If a save is detected, the leech will terminate with an error.
+ 
  @param completion A completion block that is executed when leeching completes, whether successful or not. The block is passed nil upon a successful merge, and an `NSError` otherwise.
  */
 - (void)leechPersistentStoreWithCompletion:(CDECompletionBlock)completion;
@@ -334,6 +338,8 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  Begins merging data from other peers into the persistent store.
  
  Merging involves retrieving new files from the cloud, importing them into the local data set, and applying the changes to the persistent store. This can take some time, so the method is asynchronous.
+ 
+ A merge can fail for a variety of reasons, from file downloads being incomplete, to the merge being interrupted by a save to the persistent store. Errors during merging are not typically very serious, and you should just retry the merge a bit later. Error codes can be found in CDEDefines.
  
  @param completion A block that is executed upon completion of merging, whether successful or not. The block is passed nil upon a successful merge, and an `NSError` otherwise.
  */
