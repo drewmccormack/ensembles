@@ -397,6 +397,7 @@
 			isa = PBXGroup;
 			children = (
 				07BF374A17F184DD00C56F64 /* Source */,
+				07BF374B17F184DD00C56F64 /* Supporting Files */,
 				07BF374717F184DD00C56F64 /* Frameworks */,
 				07BF374617F184DD00C56F64 /* Products */,
 				070D337518018AAD0054BA23 /* Tests */,
@@ -428,7 +429,6 @@
 		07BF374A17F184DD00C56F64 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				07D183FA1892824200E89B89 /* Baselines */,
 				07BF378E17F1853000C56F64 /* General */,
 				07BF37C417F1854F00C56F64 /* Cloud File Systems */,
 				07BF376E17F1853000C56F64 /* Cloud */,
@@ -436,7 +436,7 @@
 				07BF378117F1853000C56F64 /* Events */,
 				07BF379817F1853000C56F64 /* Model */,
 				07BF37A317F1853000C56F64 /* Revisioning */,
-				07BF374B17F184DD00C56F64 /* Supporting Files */,
+				07D183FA1892824200E89B89 /* Baselines */,
 			);
 			name = Source;
 			path = "Ensembles iOS";
@@ -447,16 +447,17 @@
 			children = (
 			);
 			name = "Supporting Files";
+			path = "Ensembles iOS";
 			sourceTree = "<group>";
 		};
 		07BF376E17F1853000C56F64 /* Cloud */ = {
 			isa = PBXGroup;
 			children = (
+				07BF377317F1853000C56F64 /* CDECloudFileSystem.h */,
 				07BF376F17F1853000C56F64 /* CDECloudDirectory.h */,
 				07BF377017F1853000C56F64 /* CDECloudDirectory.m */,
 				07BF377117F1853000C56F64 /* CDECloudFile.h */,
 				07BF377217F1853000C56F64 /* CDECloudFile.m */,
-				07BF377317F1853000C56F64 /* CDECloudFileSystem.h */,
 				07BF377417F1853000C56F64 /* CDECloudManager.h */,
 				07BF377517F1853000C56F64 /* CDECloudManager.m */,
 			);
@@ -499,6 +500,7 @@
 		07BF378E17F1853000C56F64 /* General */ = {
 			isa = PBXGroup;
 			children = (
+				07BF379517F1853000C56F64 /* CoreDataEnsembles.h */,
 				07BF379117F1853000C56F64 /* CDEDefines.h */,
 				07BF379217F1853000C56F64 /* CDEDefines.m */,
 				34700E9D188B225700FD00B1 /* CDEAvailabilityMacros.h */,
@@ -506,7 +508,6 @@
 				07BF379017F1853000C56F64 /* CDEAsynchronousTaskQueue.m */,
 				07BF379317F1853000C56F64 /* CDEFoundationAdditions.h */,
 				07BF379417F1853000C56F64 /* CDEFoundationAdditions.m */,
-				07BF379517F1853000C56F64 /* CoreDataEnsembles.h */,
 				07BF379617F1853000C56F64 /* NSMapTable+CDEAdditions.h */,
 				07BF379717F1853000C56F64 /* NSMapTable+CDEAdditions.m */,
 				07D2D639182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.h */,

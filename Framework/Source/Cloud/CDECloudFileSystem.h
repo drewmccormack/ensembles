@@ -28,7 +28,7 @@ typedef void (^CDEDirectoryContentsCallback)(NSArray *contents, NSError *error);
 /**
  Whether ensembles is considered to be connected to the file system, and thereby can make requests. 
  
- Different backends may interpret this differently. What should be true is that if isConnected returns `YES`, ensembles can attempt to make file transactions.
+ Different backends may interpret this differently. What should be true is that if `isConnected` returns `YES`, ensembles can attempt to make file transactions.
  
  If this property is `NO`, ensembles will invoke the `connect:` method before attempting further file operations.
  */
@@ -134,6 +134,8 @@ typedef void (^CDEDirectoryContentsCallback)(NSArray *contents, NSError *error);
 
 /**
  An optional method which can be implemented to perform initialization when the ensemble leeches.
+ 
+ For example, if the root directory of the file system needs to be created, this would be a good time to do that.
  
  The completion block takes an `NSError`, which should be `nil` upon successful completion. The block should be called on the main thread.
 

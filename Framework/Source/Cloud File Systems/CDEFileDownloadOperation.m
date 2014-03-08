@@ -21,6 +21,7 @@
 @synthesize url = url;
 @synthesize localPath = localPath;
 @synthesize completion = completion;
+@synthesize request = request;
 
 - (instancetype)initWithURL:(NSURL *)newURL localPath:(NSString *)newPath
 {
@@ -29,6 +30,7 @@
     self = [super init];
     if (self) {
         url = [newURL copy];
+        request = [NSMutableURLRequest requestWithURL:url];
         localPath = [newPath copy];
         fileManager = [[NSFileManager alloc] init];
         responseError = nil;
@@ -50,7 +52,6 @@
         return;
     }
     
-    NSURLRequest *request = [NSURLRequest requestWithURL:url];
     connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
 }
 
