@@ -855,6 +855,7 @@
     [managedObjectContext performBlockAndWait:^{
         NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:entityName];
         fetch.predicate = [NSPredicate predicateWithFormat:@"SELF IN %@", objectIDs];
+        fetch.includesSubentities = NO;
         objects = [managedObjectContext executeFetchRequest:fetch error:error];
         objectIDsOfFetched = [objects valueForKeyPath:@"objectID"];
     }];
