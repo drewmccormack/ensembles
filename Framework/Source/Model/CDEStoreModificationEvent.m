@@ -32,7 +32,7 @@
 - (void)awakeFromInsert
 {
     [super awakeFromInsert];
-    self.uniqueIdentifier = [[NSProcessInfo processInfo] globallyUniqueString];
+    if (!self.uniqueIdentifier) self.uniqueIdentifier = [[NSProcessInfo processInfo] globallyUniqueString];
 }
 
 - (void)awakeFromFetch

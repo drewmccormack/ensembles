@@ -21,8 +21,10 @@
 - (void)awakeFromInsert
 {
     [super awakeFromInsert];
-    self.uniqueIdentifier = [[NSProcessInfo processInfo] globallyUniqueString];
-    self.creationDate = [[NSDate alloc] init];
+    if (!self.uniqueIdentifier) {
+        self.uniqueIdentifier = [[NSProcessInfo processInfo] globallyUniqueString];
+        self.creationDate = [[NSDate alloc] init];
+    }
 }
 
 + (NSArray *)notesInManagedObjectContext:(NSManagedObjectContext *)context

@@ -19,7 +19,7 @@
 - (void)awakeFromInsert
 {
     [super awakeFromInsert];
-    self.globalIdentifier = [[NSProcessInfo processInfo] globallyUniqueString];
+    if (!self.globalIdentifier) self.globalIdentifier = [[NSProcessInfo processInfo] globallyUniqueString];
 }
 
 + (NSArray *)fetchGlobalIdentifiersForObjectIDs:(NSArray *)objectIDs inManagedObjectContext:(NSManagedObjectContext *)context
