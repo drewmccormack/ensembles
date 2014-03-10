@@ -28,7 +28,7 @@ typedef void (^CDEDirectoryContentsCallback)(NSArray *contents, NSError *error);
 /**
  Whether ensembles is considered to be connected to the file system, and thereby can make requests. 
  
- Different backends may interpret this differently. What should be true is that if isConnected returns `YES`, ensembles can attempt to make file transactions.
+ Different backends may interpret this differently. What should be true is that if `isConnected` returns `YES`, ensembles can attempt to make file transactions.
  
  If this property is `NO`, ensembles will invoke the `connect:` method before attempting further file operations.
  */
@@ -81,18 +81,66 @@ typedef void (^CDEDirectoryContentsCallback)(NSArray *contents, NSError *error);
 /**
  Determines the contents of a directory at a given path.
  
- The completion block has an `NSArray` as its first parameter. The array should contain `CDECloudFile` and `CDECloudDirectory` objects.
+ The completion block has an `NSArray` as its first parameter. The array should contain `CDECloudFile` and `CDECloudDirectory` objects. The completion block should should be called on the main thread.
  
  @param block The completion block, which takes two arguments. The first is an array of file/directory objects, and the second is an `NSError`. It should be `nil` upon success.
  */
 - (void)contentsOfDirectoryAtPath:(NSString *)path completion:(CDEDirectoryContentsCallback)block;
 
+///
+/// @name Deleting Files and Directories
+///
+
+/**
+ Deletes a file or directory.
+ 
+ The completion block takes and `NSError`, which should be `nil` upon successful completion. The block should be called on the main thread.
+ 
+ @param block The completion block, which takes one argument, an `NSError`.
+ */
 - (void)removeItemAtPath:(NSString *)fromPath completion:(CDECompletionBlock)block;
 
+///
+/// @name Transferring Files
+///
+
+/**
+ Uploads a local file to the cloud file system.
+ 
+ The completion block takes an `NSError`, which should be `nil` upon successful completion. The block should be called on the main thread.
+ 
+ @param fromPath The path to the file on the device.
+ @param toPath The path of the file in the cloud file system.
+ @param block The completion block, which takes one argument, an `NSError`.
+ */
 - (void)uploadLocalFile:(NSString *)fromPath toPath:(NSString *)toPath completion:(CDECompletionBlock)block;
+
+/**
+ Downloads a cloud file to the local file system.
+ 
+ The completion block takes an `NSError`, which should be `nil` upon successful completion. The block should be called on the main thread.
+ 
+ @param fromPath The path of the file in the cloud file system.
+ @param toPath The path to the file on the device.
+ @param block The completion block, which takes one argument, an `NSError`.
+ */
 - (void)downloadFromPath:(NSString *)fromPath toLocalFile:(NSString *)toPath completion:(CDECompletionBlock)block;
 
 @optional
+
+///
+/// @name Initial Setup
+///
+
+/**
+ An optional method which can be implemented to perform initialization when the ensemble leeches.
+ 
+ For example, if the root directory of the file system needs to be created, this would be a good time to do that.
+ 
+ The completion block takes an `NSError`, which should be `nil` upon successful completion. The block should be called on the main thread.
+
+ @param block The completion block, which takes one argument, an `NSError`.
+ */
 - (void)performInitialPreparation:(CDECompletionBlock)completion;
 
 @end

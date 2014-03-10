@@ -451,6 +451,7 @@
     [managedObjectContext performBlockAndWait:^{
         [objectIDsByEntity enumerateKeysAndObjectsUsingBlock:^(NSString *entityName, NSSet *objectIDs, BOOL *stop) {
             NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:entityName];
+            fetch.includesSubentities = NO;
             fetch.predicate = [NSPredicate predicateWithFormat:@"NOT (SELF IN %@)", objectIDs];
             NSError *error;
             NSArray *unreferencedObjects = [managedObjectContext executeFetchRequest:fetch error:&error];
@@ -854,6 +855,7 @@
     [managedObjectContext performBlockAndWait:^{
         NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:entityName];
         fetch.predicate = [NSPredicate predicateWithFormat:@"SELF IN %@", objectIDs];
+        fetch.includesSubentities = NO;
         objects = [managedObjectContext executeFetchRequest:fetch error:error];
         objectIDsOfFetched = [objects valueForKeyPath:@"objectID"];
     }];
