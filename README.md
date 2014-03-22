@@ -3,7 +3,7 @@ Core Data Ensembles
 
 _Author:_ Drew McCormack<br>
 _Created:_ 29th September, 2013<br>
-_Last Updated:_ 10th March, 2014
+_Last Updated:_ 22nd March, 2014
 
 *You can kickstart integration of Ensembles in your app &mdash; and support the open source project &mdash; by purchasing a support and documentation package at [ensembles.io](ensembles.io).*
 
@@ -59,7 +59,7 @@ By way of example, if you want to support Dropbox, you need to add the DropboxSD
 
 #### Idiomatic  App
 
-Idiomatic is a relatively simple example app which incorporates Ensembles and works with iCloud or Dropbox to sync across devices. The app allows you to record your ideas, and add tags to group them. The Core Data model of the app includes two entities, with a many-to-many relationship.
+Idiomatic is a relatively simple example app which incorporates Ensembles and works with iCloud or Dropbox to sync across devices. The app allows you to record your ideas, include a photo, and add tags to group them. The Core Data model of the app has three entities, including a many-to-many relationship.
 
 The Idiomatic project is a good way to get acquainted with Ensembles, and how it is integrated in a Core Data app. Idiomatic can be run in the iPhone Simulator, or on a device, but in order to test it, you need to follow a few preparatory steps.
 
@@ -67,10 +67,10 @@ The Idiomatic project is a good way to get acquainted with Ensembles, and how it
 2. Select the Idiomatic Project in the source list of the Xcode project, and then select the Idiomatic target.
 3. In the General section, set the bundle identifier (eg com.yourcompany.idiomatic).
 4. Select the _Capabilities_ section, turn on the iCloud switch, and replace the existing Ubiquity Container with your own.
-5. At the top of the `IDMAppDelegate` class, locate this code
+5. At the top of the `IDMSyncManager` class, locate this code
 
 		NSString * const IDMICloudContainerIdentifier = @"P7BXV6PHLD.com.mentalfaculty.idiomatic";
-		
+
 6. Fill in the Ubiquity Container Identifier appropriate for your bundle identifier and team identifier. You can find this on the iOS Developer Center under the App ID you registered. Just combine the _Prefix_ entry with the _ID_.
 7. Build and install on devices and simulators that are logged into the same iCloud account.
 8. Add notes, and tag them as desired. The app will sync when it becomes active, but you can force a sync by tapping the button under the Groups table.
@@ -84,7 +84,7 @@ Dropbox sync should work via The Mental Faculty account, but if you want to use 
 5. Choose 'Yes &mdash; My app only needs access to files it creates'
 6. Name the app (eg Idiomatic)
 7. Click on Create app 
-8. At the top of the `IDMAppDelegate` class, locate this code, and replace the values with the strings you just created on the Dropbox site.
+8. At the top of the `IDMSyncManager` class, locate this code, and replace the values with the strings you just created on the Dropbox site.
 
 		NSString * const IDMDropboxAppKey = @"xxxxxxxxxxxxxxx";
 		NSString * const IDMDropboxAppSecret = @"xxxxxxxxxxxxxxx";
@@ -94,6 +94,8 @@ Dropbox sync should work via The Mental Faculty account, but if you want to use 
 11. Open the URL Types section, and change the URL Schemes entry to 
 
 		db-<Your Dropbox App Key>
+
+Idiomatic includes one more sync service: IdioSync. This is a custom service based on a Node.js server, and Amazon S3 storage. The source code for the server is provided to those purchasing a Priority Support Package at [ensembles.io](http://ensembles.io).
 
 #### Getting to Know Ensembles
 
