@@ -494,11 +494,10 @@
     }];
         
     // Only now actually create objects, on the main context queue
-    NSArray *globalIds = [changesNeedingNewObjects valueForKeyPath:@"globalIdentifier"];
-    NSMutableArray *newObjects = [[NSMutableArray alloc] initWithCapacity:globalIds.count];
+    NSMutableArray *newObjects = [[NSMutableArray alloc] initWithCapacity:changesNeedingNewObjects.count];
     __block BOOL success = YES;
     [managedObjectContext performBlockAndWait:^{
-        for (CDEGlobalIdentifier *globalId in globalIds) {
+        for (NSUInteger i = 0; i < changesNeedingNewObjects.count; i++) {
             id newObject = [NSEntityDescription insertNewObjectForEntityForName:entity.name inManagedObjectContext:managedObjectContext];
             if (!newObject) {
                 success = NO;
@@ -520,6 +519,7 @@
     if (!success) return NO;
     
     // Update the global ids with the store object ids
+    NSArray *globalIds = [changesNeedingNewObjects valueForKeyPath:@"globalIdentifier"];
     [globalIds enumerateObjectsUsingBlock:^(CDEGlobalIdentifier *globalId, NSUInteger i, BOOL *stop) {
         NSString *uri = uris[i];
         globalId.storeURI = uri;
