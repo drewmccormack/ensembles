@@ -61,6 +61,13 @@
 			remoteGlobalIDString = 070D336118018A960054BA23;
 			remoteInfo = "Tests iOS";
 		};
+		07168C0318E037FC00153494 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9477ED211800132E00C2A419 /* Ensembles Mac.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 6DAD10F918CA067900237084;
+			remoteInfo = Ensembles;
+		};
 		0726FDC118AA47C700670262 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0726FDBB18AA47C700670262 /* DropboxSDK.xcodeproj */;
@@ -329,6 +336,7 @@
 			isa = PBXGroup;
 			children = (
 				9477ED281800132F00C2A419 /* libensembles_mac.a */,
+				07168C0418E037FC00153494 /* Ensembles.framework */,
 				9477ED2A1800132F00C2A419 /* Tests Mac.xctest */,
 			);
 			name = Products;
@@ -416,7 +424,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = IDM;
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = "The Mental Faculty B.V.";
 				TargetAttributes = {
 					074B959717EC783B0016F84D = {
@@ -479,6 +487,13 @@
 			fileType = wrapper.cfbundle;
 			path = "Tests iOS.xctest";
 			remoteRef = 070F46EF1805CDCB00EE36E5 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		07168C0418E037FC00153494 /* Ensembles.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Ensembles.framework;
+			remoteRef = 07168C0318E037FC00153494 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		0726FDC218AA47C700670262 /* DropboxSDK.framework */ = {

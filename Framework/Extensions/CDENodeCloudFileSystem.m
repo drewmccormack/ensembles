@@ -283,7 +283,7 @@
         if (authFailed) self.password = nil;
         if (!statusOK) {
             NSInteger code = authFailed ? CDEErrorCodeAuthenticationFailure : CDEErrorCodeServerError;
-            NSDictionary *userInfo = @{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"HTTP status code was %d", statusCode]};
+            NSDictionary *userInfo = @{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"HTTP status code was %ld", (long)statusCode]};
             error = [NSError errorWithDomain:CDEErrorDomain code:code userInfo:userInfo];
             if (completion) completion(error, nil);
             return;
