@@ -15,6 +15,7 @@
 
 ### Third-Party Developers on Ensembles
 * [Sync Ensemble](http://nimbleworks.co.uk/blog/sync-ensemble) by Nimbleworks
+* [MealPlan Sync with Ensembles](http://blog.stevex.net/2014/03/mealplan-sync-with-ensembles/) by Steve Tibbett
 
 ### Articles Related to Sync
 * [A Comparison of Syncing Technologies](http://grasmeyer.com/blog/2013/10/8/a-comparison-of-syncing-technologies) by Joel Grasmeyer
