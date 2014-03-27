@@ -58,7 +58,10 @@
     eventBuilder.ensemble = self.ensemble;
     [eventBuilder makeNewEventOfType:CDEStoreModificationEventTypeBaseline];
     [eventBuilder performBlockAndWait:^{
+        // Use distant past for the time, so the leeched data gets less
+        // priority than existing data.
         eventBuilder.event.globalCount = 0;
+        eventBuilder.event.timestamp = [[NSDate distantPast] timeIntervalSinceReferenceDate];
     }];
     
     NSMutableSet *allObjects = [[NSMutableSet alloc] initWithCapacity:1000];
