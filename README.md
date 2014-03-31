@@ -34,7 +34,7 @@ To add Ensembles to your App's Xcode Project with CocoaPods...
 
 To manually add Ensembles to your App's Xcode Project...
 
-1. Drag the `Ensembles iOS.xcodeproj` project from the `Framework` directory into your Xcode project.
+1. In Finder, drag the `Ensembles iOS.xcodeproj` project from the `Framework` directory into your Xcode project.
 2. Select the App's project root, and the App target.
 3. In the General tab, click the + button in the _Linked Frameworks and Libraries_ section.
 4. Choose the `libensembles_ios.a` library and add it.
