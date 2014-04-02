@@ -55,7 +55,7 @@
     __block NSArray *result = nil;
     [eventManagedObjectContext performBlockAndWait:^{
         CDEStoreModificationEvent *lastMergeEvent = [CDEStoreModificationEvent fetchNonBaselineEventForPersistentStoreIdentifier:eventStore.persistentStoreIdentifier revisionNumber:eventStore.lastMergeRevision inManagedObjectContext:eventManagedObjectContext];
-        CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:eventManagedObjectContext];
+        CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchMostRecentBaselineStoreModificationEventInManagedObjectContext:eventManagedObjectContext];
         CDERevisionSet *baselineRevisionSet = baseline.revisionSet;
 
         CDERevisionSet *fromRevisionSet = lastMergeEvent.revisionSet;
@@ -93,7 +93,7 @@
     
     __block NSArray *result = nil;
     [eventManagedObjectContext performBlockAndWait:^{
-        CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:eventManagedObjectContext];
+        CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchMostRecentBaselineStoreModificationEventInManagedObjectContext:eventManagedObjectContext];
         CDERevisionSet *baselineRevisionSet = baseline.revisionSet;
 
         CDERevisionSet *minSet = [[CDERevisionSet alloc] init];
@@ -147,7 +147,7 @@
 {
     __block BOOL result = YES;
     [eventManagedObjectContext performBlockAndWait:^{
-        CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:eventManagedObjectContext];
+        CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchMostRecentBaselineStoreModificationEventInManagedObjectContext:eventManagedObjectContext];
         
         NSArray *eventsWithBaseline = events;
         if (baseline) eventsWithBaseline = [@[baseline] arrayByAddingObjectsFromArray:events];
@@ -255,7 +255,7 @@
 {
     __block BOOL result = YES;
     [eventManagedObjectContext performBlockAndWait:^{
-        CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:eventManagedObjectContext];
+        CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchMostRecentBaselineStoreModificationEventInManagedObjectContext:eventManagedObjectContext];
         CDERevisionSet *baselineRevisionSet = baseline.revisionSet;
         for (CDEStoreModificationEvent *event in events) {
             if (event == baseline) continue;
@@ -376,7 +376,7 @@
         newRevisionSet = lastMergeEvent.revisionSet;
         if (!newRevisionSet) {
             // No previous merge exists. Try baseline.
-            CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:eventManagedObjectContext];
+            CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchMostRecentBaselineStoreModificationEventInManagedObjectContext:eventManagedObjectContext];
             if (baseline)
                 newRevisionSet = baseline.revisionSet;
             else

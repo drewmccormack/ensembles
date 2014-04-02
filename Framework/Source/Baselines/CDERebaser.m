@@ -42,7 +42,7 @@
 {
     NSManagedObjectContext *context = eventStore.managedObjectContext;
     [context performBlock:^{
-        CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:context];
+        CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchMostRecentBaselineStoreModificationEventInManagedObjectContext:context];
         CDERevisionSet *baselineRevisionSet = baseline.revisionSet;
         NSSet *storeIds = baselineRevisionSet.persistentStoreIdentifiers;
         NSArray *types = @[@(CDEStoreModificationEventTypeMerge), @(CDEStoreModificationEventTypeSave)];
@@ -109,7 +109,7 @@
     __block BOOL hasBaseline = NO;
     __block CDERevisionSet *baselineRevisionSet = nil;
     [context performBlockAndWait:^{
-        CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:context];
+        CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchMostRecentBaselineStoreModificationEventInManagedObjectContext:context];
         hasBaseline = baseline != nil;
         baselineRevisionSet = baseline.revisionSet;
     }];
@@ -138,7 +138,7 @@
     NSManagedObjectContext *context = eventStore.managedObjectContext;
     [context performBlock:^{
         // Fetch objects
-        CDEStoreModificationEvent *existingBaseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:context];
+        CDEStoreModificationEvent *existingBaseline = [CDEStoreModificationEvent fetchMostRecentBaselineStoreModificationEventInManagedObjectContext:context];
         NSArray *eventsToMerge = [CDEStoreModificationEvent fetchNonBaselineEventsUpToGlobalCount:newBaselineGlobalCount inManagedObjectContext:context];
         if (existingBaseline && eventsToMerge.count == 0) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -272,7 +272,7 @@
     NSManagedObjectContext *context = eventStore.managedObjectContext;
     __block CDERevisionSet *baselineRevisionSet;
     [context performBlockAndWait:^{
-        CDEStoreModificationEvent *baselineEvent = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:context];
+        CDEStoreModificationEvent *baselineEvent = [CDEStoreModificationEvent fetchMostRecentBaselineStoreModificationEventInManagedObjectContext:context];
         baselineRevisionSet = baselineEvent.revisionSet;
     }];
     

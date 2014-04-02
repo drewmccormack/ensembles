@@ -204,22 +204,22 @@
 
     NSError *error;
     NSArray *events = [context executeFetchRequest:fetch error:&error];
-    NSAssert(events, @"Could not fetch store mod events: %@", error);
     
     return events;
 }
 
-+ (instancetype)fetchBaselineStoreModificationEventInManagedObjectContext:(NSManagedObjectContext *)context
++ (instancetype)fetchMostRecentBaselineStoreModificationEventInManagedObjectContext:(NSManagedObjectContext *)context
 {
     NSFetchRequest *fetch = [[NSFetchRequest alloc] initWithEntityName:@"CDEStoreModificationEvent"];
     fetch.predicate = [NSPredicate predicateWithFormat:@"type = %d", CDEStoreModificationEventTypeBaseline];
     
     NSError *error;
     NSArray *events = [context executeFetchRequest:fetch error:&error];
-    NSAssert(events, @"Could not fetch store mod events: %@", error);
-    NSAssert(events.count < 2, @"Multiple baselines found");
+    if (!events) CDELog(CDELoggingLevelError, @"Could not fetch baselines: %@", error);
+        
+    if (events.count > 1) events = [CDERevisionManager sortStoreModificationEvents:events];
     
-    return events.lastObject;
+    return events.lastObject; // Return most recent
 }
 
 + (NSArray *)fetchNonBaselineEventsUpToGlobalCount:(CDEGlobalCount)globalCount inManagedObjectContext:(NSManagedObjectContext *)context
@@ -228,7 +228,7 @@
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
     fetch.predicate = [NSPredicate predicateWithFormat:@"type != %d AND globalCount <= %lld", CDEStoreModificationEventTypeBaseline, globalCount];
     NSArray *events = [context executeFetchRequest:fetch error:&error];
-    NSAssert(events, @"Fetch of events up to global count failed: %@", error);
+    if (!events) CDELog(CDELoggingLevelError, @"Could not fetch events: %@", error);
     return [CDERevisionManager sortStoreModificationEvents:events];
 }
 
@@ -238,7 +238,7 @@
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
     fetch.predicate = [NSPredicate predicateWithFormat:@"type != %d", CDEStoreModificationEventTypeBaseline];
     NSArray *events = [context executeFetchRequest:fetch error:&error];
-    NSAssert(events, @"Fetch of events failed: %@", error);
+    if (!events) CDELog(CDELoggingLevelError, @"Could not fetch events: %@", error);
     return [CDERevisionManager sortStoreModificationEvents:events];
 }
 

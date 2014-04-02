@@ -300,7 +300,7 @@
         if (needFullIntegration) {
             // All events, including baseline
             NSMutableArray *events = [[CDEStoreModificationEvent fetchNonBaselineEventsInManagedObjectContext:eventStoreContext] mutableCopy];
-            CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:eventStoreContext];
+            CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchMostRecentBaselineStoreModificationEventInManagedObjectContext:eventStoreContext];
             if (baseline) [events insertObject:baseline atIndex:0];
             storeModEvents = events;
         }

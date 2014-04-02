@@ -235,7 +235,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 {
     __block CDERevisionNumber revisionNumber = -1;
     [managedObjectContext performBlockAndWait:^{
-        CDEStoreModificationEvent *event = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:managedObjectContext];
+        CDEStoreModificationEvent *event = [CDEStoreModificationEvent fetchMostRecentBaselineStoreModificationEventInManagedObjectContext:managedObjectContext];
         CDERevision *revision = [event.revisionSet revisionForPersistentStoreIdentifier:self.persistentStoreIdentifier];
         if (revision) revisionNumber = revision.revisionNumber;
     }];
@@ -249,7 +249,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 {
     __block NSString *result = nil;
     [managedObjectContext performBlockAndWait:^{
-        CDEStoreModificationEvent *event = [CDEStoreModificationEvent fetchBaselineStoreModificationEventInManagedObjectContext:managedObjectContext];
+        CDEStoreModificationEvent *event = [CDEStoreModificationEvent fetchMostRecentBaselineStoreModificationEventInManagedObjectContext:managedObjectContext];
         result = event.uniqueIdentifier;
     }];
     return result;
