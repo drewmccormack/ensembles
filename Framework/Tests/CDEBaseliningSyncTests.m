@@ -131,29 +131,32 @@
     [self leechStores];
     [self mergeEnsemble:ensemble1];
 
-    for (NSUInteger i = 0; i < 100; i++) {
+    for (NSUInteger i = 0; i < 500; i++) {
         NSManagedObject *parentOnDevice1 = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context1];
         [parentOnDevice1 setValue:@"bob" forKey:@"name"];
     }
     XCTAssertTrue([context1 save:NULL], @"Could not save");
     
+    // Each update is worth 0.2, so we need more than 5 for each object to trigger a rebase.
     NSArray *parents = [context1 executeFetchRequest:[NSFetchRequest fetchRequestWithEntityName:@"Parent"] error:NULL];
-    for (id parent in parents) {
-        [parent setValue:@"tom" forKey:@"name"];
+    for (NSInteger i = 0; i < 6; i++) {
+        for (id parent in parents) {
+            [parent setValue:@"tom" forKey:@"name"];
+        }
+        XCTAssertTrue([context1 save:NULL], @"Could not save");
     }
-    XCTAssertTrue([context1 save:NULL], @"Could not save");
     
     [self mergeEnsemble:ensemble1];
     
     NSArray *baselineFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cloudBaselinesDir error:NULL];
     NSArray *eventFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cloudEventsDir error:NULL];
     XCTAssertEqual(baselineFiles.count, (NSUInteger)1, @"Should be one baseline file");
-    XCTAssertEqual(eventFiles.count, (NSUInteger)0, @"Should be one baseline file");
+    XCTAssertEqual(eventFiles.count, (NSUInteger)0, @"Should be no event file");
     
     [self mergeEnsemble:ensemble2];
     
     NSArray *parentsIn2 = [context2 executeFetchRequest:[NSFetchRequest fetchRequestWithEntityName:@"Parent"] error:NULL];
-    XCTAssertEqual(parentsIn2.count, (NSUInteger)100, @"Wrong parent count in second context");
+    XCTAssertEqual(parentsIn2.count, (NSUInteger)500, @"Wrong parent count in second context");
 }
 
 - (void)testRebasingGoesToMinimumGlobalCountFromAnyDevice
@@ -167,7 +170,7 @@
     XCTAssertEqual(eventFiles.count, (NSUInteger)0, @"Should be no event file");
 
     // Should generate event with global count 1
-    for (NSUInteger i = 0; i < 100; i++) {
+    for (NSUInteger i = 0; i < 500; i++) {
         NSManagedObject *parentOnDevice2 = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context2];
         [parentOnDevice2 setValue:@"jane" forKey:@"name"];
     }
@@ -175,33 +178,34 @@
     [self mergeEnsemble:ensemble2];
     
     baselineFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cloudBaselinesDir error:NULL];
-     eventFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cloudEventsDir error:NULL];
+    eventFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cloudEventsDir error:NULL];
     XCTAssertEqual(baselineFiles.count, (NSUInteger)1, @"Should be one baseline file");
     XCTAssertEqual(eventFiles.count, (NSUInteger)1, @"Should be one event file");
     
     // Should generate event with global count 1
-    for (NSUInteger i = 0; i < 100; i++) {
+    for (NSUInteger i = 0; i < 500; i++) {
         NSManagedObject *parentOnDevice1 = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context1];
         [parentOnDevice1 setValue:@"bob" forKey:@"name"];
     }
     XCTAssertTrue([context1 save:NULL], @"Could not save");
     
-    // Should generate event with global count 2
+    // Should generate events with global counts 2-12
     NSArray *parents = [context1 executeFetchRequest:[NSFetchRequest fetchRequestWithEntityName:@"Parent"] error:NULL];
-    for (id parent in parents) {
-        [parent setValue:@"tom" forKey:@"name"];
+    for (NSInteger i = 0; i < 11; i++) {
+        for (id parent in parents) {
+            [parent setValue:@"tom" forKey:@"name"];
+        }
+        XCTAssertTrue([context1 save:NULL], @"Could not save");
     }
-    XCTAssertTrue([context1 save:NULL], @"Could not save");
     
-    // Should generate a merge event with global count 3, and rebase up to global count 1 (lowest from any store)
+    // Should generate a merge event with global count 13, and rebase up to global count 1 (lowest from any store)
     [self mergeEnsemble:ensemble1];
     
     baselineFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cloudBaselinesDir error:NULL];
     eventFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cloudEventsDir error:NULL];
     XCTAssertEqual(baselineFiles.count, (NSUInteger)1, @"Should be one baseline file");
-    XCTAssertEqual(eventFiles.count, (NSUInteger)1, @"Should be an event from store 1 after rebasing");
+    XCTAssertEqual(eventFiles.count, (NSUInteger)11, @"Should be 5 events from store 1 after rebasing");
     XCTAssertEqual([baselineFiles.lastObject integerValue], (NSInteger)1, @"Wrong global count for baseline");
-    XCTAssertEqual([eventFiles.lastObject integerValue], (NSInteger)2, @"Wrong global count for left over event");
 }
 
 - (NSManagedObjectContext *)eventFileContextForURL:(NSURL *)baselineURL

@@ -90,12 +90,15 @@
     NSInteger insertedCount = [self countOfNonBaselineObjectChangesOfType:CDEObjectChangeTypeInsert];
     NSInteger updatedCount = [self countOfNonBaselineObjectChangesOfType:CDEObjectChangeTypeUpdate];
     
-    // Estimate size of baseline after rebasing
-    NSInteger rebasedBaselineCount = currentBaselineCount - 2*deletedCount - updatedCount + insertedCount;
+    // Estimate size of baseline after rebasing.
+    // Assume that an insertion is 1 data unit.
+    // A deletion removes at least one insertion, so it is worth 1 data unit.
+    // An update is usually to some subset of properties. Assume it has weight 0.2 data units.
+    float postRebaseSize = currentBaselineCount - deletedCount + insertedCount;
 
     // Estimate compaction
-    NSInteger currentCount = currentBaselineCount + deletedCount + insertedCount + updatedCount;
-    float compaction = 1.0f - ( rebasedBaselineCount / (float)MAX(1,currentCount) );
+    float currentSize = currentBaselineCount + insertedCount + 0.2*updatedCount;
+    float compaction = 1.0f - ( postRebaseSize / (float)MAX(1,currentSize) );
     compaction = MIN( MAX(compaction, 0.0f), 1.0f);
     
     return compaction;
@@ -120,7 +123,7 @@
     BOOL hasAllDevicesInBaseline = [baselineRevisionSet.persistentStoreIdentifiers isEqualToSet:allStores];
     
     BOOL hasManyEvents = [self countOfStoreModificationEvents] > 50;
-    BOOL hasAdequateChanges = [self countOfAllObjectChanges] >= 100;
+    BOOL hasAdequateChanges = [self countOfAllObjectChanges] >= 500;
     BOOL compactionIsAdequate = self.estimatedEventStoreCompactionFollowingRebase > 0.5f;
     return !hasBaseline || !hasAllDevicesInBaseline || hasManyEvents || (hasAdequateChanges && compactionIsAdequate);
 }
