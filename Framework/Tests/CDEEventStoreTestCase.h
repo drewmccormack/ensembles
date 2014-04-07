@@ -16,7 +16,7 @@
 @class CDEGlobalIdentifier;
 
 
-@interface CDEMockEventStore : NSObject
+@interface CDEMockEventStore : NSObject <NSLocking>
 
 @property (strong) NSManagedObjectContext *managedObjectContext;
 @property (readwrite) BOOL containsEventData;

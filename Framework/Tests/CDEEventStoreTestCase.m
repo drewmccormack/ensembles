@@ -16,7 +16,9 @@ static BOOL useDiskStore = NO;
 static NSString *testRootDirectory;
 static NSString *testStoreFile;
 
-@implementation CDEMockEventStore
+@implementation CDEMockEventStore {
+    NSRecursiveLock *_lock;
+}
 
 - (instancetype)init
 {
@@ -27,8 +29,12 @@ static NSString *testStoreFile;
     _identifierOfBaselineUsedToConstructStore = @"store1baseline";
     _currentBaselineIdentifier = @"store1";
     _dataFilenames = [NSSet set];
+    _lock = [[NSRecursiveLock alloc] init];
     return self;
 }
+
+- (void)lock { [_lock lock]; }
+- (void)unlock { [_lock unlock]; }
 
 - (void)updateRevisionsForSave
 {
