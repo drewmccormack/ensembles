@@ -256,9 +256,10 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
 ///
 
 /**
- Whether the ensemble is currently in the process of leeching.
+ Whether the ensemble is leeched, and thus ready to merge.
  
- You should not attempt to merge during leeching, or attempt a second leech. Either will lead to an error.
+ You should not attempt to merge unless the ensemble is leeched, or attempt to leech an ensemble that is already
+ leeched. Either will lead to an error.
  */
 @property (nonatomic, assign, readonly, getter = isLeeched) BOOL leeched;
 
