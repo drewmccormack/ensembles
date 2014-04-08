@@ -480,6 +480,19 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 }
 
 
+#pragma mark Locking
+
+- (void)lock
+{
+    [managedObjectContext lock];
+}
+
+- (void)unlock
+{
+    [managedObjectContext unlock];
+}
+
+
 #pragma mark - Merging Changes
 
 - (void)managedObjectContextDidSave:(NSNotification *)notif

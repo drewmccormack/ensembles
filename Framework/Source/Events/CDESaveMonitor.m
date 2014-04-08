@@ -175,6 +175,9 @@
     NSSet *updatedObjects = [changedObjectsDictionary objectForKey:NSUpdatedObjectsKey];
     if (insertedObjects.count + deletedObjects.count + updatedObjects.count == 0) return;
     
+    // Lock event store to make new event atomically
+    [self.eventStore lock];
+    
     // Add a store mod event
     CDEEventBuilder *eventBuilder = [[CDEEventBuilder alloc] initWithEventStore:self.eventStore];
     eventBuilder.ensemble = self.ensemble;
@@ -202,6 +205,8 @@
     // Deregister event, and clean up
     [self.eventStore deregisterIncompleteEventIdentifier:eventBuilder.event.uniqueIdentifier];
     [changedValuesByContext removeObjectForKey:context];
+    
+    [self.eventStore unlock];
 }
 
 @end
