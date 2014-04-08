@@ -96,8 +96,6 @@
 {
     CDELog(CDELoggingLevelVerbose, @"Consolidating baselines");
 
-    [eventStore lock];
-
     NSManagedObjectContext *context = self.eventStore.managedObjectContext;
     [context performBlock:^{
         // Fetch existing baselines, ordered beginning with most recent
@@ -159,7 +157,6 @@
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            [eventStore unlock];
             CDELog(CDELoggingLevelVerbose, @"Finishing baseline consolidation");
             if (completion) completion(nil);
         });
@@ -169,7 +166,6 @@
 - (void)failWithCompletion:(CDECompletionBlock)completion error:(NSError *)error
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [eventStore unlock];
         if (completion) completion(error);
     });
 }

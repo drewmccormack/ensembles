@@ -138,8 +138,6 @@
     CDEGlobalCount newBaselineGlobalCount = [self globalCountForNewBaseline];
     CDELog(CDELoggingLevelVerbose, @"New baseline global count: %lld", newBaselineGlobalCount);
     
-    [eventStore lock];
-    
     NSManagedObjectContext *context = eventStore.managedObjectContext;
     [context performBlock:^{
         // Fetch objects
@@ -147,7 +145,6 @@
         NSArray *eventsToMerge = [CDEStoreModificationEvent fetchNonBaselineEventsUpToGlobalCount:newBaselineGlobalCount inManagedObjectContext:context];
         if (existingBaseline && eventsToMerge.count == 0) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [eventStore unlock];
                 if (completion) completion(nil);
             });
             return;
@@ -161,7 +158,6 @@
         if (!passedChecks) {
             CDELog(CDELoggingLevelWarning, @"Failed rebasing prerequisite checks. Aborting rebase");
             dispatch_async(dispatch_get_main_queue(), ^{
-                [eventStore unlock];
                 if (completion) completion(error);
             });
             return;
@@ -204,7 +200,6 @@
         
         // Complete
         dispatch_async(dispatch_get_main_queue(), ^{
-            [eventStore unlock];
             CDELog(CDELoggingLevelVerbose, @"Finishing rebase");
             if (completion) completion(saved ? nil : error);
         });

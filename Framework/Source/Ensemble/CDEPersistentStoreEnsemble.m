@@ -635,13 +635,6 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
         [self dispatchCompletion:completion withError:error];
         [self.eventIntegrator stopMonitoringSaves];
         self.merging = NO;
-        
-        // Reset event store context to release memory
-        [eventStore lock];
-        [eventStore.managedObjectContext performBlockAndWait:^{
-            [eventStore.managedObjectContext reset];
-        }];
-        [eventStore unlock];
     }];
     
     taskQueue.info = kCDEMergeTaskInfo;

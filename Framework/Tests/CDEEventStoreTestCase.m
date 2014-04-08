@@ -33,9 +33,6 @@ static NSString *testStoreFile;
     return self;
 }
 
-- (void)lock { [_lock lock]; }
-- (void)unlock { [_lock unlock]; }
-
 - (void)updateRevisionsForSave
 {
     _lastRevision++;

@@ -10,7 +10,7 @@
 #import "CDEDefines.h"
 #import <CoreData/CoreData.h>
 
-@interface CDEEventStore : NSObject <NSLocking>
+@interface CDEEventStore : NSObject
 
 @property (nonatomic, strong, readonly) NSString *ensembleIdentifier;
 @property (nonatomic, strong, readwrite) id <NSObject, NSCopying, NSCoding> cloudFileSystemIdentityToken;
