@@ -40,8 +40,16 @@ typedef NS_ENUM(uint16_t, CDEUpdateStoreOption) {
 
 // These are call from thread of synced-store context
 - (void)addChangesForInsertedObjects:(NSSet *)insertedObjects objectsAreSaved:(BOOL)saved inManagedObjectContext:(NSManagedObjectContext *)context;
+- (NSDictionary *)changesDataForInsertedObjects:(NSSet *)insertedObjects objectsAreSaved:(BOOL)saved inManagedObjectContext:(NSManagedObjectContext *)context;
+- (void)addInsertChangesForChangesData:(NSDictionary *)changesData;
+
 - (void)addChangesForDeletedObjects:(NSSet *)deleted inManagedObjectContext:(NSManagedObjectContext *)context;
+- (NSDictionary *)changesDataForDeletedObjects:(NSSet *)deletedObjects inManagedObjectContext:(NSManagedObjectContext *)context;
+- (void)addDeleteChangesForChangesData:(NSDictionary *)changesData;
+
 - (void)addChangesForUpdatedObjects:(NSSet *)updated inManagedObjectContext:(NSManagedObjectContext *)context options:(CDEUpdateStoreOption)options propertyChangeValuesByObjectID:(NSDictionary *)changedValuesByObjectID;
+- (NSDictionary *)changesDataForUpdatedObjects:(NSSet *)updatedObjects inManagedObjectContext:(NSManagedObjectContext *)context options:(CDEUpdateStoreOption)options propertyChangeValuesByObjectID:(NSDictionary *)propertyChangeValuesByObjectID;
+- (void)addUpdateChangesForChangesData:(NSDictionary *)changesData;
 
 - (BOOL)addChangesForUnsavedManagedObjectContext:(NSManagedObjectContext *)contextWithChanges error:(NSError * __autoreleasing *)error;
 

@@ -94,18 +94,25 @@
     [eventManagedObjectContext performBlockAndWait:block];
 }
 
-#pragma mark - Adding Object Changes
+#pragma mark - Insertion Object Changes
 
 - (void)addChangesForInsertedObjects:(NSSet *)insertedObjects objectsAreSaved:(BOOL)saved inManagedObjectContext:(NSManagedObjectContext *)context
 {
     if (insertedObjects.count == 0) return;
     
+    // This method must be called on context thread
+    NSDictionary *changesData = [self changesDataForInsertedObjects:insertedObjects objectsAreSaved:saved inManagedObjectContext:context];
+    
+    // Add changes
+    [self addInsertChangesForChangesData:changesData];
+}
+
+- (NSDictionary *)changesDataForInsertedObjects:(NSSet *)insertedObjects objectsAreSaved:(BOOL)saved inManagedObjectContext:(NSManagedObjectContext *)context
+{
     // Created property value change objects from the inserted objects
     __block NSMutableArray *changeArrays = nil;
     __block NSMutableArray *entityNames = nil;
     __block NSArray *globalIdStrings = nil;
-
-    NSManagedObjectContext *insertedObjectsContext = context;
     
     // Create block to make property change values from the objects
     CDECodeBlock block = ^{
@@ -128,13 +135,45 @@
     };
     
     // Execute the block on the context's thread
-    if (insertedObjectsContext.concurrencyType == NSPrivateQueueConcurrencyType)
-        [insertedObjectsContext performBlockAndWait:block];
+    if (context.concurrencyType == NSPrivateQueueConcurrencyType)
+        [context performBlockAndWait:block];
     else
         block();
     
+    // Make global ids for all objects before creating object changes.
+    // We need all global ids to exist before trying to store relationships which utilize global ids.
+    NSDictionary *changesData = @{@"changeArrays" : changeArrays, @"entityNames" : entityNames, @"globalIdStrings" : (globalIdStrings ? : [NSNull null])};
+    NSArray *globalIds = [self addGlobalIdentifiersForInsertChangesData:changesData];
+    
+    return @{@"changeArrays" : changeArrays, @"entityNames" : entityNames, @"globalIds" : globalIds};
+}
+
+- (void)addInsertChangesForChangesData:(NSDictionary *)changesData
+{
     // Build the event from the property changes on the event store thread
     [eventManagedObjectContext performBlockAndWait:^{
+        NSArray *changeArrays = changesData[@"changeArrays"];
+        NSArray *entityNames = changesData[@"entityNames"];
+        NSArray *globalIds = changesData[@"globalIds"];
+        
+        // Now that all global ids exist, create object changes
+        __block NSUInteger i = 0;
+        [changeArrays cde_enumerateObjectsDrainingEveryIterations:50 usingBlock:^(NSArray *propertyChanges, NSUInteger index, BOOL *stop) {
+            CDEGlobalIdentifier *newGlobalId = globalIds[i];
+            NSString *entityName = entityNames[i];
+            [self addObjectChangeOfType:CDEObjectChangeTypeInsert forGlobalIdentifier:newGlobalId entityName:entityName propertyChanges:propertyChanges];
+            i++;
+        }];
+    }];
+}
+
+- (NSArray *)addGlobalIdentifiersForInsertChangesData:(NSDictionary *)changesData
+{
+    __block NSArray *returnArray = nil;
+    [eventManagedObjectContext performBlockAndWait:^{
+        NSArray *changeArrays = changesData[@"changeArrays"];
+        NSArray *entityNames = changesData[@"entityNames"];
+        NSArray *globalIdStrings = CDENSNullToNil(changesData[@"globalIdStrings"]);
         
         // Retrieve existing global identifiers
         NSArray *existingGlobalIdentifiers = nil;
@@ -142,8 +181,6 @@
             existingGlobalIdentifiers = [CDEGlobalIdentifier fetchGlobalIdentifiersForIdentifierStrings:globalIdStrings withEntityNames:entityNames inManagedObjectContext:eventManagedObjectContext];
         }
         
-        // Make global ids for all objects first before creating object changes.
-        // We need all global ids to exist before trying to store relationships which utilize global ids.
         NSMutableArray *globalIds = [[NSMutableArray alloc] init];
         __block NSUInteger i = 0;
         [changeArrays cde_enumerateObjectsDrainingEveryIterations:50 usingBlock:^(NSArray *propertyChanges, NSUInteger index, BOOL *stop) {
@@ -165,23 +202,27 @@
             [globalIds addObject:newGlobalId];
         }];
         
-        // Now that all global ids exist, create object changes
-        i = 0;
-        [changeArrays cde_enumerateObjectsDrainingEveryIterations:50 usingBlock:^(NSArray *propertyChanges, NSUInteger index, BOOL *stop) {
-            CDEGlobalIdentifier *newGlobalId = globalIds[i];
-            NSString *entityName = entityNames[i];
-            [self addObjectChangeOfType:CDEObjectChangeTypeInsert forGlobalIdentifier:newGlobalId entityName:entityName propertyChanges:propertyChanges];
-            i++;
-        }];
+        returnArray = globalIds;
+        
+        NSError *error;
+        if (![eventManagedObjectContext save:&error]) CDELog(CDELoggingLevelError, @"Error saving event store: %@", error);
     }];
+    return returnArray;
 }
+
+#pragma mark - Deletion Object Changes
 
 - (void)addChangesForDeletedObjects:(NSSet *)deletedObjects inManagedObjectContext:(NSManagedObjectContext *)context
 {
     if (deletedObjects.count == 0) return;
     
+    NSDictionary *changesData = [self changesDataForDeletedObjects:deletedObjects inManagedObjectContext:context];
+    [self addDeleteChangesForChangesData:changesData];
+}
+
+- (NSDictionary *)changesDataForDeletedObjects:(NSSet *)deletedObjects inManagedObjectContext:(NSManagedObjectContext *)context
+{
     __block NSArray *orderedObjectIDs = nil;
-    NSManagedObjectContext *deletedObjectsContext = context;
     
     CDECodeBlock block = ^{
         NSSet *deletedObjectIds = [deletedObjects valueForKeyPath:@"objectID"];
@@ -189,18 +230,24 @@
     };
     
     // Execute the block on the context's thread
-    if (deletedObjectsContext.concurrencyType == NSPrivateQueueConcurrencyType)
-        [deletedObjectsContext performBlockAndWait:block];
+    if (context.concurrencyType == NSPrivateQueueConcurrencyType)
+        [context performBlockAndWait:block];
     else
         block();
     
+    return @{@"orderedObjectIDs": orderedObjectIDs};
+}
+
+- (void)addDeleteChangesForChangesData:(NSDictionary *)changesData
+{
     [eventManagedObjectContext performBlockAndWait:^{
+        NSArray *orderedObjectIDs = changesData[@"orderedObjectIDs"];
         NSArray *globalIds = [CDEGlobalIdentifier fetchGlobalIdentifiersForObjectIDs:orderedObjectIDs inManagedObjectContext:eventManagedObjectContext];
         [globalIds enumerateObjectsUsingBlock:^(CDEGlobalIdentifier *globalId, NSUInteger i, BOOL *stop) {
             NSManagedObjectID *objectID = orderedObjectIDs[i];
             
             if (globalId == (id)[NSNull null]) {
-                CDELog(CDELoggingLevelError, @"Deleted object with no global identifier. This is usually due to creating and deleting two separate objects with the same global id in a single save operation. ObjectID: %@", objectID);
+                CDELog(CDELoggingLevelError, @"Deleted object with no global identifier. This can be due to creating and deleting two separate objects with the same global id in a single save operation. ObjectID: %@", objectID);
                 return;
             }
             
@@ -213,23 +260,30 @@
     }];
 }
 
+#pragma mark - Update Object Changes
+
 - (void)addChangesForUpdatedObjects:(NSSet *)updatedObjects inManagedObjectContext:(NSManagedObjectContext *)context options:(CDEUpdateStoreOption)options propertyChangeValuesByObjectID:(NSDictionary *)propertyChangeValuesByObjectID
 {
     if (updatedObjects.count == 0) return;
     
+    NSDictionary *changesData = [self changesDataForUpdatedObjects:updatedObjects inManagedObjectContext:context options:options propertyChangeValuesByObjectID:propertyChangeValuesByObjectID];
+    [self addUpdateChangesForChangesData:changesData];
+}
+
+- (NSDictionary *)changesDataForUpdatedObjects:(NSSet *)updatedObjects inManagedObjectContext:(NSManagedObjectContext *)context options:(CDEUpdateStoreOption)options propertyChangeValuesByObjectID:(NSDictionary *)propertyChangeValuesByObjectID
+{
     // Determine what needs to be stored
     BOOL storePreSaveInfo = (CDEUpdateStoreOptionPreSaveInfo & options);
     BOOL storeUnsavedValues = (CDEUpdateStoreOptionUnsavedValue & options);
     BOOL storeSavedValues = (CDEUpdateStoreOptionSavedValue & options);
     NSAssert(!(storePreSaveInfo && storeSavedValues), @"Cannot store pre-save info and saved values");
     NSAssert(!(storeUnsavedValues && storeSavedValues), @"Cannot store unsaved values and saved values");
-
+    
     // Can't access objects in background, so just pass ids
     __block NSArray *objectIDs = nil;
-    NSManagedObjectContext *updatedObjectsContext = context;
     CDECodeBlock block = ^{
         NSArray *objects = [updatedObjects allObjects];
-    
+        
         // Update property changes with saved values
         BOOL isPreSave = storePreSaveInfo || storeUnsavedValues;
         BOOL storeValues = storeUnsavedValues || storeSavedValues;
@@ -246,13 +300,23 @@
         objectIDs = newObjectIDs;
     };
     
-    if (updatedObjectsContext.concurrencyType != NSConfinementConcurrencyType)
-        [updatedObjectsContext performBlockAndWait:block];
+    if (context.concurrencyType != NSConfinementConcurrencyType)
+        [context performBlockAndWait:block];
     else
         block();
     
-    NSPersistentStoreCoordinator *coordinator = updatedObjectsContext.persistentStoreCoordinator;
+    return @{@"objectIDs" : objectIDs, @"persistentStoreCoordinator" : context.persistentStoreCoordinator, @"propertyChangeValuesByObjectID" : (propertyChangeValuesByObjectID ? : [NSNull null])};
+}
+
+- (void)addUpdateChangesForChangesData:(NSDictionary *)changesData
+{
     [eventManagedObjectContext performBlockAndWait:^{
+        NSArray *objectIDs = changesData[@"objectIDs"];
+        NSPersistentStoreCoordinator *coordinator = changesData[@"persistentStoreCoordinator"];
+        NSDictionary *propertyChangeValuesByObjectID = CDENSNullToNil(changesData[@"propertyChangeValuesByObjectID"]);
+        
+        [coordinator lock];
+        
         NSArray *globalIds = [CDEGlobalIdentifier fetchGlobalIdentifiersForObjectIDs:objectIDs inManagedObjectContext:eventManagedObjectContext];
         [globalIds cde_enumerateObjectsDrainingEveryIterations:50 usingBlock:^(CDEGlobalIdentifier *globalId, NSUInteger index, BOOL *stop) {
             if ((id)globalId == [NSNull null]) {
@@ -267,6 +331,8 @@
             
             [self addObjectChangeOfType:CDEObjectChangeTypeUpdate forGlobalIdentifier:globalId entityName:objectID.entity.name propertyChanges:propertyChanges];
         }];
+        
+        [coordinator unlock];
     }];
 }
 

@@ -158,7 +158,7 @@
     NSPersistentStore *monitoredStore = [self monitoredPersistentStoreInManagedObjectContext:context];
     if (!monitoredStore) return;
     
-    CDELog(CDELoggingLevelVerbose, @"Store changes post-save");
+    CDELog(CDELoggingLevelVerbose, @"Storing changes post-save");
     
     // Store changes
     [self storeChangesForContext:context changedObjectsDictionary:notif.userInfo];
@@ -175,38 +175,43 @@
     NSSet *updatedObjects = [changedObjectsDictionary objectForKey:NSUpdatedObjectsKey];
     if (insertedObjects.count + deletedObjects.count + updatedObjects.count == 0) return;
     
-    // Lock event store to make new event atomically
-    [self.eventStore lock];
+    // Reduce to just the objects belonging to the store
+    insertedObjects = [self monitoredManagedObjectsInSet:insertedObjects];
+    deletedObjects = [self monitoredManagedObjectsInSet:deletedObjects];
+    updatedObjects = [self monitoredManagedObjectsInSet:updatedObjects];
     
-    // Add a store mod event
+    // Get change data. Must be called on the context thread, not the event store thread.
     CDEEventBuilder *eventBuilder = [[CDEEventBuilder alloc] initWithEventStore:self.eventStore];
     eventBuilder.ensemble = self.ensemble;
-    [eventBuilder makeNewEventOfType:CDEStoreModificationEventTypeSave];
-    
-    // Register event, so if there is a crash, we can detect it and clean up
-    [self.eventStore registerIncompleteEventIdentifier:eventBuilder.event.uniqueIdentifier isMandatory:YES];
-    
-    // Inserted Objects. Do inserts before updates to make sure each object has a global identifier.
-    insertedObjects = [self monitoredManagedObjectsInSet:insertedObjects];
-    [eventBuilder addChangesForInsertedObjects:insertedObjects objectsAreSaved:YES inManagedObjectContext:context];
-    [self saveEventStore];
-    
-    // Deleted Objects
-    deletedObjects = [self monitoredManagedObjectsInSet:deletedObjects];
-    [eventBuilder addChangesForDeletedObjects:deletedObjects inManagedObjectContext:context];
-    [self saveEventStore];
-    
-    // Updated Objects
-    updatedObjects = [self monitoredManagedObjectsInSet:updatedObjects];
     NSDictionary *changedValuesByObjectID = [changedValuesByContext objectForKey:context];
-    [eventBuilder addChangesForUpdatedObjects:updatedObjects inManagedObjectContext:context options:CDEUpdateStoreOptionSavedValue propertyChangeValuesByObjectID:changedValuesByObjectID];
-    [self saveEventStore];
-    
-    // Deregister event, and clean up
-    [self.eventStore deregisterIncompleteEventIdentifier:eventBuilder.event.uniqueIdentifier];
-    [changedValuesByContext removeObjectForKey:context];
-    
-    [self.eventStore unlock];
+    NSDictionary *insertData = [eventBuilder changesDataForInsertedObjects:insertedObjects objectsAreSaved:YES inManagedObjectContext:context];
+    NSDictionary *updateData = [eventBuilder changesDataForUpdatedObjects:updatedObjects inManagedObjectContext:context options:CDEUpdateStoreOptionSavedValue propertyChangeValuesByObjectID:changedValuesByObjectID];
+    NSDictionary *deleteData = [eventBuilder changesDataForDeletedObjects:deletedObjects inManagedObjectContext:context];
+
+    // Make sure the event is saved atomically
+    [self.eventStore.managedObjectContext performBlockAndWait:^{
+        // Add a store mod event
+        [eventBuilder makeNewEventOfType:CDEStoreModificationEventTypeSave];
+        
+        // Register event, so if there is a crash, we can detect it and clean up
+        [self.eventStore registerIncompleteEventIdentifier:eventBuilder.event.uniqueIdentifier isMandatory:YES];
+        
+        // Inserted Objects. Do inserts before updates to make sure each object has a global identifier.
+        [eventBuilder addInsertChangesForChangesData:insertData];
+        [self saveEventStore];
+        
+        // Updated Objects
+        [eventBuilder addUpdateChangesForChangesData:updateData];
+        [self saveEventStore];
+        
+        // Deleted Objects
+        [eventBuilder addDeleteChangesForChangesData:deleteData];
+        [self saveEventStore];
+        
+        // Deregister event, and clean up
+        [self.eventStore deregisterIncompleteEventIdentifier:eventBuilder.event.uniqueIdentifier];
+        [changedValuesByContext removeObjectForKey:context];
+    }];
 }
 
 @end
