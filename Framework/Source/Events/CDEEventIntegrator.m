@@ -303,6 +303,7 @@
             CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchMostRecentBaselineStoreModificationEventInManagedObjectContext:eventStoreContext];
             if (baseline) [events insertObject:baseline atIndex:0];
             storeModEvents = events;
+            CDELog(CDELoggingLevelVerbose, @"Baseline has changed. Will carry out full integration of the persistent store.");
         }
         else {
             // Get all modification events added since the last merge
