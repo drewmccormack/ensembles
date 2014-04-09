@@ -187,6 +187,25 @@
     return result;
 }
 
+- (BOOL)isEqualToRevisionSet:(CDERevisionSet *)otherSet
+{
+    NSMutableSet *allStoreIds = [[NSMutableSet alloc] initWithSet:self.persistentStoreIdentifiers];
+    [allStoreIds unionSet:otherSet.persistentStoreIdentifiers];
+    
+    BOOL rev1AlwaysEqualToRev2 = YES;
+    for ( NSString *persistentStoreId in allStoreIds ) {
+        CDERevision *rev1 = [self revisionForPersistentStoreIdentifier:persistentStoreId];
+        CDERevision *rev2 = [otherSet revisionForPersistentStoreIdentifier:persistentStoreId];
+        
+        if (!rev1 || !rev2 || (rev1.revisionNumber != rev2.revisionNumber)) {
+            rev1AlwaysEqualToRev2 = NO;
+            break;
+        }
+    }
+    
+    return rev1AlwaysEqualToRev2;
+}
+
 
 #pragma mark Description
 

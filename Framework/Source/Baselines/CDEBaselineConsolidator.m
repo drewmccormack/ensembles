@@ -170,15 +170,20 @@
     });
 }
 
-- (NSArray *)baselinesDecreasingInRecencyInManagedObjectContext:(NSManagedObjectContext *)context error:(NSError * __autoreleasing *)error
+- (NSArray *)decreasingRecencySortDescriptors
 {
-    NSFetchRequest *fetch = [self.class baselineFetchRequest];
     NSArray *sortDescriptors = @[
         [NSSortDescriptor sortDescriptorWithKey:@"globalCount" ascending:NO],
         [NSSortDescriptor sortDescriptorWithKey:@"timestamp" ascending:NO],
         [NSSortDescriptor sortDescriptorWithKey:@"eventRevision.persistentStoreIdentifier" ascending:NO]
     ];
-    fetch.sortDescriptors = sortDescriptors;
+    return sortDescriptors;
+}
+
+- (NSArray *)baselinesDecreasingInRecencyInManagedObjectContext:(NSManagedObjectContext *)context error:(NSError * __autoreleasing *)error
+{
+    NSFetchRequest *fetch = [self.class baselineFetchRequest];
+    fetch.sortDescriptors = [self decreasingRecencySortDescriptors];
     NSArray *baselineEvents = [context executeFetchRequest:fetch error:error];
     return baselineEvents;
 }
@@ -186,12 +191,28 @@
 - (NSSet *)redundantBaselinesInBaselines:(NSArray *)allBaselines
 {
     NSMutableSet *baselinesToEliminate = [NSMutableSet setWithCapacity:allBaselines.count];
-    for (CDEStoreModificationEvent *firstEvent in allBaselines) {
-        for (CDEStoreModificationEvent *secondEvent in allBaselines) {
-            if (firstEvent == secondEvent) continue;
+    for (NSUInteger i = 0; i < allBaselines.count; i++) {
+        CDEStoreModificationEvent *firstEvent = allBaselines[i];
+        
+        for (NSUInteger j = 0; j < i; j++) {
+            CDEStoreModificationEvent *secondEvent = allBaselines[j];
+
             CDERevisionSet *firstSet = firstEvent.revisionSet;
             CDERevisionSet *secondSet = secondEvent.revisionSet;
-            if ([firstSet compare:secondSet] == NSOrderedDescending) [baselinesToEliminate addObject:secondEvent];
+            NSComparisonResult comparison = [firstSet compare:secondSet];
+            
+            if (comparison == NSOrderedDescending) {
+                [baselinesToEliminate addObject:secondEvent];
+            }
+            else if (comparison == NSOrderedAscending) {
+                [baselinesToEliminate addObject:firstEvent];
+            }
+            else if ([firstSet isEqualToRevisionSet:secondSet]) {
+                // If exactly the same, eliminate the oldest
+                NSArray *events = @[firstEvent, secondEvent];
+                events = [events sortedArrayUsingDescriptors:[self decreasingRecencySortDescriptors]];
+                [baselinesToEliminate addObject:events.lastObject];
+            }
         }
     }
     return baselinesToEliminate;
