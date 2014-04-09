@@ -63,14 +63,17 @@
         
         NSString *storeId = self.eventStore.persistentStoreIdentifier;
         NSMutableSet *baselineRevisions = [NSMutableSet set];
+        NSUInteger countOfBaselinesWithStore = 0;
         for (CDEStoreModificationEvent *baseline in baselines) {
             CDERevisionSet *revSet = baseline.revisionSet;
             CDERevision *storeRevision = [revSet revisionForPersistentStoreIdentifier:storeId];
+            if (!storeRevision) continue;
             [baselineRevisions addObject:@(storeRevision.revisionNumber)];
+            countOfBaselinesWithStore++;
         }
         
         // If revisions are not unique, should get different count to baselines
-        result = baselineRevisions.count != baselines.count;
+        result = baselineRevisions.count != countOfBaselinesWithStore;
     }];
     return result;
 }
