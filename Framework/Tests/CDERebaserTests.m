@@ -416,31 +416,6 @@
     [self waitForAsyncOpToFinish];
 }
 
-- (void)testUnusedGlobalIdentifiersAreRemoved
-{
-    [self addEventsForType:CDEStoreModificationEventTypeBaseline storeId:@"store1" globalCounts:@[@10] revisions:@[@110]];
-    [self addEventsForType:CDEStoreModificationEventTypeSave storeId:@"store1" globalCounts:@[@20] revisions:@[@111]];
-    
-    [context performBlockAndWait:^{
-        CDEGlobalIdentifier *globalId1 = [NSEntityDescription insertNewObjectForEntityForName:@"CDEGlobalIdentifier" inManagedObjectContext:context];
-        globalId1.globalIdentifier = @"unique";
-        globalId1.nameOfEntity = @"A";
-        [context save:NULL];
-        
-        NSArray *ids = [CDEGlobalIdentifier fetchGlobalIdentifiersForIdentifierStrings:@[@"unique"] withEntityNames:@[@"A"] inManagedObjectContext:context];
-        XCTAssertTrue(ids.lastObject != [NSNull null], @"Did not make id");
-    }];
-    
-    [rebaser rebaseWithCompletion:^(NSError *error) {
-        [context performBlockAndWait:^{
-            NSArray *ids = [CDEGlobalIdentifier fetchGlobalIdentifiersForIdentifierStrings:@[@"unique"] withEntityNames:@[@"A"] inManagedObjectContext:context];
-            XCTAssertTrue(ids.lastObject == [NSNull null], @"Did not remove id");
-        }];
-        [self stopAsyncOp];
-    }];
-    [self waitForAsyncOpToFinish];
-}
-
 - (NSArray *)addEventsForType:(CDEStoreModificationEventType)type storeId:(NSString *)storeId globalCounts:(NSArray *)globalCounts revisions:(NSArray *)revisions
 {
     __block NSMutableArray *events = [NSMutableArray array];

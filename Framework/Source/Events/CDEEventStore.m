@@ -11,6 +11,7 @@
 #import "CDEStoreModificationEvent.h"
 #import "CDERevisionSet.h"
 #import "CDERevision.h"
+#import "CDEGlobalIdentifier.h"
 #import "CDEDataFile.h"
 
 
@@ -261,6 +262,23 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
         identifierOfBaselineUsedToConstructStore = [newId copy];
         [self saveStoreMetadata];
     }
+}
+
+
+#pragma mark - Cleaning Up Old Data
+
+- (void)removeUnusedDataWithCompletion:(CDECompletionBlock)completion
+{
+    // Delete unused global ids
+    [self.managedObjectContext performBlock:^{
+        NSError *error;
+        NSArray *unusedGlobalIds = [CDEGlobalIdentifier fetchUnreferencedGlobalIdentifiersInManagedObjectContext:self.managedObjectContext];
+        for (CDEGlobalIdentifier *globalId in unusedGlobalIds) [self.managedObjectContext deleteObject:globalId];
+        BOOL success = [self.managedObjectContext save:&error];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (completion) completion(success ? nil : error);
+        });
+    }];
 }
 
 

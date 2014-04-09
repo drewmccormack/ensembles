@@ -188,11 +188,6 @@
         
         // Delete merged events
         for (CDEStoreModificationEvent *event in eventsToMerge) [context deleteObject:event];
-        
-        // Delete unused global ids
-        [context processPendingChanges];
-        NSArray *unusedGlobalIds = [CDEGlobalIdentifier fetchUnreferencedGlobalIdentifiersInManagedObjectContext:context];
-        for (CDEGlobalIdentifier *globalId in unusedGlobalIds) [context deleteObject:globalId];
 
         // Save
         BOOL saved = [context save:&error];

@@ -93,6 +93,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
     
         self.eventStore = [[CDEEventStore alloc] initWithEnsembleIdentifier:self.ensembleIdentifier pathToEventDataRootDirectory:eventDataRoot];
         self.leeched = eventStore.containsEventData;
+        if (self.leeched) [self.eventStore removeUnusedDataWithCompletion:NULL];
         
         [self initializeEventIntegrator];
         

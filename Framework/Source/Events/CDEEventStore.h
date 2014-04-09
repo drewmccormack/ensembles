@@ -47,6 +47,8 @@
 - (void)registerIncompleteEventIdentifier:(NSString *)identifier isMandatory:(BOOL)mandatory;
 - (void)deregisterIncompleteEventIdentifier:(NSString *)identifier;
 
+- (void)removeUnusedDataWithCompletion:(CDECompletionBlock)completion;
+
 - (BOOL)importDataFile:(NSString *)path;
 - (NSString *)importData:(NSData *)data; // Returns filename
 - (BOOL)exportDataFile:(NSString *)filename toDirectory:(NSString *)dirPath;
