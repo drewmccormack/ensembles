@@ -139,7 +139,6 @@
         // Merge surviving baselines
         NSMutableArray *survivingBaselines = [NSMutableArray arrayWithArray:baselineEvents];
         [survivingBaselines removeObjectsInArray:baselinesToEliminate.allObjects];
-        CDELog(CDELoggingLevelVerbose, @"Merging baselines with unique ids: %@", [survivingBaselines valueForKeyPath:@"uniqueIdentifier"]);
         CDEStoreModificationEvent *newBaseline = [self mergedBaselineFromOrderedBaselineEvents:survivingBaselines error:&error];
         if (!newBaseline) {
             [self failWithCompletion:completion error:error];
@@ -226,13 +225,16 @@
     if (baselines.count == 0) return nil;
     if (baselines.count == 1) return baselines.lastObject;
     
+    CDELog(CDELoggingLevelVerbose, @"Merging baselines with unique ids: %@", [baselines valueForKeyPath:@"uniqueIdentifier"]);
+    
     // Change the first baseline into our new baseline by assigning a different unique id
-    // Global count should be minimum, to ensure it preceeds all other events
+    // Global count should be maximum, ie, just keep the count of the existing first baseline.
+    // A baseline global count is not required to preceed save/merge events, and assigning the
+    // maximum will give this new baseline precedence over older baselines.
     CDEStoreModificationEvent *firstBaseline = baselines.firstObject;
     firstBaseline.uniqueIdentifier = [[NSProcessInfo processInfo] globallyUniqueString];
     firstBaseline.timestamp = [NSDate timeIntervalSinceReferenceDate];
     firstBaseline.modelVersion = [self.ensemble.managedObjectModel cde_entityHashesPropertyList];
-    firstBaseline.globalCount = [baselines.lastObject globalCount];
     
     // Update the revisions of each store in the baseline
     CDERevisionSet *newRevisionSet = [CDERevisionSet revisionSetByTakingStoreWiseMaximumOfRevisionSets:[baselines valueForKeyPath:@"revisionSet"]];

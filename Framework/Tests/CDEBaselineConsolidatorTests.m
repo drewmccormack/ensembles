@@ -99,7 +99,7 @@
             
             CDEStoreModificationEvent *event = events.lastObject;
             XCTAssertTrue(event == mostRecentBaseline, @"Wrong baseline kept");
-            XCTAssertEqual(event.globalCount, (int64_t)2, @"Global count should be minimum of non-redundant baselines");
+            XCTAssertEqual(event.globalCount, (int64_t)3, @"Global count should be maximum of non-redundant baselines");
             XCTAssertNotEqualObjects(mostRecentBaseline.uniqueIdentifier, uniqueId, @"After merging, baseline should have a different uniqueId");
             XCTAssertEqualObjects(event.eventRevision.persistentStoreIdentifier, self.eventStore.persistentStoreIdentifier, @"Store id should be the event store id");
 
@@ -124,8 +124,8 @@
             XCTAssertEqual(event.eventRevision.revisionNumber, (CDERevisionNumber)-1, @"Wrong revision number for store1");
             
             NSSet *others = [event.eventRevisionsOfOtherStores valueForKeyPath:@"revision"];
-            CDERevision *rev1 = [[CDERevision alloc] initWithPersistentStoreIdentifier:@"123" revisionNumber:10 globalCount:10];
-            CDERevision *rev2 = [[CDERevision alloc] initWithPersistentStoreIdentifier:@"234" revisionNumber:10 globalCount:10];
+            CDERevision *rev1 = [[CDERevision alloc] initWithPersistentStoreIdentifier:@"123" revisionNumber:10 globalCount:20];
+            CDERevision *rev2 = [[CDERevision alloc] initWithPersistentStoreIdentifier:@"234" revisionNumber:10 globalCount:20];
             NSSet *set = [NSSet setWithObjects:rev1, rev2, nil];
             XCTAssertEqualObjects(others, set, @"Wrong revisions for other stores");
 
