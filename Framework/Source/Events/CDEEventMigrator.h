@@ -23,7 +23,7 @@
 - (instancetype)initWithEventStore:(CDEEventStore *)newStore;
 
 - (void)migrateLocalEventWithRevision:(CDERevisionNumber)revision toFile:(NSString *)path allowedTypes:(NSArray *)types completion:(CDECompletionBlock)completion;
-- (void)migrateLocalBaselineWithUniqueIdentifier:(NSString *)uniqueId globalCount:(CDEGlobalCount)count toFile:(NSString *)path completion:(CDECompletionBlock)completion;
+- (void)migrateLocalBaselineWithUniqueIdentifier:(NSString *)uniqueId globalCount:(CDEGlobalCount)count persistentStorePrefix:(NSString *)storePrefix toFile:(NSString *)path completion:(CDECompletionBlock)completion;
 - (void)migrateNonBaselineEventsSinceRevision:(CDERevisionNumber)revision toFile:(NSString *)path completion:(CDECompletionBlock)completion;
 - (void)migrateEventsInFromFiles:(NSArray *)paths completion:(CDECompletionBlock)completion;
 

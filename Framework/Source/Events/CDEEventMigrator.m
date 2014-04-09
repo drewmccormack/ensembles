@@ -57,12 +57,12 @@ static NSString *kCDEDefaultStoreType;
     }];
 }
 
-- (void)migrateLocalBaselineWithUniqueIdentifier:(NSString *)uniqueId globalCount:(CDEGlobalCount)count toFile:(NSString *)path completion:(CDECompletionBlock)completion
+- (void)migrateLocalBaselineWithUniqueIdentifier:(NSString *)uniqueId globalCount:(CDEGlobalCount)count persistentStorePrefix:(NSString *)storePrefix toFile:(NSString *)path completion:(CDECompletionBlock)completion
 {
     [eventStore.managedObjectContext performBlock:^{
         NSError *error = nil;
         CDEStoreModificationEvent *baseline = nil;
-        baseline = [CDEStoreModificationEvent fetchStoreModificationEventWithUniqueIdentifier:uniqueId globalCount:count inManagedObjectContext:eventStore.managedObjectContext];
+        baseline = [CDEStoreModificationEvent fetchStoreModificationEventWithUniqueIdentifier:uniqueId globalCount:count persistentStorePrefix:storePrefix inManagedObjectContext:eventStore.managedObjectContext];
         if (!baseline) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (completion) completion(error);

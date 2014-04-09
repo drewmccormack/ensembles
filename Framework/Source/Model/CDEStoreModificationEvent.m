@@ -161,10 +161,10 @@
     return events.lastObject;
 }
 
-+ (instancetype)fetchStoreModificationEventWithUniqueIdentifier:(NSString *)uniqueId globalCount:(CDEGlobalCount)count inManagedObjectContext:(NSManagedObjectContext *)context
++ (instancetype)fetchStoreModificationEventWithUniqueIdentifier:(NSString *)uniqueId globalCount:(CDEGlobalCount)count persistentStorePrefix:(NSString *)storePrefix inManagedObjectContext:(NSManagedObjectContext *)context
 {
     NSFetchRequest *fetch = [[NSFetchRequest alloc] initWithEntityName:@"CDEStoreModificationEvent"];
-    fetch.predicate = [NSPredicate predicateWithFormat:@"uniqueIdentifier = %@ AND globalCount = %lld", uniqueId, count];
+    fetch.predicate = [NSPredicate predicateWithFormat:@"uniqueIdentifier = %@ AND globalCount = %lld AND eventRevision.persistentStoreIdentifier BEGINSWITH %@", uniqueId, count, storePrefix];
     
     NSError *error;
     NSArray *events = [context executeFetchRequest:fetch error:&error];

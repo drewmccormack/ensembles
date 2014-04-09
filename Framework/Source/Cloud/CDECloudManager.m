@@ -7,6 +7,7 @@
 //
 
 #import "CDECloudManager.h"
+#import "CDEEventFile.h"
 #import "CDEFoundationAdditions.h"
 #import "CDEEventStore.h"
 #import "CDECloudFileSystem.h"
@@ -166,7 +167,7 @@
 
 - (void)transferNewFilesToTransitCacheFromRemoteDirectory:(NSString *)remoteDirectory availableFilenames:(NSArray *)filenames forEventTypes:(NSArray *)eventTypes completion:(CDECompletionBlock)completion
 {
-        NSArray *filenamesToRetrieve = [self eventFilesRequiringRetrievalFromAvailableRemoteFiles:filenames allowedEventTypes:eventTypes];
+        NSArray *filenamesToRetrieve = [self filesRequiringRetrievalFromAvailableRemoteFiles:filenames allowedEventTypes:eventTypes];
         [self transferRemoteFiles:filenamesToRetrieve fromRemoteDirectory:remoteDirectory withCompletion:completion];
 }
 
@@ -212,11 +213,13 @@
     [operationQueue addOperation:taskQueue];
 }
 
-- (NSArray *)eventFilesRequiringRetrievalFromAvailableRemoteFiles:(NSArray *)remoteFiles allowedEventTypes:(NSArray *)eventTypes
+- (NSArray *)filesRequiringRetrievalFromAvailableRemoteFiles:(NSArray *)remoteFiles allowedEventTypes:(NSArray *)eventTypes
 {
     NSMutableSet *toRetrieve = [NSMutableSet setWithArray:remoteFiles];
-    NSSet *storeFilenames = [self filenamesForEventsWithAllowedTypes:eventTypes createdInStore:nil];
-    [toRetrieve minusSet:storeFilenames];
+    NSSet *eventFiles = [self eventFilesForEventsWithAllowedTypes:eventTypes createdInStore:nil];
+    for (CDEEventFile *eventFile in eventFiles) {
+        [toRetrieve minusSet:eventFile.aliases];
+    }
     return [self sortFilenamesByGlobalCount:toRetrieve.allObjects];
 }
 
@@ -245,35 +248,24 @@
         NSString *path = [self.localDownloadDirectory stringByAppendingPathComponent:file];
         
         CDEAsynchronousTaskBlock block = ^(CDEAsynchronousTaskCallbackBlock next) {
-            BOOL isBaseline = NO;
-            BOOL valid = [self filename:file isValidForAllowedEventTypes:types isBaseline:&isBaseline];
-            
-            if (!valid) {
+            CDEEventFile *eventFile = [[CDEEventFile alloc] initWithFilename:file];
+            if (eventFile == nil) {
                 next(nil, NO);
                 return;
             }
             
             // Check for a pre-existing event first. Skip if we find one.
-            __block BOOL eventExists = NO;
-            CDEGlobalCount globalCount;
-            if (isBaseline) {
-                NSString *uniqueId;
-                [self count:&globalCount andUniqueIdentifier:&uniqueId fromBaselineFilename:file];
-                [moc performBlockAndWait:^{
-                    CDEStoreModificationEvent *existingEvent = [CDEStoreModificationEvent fetchStoreModificationEventWithUniqueIdentifier:uniqueId globalCount:globalCount inManagedObjectContext:moc];
-                    eventExists = existingEvent != nil;
-                }];
-            }
-            else {
-                CDERevision *revision;
-                [self count:&globalCount andRevision:&revision fromEventFilename:file];
-                [moc performBlockAndWait:^{
-                    CDEStoreModificationEvent *existingEvent = [CDEStoreModificationEvent fetchStoreModificationEventWithAllowedTypes:types persistentStoreIdentifier:revision.persistentStoreIdentifier revisionNumber:revision.revisionNumber inManagedObjectContext:moc]; 
-                    eventExists = existingEvent != nil;
-                }];
-            }
+            __block BOOL eventsExist = NO;
+            [moc performBlockAndWait:^{
+                NSError *error;
+                NSFetchRequest *fetch = [[NSFetchRequest alloc] initWithEntityName:@"CDEStoreModificationEvent"];
+                fetch.predicate = eventFile.eventFetchPredicate;
+                NSArray *events = [moc executeFetchRequest:fetch error:&error];
+                if (!events) CDELog(CDELoggingLevelError, @"Could not fetch events: %@", error);
+                eventsExist = events.count > 0;
+            }];
             
-            if (eventExists) {
+            if (eventsExist && eventFile.eventShouldBeUnique) {
                 [fileManager removeItemAtPath:path error:NULL];
                 next(nil, NO);
                 return;
@@ -377,22 +369,9 @@
         NSString *path = [self.localUploadDirectory stringByAppendingPathComponent:file];
         
         CDEAsynchronousTaskBlock block = ^(CDEAsynchronousTaskCallbackBlock next) {
-            BOOL isBaseline = NO;
-            __unused BOOL valid = [self filename:file isValidForAllowedEventTypes:types isBaseline:&isBaseline];
-            NSAssert(valid, @"Invalid filename");
-            
-            CDEGlobalCount globalCount = -1;
-            CDERevision *revision = nil;
-            NSString *uniqueId = nil;
-            if (isBaseline) {
-                __unused BOOL isBaselineFile = [self count:&globalCount andUniqueIdentifier:&uniqueId fromBaselineFilename:file];
-                NSAssert(isBaselineFile, @"Should be baseline");
-            }
-            else {
-                __unused BOOL isEventFile = [self count:&globalCount andRevision:&revision fromEventFilename:file];
-                NSAssert(isEventFile, @"Should be event file");
-            }
-            
+            CDEEventFile *eventFile = [[CDEEventFile alloc] initWithFilename:file];
+            NSAssert(eventFile, @"Invalid filename");
+
             // Migrate data to file
             dispatch_async(dispatch_get_main_queue(), ^{
                 BOOL isDir;
@@ -404,13 +383,13 @@
                     }
                 }
                 
-                if (isBaseline) {
-                    [migrator migrateLocalBaselineWithUniqueIdentifier:uniqueId globalCount:globalCount toFile:path completion:^(NSError *error) {
+                if (eventFile.isBaseline) {
+                    [migrator migrateLocalBaselineWithUniqueIdentifier:eventFile.uniqueIdentifier globalCount:eventFile.globalCount persistentStorePrefix:eventFile.persistentStorePrefix toFile:path completion:^(NSError *error) {
                         next(error, NO);
                     }];
                 }
                 else {
-                    [migrator migrateLocalEventWithRevision:revision.revisionNumber toFile:path allowedTypes:types completion:^(NSError *error) {
+                    [migrator migrateLocalEventWithRevision:eventFile.revisionNumber toFile:path allowedTypes:types completion:^(NSError *error) {
                         next(error, NO);
                     }];
                 }
@@ -468,80 +447,23 @@
     [operationQueue addOperation:taskQueue];
 }
 
+
+#pragma mark Event Files
+
 - (NSArray *)localEventFilesMissingFromRemoteCloudFiles:(NSArray *)remoteFiles allowedTypes:(NSArray *)types
 {
     NSString *persistentStoreId = self.eventStore.persistentStoreIdentifier;
-    NSMutableSet *filenames = [[self filenamesForEventsWithAllowedTypes:types createdInStore:persistentStoreId] mutableCopy];
+    NSSet *eventFiles = [self eventFilesForEventsWithAllowedTypes:types createdInStore:persistentStoreId];
     
-    // Remove remote files to get the missing ones
     NSSet *remoteSet = [NSSet setWithArray:remoteFiles];
-    [filenames minusSet:remoteSet];
+    NSMutableSet *filenames = [[NSMutableSet alloc] init];
+    for (CDEEventFile *eventFile in eventFiles) {
+        if (![remoteSet intersectsSet:eventFile.aliases]) {
+            [filenames addObject:eventFile.preferredFilename];
+        }
+    }
     
     return [self sortFilenamesByGlobalCount:filenames.allObjects];
-}
-
-
-#pragma mark File Naming
-
-- (NSString *)filenameForEvent:(CDEStoreModificationEvent *)event
-{
-    NSString *result = nil;
-    if (event.type == CDEStoreModificationEventTypeBaseline)
-        result = [NSString stringWithFormat:@"%lli_%@.cdeevent", event.globalCount, event.uniqueIdentifier];
-    else {
-        CDERevision *revision = event.eventRevision.revision;
-        result = [NSString stringWithFormat:@"%lli_%@_%lli.cdeevent", event.globalCount, revision.persistentStoreIdentifier, revision.revisionNumber];
-    }
-    return result;
-}
-
-- (BOOL)count:(CDEGlobalCount *)count andRevision:(CDERevision * __autoreleasing *)revision fromEventFilename:(NSString *)filename
-{
-    NSArray *components = [[filename stringByDeletingPathExtension] componentsSeparatedByString:@"_"];
-    if (components.count != 3) {
-        *count = -1;
-        *revision = nil;
-        return NO;
-    }
-    
-    *count = [components[0] longLongValue];
-    
-    CDERevisionNumber revNumber = [components[2] longLongValue];
-    *revision = [[CDERevision alloc] initWithPersistentStoreIdentifier:components[1] revisionNumber:revNumber];
-    
-    return YES;
-}
-
-- (BOOL)count:(CDEGlobalCount *)count andUniqueIdentifier:(NSString * __autoreleasing *)uniqueId fromBaselineFilename:(NSString *)filename
-{
-    NSArray *components = [[filename stringByDeletingPathExtension] componentsSeparatedByString:@"_"];
-    if (components.count != 2) {
-        *count = -1;
-        *uniqueId = nil;
-        return NO;
-    }
-    
-    *count = [components[0] longLongValue];
-    *uniqueId = components[1];
-    
-    return YES;
-}
-
-- (BOOL)filename:(NSString *)file isValidForAllowedEventTypes:(NSArray *)types isBaseline:(BOOL *)isBaselineFile
-{
-    CDEGlobalCount globalCount = -1;
-    CDERevision *revision = nil;
-    NSString *uniqueId = nil;
-    BOOL isEventFile = [self count:&globalCount andRevision:&revision fromEventFilename:file];
-    *isBaselineFile = NO;
-    if (isEventFile &&
-        ([types containsObject:@(CDEStoreModificationEventTypeSave)] ||
-         [types containsObject:@(CDEStoreModificationEventTypeMerge)]) ) return YES;
-    
-    *isBaselineFile = [self count:&globalCount andUniqueIdentifier:&uniqueId fromBaselineFilename:file];
-    if (*isBaselineFile && [types containsObject:@(CDEStoreModificationEventTypeBaseline)]) return YES;
-    
-    return NO;
 }
 
 - (NSArray *)sortFilenamesByGlobalCount:(NSArray *)filenames
@@ -554,24 +476,22 @@
     return sortedResult;
 }
 
-// Use type of nil for all types
-// Use nil for store if any store is allowed
-- (NSSet *)filenamesForEventsWithAllowedTypes:(NSArray *)types createdInStore:(NSString *)persistentStoreIdentifier
+- (NSSet *)eventFilesForEventsWithAllowedTypes:(NSArray *)types createdInStore:(NSString *)persistentStoreIdentifier
 {
-    NSMutableSet *filenames = [[NSMutableSet alloc] init];
     NSManagedObjectContext *moc = self.eventStore.managedObjectContext;
+    __block NSMutableSet *eventFiles = [NSMutableSet set];
     [moc performBlockAndWait:^{
         NSArray *events = [CDEStoreModificationEvent fetchStoreModificationEventsWithTypes:types persistentStoreIdentifier:persistentStoreIdentifier inManagedObjectContext:moc];
         if (!events) {
             CDELog(CDELoggingLevelError, @"Could not retrieve local events");
         }
-        
+
         for (CDEStoreModificationEvent *event in events) {
-            NSString *filename = [self filenameForEvent:event];
-            [filenames addObject:filename];
+            CDEEventFile *eventFile = [[CDEEventFile alloc] initWithStoreModificationEvent:event];
+            [eventFiles addObject:eventFile];
         }
     }];
-    return filenames;
+    return eventFiles;
 }
 
 
@@ -638,19 +558,22 @@
     
     // Determine corresponding files for data still in event store
     NSArray *nonBaselineTypes = @[@(CDEStoreModificationEventTypeSave), @(CDEStoreModificationEventTypeMerge)];
-    NSSet *nonBaselineFilesForEventStore = [self filenamesForEventsWithAllowedTypes:nonBaselineTypes createdInStore:nil];
-    NSSet *baselineFilesForEventStore = [self filenamesForEventsWithAllowedTypes:@[@(CDEStoreModificationEventTypeBaseline)] createdInStore:nil];
-    NSSet *dataFilesForEventStore = self.eventStore.dataFilenames;
+    NSArray *baselineTypes = @[@(CDEStoreModificationEventTypeBaseline)];
     
     // Determine baselines to remove
     NSMutableSet *baselinesToRemove = [snapshotBaselineFilenames mutableCopy];
-    [baselinesToRemove minusSet:baselineFilesForEventStore];
+    NSSet *baselineEventFilesForStore = [self eventFilesForEventsWithAllowedTypes:baselineTypes createdInStore:nil];
+    NSSet *baselineAliasesForStore = [baselineEventFilesForStore valueForKeyPath:@"@distinctUnionOfSets.aliases"];
+    [baselinesToRemove minusSet:baselineAliasesForStore];
     
     // Determine non-baselines to remove
     NSMutableSet *nonBaselinesToRemove = [snapshotEventFilenames mutableCopy];
-    [nonBaselinesToRemove minusSet:nonBaselineFilesForEventStore];
+    NSSet *nonBaselineEventFilesForStore = [self eventFilesForEventsWithAllowedTypes:nonBaselineTypes createdInStore:nil];
+    NSSet *nonBaselineAliasesForStore = [nonBaselineEventFilesForStore valueForKeyPath:@"@distinctUnionOfSets.aliases"];
+    [nonBaselinesToRemove minusSet:nonBaselineAliasesForStore];
     
     // Determine data files to remove
+    NSSet *dataFilesForEventStore = self.eventStore.dataFilenames;
     NSMutableSet *dataFilesToRemove = [snapshotDataFilenames mutableCopy];
     [dataFilesToRemove minusSet:dataFilesForEventStore];
     
