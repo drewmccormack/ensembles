@@ -354,6 +354,22 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
 - (void)cancelMergeWithCompletion:(CDECompletionBlock)completion;
 
 ///
+/// @name Ensemble Discovery
+///
+
+/**
+ Queries a cloud file system for the identifiers of the ensembles it contains.
+ 
+ Use this method to discover dynamically generated ensembles, such as in document-based apps. 
+ 
+ Note that this is quite a primitive register for documents. You may be better to maintain a custom registry of document metadata (eg plists) in a cloud directory. You can still use the cloud file system instance to upload and download the metadata files.
+ 
+ @param cloudFileSystem The cloud file system object used to transfer files between devices.
+ @param completion The completion block called with the results. The error parameter is nil on success.
+ */
++ (void)retrieveEnsembleIdentifiersFromCloudFileSystem:(id <CDECloudFileSystem>)cloudFileSystem completion:(void(^)(NSError *error, NSArray *identifiers))completion;
+
+///
 /// @name Waiting for Task Completion
 ///
 
