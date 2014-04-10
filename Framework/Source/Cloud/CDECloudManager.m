@@ -405,6 +405,10 @@
 
 - (BOOL)migrateNewLocalDataFilesToTransitCache:(NSError * __autoreleasing *)error
 {
+    // Remove any existing files in the cache first
+    BOOL success = [self removeFilesInDirectory:self.localUploadDirectory error:error];
+    if (!success) return NO;
+    
     NSMutableSet *toTransfer = [self.eventStore.dataFilenames mutableCopy];
     [toTransfer minusSet:snapshotDataFilenames];
     
