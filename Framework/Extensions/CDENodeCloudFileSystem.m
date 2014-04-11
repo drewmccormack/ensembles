@@ -182,7 +182,10 @@
         
         NSArray *urls = responseDict[@"urls"];
         NSURL *url = [NSURL URLWithString:urls.lastObject];
-        CDEFileUploadOperation *operation = [[CDEFileUploadOperation alloc] initWithURL:url localPath:fromPath];
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData timeoutInterval:300.0];
+        request.HTTPMethod = @"PUT";
+        
+        CDEFileUploadOperation *operation = [[CDEFileUploadOperation alloc] initWithURLRequest:request localPath:fromPath];
         operation.completion = completion;
         [operationQueue addOperation:operation];
     }];
@@ -199,7 +202,9 @@
         
         NSArray *urls = responseDict[@"urls"];
         NSURL *url = [NSURL URLWithString:urls.lastObject];
-        CDEFileDownloadOperation *operation = [[CDEFileDownloadOperation alloc] initWithURL:url localPath:toPath];
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+        request.cachePolicy = NSURLRequestReloadIgnoringLocalAndRemoteCacheData;
+        CDEFileDownloadOperation *operation = [[CDEFileDownloadOperation alloc] initWithURLRequest:request localPath:toPath];
         operation.completion = completion;
         [operationQueue addOperation:operation];
     }];

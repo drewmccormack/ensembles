@@ -12,11 +12,10 @@
 
 @interface CDEFileDownloadOperation : CDEAsynchronousOperation
 
-@property (nonatomic, copy, readonly) NSURL *url;
-@property (nonatomic, strong, readonly) NSMutableURLRequest *request;
+@property (nonatomic, copy, readonly) NSURLRequest *request;
 @property (nonatomic, copy, readonly) NSString *localPath;
 @property (nonatomic, copy, readwrite) CDECompletionBlock completion;
 
-- (instancetype)initWithURL:(NSURL *)url localPath:(NSString *)path;
+- (instancetype)initWithURLRequest:(NSURLRequest *)newRequest localPath:(NSString *)path;
 
 @end

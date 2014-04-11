@@ -15,27 +15,30 @@
     NSFileManager *fileManager;
     NSFileHandle *fileHandle;
     NSURLConnection *connection;
+    NSMutableURLRequest *mutableRequest;
     NSError *responseError;
 }
 
-@synthesize url = url;
 @synthesize localPath = localPath;
 @synthesize completion = completion;
-@synthesize request = request;
 
-- (instancetype)initWithURL:(NSURL *)newURL localPath:(NSString *)newPath
+- (instancetype)initWithURLRequest:(NSURLRequest *)newURLRequest localPath:(NSString *)newPath
 {
-    NSParameterAssert(newURL != nil);
+    NSParameterAssert(newURLRequest != nil);
     NSParameterAssert(newPath != nil);
     self = [super init];
     if (self) {
-        url = [newURL copy];
-        request = [NSMutableURLRequest requestWithURL:url];
+        mutableRequest = [newURLRequest mutableCopy];
         localPath = [newPath copy];
         fileManager = [[NSFileManager alloc] init];
         responseError = nil;
     }
     return self;
+}
+
+- (NSURLRequest *)request
+{
+    return [mutableRequest copy];
 }
 
 - (void)beginAsynchronousTask
@@ -52,7 +55,7 @@
         return;
     }
     
-    connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
+    connection = [[NSURLConnection alloc] initWithRequest:mutableRequest delegate:self startImmediately:YES];
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error

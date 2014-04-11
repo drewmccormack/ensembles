@@ -14,40 +14,40 @@
 @implementation CDEFileUploadOperation {
     NSURLConnection *connection;
     NSError *responseError;
+    NSMutableURLRequest *mutableRequest;
+    
 }
 
-@synthesize url = url;
 @synthesize localPath = localPath;
-@synthesize request = request;
 @synthesize completion = completion;
 
-- (instancetype)initWithURL:(NSURL *)newURL localPath:(NSString *)newPath
+- (instancetype)initWithURLRequest:(NSURLRequest *)newURLRequest localPath:(NSString *)newPath
 {
-    NSParameterAssert(newURL != nil);
+    NSParameterAssert(newURLRequest != nil);
     NSParameterAssert(newPath != nil);
     self = [super init];
     if (self) {
-        url = [newURL copy];
         localPath = [newPath copy];
         responseError = nil;
-        
-        request = [NSMutableURLRequest requestWithURL:url
-            cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
-            timeoutInterval:300.0];
-        request.HTTPMethod = @"PUT";
-        request.HTTPBodyStream = [NSInputStream inputStreamWithFileAtPath:localPath];
+        mutableRequest = [newURLRequest mutableCopy];
+        mutableRequest.HTTPBodyStream = [NSInputStream inputStreamWithFileAtPath:localPath];
         
         NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:localPath error:NULL];
         unsigned long long result = attributes.fileSize;
         NSString *lengthAsString = [NSString stringWithFormat:@"%llu", result];
-        [request setValue:lengthAsString forHTTPHeaderField:@"Content-Length"];
+        [mutableRequest setValue:lengthAsString forHTTPHeaderField:@"Content-Length"];
     }
     return self;
 }
 
+- (NSURLRequest *)request
+{
+    return [mutableRequest copy];
+}
+
 - (void)beginAsynchronousTask
 {
-    connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
+    connection = [[NSURLConnection alloc] initWithRequest:mutableRequest delegate:self startImmediately:YES];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
