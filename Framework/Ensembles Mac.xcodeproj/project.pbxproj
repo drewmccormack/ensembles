@@ -467,7 +467,7 @@
 				6DAD11E318CA09A000237084 /* Ensembles.m */,
 				07BF7A03177F0A9D0029D500 /* General */,
 				07973F00183BE44A007F48CA /* Cloud File Systems */,
-				07973F09183BE466007F48CA /* Cloud */,
+				07973F09183BE466007F48CA /* Cloud Management */,
 				07BF79F5177F0A9D0029D500 /* Ensemble */,
 				07BF79F8177F0A9D0029D500 /* Events */,
 				07BF7A0C177F0A9D0029D500 /* Model */,
@@ -507,19 +507,20 @@
 			path = "Cloud File Systems";
 			sourceTree = "<group>";
 		};
-		07973F09183BE466007F48CA /* Cloud */ = {
+		07973F09183BE466007F48CA /* Cloud Management */ = {
 			isa = PBXGroup;
 			children = (
+				07973F0F183BE466007F48CA /* CDECloudManager.h */,
+				07973F10183BE466007F48CA /* CDECloudManager.m */,
 				07973F0A183BE466007F48CA /* CDECloudDirectory.h */,
 				07973F0B183BE466007F48CA /* CDECloudDirectory.m */,
 				07973F0C183BE466007F48CA /* CDECloudFile.h */,
 				07973F0D183BE466007F48CA /* CDECloudFile.m */,
 				07973F0E183BE466007F48CA /* CDECloudFileSystem.h */,
-				07973F0F183BE466007F48CA /* CDECloudManager.h */,
-				07973F10183BE466007F48CA /* CDECloudManager.m */,
 				070C675818F4162E00266A4E /* CDEEventFile.h */,
 				070C675918F4162E00266A4E /* CDEEventFile.m */,
 			);
+			name = "Cloud Management";
 			path = Cloud;
 			sourceTree = "<group>";
 		};

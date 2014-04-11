@@ -434,7 +434,7 @@
 			children = (
 				07BF378E17F1853000C56F64 /* General */,
 				07BF37C417F1854F00C56F64 /* Cloud File Systems */,
-				07BF376E17F1853000C56F64 /* Cloud */,
+				07BF376E17F1853000C56F64 /* Cloud Management */,
 				07BF377C17F1853000C56F64 /* Ensemble */,
 				07BF378117F1853000C56F64 /* Events */,
 				07BF379817F1853000C56F64 /* Model */,
@@ -453,7 +453,7 @@
 			path = "Ensembles iOS";
 			sourceTree = "<group>";
 		};
-		07BF376E17F1853000C56F64 /* Cloud */ = {
+		07BF376E17F1853000C56F64 /* Cloud Management */ = {
 			isa = PBXGroup;
 			children = (
 				070C675E18F43E2E00266A4E /* CDEEventFile.h */,
@@ -466,7 +466,7 @@
 				07BF377417F1853000C56F64 /* CDECloudManager.h */,
 				07BF377517F1853000C56F64 /* CDECloudManager.m */,
 			);
-			name = Cloud;
+			name = "Cloud Management";
 			path = Source/Cloud;
 			sourceTree = SOURCE_ROOT;
 		};

@@ -354,7 +354,7 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
 - (void)cancelMergeWithCompletion:(CDECompletionBlock)completion;
 
 ///
-/// @name Ensemble Discovery
+/// @name Ensemble Discovery and Management
 ///
 
 /**
@@ -368,6 +368,19 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  @param completion The completion block called with the results. The error parameter is nil on success.
  */
 + (void)retrieveEnsembleIdentifiersFromCloudFileSystem:(id <CDECloudFileSystem>)cloudFileSystem completion:(void(^)(NSError *error, NSArray *identifiers))completion;
+
+/**
+ Completely removes the cloud data of an ensemble,
+ 
+ You should use this method sparingly, only if you are sure that your devices are no longer using the ensemble. 
+ 
+ The removal can also take some time to propagate depending on the cloud file system used. With iCloud, for example, it can be many minutes before other devices remove the data. For this reason, it is not a good idea to delete the data, and then immediately recreate the ensemble. In cases like that, it is reasonably likely that a device will see a mix of new and old data, and enter an invalid state.
+ 
+ @param identifier The identifier of the ensemble for removal.
+ @param cloudFileSystem The cloud file system storing the data.
+ @param completion The completion block called when the data has been removed. Success is indicated by the error being nil.
+ */
++ (void)removeEnsembleWithIdentifier:(NSString *)identifier inCloudFileSystem:(id <CDECloudFileSystem>)cloudFileSystem completion:(void(^)(NSError *error))completion;
 
 ///
 /// @name Waiting for Task Completion
