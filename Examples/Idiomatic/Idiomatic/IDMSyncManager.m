@@ -102,8 +102,9 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
     cloudFileSystem = [self makeCloudFileSystem];
     if (!cloudFileSystem) return;
     
+    NSURL *storeURL = [NSURL fileURLWithPath:storePath];
     NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"Model" withExtension:@"momd"];
-    ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"MainStore" persistentStorePath:self.storePath managedObjectModelURL:modelURL cloudFileSystem:cloudFileSystem];
+    ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"MainStore" persistentStoreURL:storeURL managedObjectModelURL:modelURL cloudFileSystem:cloudFileSystem];
     ensemble.delegate = self;
 }
 

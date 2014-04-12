@@ -235,9 +235,9 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
 ///
 
 /**
- The path to the SQLite persistent store that is to be synced.
+ The file URL to the SQLite persistent store that is to be synced.
  */
-@property (nonatomic, strong, readonly) NSString *storePath;
+@property (nonatomic, strong, readonly) NSURL *storeURL;
 
 /**
  The file URL of the managed object model file used for the persistent store.
@@ -280,11 +280,11 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  Unless you have good reason to set the local data root elsewhere, this is the initializer you should use.
  
  @param identifier The global identifier for the ensemble. This must be the same for all syncing ensemble objects across devices.
- @param path The path to the persistent store that is to be synced.
+ @param storeURL The file URL for the persistent store that is to be synced.
  @param managedObjectModelURL A file URL for the location of the compiled (momd, mom) model file used in the persistent store.
  @param cloudFileSystem The cloud file system object used to transfer files between devices.
  */
-- (instancetype)initWithEnsembleIdentifier:(NSString *)identifier persistentStorePath:(NSString *)path managedObjectModelURL:(NSURL *)modelURL cloudFileSystem:(id <CDECloudFileSystem>)cloudFileSystem;
+- (instancetype)initWithEnsembleIdentifier:(NSString *)identifier persistentStoreURL:(NSURL *)storeURL managedObjectModelURL:(NSURL *)modelURL cloudFileSystem:(id <CDECloudFileSystem>)cloudFileSystem;
 
 /**
  Initializes an ensemble.
@@ -292,12 +292,12 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  This is the designated initializer.
  
  @param identifier The global identifier for the ensemble. This must be the same for all syncing ensemble objects across devices.
- @param path The path to the persistent store that is to be synced.
+ @param storeURL The file URL to the persistent store that is to be synced.
  @param managedObjectModelURL A file URL for the location of the compiled (momd, mom) model file used in the persistent store.
  @param cloudFileSystem The cloud file system object used to transfer files between devices.
  @param dataRoot The path to the root directory used by the ensemble to store transaction logs and other metadata.
  */
-- (instancetype)initWithEnsembleIdentifier:(NSString *)identifier persistentStorePath:(NSString *)path managedObjectModelURL:(NSURL *)modelURL cloudFileSystem:(id <CDECloudFileSystem>)cloudFileSystem localDataRootDirectory:(NSString *)dataRoot;
+- (instancetype)initWithEnsembleIdentifier:(NSString *)identifier persistentStoreURL:(NSURL *)storeURL managedObjectModelURL:(NSURL *)modelURL cloudFileSystem:(id <CDECloudFileSystem>)cloudFileSystem localDataRootDirectory:(NSString *)dataRoot;
 
 ///
 /// @name Leeching and Deleeching

@@ -66,7 +66,7 @@
     
     [CDEEventStore setDefaultPathToEventDataRootDirectory:[rootTestDir stringByAppendingPathComponent:@"eventStore1"]];
 
-    ensemble1 = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"testensemble" persistentStorePath:storePath managedObjectModelURL:testModelURL cloudFileSystem:(id)cloudFileSystem];
+    ensemble1 = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"testensemble" persistentStoreURL:storeURL managedObjectModelURL:testModelURL cloudFileSystem:(id)cloudFileSystem];
     
     [ensemble1 leechPersistentStoreWithCompletion:^(NSError *error) {
         [self finishAsync];
@@ -87,7 +87,7 @@
     
     [CDEEventStore setDefaultPathToEventDataRootDirectory:[rootTestDir stringByAppendingPathComponent:@"eventStore2"]];
 
-    ensemble2 = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"testensemble" persistentStorePath:storePath managedObjectModelURL:testModelURL cloudFileSystem:(id)cloudFileSystem];
+    ensemble2 = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"testensemble" persistentStoreURL:storeURL managedObjectModelURL:testModelURL cloudFileSystem:(id)cloudFileSystem];
     
     [ensemble2 leechPersistentStoreWithCompletion:^(NSError *error) {
         [self finishAsync];
