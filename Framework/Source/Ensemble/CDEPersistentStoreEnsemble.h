@@ -14,6 +14,7 @@
 @class CDEPersistentStoreEnsemble;
 @protocol CDECloudFileSystem;
 
+
 ///
 /// @name Notifications
 ///
@@ -54,6 +55,7 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
 
 @optional
 
+
 ///
 /// @name Leeching
 ///
@@ -71,6 +73,7 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  @param ensemble The `CDEPersistentStoreEnsemble` that is importing the store
  */
 - (void)persistentStoreEnsembleDidImportStore:(CDEPersistentStoreEnsemble *)ensemble;
+
 
 ///
 /// @name Merging
@@ -131,6 +134,7 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  */
 - (void)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didSaveMergeChangesWithNotification:(NSNotification *)notification;
 
+
 ///
 /// @name Deleeching
 ///
@@ -148,6 +152,7 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  @param error An error describing the cause of the deleech
  */
 - (void)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didDeleechWithError:(NSError *)error;
+
 
 ///
 /// @name Object Identity
@@ -188,6 +193,7 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  */
 @interface CDEPersistentStoreEnsemble : NSObject
 
+
 ///
 /// @name Delegate
 ///
@@ -197,6 +203,7 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  */
 @property (nonatomic, weak, readwrite) id <CDEPersistentStoreEnsembleDelegate> delegate;
 
+
 ///
 /// @name Cloud File System
 ///
@@ -205,6 +212,7 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  The cloud file system, which is used to transfer files to other devices.
  */
 @property (nonatomic, strong, readonly) id <CDECloudFileSystem> cloudFileSystem;
+
 
 ///
 /// @name Storage for Ensemble
@@ -219,6 +227,7 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  */
 @property (nonatomic, strong, readonly) NSURL *localDataRootDirectoryURL;
 
+
 ///
 /// @name Ensemble Identity
 ///
@@ -229,6 +238,7 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  The identifier is passed in during initialization. Ensemble objects on different devices with corresponding identifiers will sync their persistent stores.
  */
 @property (nonatomic, strong, readonly) NSString *ensembleIdentifier;
+
 
 ///
 /// @name Persistent Store and Model
@@ -251,6 +261,7 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  */
 @property (nonatomic, strong, readonly) NSManagedObjectModel *managedObjectModel;
 
+
 ///
 /// @name Active State
 ///
@@ -269,6 +280,7 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  Attempting to merge while another merge is in progress will lead to an error.
  */
 @property (nonatomic, assign, readonly, getter = isMerging) BOOL merging;
+
 
 ///
 /// @name Initialization
@@ -298,6 +310,7 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  @param dataRootURL The file URL to the root directory used by the ensemble to store transaction logs and other metadata.
  */
 - (instancetype)initWithEnsembleIdentifier:(NSString *)identifier persistentStoreURL:(NSURL *)storeURL managedObjectModelURL:(NSURL *)modelURL cloudFileSystem:(id <CDECloudFileSystem>)cloudFileSystem localDataRootDirectoryURL:(NSURL *)dataRootURL;
+
 
 ///
 /// @name Leeching and Deleeching
@@ -331,6 +344,7 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  */
 - (void)deleechPersistentStoreWithCompletion:(CDECompletionBlock)completion;
 
+
 ///
 /// @name Merging
 ///
@@ -352,6 +366,7 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  @param completion A block that is executed upon completion. The block is passed nil if the cancellation is successful, and an `NSError` otherwise.
  */
 - (void)cancelMergeWithCompletion:(CDECompletionBlock)completion;
+
 
 ///
 /// @name Ensemble Discovery and Management
@@ -381,6 +396,7 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  @param completion The completion block called when the data has been removed. Success is indicated by the error being nil.
  */
 + (void)removeEnsembleWithIdentifier:(NSString *)identifier inCloudFileSystem:(id <CDECloudFileSystem>)cloudFileSystem completion:(void(^)(NSError *error))completion;
+
 
 ///
 /// @name Waiting for Task Completion
