@@ -76,7 +76,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
 
 #pragma mark - Initialization and Deallocation
 
-- (instancetype)initWithEnsembleIdentifier:(NSString *)identifier persistentStoreURL:(NSURL *)newStoreURL managedObjectModelURL:(NSURL *)modelURL cloudFileSystem:(id <CDECloudFileSystem>)newCloudFileSystem localDataRootDirectory:(NSString *)eventDataRoot
+- (instancetype)initWithEnsembleIdentifier:(NSString *)identifier persistentStoreURL:(NSURL *)newStoreURL managedObjectModelURL:(NSURL *)modelURL cloudFileSystem:(id <CDECloudFileSystem>)newCloudFileSystem localDataRootDirectoryURL:(NSURL *)eventDataRootURL
 {
     self = [super init];
     if (self) {
@@ -91,7 +91,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
         self.managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
         self.cloudFileSystem = newCloudFileSystem;
     
-        self.eventStore = [[CDEEventStore alloc] initWithEnsembleIdentifier:self.ensembleIdentifier pathToEventDataRootDirectory:eventDataRoot];
+        self.eventStore = [[CDEEventStore alloc] initWithEnsembleIdentifier:self.ensembleIdentifier pathToEventDataRootDirectory:eventDataRootURL.path];
         self.leeched = eventStore.containsEventData;
         if (self.leeched) [self.eventStore removeUnusedDataWithCompletion:NULL];
         
@@ -114,7 +114,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
 
 - (instancetype)initWithEnsembleIdentifier:(NSString *)identifier persistentStoreURL:(NSURL *)url managedObjectModelURL:(NSURL *)modelURL cloudFileSystem:(id <CDECloudFileSystem>)newCloudFileSystem
 {
-    return [self initWithEnsembleIdentifier:identifier persistentStoreURL:url managedObjectModelURL:modelURL cloudFileSystem:newCloudFileSystem localDataRootDirectory:nil];
+    return [self initWithEnsembleIdentifier:identifier persistentStoreURL:url managedObjectModelURL:modelURL cloudFileSystem:newCloudFileSystem localDataRootDirectoryURL:nil];
 }
 
 - (void)initializeEventIntegrator
@@ -486,9 +486,9 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
 
 #pragma mark Accessors
 
-- (NSString *)localDataRootDirectory
+- (NSURL *)localDataRootDirectoryURL
 {
-    return self.eventStore.pathToEventDataRootDirectory;
+    return [NSURL fileURLWithPath:self.eventStore.pathToEventDataRootDirectory];
 }
 
 #pragma mark Merging Changes

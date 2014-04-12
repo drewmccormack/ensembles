@@ -211,13 +211,13 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
 ///
 
 /**
- The root of a directory used by the ensemble to store transaction logs and other data needed to sync.
+ File URL for the root of a directory used by the ensemble to store transaction logs and other data needed to sync.
  
  The directory is setup when the ensemble leeches, and removed when it deleeches. The data stored includes the transaction logs, binary files, and various metadata files.
  
  The default location is set by the framework to be a folder inside the user's Application Support directory. You can override this by passing a path upon initialization.
  */
-@property (nonatomic, strong, readonly) NSString *localDataRootDirectory;
+@property (nonatomic, strong, readonly) NSURL *localDataRootDirectoryURL;
 
 ///
 /// @name Ensemble Identity
@@ -295,9 +295,9 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  @param storeURL The file URL to the persistent store that is to be synced.
  @param managedObjectModelURL A file URL for the location of the compiled (momd, mom) model file used in the persistent store.
  @param cloudFileSystem The cloud file system object used to transfer files between devices.
- @param dataRoot The path to the root directory used by the ensemble to store transaction logs and other metadata.
+ @param dataRootURL The file URL to the root directory used by the ensemble to store transaction logs and other metadata.
  */
-- (instancetype)initWithEnsembleIdentifier:(NSString *)identifier persistentStoreURL:(NSURL *)storeURL managedObjectModelURL:(NSURL *)modelURL cloudFileSystem:(id <CDECloudFileSystem>)cloudFileSystem localDataRootDirectory:(NSString *)dataRoot;
+- (instancetype)initWithEnsembleIdentifier:(NSString *)identifier persistentStoreURL:(NSURL *)storeURL managedObjectModelURL:(NSURL *)modelURL cloudFileSystem:(id <CDECloudFileSystem>)cloudFileSystem localDataRootDirectoryURL:(NSURL *)dataRootURL;
 
 ///
 /// @name Leeching and Deleeching
