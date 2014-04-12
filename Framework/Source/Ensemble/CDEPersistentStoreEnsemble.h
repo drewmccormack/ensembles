@@ -316,7 +316,7 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  
  You should avoid saving to the persistent store during leeching. If a save is detected, the leech will terminate with an error.
  
- @param completion A completion block that is executed when leeching completes, whether successful or not. The block is passed nil upon a successful merge, and an `NSError` otherwise.
+ @param completion A completion block that is executed when leeching completes, whether successful or not. The block is passed `nil` upon a successful leech, and an `NSError` otherwise.
  */
 - (void)leechPersistentStoreWithCompletion:(CDECompletionBlock)completion;
 
