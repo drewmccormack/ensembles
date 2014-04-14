@@ -340,7 +340,7 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  
  Because this can be a lengthy process, the method is asynchronous.
  
- @param completion A completion block that is executed when deleeching completes. The block is passed nil upon a successful merge, and an `NSError` otherwise.
+ @param completion A completion block that is executed when deleeching completes. The block is passed nil upon success, and an `NSError` otherwise.
  */
 - (void)deleechPersistentStoreWithCompletion:(CDECompletionBlock)completion;
 
