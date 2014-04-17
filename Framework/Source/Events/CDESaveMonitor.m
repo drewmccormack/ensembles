@@ -68,7 +68,9 @@
     NSURL *monitoredStoreURL = [NSURL fileURLWithPath:self.storePath];
     NSPersistentStore *monitoredStore = nil;
     for (NSPersistentStore *store in stores) {
-        if ([store.URL isEqual:monitoredStoreURL]) {
+        NSURL *url1 = [store.URL URLByStandardizingPath];
+        NSURL *url2 = [monitoredStoreURL URLByStandardizingPath];
+        if ([url1 isEqual:url2]) {
             monitoredStore = store;
             break;
         }

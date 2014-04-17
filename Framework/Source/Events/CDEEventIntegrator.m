@@ -114,7 +114,9 @@
     
     NSArray *stores = context.persistentStoreCoordinator.persistentStores;
     for (NSPersistentStore *store in stores) {
-        if ([self.storeURL isEqual:store.URL]) {
+        NSURL *url1 = [self.storeURL URLByStandardizingPath];
+        NSURL *url2 = [store.URL URLByStandardizingPath];
+        if ([url1 isEqual:url2]) {
             saveOccurredDuringMerge = YES;
             break;
         }
