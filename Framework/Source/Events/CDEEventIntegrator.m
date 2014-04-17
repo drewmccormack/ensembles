@@ -196,12 +196,14 @@
                 return;
             }
             
-            // Save changes event context.
+            // Save changes event context
             __block BOOL eventSaveSucceeded = NO;
             [eventStoreContext performBlockAndWait:^{
                 BOOL isUnique = [self checkUniquenessOfEventWithRevision:revision];
-                if (isUnique)
+                if (isUnique) {
+                    [eventBuilder finalizeNewEvent];
                     eventSaveSucceeded = [eventStoreContext save:&error];
+                }
                 else
                     error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeSaveOccurredDuringMerge userInfo:nil];
             }];

@@ -209,6 +209,9 @@
         
         // Deleted Objects
         [eventBuilder addDeleteChangesForChangesData:deleteData];
+        
+        // Finalize
+        [eventBuilder finalizeNewEvent];
         [self saveEventStore];
         
         // Deregister event, and clean up

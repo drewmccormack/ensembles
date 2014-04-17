@@ -211,14 +211,14 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
     return returnNumber;
 }
 
-- (CDERevisionNumber)lastMergeRevision
+- (CDERevisionNumber)lastMergeRevisionSaved
 {
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"persistentStoreIdentifier = %@ AND storeModificationEvent.type = %d", self.persistentStoreIdentifier, CDEStoreModificationEventTypeMerge];
     CDERevisionNumber result = [self lastRevisionNumberSavedForEventRevisionPredicate:predicate];
     return result;
 }
 
-- (CDERevisionNumber)lastSaveRevision
+- (CDERevisionNumber)lastSaveRevisionSaved
 {
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"persistentStoreIdentifier = %@ AND storeModificationEvent.type = %d", self.persistentStoreIdentifier, CDEStoreModificationEventTypeSave];
     CDERevisionNumber result = [self lastRevisionNumberSavedForEventRevisionPredicate:predicate];
@@ -227,7 +227,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 
 - (CDERevisionNumber)lastRevisionSaved
 {
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"persistentStoreIdentifier = %@ AND (storeModificationEvent != NIL OR storeModificationEventForOtherStores != NIL)", self.persistentStoreIdentifier];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"persistentStoreIdentifier = %@ AND (storeModificationEvent.type != %d OR storeModificationEventForOtherStores.type != %d)", self.persistentStoreIdentifier, CDEStoreModificationEventTypeIncomplete, CDEStoreModificationEventTypeIncomplete];
     CDERevisionNumber result = [self lastRevisionNumberSavedForEventRevisionPredicate:predicate];
     return result;
 }

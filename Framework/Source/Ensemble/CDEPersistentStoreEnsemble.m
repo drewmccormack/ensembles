@@ -178,8 +178,9 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
 
 - (void)performInitialChecks
 {
+    if (![self checkIncompleteEvents]) return;
+    
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (![self checkIncompleteEvents]) return;
         [self checkCloudFileSystemIdentityWithCompletion:^(NSError *error) {
             if (!error) {
                 observingIdentityToken = YES;
@@ -193,18 +194,22 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
 {
     BOOL succeeded = YES;
     if (eventStore.incompleteMandatoryEventIdentifiers.count > 0) {
-        succeeded = NO;
-        [self deleechPersistentStoreWithCompletion:^(NSError *error) {
-            if (!error) {
-                if ([self.delegate respondsToSelector:@selector(persistentStoreEnsemble:didDeleechWithError:)]) {
-                    NSError *deleechError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeDataCorruptionDetected userInfo:nil];
-                    [self.delegate persistentStoreEnsemble:self didDeleechWithError:deleechError];
+        // Delay until after init... returns, because we want to inform the delegate
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self deleechPersistentStoreWithCompletion:^(NSError *error) {
+                if (!error) {
+                    if ([self.delegate respondsToSelector:@selector(persistentStoreEnsemble:didDeleechWithError:)]) {
+                        NSError *deleechError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeDataCorruptionDetected userInfo:nil];
+                        [self.delegate persistentStoreEnsemble:self didDeleechWithError:deleechError];
+                    }
                 }
-            }
-            else {
-                CDELog(CDELoggingLevelError, @"Could not deleech after failing incomplete event check: %@", error);
-            }
-        }];
+                else {
+                    CDELog(CDELoggingLevelError, @"Could not deleech after failing incomplete event check: %@", error);
+                }
+            }];
+        });
+        
+        succeeded = NO;
     }
     else {
         NSManagedObjectContext *context = eventStore.managedObjectContext;
@@ -217,16 +222,24 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
                 
                 NSError *error;
                 if ([context save:&error]) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [eventStore deregisterIncompleteEventIdentifier:eventId];
-                    });
+                    [eventStore deregisterIncompleteEventIdentifier:eventId];
                 }
                 else {
                     CDELog(CDELoggingLevelError, @"Could not save after deleting incomplete event: %@", error);
                 }
             }];
         }
+        
+        [context performBlock:^{
+            NSArray *incompleteEvents = [CDEStoreModificationEvent fetchStoreModificationEventsWithTypes:@[@(CDEStoreModificationEventTypeIncomplete)] persistentStoreIdentifier:nil inManagedObjectContext:context];
+            for (CDEStoreModificationEvent *event in incompleteEvents) [context deleteObject:event];
+            NSError *error;
+            if (![context save:&error]) {
+                CDELog(CDELoggingLevelError, @"Failed to delete incomplete events: %@", error);
+            }
+        }];
     }
+    
     return succeeded;
 }
 

@@ -26,6 +26,7 @@
 @synthesize event = event;
 @synthesize eventStore = eventStore;
 @synthesize eventManagedObjectContext = eventManagedObjectContext;
+@synthesize eventType = eventType;
 
 #pragma mark - Initialization
 
@@ -35,6 +36,7 @@
     if (self) {
         eventStore = newStore;
         eventManagedObjectContext = newContext;
+        eventType = CDEStoreModificationEventTypeIncomplete;
     }
     return self;
 }
@@ -50,6 +52,8 @@
 {
     __block CDERevision *returnRevision = nil;
     [eventManagedObjectContext performBlockAndWait:^{
+        eventType = type;
+        
         CDERevisionNumber lastRevision = eventStore.lastRevisionSaved;
         NSString *persistentStoreId = self.eventStore.persistentStoreIdentifier;
         
@@ -59,7 +63,7 @@
 
         event = [NSEntityDescription insertNewObjectForEntityForName:@"CDEStoreModificationEvent" inManagedObjectContext:eventManagedObjectContext];
         
-        event.type = type;
+        event.type = CDEStoreModificationEventTypeIncomplete;
         event.timestamp = [NSDate timeIntervalSinceReferenceDate];
         event.globalCount = globalCountBeforeMakingEvent+1;
         event.modelVersion = [self.ensemble.managedObjectModel cde_entityHashesPropertyList];
@@ -71,12 +75,12 @@
         revision.storeModificationEvent = event;
         
         // Set the state of other stores
-        if (type == CDEStoreModificationEventTypeSave) {
+        if (eventType == CDEStoreModificationEventTypeSave) {
             CDERevisionSet *newRevisionSet = [revisionManager revisionSetForLastMergeOrBaseline];
             [newRevisionSet removeRevisionForPersistentStoreIdentifier:persistentStoreId];
             event.revisionSetOfOtherStoresAtCreation = newRevisionSet;
         }
-        else if (type == CDEStoreModificationEventTypeMerge) {
+        else if (eventType == CDEStoreModificationEventTypeMerge) {
             CDERevisionSet *mostRecentSet = [revisionManager revisionSetOfMostRecentEvents];
             [mostRecentSet removeRevisionForPersistentStoreIdentifier:self.eventStore.persistentStoreIdentifier];
             event.revisionSetOfOtherStoresAtCreation = mostRecentSet;
@@ -86,6 +90,13 @@
     }];
     
     return returnRevision;
+}
+
+- (void)finalizeNewEvent
+{
+    [eventManagedObjectContext performBlockAndWait:^{
+        event.type = eventType;
+    }];
 }
 
 #pragma mark - Modifying Events

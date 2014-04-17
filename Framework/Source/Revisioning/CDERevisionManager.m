@@ -286,7 +286,7 @@
         NSSet *stores = [NSSet setWithArray:[events valueForKeyPath:@"eventRevision.persistentStoreIdentifier"]];
         NSArray *sortDescs = @[[NSSortDescriptor sortDescriptorWithKey:@"eventRevision.revisionNumber" ascending:YES]];
         for (NSString *persistentStoreId in stores) {
-            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"eventRevision.persistentStoreIdentifier = %@ AND type != %d", persistentStoreId, CDEStoreModificationEventTypeBaseline];
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"eventRevision.persistentStoreIdentifier = %@ AND type != %d AND type != %d", persistentStoreId, CDEStoreModificationEventTypeBaseline, CDEStoreModificationEventTypeIncomplete];
             NSArray *storeEvents = [events filteredArrayUsingPredicate:predicate];
             storeEvents = [storeEvents sortedArrayUsingDescriptors:sortDescs];
             if (storeEvents.count == 0) continue;

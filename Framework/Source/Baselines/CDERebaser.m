@@ -327,7 +327,7 @@
     [context performBlockAndWait:^{
         NSError *error = nil;
         NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEObjectChange"];
-        NSPredicate *eventTypePredicate = [NSPredicate predicateWithFormat:@"storeModificationEvent.type != %d", CDEStoreModificationEventTypeBaseline];
+        NSPredicate *eventTypePredicate = [NSPredicate predicateWithFormat:@"storeModificationEvent.type != %d && storeModificationEvent.type != %d", CDEStoreModificationEventTypeBaseline, CDEStoreModificationEventTypeIncomplete];
         NSPredicate *changeTypePredicate = [NSPredicate predicateWithFormat:@"type = %d", type];
         fetch.predicate = [NSCompoundPredicate andPredicateWithSubpredicates:@[eventTypePredicate, changeTypePredicate]];
         count = [context countForFetchRequest:fetch error:&error];

@@ -30,11 +30,13 @@ typedef NS_ENUM(uint16_t, CDEUpdateStoreOption) {
 @property (nonatomic, strong, readonly) NSManagedObjectContext *eventManagedObjectContext;
 @property (nonatomic, strong, readonly) CDEStoreModificationEvent *event;
 @property (nonatomic, weak, readwrite) CDEPersistentStoreEnsemble *ensemble;
+@property (nonatomic, assign, readonly) CDEStoreModificationEventType eventType;
 
 - (id)initWithEventStore:(CDEEventStore *)eventStore;
 - (id)initWithEventStore:(CDEEventStore *)eventStore eventManagedObjectContext:(NSManagedObjectContext *)context;
 
 - (CDERevision *)makeNewEventOfType:(CDEStoreModificationEventType)type uniqueIdentifier:(NSString *)uniqueIdOrNil;
+- (void)finalizeNewEvent;
 
 - (void)performBlockAndWait:(CDECodeBlock)block; // Executes in eventManagedObjectContext queue
 

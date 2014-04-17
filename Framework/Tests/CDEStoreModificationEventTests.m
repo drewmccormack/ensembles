@@ -40,6 +40,7 @@
     // Event Builder
     eventBuilder = [[CDEEventBuilder alloc] initWithEventStore:(id)self.eventStore];
     [eventBuilder makeNewEventOfType:CDEStoreModificationEventTypeSave uniqueIdentifier:nil];
+    [eventBuilder finalizeNewEvent];
     event = eventBuilder.event;
 }
 
@@ -72,12 +73,16 @@
     
     CDEEventBuilder *b = [[CDEEventBuilder alloc] initWithEventStore:(id)self.eventStore];
     [b makeNewEventOfType:CDEStoreModificationEventTypeMerge uniqueIdentifier:nil];
-    
+    [b finalizeNewEvent];
+
     b = [[CDEEventBuilder alloc] initWithEventStore:(id)self.eventStore];
     [b makeNewEventOfType:CDEStoreModificationEventTypeBaseline uniqueIdentifier:nil];
-    
+    [b finalizeNewEvent];
+
     b = [[CDEEventBuilder alloc] initWithEventStore:(id)self.eventStore];
     [b makeNewEventOfType:CDEStoreModificationEventTypeMerge uniqueIdentifier:nil];
+    [b finalizeNewEvent];
+    
     [context performBlockAndWait:^{
         b.event.eventRevision.persistentStoreIdentifier = @"123";
         

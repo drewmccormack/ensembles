@@ -84,6 +84,7 @@
         [eventBuilder addChangesForInsertedObjects:allObjects objectsAreSaved:YES inManagedObjectContext:context];
         
         [eventContext performBlock:^{
+            [eventBuilder finalizeNewEvent];
             [eventContext save:&error];
             
             dispatch_async(dispatch_get_main_queue(), ^{

@@ -37,6 +37,8 @@
     NSArray *parents = [context2 executeFetchRequest:fetch error:NULL];
     XCTAssertEqual(parents.count, (NSUInteger)1, @"Wrong number of parents on device 2");
     
+    CDESetCurrentLoggingLevel(CDELoggingLevelVerbose);
+    
     NSManagedObject *parentOnDevice2 = parents.lastObject;
     [parentOnDevice2 setValue:@"dave" forKey:@"name"];
     XCTAssertTrue([context2 save:NULL], @"Could not save");

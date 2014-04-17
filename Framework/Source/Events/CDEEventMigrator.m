@@ -133,7 +133,7 @@ static NSString *kCDEDefaultStoreType;
 
 - (void)migrateEventsInFromFiles:(NSArray *)paths completion:(CDECompletionBlock)completion
 {
-    CDELog(CDELoggingLevelVerbose, @"Migrating file events to event store");
+    CDELog(CDELoggingLevelVerbose, @"Migrating file events to event store from paths: %@", paths);
     
     [self.eventStore.managedObjectContext performBlock:^{
         NSManagedObjectContext *importContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
@@ -261,7 +261,7 @@ static NSString *kCDEDefaultStoreType;
 - (NSArray *)storeModificationEventsCreatedLocallySinceRevisionNumber:(CDERevisionNumber)revisionNumber error:(NSError * __autoreleasing *)error
 {
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
-    fetch.predicate = [NSPredicate predicateWithFormat:@"eventRevision.revisionNumber > %lld AND eventRevision.persistentStoreIdentifier = %@ && type != %d", revisionNumber, eventStore.persistentStoreIdentifier, CDEStoreModificationEventTypeBaseline];
+    fetch.predicate = [NSPredicate predicateWithFormat:@"eventRevision.revisionNumber > %lld AND eventRevision.persistentStoreIdentifier = %@ && type != %d && type != %d", revisionNumber, eventStore.persistentStoreIdentifier, CDEStoreModificationEventTypeBaseline, CDEStoreModificationEventTypeIncomplete];
     NSArray *storeModEvents = [eventStore.managedObjectContext executeFetchRequest:fetch error:error];
     return storeModEvents;
 }

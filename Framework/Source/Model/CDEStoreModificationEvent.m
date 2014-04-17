@@ -199,7 +199,7 @@
 + (NSArray *)fetchNonBaselineEventsForPersistentStoreIdentifier:(NSString *)persistentStoreId sinceRevisionNumber:(CDERevisionNumber)revision inManagedObjectContext:(NSManagedObjectContext *)context
 {
     NSFetchRequest *fetch = [[NSFetchRequest alloc] initWithEntityName:@"CDEStoreModificationEvent"];
-    fetch.predicate = [NSPredicate predicateWithFormat:@"eventRevision.persistentStoreIdentifier = %@ && eventRevision.revisionNumber > %lld && type != %d", persistentStoreId, revision, CDEStoreModificationEventTypeBaseline];
+    fetch.predicate = [NSPredicate predicateWithFormat:@"eventRevision.persistentStoreIdentifier = %@ && eventRevision.revisionNumber > %lld && type != %d && type != %d", persistentStoreId, revision, CDEStoreModificationEventTypeBaseline, CDEStoreModificationEventTypeIncomplete];
 
     NSError *error;
     NSArray *events = [context executeFetchRequest:fetch error:&error];
@@ -225,7 +225,7 @@
 {
     NSError *error;
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
-    fetch.predicate = [NSPredicate predicateWithFormat:@"type != %d AND globalCount <= %lld", CDEStoreModificationEventTypeBaseline, globalCount];
+    fetch.predicate = [NSPredicate predicateWithFormat:@"type != %d AND type != %d AND globalCount <= %lld", CDEStoreModificationEventTypeBaseline, CDEStoreModificationEventTypeIncomplete, globalCount];
     NSArray *events = [context executeFetchRequest:fetch error:&error];
     if (!events) CDELog(CDELoggingLevelError, @"Could not fetch events: %@", error);
     return [CDERevisionManager sortStoreModificationEvents:events];
@@ -235,7 +235,7 @@
 {
     NSError *error;
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
-    fetch.predicate = [NSPredicate predicateWithFormat:@"type != %d", CDEStoreModificationEventTypeBaseline];
+    fetch.predicate = [NSPredicate predicateWithFormat:@"type != %d AND type != %d", CDEStoreModificationEventTypeBaseline, CDEStoreModificationEventTypeIncomplete];
     NSArray *events = [context executeFetchRequest:fetch error:&error];
     if (!events) CDELog(CDELoggingLevelError, @"Could not fetch events: %@", error);
     return [CDERevisionManager sortStoreModificationEvents:events];

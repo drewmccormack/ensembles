@@ -14,6 +14,7 @@
 @class CDERevisionSet;
 
 typedef NS_ENUM(int16_t, CDEStoreModificationEventType) {
+    CDEStoreModificationEventTypeIncomplete = 0,
     CDEStoreModificationEventTypeBaseline   = 100,
     CDEStoreModificationEventTypeSave       = 200,
     CDEStoreModificationEventTypeMerge      = 300
