@@ -325,7 +325,6 @@
     __block long long maxCount = -1;
     [eventManagedObjectContext performBlockAndWait:^{
         NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
-        fetch.propertiesToFetch = @[@"globalCount"];
         
         NSArray *result = [eventManagedObjectContext executeFetchRequest:fetch error:NULL];
         if (!result) @throw [NSException exceptionWithName:CDEException reason:@"Failed to get global count" userInfo:nil];

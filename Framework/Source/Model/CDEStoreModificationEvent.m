@@ -136,7 +136,6 @@
 {
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
     fetch.relationshipKeyPathsForPrefetching = @[@"eventRevision"];
-    fetch.propertiesToFetch = @[@"globalCount"];
     fetch.predicate = [self predicateForAllowedTypes:types persistentStoreIdentifier:persistentStoreIdentifier];
     
     NSError *error;

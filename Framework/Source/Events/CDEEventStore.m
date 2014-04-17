@@ -196,7 +196,6 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
     [self.managedObjectContext performBlockAndWait:^{
         NSFetchRequest *request = [[NSFetchRequest alloc] initWithEntityName:@"CDEEventRevision"];
         request.predicate = predicate;
-        request.propertiesToFetch = @[@"revisionNumber"];
         
         NSError *error = nil;
         NSArray *revisions = [self.managedObjectContext executeFetchRequest:request error:&error];

@@ -20,7 +20,6 @@
 {
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEDataFile"];
     fetch.predicate = [NSPredicate predicateWithFormat:@"objectChange != NIL"];
-    fetch.propertiesToFetch = @[@"filename"];
     
     NSError *error;
     NSArray *results = [context executeFetchRequest:fetch error:&error];
@@ -37,7 +36,6 @@
     
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEDataFile"];
     fetch.predicate = [NSPredicate predicateWithFormat:@"objectChange.storeModificationEvent IN %@", events];
-    fetch.propertiesToFetch = @[@"filename"];
     
     NSError *error;
     NSArray *results = [context executeFetchRequest:fetch error:&error];
