@@ -55,13 +55,13 @@
         
         CDERevisionManager *revisionManager = [[CDERevisionManager alloc] initWithEventStore:eventStore];
         revisionManager.managedObjectModelURL = self.ensemble.managedObjectModelURL;
-        CDEGlobalCount globalCountBeforeMerge = [revisionManager maximumGlobalCount];
+        CDEGlobalCount globalCountBeforeMakingEvent = [revisionManager maximumGlobalCount];
 
         event = [NSEntityDescription insertNewObjectForEntityForName:@"CDEStoreModificationEvent" inManagedObjectContext:eventManagedObjectContext];
         
         event.type = type;
         event.timestamp = [NSDate timeIntervalSinceReferenceDate];
-        event.globalCount = globalCountBeforeMerge+1;
+        event.globalCount = globalCountBeforeMakingEvent+1;
         event.modelVersion = [self.ensemble.managedObjectModel cde_entityHashesPropertyList];
         
         CDEEventRevision *revision = [NSEntityDescription insertNewObjectForEntityForName:@"CDEEventRevision" inManagedObjectContext:eventManagedObjectContext];
