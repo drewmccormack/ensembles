@@ -286,7 +286,7 @@
         CDEStoreModificationEvent *mergeEvent = [NSEntityDescription insertNewObjectForEntityForName:@"CDEStoreModificationEvent" inManagedObjectContext:eventMOC];
         mergeEvent.type = CDEStoreModificationEventTypeMerge;
         mergeEvent.timestamp = 10.0;
-        mergeEvent.eventRevision = [CDEEventRevision makeEventRevisionForPersistentStoreIdentifier:@"store1" revisionNumber:self.eventStore.lastMergeRevision inManagedObjectContext:eventMOC];
+        mergeEvent.eventRevision = [CDEEventRevision makeEventRevisionForPersistentStoreIdentifier:@"store1" revisionNumber:self.eventStore.lastMergeRevisionSaved inManagedObjectContext:eventMOC];
         
         NSMutableSet *revs = [[NSMutableSet alloc] init];
         for (NSString *otherStoreId in otherStoreIds) {

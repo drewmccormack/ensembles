@@ -172,19 +172,16 @@
                 return;
             }
             
+            // Create id of new event
+            // Register event in case of crashes
+            newEventUniqueId = [[NSProcessInfo processInfo] globallyUniqueString];
+            [self.eventStore registerIncompleteEventIdentifier:newEventUniqueId isMandatory:NO];
+            
             // Create a merge event
             CDEEventBuilder *eventBuilder = [[CDEEventBuilder alloc] initWithEventStore:self.eventStore];
             eventBuilder.ensemble = self.ensemble;
-            CDERevision *revision = [eventBuilder makeNewEventOfType:CDEStoreModificationEventTypeMerge];
-            
-            // Get unique id of event
-            [eventStoreContext performBlockAndWait:^{
-                newEventUniqueId = [eventBuilder.event.uniqueIdentifier copy];
-            }];
-            
-            // Register event in case of crashes
-            [self.eventStore registerIncompleteEventIdentifier:newEventUniqueId isMandatory:NO];
-            
+            CDERevision *revision = [eventBuilder makeNewEventOfType:CDEStoreModificationEventTypeMerge uniqueIdentifier:newEventUniqueId];
+        
             // Repair inconsistencies caused by integration
             BOOL repairSucceeded = [self repairWithMergeEventBuilder:eventBuilder error:&error];
             if (!repairSucceeded) {
@@ -199,7 +196,7 @@
                 return;
             }
             
-            // Save changes event context. First save child, then parent.
+            // Save changes event context.
             __block BOOL eventSaveSucceeded = NO;
             [eventStoreContext performBlockAndWait:^{
                 BOOL isUnique = [self checkUniquenessOfEventWithRevision:revision];
@@ -234,7 +231,9 @@
     [self.eventStore.managedObjectContext performBlockAndWait:^{
         NSFetchRequest *fetch = [[NSFetchRequest alloc] initWithEntityName:@"CDEStoreModificationEvent"];
         fetch.predicate = [NSPredicate predicateWithFormat:@"eventRevision.persistentStoreIdentifier = %@ && eventRevision.revisionNumber = %lld && type != %d", self.eventStore.persistentStoreIdentifier, revision.revisionNumber, CDEStoreModificationEventTypeBaseline];
-        count = [self.eventStore.managedObjectContext countForFetchRequest:fetch error:NULL];
+        NSError *error = nil;
+        count = [self.eventStore.managedObjectContext countForFetchRequest:fetch error:&error];
+        if (count == NSNotFound) CDELog(CDELoggingLevelError, @"Could not get count of revisions: %@", error);
     }];
     return count == 1;
 }

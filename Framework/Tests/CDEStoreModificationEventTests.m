@@ -39,7 +39,7 @@
     
     // Event Builder
     eventBuilder = [[CDEEventBuilder alloc] initWithEventStore:(id)self.eventStore];
-    [eventBuilder makeNewEventOfType:CDEStoreModificationEventTypeSave];
+    [eventBuilder makeNewEventOfType:CDEStoreModificationEventTypeSave uniqueIdentifier:nil];
     event = eventBuilder.event;
 }
 
@@ -71,13 +71,13 @@
     NSManagedObjectContext *context = self.eventStore.managedObjectContext;
     
     CDEEventBuilder *b = [[CDEEventBuilder alloc] initWithEventStore:(id)self.eventStore];
-    [b makeNewEventOfType:CDEStoreModificationEventTypeMerge];
+    [b makeNewEventOfType:CDEStoreModificationEventTypeMerge uniqueIdentifier:nil];
     
     b = [[CDEEventBuilder alloc] initWithEventStore:(id)self.eventStore];
-    [b makeNewEventOfType:CDEStoreModificationEventTypeBaseline];
+    [b makeNewEventOfType:CDEStoreModificationEventTypeBaseline uniqueIdentifier:nil];
     
     b = [[CDEEventBuilder alloc] initWithEventStore:(id)self.eventStore];
-    [b makeNewEventOfType:CDEStoreModificationEventTypeMerge];
+    [b makeNewEventOfType:CDEStoreModificationEventTypeMerge uniqueIdentifier:nil];
     [context performBlockAndWait:^{
         b.event.eventRevision.persistentStoreIdentifier = @"123";
         

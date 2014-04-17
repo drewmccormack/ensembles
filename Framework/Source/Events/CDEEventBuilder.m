@@ -46,11 +46,11 @@
 
 #pragma mark - Making New Events
 
-- (CDERevision *)makeNewEventOfType:(CDEStoreModificationEventType)type
+- (CDERevision *)makeNewEventOfType:(CDEStoreModificationEventType)type uniqueIdentifier:(NSString *)uniqueIdOrNil
 {
     __block CDERevision *returnRevision = nil;
     [eventManagedObjectContext performBlockAndWait:^{
-        CDERevisionNumber lastRevision = eventStore.lastRevision;
+        CDERevisionNumber lastRevision = eventStore.lastRevisionSaved;
         NSString *persistentStoreId = self.eventStore.persistentStoreIdentifier;
         
         CDERevisionManager *revisionManager = [[CDERevisionManager alloc] initWithEventStore:eventStore];
@@ -63,6 +63,7 @@
         event.timestamp = [NSDate timeIntervalSinceReferenceDate];
         event.globalCount = globalCountBeforeMakingEvent+1;
         event.modelVersion = [self.ensemble.managedObjectModel cde_entityHashesPropertyList];
+        if (uniqueIdOrNil) event.uniqueIdentifier = uniqueIdOrNil;
         
         CDEEventRevision *revision = [NSEntityDescription insertNewObjectForEntityForName:@"CDEEventRevision" inManagedObjectContext:eventManagedObjectContext];
         revision.persistentStoreIdentifier = self.eventStore.persistentStoreIdentifier;

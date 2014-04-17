@@ -24,9 +24,9 @@
 @property (nonatomic, strong, readonly) NSArray *incompleteEventIdentifiers;
 @property (nonatomic, strong, readonly) NSArray *incompleteMandatoryEventIdentifiers;
 
-@property (nonatomic, assign, readonly) CDERevisionNumber lastSaveRevision;
-@property (nonatomic, assign, readonly) CDERevisionNumber lastMergeRevision;
-@property (nonatomic, assign, readonly) CDERevisionNumber lastRevision;
+@property (nonatomic, assign, readonly) CDERevisionNumber lastSaveRevisionSaved;
+@property (nonatomic, assign, readonly) CDERevisionNumber lastMergeRevisionSaved;
+@property (nonatomic, assign, readonly) CDERevisionNumber lastRevisionSaved;
 @property (nonatomic, assign, readonly) CDERevisionNumber baselineRevision;
 
 @property (nonatomic, strong, readonly) NSSet *dataFilenames;

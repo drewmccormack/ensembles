@@ -54,7 +54,7 @@
 {
     __block NSArray *result = nil;
     [eventManagedObjectContext performBlockAndWait:^{
-        CDEStoreModificationEvent *lastMergeEvent = [CDEStoreModificationEvent fetchNonBaselineEventForPersistentStoreIdentifier:eventStore.persistentStoreIdentifier revisionNumber:eventStore.lastMergeRevision inManagedObjectContext:eventManagedObjectContext];
+        CDEStoreModificationEvent *lastMergeEvent = [CDEStoreModificationEvent fetchNonBaselineEventForPersistentStoreIdentifier:eventStore.persistentStoreIdentifier revisionNumber:eventStore.lastMergeRevisionSaved inManagedObjectContext:eventManagedObjectContext];
         CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchMostRecentBaselineStoreModificationEventInManagedObjectContext:eventManagedObjectContext];
         CDERevisionSet *baselineRevisionSet = baseline.revisionSet;
 
@@ -368,7 +368,7 @@
 {
     __block CDERevisionSet *newRevisionSet = nil;
     [eventManagedObjectContext performBlockAndWait:^{
-        CDERevisionNumber lastMergeRevision = eventStore.lastMergeRevision;
+        CDERevisionNumber lastMergeRevision = eventStore.lastMergeRevisionSaved;
         NSString *persistentStoreId = self.eventStore.persistentStoreIdentifier;
         CDEStoreModificationEvent *lastMergeEvent = [CDEStoreModificationEvent fetchNonBaselineEventForPersistentStoreIdentifier:persistentStoreId revisionNumber:lastMergeRevision inManagedObjectContext:eventManagedObjectContext];
         

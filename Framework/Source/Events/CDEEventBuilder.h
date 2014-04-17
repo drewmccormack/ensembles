@@ -34,7 +34,7 @@ typedef NS_ENUM(uint16_t, CDEUpdateStoreOption) {
 - (id)initWithEventStore:(CDEEventStore *)eventStore;
 - (id)initWithEventStore:(CDEEventStore *)eventStore eventManagedObjectContext:(NSManagedObjectContext *)context;
 
-- (CDERevision *)makeNewEventOfType:(CDEStoreModificationEventType)type;
+- (CDERevision *)makeNewEventOfType:(CDEStoreModificationEventType)type uniqueIdentifier:(NSString *)uniqueIdOrNil;
 
 - (void)performBlockAndWait:(CDECodeBlock)block; // Executes in eventManagedObjectContext queue
 

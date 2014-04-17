@@ -137,7 +137,7 @@
         [self addModEventForStore:@"otherstore" revision:1 timestamp:1234];
     }];
     
-    self.eventStore.lastMergeRevision = 0;
+    self.eventStore.lastMergeRevisionSaved = 0;
     NSArray *events = [revisionManager fetchUncommittedStoreModificationEvents:NULL];
     XCTAssertEqual(events.count, (NSUInteger)2, @"Wrong event count for merge revision 0");
 }
@@ -151,7 +151,7 @@
         baseline.eventRevisionsOfOtherStores = [NSSet setWithObject:[self addEventRevisionForStore:@"store1" revision:4]];
     }];
     
-    self.eventStore.lastMergeRevision = -1;
+    self.eventStore.lastMergeRevisionSaved = -1;
     NSArray *events = [revisionManager fetchUncommittedStoreModificationEvents:NULL];
     XCTAssertEqual(events.count, (NSUInteger)0, @"Should be no events since baseline");
 }
@@ -166,7 +166,7 @@
         baseline.eventRevisionsOfOtherStores = [NSSet setWithObject:[self addEventRevisionForStore:@"store1" revision:4]];
     }];
     
-    self.eventStore.lastMergeRevision = -1;
+    self.eventStore.lastMergeRevisionSaved = -1;
     NSArray *events = [revisionManager fetchUncommittedStoreModificationEvents:NULL];
     XCTAssertEqual(events.count, (NSUInteger)1, @"Should be an event");
 }
@@ -187,14 +187,14 @@
         baseline.eventRevisionsOfOtherStores = [NSSet setWithObject:[self addEventRevisionForStore:@"store1" revision:2]];
     }];
     
-    self.eventStore.lastMergeRevision = 5;
+    self.eventStore.lastMergeRevisionSaved = 5;
     NSArray *events = [revisionManager fetchUncommittedStoreModificationEvents:NULL];
     XCTAssertEqual(events.count, (NSUInteger)0, @"Should be no event");
     
     [moc performBlockAndWait:^{
         merge.eventRevision.revisionNumber = 3;
     }];
-    self.eventStore.lastMergeRevision = 3;
+    self.eventStore.lastMergeRevisionSaved = 3;
     events = [revisionManager fetchUncommittedStoreModificationEvents:NULL];
     XCTAssertEqual(events.count, (NSUInteger)1, @"Should be an event");
 }
@@ -229,7 +229,7 @@
         [self addModEventForStore:@"thirdstore" revision:0 globalCount:100 timestamp:1234.0];
     }];
     
-    self.eventStore.lastMergeRevision = 0;
+    self.eventStore.lastMergeRevisionSaved = 0;
     NSArray *events = [revisionManager fetchUncommittedStoreModificationEvents:NULL];
     
     XCTAssertEqual([events[0] globalCount], (CDEGlobalCount)100, @"Global count of first wrong in uncommitted");
@@ -320,7 +320,7 @@
         [self addModEventForStore:@"other" revision:0 globalCount:100 timestamp:1234.0];
     }];
     
-    self.eventStore.lastMergeRevision = 0;
+    self.eventStore.lastMergeRevisionSaved = 0;
     NSArray *events = [revisionManager fetchUncommittedStoreModificationEvents:NULL];
     XCTAssertEqual(events.count, (NSUInteger)2, @"Wrong number of events uncommitted");
     

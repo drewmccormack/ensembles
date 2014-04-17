@@ -23,9 +23,9 @@ static NSString *testStoreFile;
 - (instancetype)init
 {
     self = [super init];
-    _lastRevision = -1;
-    _lastSaveRevision = -1;
-    _lastMergeRevision = -1;
+    _lastRevisionSaved = -1;
+    _lastSaveRevisionSaved = -1;
+    _lastMergeRevisionSaved = -1;
     _identifierOfBaselineUsedToConstructStore = @"store1baseline";
     _currentBaselineIdentifier = @"store1";
     _dataFilenames = [NSSet set];
@@ -35,14 +35,14 @@ static NSString *testStoreFile;
 
 - (void)updateRevisionsForSave
 {
-    _lastRevision++;
-    _lastSaveRevision = _lastRevision;
+    _lastRevisionSaved++;
+    _lastSaveRevisionSaved = _lastRevisionSaved;
 }
 
 - (void)updateRevisionsForMerge
 {
-    _lastRevision++;
-    _lastMergeRevision = _lastRevision;
+    _lastRevisionSaved++;
+    _lastMergeRevisionSaved = _lastRevisionSaved;
 }
 
 - (NSString *)persistentStoreIdentifier

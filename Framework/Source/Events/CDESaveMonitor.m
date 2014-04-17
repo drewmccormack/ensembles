@@ -192,12 +192,13 @@
 
     // Make sure the event is saved atomically
     [self.eventStore.managedObjectContext performBlockAndWait:^{
-        // Add a store mod event
-        [eventBuilder makeNewEventOfType:CDEStoreModificationEventTypeSave];
-        
         // Register event, so if there is a crash, we can detect it and clean up
-        [self.eventStore registerIncompleteEventIdentifier:eventBuilder.event.uniqueIdentifier isMandatory:YES];
+        NSString *newUniqueId = [[NSProcessInfo processInfo] globallyUniqueString];
+        [self.eventStore registerIncompleteEventIdentifier:newUniqueId isMandatory:YES];
         
+        // Add a store mod event
+        [eventBuilder makeNewEventOfType:CDEStoreModificationEventTypeSave uniqueIdentifier:newUniqueId];
+    
         // Inserted Objects. Do inserts before updates to make sure each object has a global identifier.
         [eventBuilder addInsertChangesForChangesData:insertData];
         [self saveEventStore];

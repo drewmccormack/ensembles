@@ -190,12 +190,13 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 
 #pragma mark - Revisions
 
-- (CDERevisionNumber)lastRevisionNumberForEventRevisionPredicate:(NSPredicate *)predicate
+- (CDERevisionNumber)lastRevisionNumberSavedForEventRevisionPredicate:(NSPredicate *)predicate
 {
     __block CDERevisionNumber result = -1;
     [self.managedObjectContext performBlockAndWait:^{
         NSFetchRequest *request = [[NSFetchRequest alloc] initWithEntityName:@"CDEEventRevision"];
         request.predicate = predicate;
+        request.includesPendingChanges = NO; // Only consider saved revisions
         
         NSError *error = nil;
         NSArray *revisions = [self.managedObjectContext executeFetchRequest:request error:&error];
@@ -213,21 +214,21 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 - (CDERevisionNumber)lastMergeRevision
 {
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"persistentStoreIdentifier = %@ AND storeModificationEvent.type = %d", self.persistentStoreIdentifier, CDEStoreModificationEventTypeMerge];
-    CDERevisionNumber result = [self lastRevisionNumberForEventRevisionPredicate:predicate];
+    CDERevisionNumber result = [self lastRevisionNumberSavedForEventRevisionPredicate:predicate];
     return result;
 }
 
 - (CDERevisionNumber)lastSaveRevision
 {
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"persistentStoreIdentifier = %@ AND storeModificationEvent.type = %d", self.persistentStoreIdentifier, CDEStoreModificationEventTypeSave];
-    CDERevisionNumber result = [self lastRevisionNumberForEventRevisionPredicate:predicate];
+    CDERevisionNumber result = [self lastRevisionNumberSavedForEventRevisionPredicate:predicate];
     return result;
 }
 
-- (CDERevisionNumber)lastRevision
+- (CDERevisionNumber)lastRevisionSaved
 {
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"persistentStoreIdentifier = %@ AND (storeModificationEvent != NIL OR storeModificationEventForOtherStores != NIL)", self.persistentStoreIdentifier];
-    CDERevisionNumber result = [self lastRevisionNumberForEventRevisionPredicate:predicate];
+    CDERevisionNumber result = [self lastRevisionNumberSavedForEventRevisionPredicate:predicate];
     return result;
 }
 
