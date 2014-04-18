@@ -99,6 +99,7 @@ static NSString *kCDEDefaultStoreType;
     NSPersistentStoreCoordinator *mainCoordinator = eventStore.managedObjectContext.persistentStoreCoordinator;
     NSPersistentStoreCoordinator *persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:mainCoordinator.managedObjectModel];
     exportContext.persistentStoreCoordinator = persistentStoreCoordinator;
+    exportContext.undoManager = nil;
 
     NSError *error = nil;
     NSPersistentStore *fileStore = nil;
@@ -140,6 +141,7 @@ static NSString *kCDEDefaultStoreType;
         NSPersistentStoreCoordinator *mainCoordinator = eventStore.managedObjectContext.persistentStoreCoordinator;
         NSPersistentStoreCoordinator *persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:mainCoordinator.managedObjectModel];
         importContext.persistentStoreCoordinator = persistentStoreCoordinator;
+        importContext.undoManager = nil;
         
         NSError *error = nil;
         NSPersistentStore *fileStore = nil;

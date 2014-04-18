@@ -480,6 +480,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
     managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
     [managedObjectContext performBlockAndWait:^{
         managedObjectContext.persistentStoreCoordinator = coordinator;
+        managedObjectContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
         managedObjectContext.undoManager = nil;
     }];
     

@@ -258,7 +258,6 @@
                     CDELog(CDELoggingLevelError, @"Could not save after deleting partially merged event from a failed merge. Will reset context: %@", error);
                     [eventContext reset];
                 }
-                
             }
         }];
     }
@@ -890,7 +889,7 @@
     return result;
 }
 
-// Called on event store child context
+// Called on event store context
 - (NSMapTable *)fetchObjectsByGlobalIdentifierForObjectChanges:(id)objectChanges error:(NSError * __autoreleasing *)error
 {
     // Get ids for objects directly involved in the change
