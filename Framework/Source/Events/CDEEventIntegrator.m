@@ -7,6 +7,7 @@
 //
 
 #import "CDEEventIntegrator.h"
+#import "CDEFoundationAdditions.h"
 #import "CDEEventBuilder.h"
 #import "CDEPersistentStoreEnsemble.h"
 #import "NSMapTable+CDEAdditions.h"
@@ -204,8 +205,9 @@
                     [eventBuilder finalizeNewEvent];
                     eventSaveSucceeded = [eventStoreContext save:&error];
                 }
-                else
+                else {
                     error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeSaveOccurredDuringMerge userInfo:nil];
+                }
             }];
             if (!eventSaveSucceeded) {
                 [self failWithError:error];
@@ -250,8 +252,13 @@
         [eventContext performBlockAndWait:^{
             CDEStoreModificationEvent *event = [CDEStoreModificationEvent fetchStoreModificationEventWithUniqueIdentifier:newEventUniqueId inManagedObjectContext:eventContext];
             if (event) {
+                NSError *error = nil;
                 [eventContext deleteObject:event];
-                [eventContext save:NULL];
+                if (![eventContext save:&error]) {
+                    CDELog(CDELoggingLevelError, @"Could not save after deleting partially merged event from a failed merge. Will reset context: %@", error);
+                    [eventContext reset];
+                }
+                
             }
         }];
     }
@@ -469,7 +476,7 @@
 
 #pragma mark Applying Insertions
 
-// Called on event child context queue
+// Called on event context queue
 - (BOOL)insertObjectsForEntity:(NSEntityDescription *)entity objectChanges:(NSArray *)insertChanges error:(NSError * __autoreleasing *)error
 {
     // Determine which insertions actually need new objects. Some may already have
@@ -481,7 +488,7 @@
         [urisForInsertChanges addObject:CDENilToNSNull(url)];
     }
     
-    NSMutableArray *changesNeedingNewObjects = [[NSMutableArray alloc] initWithCapacity:insertChanges.count];
+    NSMutableArray *indexesNeedingNewObjects = [[NSMutableArray alloc] initWithCapacity:insertChanges.count];
     [managedObjectContext performBlockAndWait:^{
         [urisForInsertChanges enumerateObjectsUsingBlock:^(NSURL *url, NSUInteger i, BOOL *stop) {
             BOOL objectNeedsCreating = NO;
@@ -493,15 +500,20 @@
                 NSManagedObject *object = [managedObjectContext existingObjectWithID:objectID error:NULL];
                 objectNeedsCreating = !object || object.isDeleted || nil == object.managedObjectContext;
             }
-            if (objectNeedsCreating) [changesNeedingNewObjects addObject:insertChanges[i]];
+            if (objectNeedsCreating) [indexesNeedingNewObjects addObject:@(i)];
         }];
     }];
-        
+    
+    NSArray *changesNeedingNewObjects = [indexesNeedingNewObjects cde_arrayByTransformingObjectsWithBlock:^id(NSNumber *index) {
+        return insertChanges[index.unsignedIntegerValue];
+    }];
+    
     // Only now actually create objects, on the main context queue
     NSMutableArray *newObjects = [[NSMutableArray alloc] initWithCapacity:changesNeedingNewObjects.count];
     __block BOOL success = YES;
+    NSUInteger numberOfNewObjects = changesNeedingNewObjects.count;
     [managedObjectContext performBlockAndWait:^{
-        for (NSUInteger i = 0; i < changesNeedingNewObjects.count; i++) {
+        for (NSUInteger i = 0; i < numberOfNewObjects; i++) {
             id newObject = [NSEntityDescription insertNewObjectForEntityForName:entity.name inManagedObjectContext:managedObjectContext];
             if (!newObject) {
                 success = NO;
