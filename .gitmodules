@@ -1,3 +1,6 @@
 [submodule "Vendor/DropboxSDK"]
 	path = Vendor/DropboxSDK
 	url = https://github.com/drewmccormack/dropbox-sdk-ios.git
+[submodule "Vendor/MagicalRecord"]
+	path = Vendor/MagicalRecord
+	url = https://github.com/magicalpanda/MagicalRecord.git
