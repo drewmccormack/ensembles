@@ -21,19 +21,25 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    
     self.numberHolder = [NumberHolder MR_findFirst];
-    if (!self.numberHolder) self.numberHolder = [NumberHolder MR_createEntity];
-    
     self.numberLabel.text = self.numberHolder.number.stringValue;
 }
 
 - (IBAction)changeNumber:(id)sender
 {
-    self.numberHolder.number = [NSNumber numberWithInteger:rand()%100+1];
+    NSUInteger oldNumber = self.numberHolder.number.unsignedIntegerValue;
+    NSUInteger newNumber = 0;
+    while (oldNumber == newNumber) newNumber = rand()%100;
+    self.numberHolder.number = [NSNumber numberWithInteger:newNumber];
     self.numberLabel.text = self.numberHolder.number.stringValue;
     
     [[NSManagedObjectContext MR_defaultContext] MR_saveToPersistentStoreAndWait];
+}
+
+- (void)refresh
+{
+    self.numberLabel.text = self.numberHolder.number.stringValue;
+
 }
 
 @end

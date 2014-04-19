@@ -10,6 +10,7 @@
 #import "CoreDataEnsembles.h"
 #import "CoreData+MagicalRecord.h"
 #import "ViewController.h"
+#import "NumberHolder.h"
 
 @interface AppDelegate () <CDEPersistentStoreEnsembleDelegate>
 
@@ -22,11 +23,25 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    // Load model. Don't use the standard 'merged model' of Magical Record, because that would include
+    // the Ensembles model. Don't want to merge models.
+    NSManagedObjectModel *model = [NSManagedObjectModel MR_newManagedObjectModelNamed:@"Model.momd"];
+    [NSManagedObjectModel MR_setDefaultManagedObjectModel:model];
+    
     // Setup Core Data Stack
-    [MagicalRecord setupCoreDataStack];
+    [MagicalRecord setShouldAutoCreateManagedObjectModel:NO];
+    [MagicalRecord setupAutoMigratingCoreDataStack];
+    
+    // Create holder object if necessary. Ensure it is fully saved before we leech.
+    NumberHolder *numberHolder = [NumberHolder MR_findFirst];
+    if (!numberHolder) {
+        numberHolder = [NumberHolder MR_createEntity];
+        numberHolder.uniqueIdentifier = @"NumberHolder";
+    }
+    [[NSManagedObjectContext MR_defaultContext] MR_saveToPersistentStoreAndWait];
     
     // Setup Ensemble
-    NSURL *url = [NSPersistentStore MR_defaultLocalStoreUrl];
+    NSURL *url = [NSPersistentStore MR_urlForStoreName:[MagicalRecord defaultStoreName]];
     NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"Model" withExtension:@"momd"];
     cloudFileSystem = [[CDEICloudFileSystem alloc] initWithUbiquityContainerIdentifier:nil];
     ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"MagicalRecord" persistentStoreURL:url managedObjectModelURL:modelURL cloudFileSystem:cloudFileSystem];
@@ -68,33 +83,46 @@
 
 - (void)syncWithCompletion:(void(^)(void))completion
 {
+    if (ensemble.isMerging) return;
+    
     ViewController *viewController = (id)self.window.rootViewController;
     [viewController.activityIndicator startAnimating];
     if (!ensemble.isLeeched) {
         [ensemble leechPersistentStoreWithCompletion:^(NSError *error) {
+            if (error) NSLog(@"Error in leech: %@", error);
             [viewController.activityIndicator stopAnimating];
+            [viewController refresh];
             if (completion) completion();
         }];
     }
     else {
         [ensemble mergeWithCompletion:^(NSError *error) {
+            if (error) NSLog(@"Error in merge: %@", error);
             [viewController.activityIndicator stopAnimating];
+            [viewController refresh];
             if (completion) completion();
         }];
     }
 }
 
+#pragma mark Ensemble Delegate Methods
+
 - (void)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didSaveMergeChangesWithNotification:(NSNotification *)notification
 {
     NSManagedObjectContext *rootContext = [NSManagedObjectContext MR_rootSavingContext];
-    [rootContext performBlock:^{
+    [rootContext performBlockAndWait:^{
         [rootContext mergeChangesFromContextDidSaveNotification:notification];
     }];
     
     NSManagedObjectContext *mainContext = [NSManagedObjectContext MR_defaultContext];
-    [mainContext performBlock:^{
+    [mainContext performBlockAndWait:^{
         [mainContext mergeChangesFromContextDidSaveNotification:notification];
     }];
+}
+
+- (NSArray *)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble globalIdentifiersForManagedObjects:(NSArray *)objects
+{
+    return [objects valueForKeyPath:@"uniqueIdentifier"];
 }
 
 @end

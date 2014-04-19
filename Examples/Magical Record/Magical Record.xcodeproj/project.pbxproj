@@ -24,9 +24,9 @@
 		073A5989190194420094FFAA /* libMagicalRecord-iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 073A5982190194180094FFAA /* libMagicalRecord-iOS.a */; };
 		073A59941901946C0094FFAA /* libensembles_ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 073A5991190194580094FFAA /* libensembles_ios.a */; };
 		073A5996190197140094FFAA /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 073A5995190197140094FFAA /* CoreData.framework */; };
-		073A5999190197520094FFAA /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 073A5997190197520094FFAA /* Model.xcdatamodeld */; };
 		073A599C19019C290094FFAA /* NumberHolder.m in Sources */ = {isa = PBXBuildFile; fileRef = 073A599B19019C290094FFAA /* NumberHolder.m */; };
 		073A59A81901B5110094FFAA /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 073A59A41901B5110094FFAA /* CDEEventStoreModel.xcdatamodeld */; };
+		07D71DE01902A3CC00DEEB71 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 07D71DDE1902A3CC00DEEB71 /* Model.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -104,13 +104,13 @@
 		073A5979190194180094FFAA /* MagicalRecord.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = MagicalRecord.xcodeproj; path = ../../Vendor/MagicalRecord/MagicalRecord.xcodeproj; sourceTree = "<group>"; };
 		073A598A190194580094FFAA /* Ensembles iOS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "Ensembles iOS.xcodeproj"; path = "../../Framework/Ensembles iOS.xcodeproj"; sourceTree = "<group>"; };
 		073A5995190197140094FFAA /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
-		073A5998190197520094FFAA /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		073A599A19019C290094FFAA /* NumberHolder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NumberHolder.h; sourceTree = "<group>"; };
 		073A599B19019C290094FFAA /* NumberHolder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NumberHolder.m; sourceTree = "<group>"; };
 		073A59A31901B0810094FFAA /* Magical Record.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Magical Record.entitlements"; sourceTree = "<group>"; };
 		073A59A51901B5110094FFAA /* CDEEventStoreModel_0.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_0.xcdatamodel; sourceTree = "<group>"; };
 		073A59A61901B5110094FFAA /* CDEEventStoreModel_1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_1.xcdatamodel; sourceTree = "<group>"; };
 		073A59A71901B5110094FFAA /* CDEEventStoreModel_2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_2.xcdatamodel; sourceTree = "<group>"; };
+		07D71DDF1902A3CC00DEEB71 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -192,9 +192,9 @@
 		073A594B190194050094FFAA /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				07D71DDE1902A3CC00DEEB71 /* Model.xcdatamodeld */,
 				073A59A41901B5110094FFAA /* CDEEventStoreModel.xcdatamodeld */,
 				073A5956190194050094FFAA /* Main.storyboard */,
-				073A5997190197520094FFAA /* Model.xcdatamodeld */,
 				073A594C190194050094FFAA /* Magical Record-Info.plist */,
 				073A594D190194050094FFAA /* InfoPlist.strings */,
 				073A5950190194050094FFAA /* main.m */,
@@ -406,7 +406,7 @@
 				073A595B190194050094FFAA /* ViewController.m in Sources */,
 				073A5955190194050094FFAA /* AppDelegate.m in Sources */,
 				073A5951190194050094FFAA /* main.m in Sources */,
-				073A5999190197520094FFAA /* Model.xcdatamodeld in Sources */,
+				07D71DE01902A3CC00DEEB71 /* Model.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -627,6 +627,7 @@
 				073A5975190194050094FFAA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		073A5976190194050094FFAA /* Build configuration list for PBXNativeTarget "Magical RecordTests" */ = {
 			isa = XCConfigurationList;
@@ -635,20 +636,11 @@
 				073A5978190194050094FFAA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		073A5997190197520094FFAA /* Model.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				073A5998190197520094FFAA /* Model.xcdatamodel */,
-			);
-			currentVersion = 073A5998190197520094FFAA /* Model.xcdatamodel */;
-			path = Model.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
 		073A59A41901B5110094FFAA /* CDEEventStoreModel.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
@@ -659,6 +651,16 @@
 			currentVersion = 073A59A71901B5110094FFAA /* CDEEventStoreModel_2.xcdatamodel */;
 			name = CDEEventStoreModel.xcdatamodeld;
 			path = ../../../Framework/Resources/CDEEventStoreModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+		07D71DDE1902A3CC00DEEB71 /* Model.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				07D71DDF1902A3CC00DEEB71 /* Model.xcdatamodel */,
+			);
+			currentVersion = 07D71DDF1902A3CC00DEEB71 /* Model.xcdatamodel */;
+			path = Model.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};
