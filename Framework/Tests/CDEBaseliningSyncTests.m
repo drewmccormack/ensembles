@@ -73,8 +73,7 @@
     // Merge second store. Should consolidate baselines.
     [self mergeEnsemble:ensemble2];
     
-    events = [self fetchEventsInEventFile:baseline1Path];
-    XCTAssertEqual(events.count, (NSUInteger)0, @"After second store merges, first baseline should not exist");
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:baseline1Path], @"After second store merges, first baseline should not exist");
     
     // Check new baseline file
     baselineFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cloudBaselinesDir error:NULL];
