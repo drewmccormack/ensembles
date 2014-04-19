@@ -569,17 +569,26 @@
     NSSet *baselineEventFilesForStore = [self eventFilesForEventsWithAllowedTypes:baselineTypes createdInStore:nil];
     NSSet *baselineAliasesForStore = [baselineEventFilesForStore valueForKeyPath:@"@distinctUnionOfSets.aliases"];
     [baselinesToRemove minusSet:baselineAliasesForStore];
+    CDELog(CDELoggingLevelVerbose, @"Baseline files in cloud: %@", snapshotBaselineFilenames);
+    CDELog(CDELoggingLevelVerbose, @"Aliases for baseline files in store: %@", baselineAliasesForStore);
+    CDELog(CDELoggingLevelVerbose, @"Baseline files to remove: %@", baselinesToRemove);
     
     // Determine non-baselines to remove
     NSMutableSet *nonBaselinesToRemove = [snapshotEventFilenames mutableCopy];
     NSSet *nonBaselineEventFilesForStore = [self eventFilesForEventsWithAllowedTypes:nonBaselineTypes createdInStore:nil];
     NSSet *nonBaselineAliasesForStore = [nonBaselineEventFilesForStore valueForKeyPath:@"@distinctUnionOfSets.aliases"];
     [nonBaselinesToRemove minusSet:nonBaselineAliasesForStore];
+    CDELog(CDELoggingLevelVerbose, @"Event files in cloud: %@", snapshotEventFilenames);
+    CDELog(CDELoggingLevelVerbose, @"Aliases for event files in store: %@", nonBaselineAliasesForStore);
+    CDELog(CDELoggingLevelVerbose, @"Event files to remove: %@", nonBaselinesToRemove);
     
     // Determine data files to remove
     NSSet *dataFilesForEventStore = self.eventStore.dataFilenames;
     NSMutableSet *dataFilesToRemove = [snapshotDataFilenames mutableCopy];
     [dataFilesToRemove minusSet:dataFilesForEventStore];
+    CDELog(CDELoggingLevelVerbose, @"Data files in cloud: %@", snapshotDataFilenames);
+    CDELog(CDELoggingLevelVerbose, @"Data files in store: %@", dataFilesForEventStore);
+    CDELog(CDELoggingLevelVerbose, @"Data files to remove: %@", dataFilesToRemove);
     
     // Queue up removals
     NSMutableArray *pathsToRemove = [NSMutableArray array];

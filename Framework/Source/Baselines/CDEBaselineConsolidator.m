@@ -108,6 +108,7 @@
             [self failWithCompletion:completion error:error];
             return;
         }
+        CDELog(CDELoggingLevelVerbose, @"Found baselines with unique ids: %@", [baselineEvents valueForKeyPath:@"uniqueIdentifier"]);
         
         // Check that all baseline model versions are known
         CDERevisionManager *revisionManager = [[CDERevisionManager alloc] initWithEventStore:self.eventStore];
@@ -139,6 +140,8 @@
         // Merge surviving baselines
         NSMutableArray *survivingBaselines = [NSMutableArray arrayWithArray:baselineEvents];
         [survivingBaselines removeObjectsInArray:baselinesToEliminate.allObjects];
+        CDELog(CDELoggingLevelVerbose, @"Baselines remaining that need merging: %@", [survivingBaselines valueForKeyPath:@"uniqueIdentifier"]);
+
         CDEStoreModificationEvent *newBaseline = [self mergedBaselineFromOrderedBaselineEvents:survivingBaselines error:&error];
         if (!newBaseline) {
             [self failWithCompletion:completion error:error];
@@ -149,6 +152,7 @@
         [survivingBaselines removeObject:newBaseline];
         for (CDEStoreModificationEvent *baseline in survivingBaselines) {
             [context deleteObject:baseline];
+            CDELog(CDELoggingLevelVerbose, @"Deleting baseline with unique id: %@", baseline.uniqueIdentifier);
         }
         
         // Save
