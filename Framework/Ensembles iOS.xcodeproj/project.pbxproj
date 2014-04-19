@@ -76,6 +76,7 @@
 		075FDCE6183628F90020E1C9 /* CDEMockLocalFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 075FDCE1183628F90020E1C9 /* CDEMockLocalFileSystem.m */; };
 		075FDCE7183628F90020E1C9 /* CDEPersistentStoreEnsembleMergeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 075FDCE2183628F90020E1C9 /* CDEPersistentStoreEnsembleMergeTests.m */; };
 		075FDCE8183628F90020E1C9 /* CDEStoreModificationEventTestsModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 075FDCE3183628F90020E1C9 /* CDEStoreModificationEventTestsModel.xcdatamodeld */; };
+		076FC91F1902704D00C3FE6A /* CDEBaseliningSyncTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 076FC91E1902704D00C3FE6A /* CDEBaseliningSyncTests.m */; };
 		07973EFE183BE40A007F48CA /* CDEICloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 07973EFB183BE40A007F48CA /* CDEICloudFileSystem.m */; };
 		07973EFF183BE40A007F48CA /* CDELocalCloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 07973EFD183BE40A007F48CA /* CDELocalCloudFileSystem.m */; };
 		07ABB5A418B24A6B006FC638 /* CDEDataFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 07ABB5A318B24A6B006FC638 /* CDEDataFile.m */; };
@@ -198,6 +199,7 @@
 		075FDCE1183628F90020E1C9 /* CDEMockLocalFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEMockLocalFileSystem.m; sourceTree = "<group>"; };
 		075FDCE2183628F90020E1C9 /* CDEPersistentStoreEnsembleMergeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEPersistentStoreEnsembleMergeTests.m; sourceTree = "<group>"; };
 		075FDCE4183628F90020E1C9 /* CDEStoreModificationEventTestsModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEStoreModificationEventTestsModel.xcdatamodel; sourceTree = "<group>"; };
+		076FC91E1902704D00C3FE6A /* CDEBaseliningSyncTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEBaseliningSyncTests.m; sourceTree = "<group>"; };
 		07973EFA183BE40A007F48CA /* CDEICloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDEICloudFileSystem.h; path = "Source/Cloud File Systems/CDEICloudFileSystem.h"; sourceTree = SOURCE_ROOT; };
 		07973EFB183BE40A007F48CA /* CDEICloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDEICloudFileSystem.m; path = "Source/Cloud File Systems/CDEICloudFileSystem.m"; sourceTree = SOURCE_ROOT; };
 		07973EFC183BE40A007F48CA /* CDELocalCloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDELocalCloudFileSystem.h; path = "Source/Cloud File Systems/CDELocalCloudFileSystem.h"; sourceTree = SOURCE_ROOT; };
@@ -392,6 +394,7 @@
 				070D339118018AAD0054BA23 /* CDESyncTest.m */,
 				070D338718018AAD0054BA23 /* CDEOneWaySyncTests.m */,
 				070D339218018AAD0054BA23 /* CDETwoWaySyncTests.m */,
+				076FC91E1902704D00C3FE6A /* CDEBaseliningSyncTests.m */,
 			);
 			name = "Sync System Tests";
 			sourceTree = "<group>";
@@ -710,6 +713,7 @@
 				070D33A418018AAD0054BA23 /* CDEBasicIntegratorRelationshipTests.m in Sources */,
 				070D33A518018AAD0054BA23 /* CDECloudManagerTests.m in Sources */,
 				070D33B418018AAD0054BA23 /* CDEPropertyChangeValueTests.m in Sources */,
+				076FC91F1902704D00C3FE6A /* CDEBaseliningSyncTests.m in Sources */,
 				07D183F91892822200E89B89 /* CDERebaserTests.m in Sources */,
 				070D33B618018AAD0054BA23 /* CDESaveMonitorRelationshipTests.m in Sources */,
 				07D183F81892822200E89B89 /* CDEBaselineConsolidatorTests.m in Sources */,

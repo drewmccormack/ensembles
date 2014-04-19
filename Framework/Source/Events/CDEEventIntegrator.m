@@ -342,6 +342,10 @@
         NSArray *storeIds = [storeModEvents valueForKeyPath:@"@distinctUnionOfObjects.eventRevision.persistentStoreIdentifier"];
         if (!needFullIntegration && storeIds.count == 1 && [storeIds.lastObject isEqualToString:self.eventStore.persistentStoreIdentifier]) return;
         
+        // If there are no object changes, don't merge
+        NSUInteger numberOfChanges = [[storeModEvents valueForKeyPath:@"@sum.objectChanges.@count"] unsignedIntegerValue];
+        if (numberOfChanges == 0) return;
+        
         // Apply changes in the events, in order.
         NSMutableDictionary *insertedObjectIDsByEntity = needFullIntegration ? [[NSMutableDictionary alloc] init] : nil;
         for (CDEStoreModificationEvent *storeModEvent in storeModEvents) {
