@@ -275,24 +275,7 @@ static NSString *kCDEDefaultStoreType;
     
     NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
     NSArray *fromContextObjects = [fromContext executeFetchRequest:fetch error:error];
-    if (!fromContextObjects) return nil;
-    
-    NSFetchRequest *toContextFetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
-    NSArray *toContextObjects = [toContext executeFetchRequest:toContextFetch error:error];
-    if (!toContextObjects) return nil;
-    
-    // Make sure there are no duplicates. Enforce uniqueness on revision.
-    NSArray *keys = [toContextObjects valueForKeyPath:@"eventRevision.revision.uniqueIdentifier"];
-    NSDictionary *toContextObjectsByRevisionId = [[NSDictionary alloc] initWithObjects:toContextObjects forKeys:keys];
-    NSMutableArray *objectsToMigrate = [NSMutableArray arrayWithCapacity:fromContextObjects.count];
-    for (CDEStoreModificationEvent *event in fromContextObjects) {
-        id <NSCopying> key = event.eventRevision.revision.uniqueIdentifier;
-        CDEStoreModificationEvent *existingObject = toContextObjectsByRevisionId[key];
-        if (existingObject) continue;
-        [objectsToMigrate addObject:event];
-    }
-    
-    return objectsToMigrate;
+    return fromContextObjects;
 }
 
 - (NSMapTable *)migrateEntity:(NSString *)entityName inManagedObjectContext:(NSManagedObjectContext *)fromContext toContext:(NSManagedObjectContext *)toContext enforceUniquenessForAttributes:(NSArray *)uniqueAttributes error:(NSError * __autoreleasing *)error

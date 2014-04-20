@@ -233,29 +233,6 @@
     XCTAssertEqual(events.count, (NSUInteger)0, @"Should be no local events");
 }
 
-- (void)testReimportAddsNoNewEvents
-{
-    [migrator migrateNonBaselineEventsSinceRevision:-1 toFile:exportedEventsFile completion:^(NSError *error) {
-        finishedAsyncOp = YES;
-        XCTAssertNil(error, @"Error migrating to file");
-    }];
-    [self waitForAsyncOpToFinish];
-    
-    finishedAsyncOp = NO;
-    [migrator migrateEventsInFromFiles:@[exportedEventsFile] completion:^(NSError *error) {
-        finishedAsyncOp = YES;
-        XCTAssertNil(error, @"Error migrating in from file");
-    }];
-    [self waitForAsyncOpToFinish];
-    
-    [moc performBlockAndWait:^{
-        NSFetchRequest *request = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
-        NSArray *events = [moc executeFetchRequest:request error:NULL];
-        XCTAssertNotNil(events, @"Fetch failed");
-        XCTAssertEqual(events.count, (NSUInteger)1, @"Wrong store count");
-    }];
-}
-
 - (void)testImportFromOtherStore
 {
     [self migrateToFileFromRevision:-1];
