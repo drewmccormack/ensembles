@@ -46,7 +46,7 @@
 {
     if (self.storeModificationEvent)
         return [[CDERevision alloc] initWithPersistentStoreIdentifier:self.persistentStoreIdentifier revisionNumber:self.revisionNumber globalCount:self.storeModificationEvent.globalCount];
-    else if (self.storeModificationEventForOtherStores.type == CDEStoreModificationEventTypeBaseline)
+    else if (self.storeModificationEventForOtherStores)
         return [[CDERevision alloc] initWithPersistentStoreIdentifier:self.persistentStoreIdentifier revisionNumber:self.revisionNumber globalCount:self.storeModificationEventForOtherStores.globalCount];
     else
         return [[CDERevision alloc] initWithPersistentStoreIdentifier:self.persistentStoreIdentifier revisionNumber:self.revisionNumber];

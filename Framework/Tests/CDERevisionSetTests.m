@@ -71,7 +71,7 @@
 - (void)testAddingStoreTwice
 {
     XCTAssertNoThrow([set addRevision:revision1], @"Threw when adding revision");
-    XCTAssertThrows([set addRevision:revision1], @"Should throw when adding revision for same store");
+    XCTAssertNoThrow([set addRevision:revision1], @"Should not throw when adding revision for same store");
 }
 
 - (void)testRemovingNonExistentStore

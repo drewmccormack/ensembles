@@ -106,7 +106,7 @@
 
 - (BOOL)shouldRebase
 {
-    // Rebase if there are more than 500 object changes, and we can reduce object changes by more than 50%,
+    // Rebase if there are more than 500 object changes, or we can reduce data by more than 50%,
     // or if there is no baseline at all
     NSManagedObjectContext *context = eventStore.managedObjectContext;
     __block BOOL hasBaseline = NO;

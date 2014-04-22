@@ -46,7 +46,9 @@
 - (void)addRevision:(CDERevision *)newRevision
 {
     NSString *newId = newRevision.persistentStoreIdentifier;
-    NSAssert(revisionsByIdentifier[newId] == nil, @"Store is already present in set");
+    if (revisionsByIdentifier[newId] != nil) {
+        CDELog(CDELoggingLevelError, @"Found duplicate store in revision set. Existing Set: %@\rNew Rev: %@", self, newRevision);
+    }
     revisionsByIdentifier[newId] = newRevision;
 }
 
@@ -87,6 +89,7 @@
 {
     NSMutableSet *allStoreIds = [[NSMutableSet alloc] initWithSet:self.persistentStoreIdentifiers];
     [allStoreIds unionSet:otherSet.persistentStoreIdentifiers];
+    [allStoreIds removeObject:[NSNull null]];
     
     CDERevisionSet *resultSet = [[CDERevisionSet alloc] init];
     for ( NSString *persistentStoreId in allStoreIds ) {
