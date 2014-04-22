@@ -95,6 +95,7 @@
             [context deleteObject:eventRev];
         }
     }
+    [context processPendingChanges];
 }
 
 

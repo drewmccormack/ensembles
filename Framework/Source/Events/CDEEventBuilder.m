@@ -70,7 +70,7 @@
         if (uniqueIdOrNil) event.uniqueIdentifier = uniqueIdOrNil;
         
         CDEEventRevision *revision = [NSEntityDescription insertNewObjectForEntityForName:@"CDEEventRevision" inManagedObjectContext:eventManagedObjectContext];
-        revision.persistentStoreIdentifier = self.eventStore.persistentStoreIdentifier;
+        revision.persistentStoreIdentifier = persistentStoreId;
         revision.revisionNumber = lastRevision+1;
         revision.storeModificationEvent = event;
         
@@ -82,11 +82,11 @@
         }
         else if (eventType == CDEStoreModificationEventTypeMerge) {
             CDERevisionSet *mostRecentSet = [revisionManager revisionSetOfMostRecentEvents];
-            [mostRecentSet removeRevisionForPersistentStoreIdentifier:self.eventStore.persistentStoreIdentifier];
+            [mostRecentSet removeRevisionForPersistentStoreIdentifier:persistentStoreId];
             event.revisionSetOfOtherStoresAtCreation = mostRecentSet;
         }
         
-        returnRevision = [event.revisionSet revisionForPersistentStoreIdentifier:self.eventStore.persistentStoreIdentifier];
+        returnRevision = [event.revisionSet revisionForPersistentStoreIdentifier:persistentStoreId];
     }];
     
     return returnRevision;
