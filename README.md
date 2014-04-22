@@ -3,7 +3,7 @@ Core Data Ensembles
 
 _Author:_ Drew McCormack<br>
 _Created:_ 29th September, 2013<br>
-_Last Updated:_ 22nd March, 2014
+_Last Updated:_ 22nd April, 2014
 
 *You can kickstart integration of Ensembles in your app &mdash; and support the open source project &mdash; by purchasing a support and documentation package at [ensembles.io](http://www.ensembles.io).*
 
@@ -30,7 +30,7 @@ To add Ensembles to your App's Xcode Project with CocoaPods...
 1. Add the following to your Podfile 
 
 		platform :ios, '7.0'
-		pod "Ensembles", "~> 0.4.0"
+		pod "Ensembles", "~> 1.0"
 
 To manually add Ensembles to your App's Xcode Project...
 
@@ -51,7 +51,7 @@ If you are using Cocoapods, you should not need to do anything. The optional clo
 
 If you don't want to include the optional services in your project, you can replace the standard pod command in your Podfile with the following
 
-		pod "Ensembles/Core", "~> 0.4.0"
+		pod "Ensembles/Core", "~> 1.0"
 
 If you are installing Ensembles manually, rather than with Cocoapods, you need to locate the source files and frameworks relevant to the service you want to support. You can find frameworks in the `Vendor` folder, and source files in `Framework/Extensions`.
 
