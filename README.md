@@ -49,7 +49,7 @@ By default, Ensembles only includes support for iCloud. To use other cloud servi
 
 If you are using Cocoapods, you should not need to do anything. The optional cloud services are included in the default install. 
 
-If you don't want to include the optional services in your project, you can replace the standard pod command in your Podfile with the following
+To exclude the optional services in your project, replace the standard pod command in your Podfile with the following
 
 		pod "Ensembles/Core", "~> 1.0"
 
