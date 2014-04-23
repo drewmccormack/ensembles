@@ -46,13 +46,15 @@ static NSString *kCDEDefaultStoreType;
         NSError *error = nil;
         CDEStoreModificationEvent *event = nil;
         event = [CDEStoreModificationEvent fetchStoreModificationEventWithAllowedTypes:types persistentStoreIdentifier:eventStore.persistentStoreIdentifier revisionNumber:revisionNumber inManagedObjectContext:eventStore.managedObjectContext];
-        if (!event) {
+        if (event) {
+            [self migrateStoreModificationEvents:@[event] toFile:path completion:completion];
+        }
+        else {
+            NSDictionary *info = @{NSLocalizedDescriptionKey : @"Failed to fetch local event in migrateLocalEventToTemporaryFilesForRevision..."};
+            error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeUnknown userInfo:info];
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (completion) completion(error);
             });
-        }
-        else {
-            [self migrateStoreModificationEvents:@[event] toFile:path completion:completion];
         }
     }];
 }
@@ -63,14 +65,16 @@ static NSString *kCDEDefaultStoreType;
         NSError *error = nil;
         CDEStoreModificationEvent *baseline = nil;
         baseline = [CDEStoreModificationEvent fetchStoreModificationEventWithUniqueIdentifier:uniqueId globalCount:count persistentStorePrefix:storePrefix inManagedObjectContext:eventStore.managedObjectContext];
-        if (!baseline) {
+        if (baseline) {
+            NSAssert(baseline.type == CDEStoreModificationEventTypeBaseline, @"Wrong event type for baseline");
+            [self migrateStoreModificationEvents:@[baseline] toFile:path completion:completion];
+        }
+        else {
+            NSDictionary *info = @{NSLocalizedDescriptionKey : @"Failed to fetch local event in migrateLocalBaselineWithUniqueIdentifier..."};
+            error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeUnknown userInfo:info];
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (completion) completion(error);
             });
-        }
-        else {
-            NSAssert(baseline.type == CDEStoreModificationEventTypeBaseline, @"Wrong event type for baseline");
-            [self migrateStoreModificationEvents:@[baseline] toFile:path completion:completion];
         }
     }];
 }
