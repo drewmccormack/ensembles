@@ -13,3 +13,4 @@ xcuserdata
 *.moved-aside
 DerivedData
 .idea/
+*.xccheckout
