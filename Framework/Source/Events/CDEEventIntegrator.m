@@ -811,7 +811,7 @@
         // Call block on the saving context queue
         BOOL shouldSave = shouldSaveBlock(managedObjectContext, reparationContext);
         if (!shouldSave) {
-            *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeCancelled userInfo:nil];
+            if (error) *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeCancelled userInfo:nil];
             return NO;
         }
         
