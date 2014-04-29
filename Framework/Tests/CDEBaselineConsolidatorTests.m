@@ -93,6 +93,7 @@
     }];
 
     [consolidator consolidateBaselineWithCompletion:^(NSError *error) {
+        XCTAssertNil(error, @"Error was not nil");
         [context performBlock:^{
             NSArray *events = [self storeModEvents];
             XCTAssertEqual(events.count, (NSUInteger)1, @"Should only be one baseline left");
@@ -117,11 +118,12 @@
     [[self addBaselineEventsForStoreId:@"234" globalCounts:@[@(20)] revisions:@[@(10)]] lastObject];
     
     [consolidator consolidateBaselineWithCompletion:^(NSError *error) {
+        XCTAssertNil(error, @"Error was not nil");
         [context performBlock:^{
             NSArray *events = [self storeModEvents];
             CDEStoreModificationEvent *event = events.lastObject;
             
-            XCTAssertEqual(event.eventRevision.revisionNumber, (CDERevisionNumber)-1, @"Wrong revision number for store1");
+            XCTAssertEqual(event.eventRevision.revisionNumber, (CDERevisionNumber)0, @"Wrong revision number for store1");
             
             NSSet *others = [event.eventRevisionsOfOtherStores valueForKeyPath:@"revision"];
             CDERevision *rev1 = [[CDERevision alloc] initWithPersistentStoreIdentifier:@"123" revisionNumber:10 globalCount:20];
@@ -158,6 +160,7 @@
     
     
     [consolidator consolidateBaselineWithCompletion:^(NSError *error) {
+        XCTAssertNil(error, @"Error was not nil");
         [context performBlock:^{
             NSArray *events = [self storeModEvents];
             CDEStoreModificationEvent *event = events.lastObject;
@@ -206,6 +209,7 @@
     
     
     [consolidator consolidateBaselineWithCompletion:^(NSError *error) {
+        XCTAssertNil(error, @"Error was not nil");
         [context performBlock:^{
             NSArray *events = [self storeModEvents];
             CDEStoreModificationEvent *event = events.lastObject;
