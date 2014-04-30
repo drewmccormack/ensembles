@@ -6,8 +6,9 @@
 //  Copyright (c) 2014 Drew McCormack. All rights reserved.
 //
 
+#import <Ensembles/Ensembles.h>
+
 #import "AppDelegate.h"
-#import "CoreDataEnsembles.h"
 #import "CoreData+MagicalRecord.h"
 #import "ViewController.h"
 #import "NumberHolder.h"
