@@ -9,8 +9,6 @@
 #import <CoreData/CoreData.h>
 
 #import "IDMAppDelegateMac.h"
-#import "CDEPersistentStoreEnsemble.h"
-#import "CDEICloudFileSystem.h"
 #import "IDMAddNoteViewController.h"
 #import "IDMNote.h"
 #import "IDMTag.h"

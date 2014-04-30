@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "07BF7932177F04B30029D500"
-               BuildableName = "libensembles.a"
-               BlueprintName = "Ensembles Mac"
+               BlueprintIdentifier = "07D9F00C1911039D00D191FA"
+               BuildableName = "Ensembles Resources Mac.bundle"
+               BlueprintName = "Ensembles Resources Mac"
                ReferencedContainer = "container:Ensembles Mac.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -28,16 +28,6 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       buildConfiguration = "Debug">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "07592CA5177F2D1000816034"
-               BuildableName = "Tests Mac.xctest"
-               BlueprintName = "Tests Mac"
-               ReferencedContainer = "container:Ensembles Mac.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
@@ -49,16 +39,6 @@
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       allowLocationSimulation = "YES">
-      <CommandLineArguments>
-         <CommandLineArgument
-            argument = "-com.apple.CoreData.SQLDebug 1"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "-com.apple.CoreData.ThreadingDebug 1"
-            isEnabled = "NO">
-         </CommandLineArgument>
-      </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>

@@ -81,16 +81,16 @@
 		072BA980180AAD0E003AA94E /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 072BA97C180AACD9003AA94E /* CDEEventStoreModel.xcdatamodeld */; };
 		07571EE01910E171008479A9 /* Ensembles.h in Headers */ = {isa = PBXBuildFile; fileRef = 07571EDE1910DFB9008479A9 /* Ensembles.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		07571EE11910E171008479A9 /* CDEDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF379117F1853000C56F64 /* CDEDefines.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		07571EE21910E171008479A9 /* CDEAvailabilityMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 34700E9D188B225700FD00B1 /* CDEAvailabilityMacros.h */; };
-		07571EE31910E171008479A9 /* CDEAsynchronousTaskQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF378F17F1853000C56F64 /* CDEAsynchronousTaskQueue.h */; };
-		07571EE41910E171008479A9 /* CDEFoundationAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF379317F1853000C56F64 /* CDEFoundationAdditions.h */; };
-		07571EE51910E171008479A9 /* NSMapTable+CDEAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF379617F1853000C56F64 /* NSMapTable+CDEAdditions.h */; };
-		07571EE61910E171008479A9 /* NSManagedObjectModel+CDEAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 07D2D639182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.h */; };
-		07571EE71910E171008479A9 /* CDEAsynchronousOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 0701770418C1EDE700C4DA01 /* CDEAsynchronousOperation.h */; };
+		07571EE21910E171008479A9 /* CDEAvailabilityMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 34700E9D188B225700FD00B1 /* CDEAvailabilityMacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07571EE31910E171008479A9 /* CDEAsynchronousTaskQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF378F17F1853000C56F64 /* CDEAsynchronousTaskQueue.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07571EE41910E171008479A9 /* CDEFoundationAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF379317F1853000C56F64 /* CDEFoundationAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07571EE51910E171008479A9 /* NSMapTable+CDEAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF379617F1853000C56F64 /* NSMapTable+CDEAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07571EE61910E171008479A9 /* NSManagedObjectModel+CDEAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 07D2D639182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07571EE71910E171008479A9 /* CDEAsynchronousOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 0701770418C1EDE700C4DA01 /* CDEAsynchronousOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		07571EE81910E171008479A9 /* CDEICloudFileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 07973EFA183BE40A007F48CA /* CDEICloudFileSystem.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		07571EE91910E171008479A9 /* CDELocalCloudFileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 07973EFC183BE40A007F48CA /* CDELocalCloudFileSystem.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		07571EEA1910E171008479A9 /* CDEFileDownloadOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 0701770118C1EC4B00C4DA01 /* CDEFileDownloadOperation.h */; };
-		07571EEB1910E171008479A9 /* CDEFileUploadOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 0701771318C25F2A00C4DA01 /* CDEFileUploadOperation.h */; };
+		07571EEA1910E171008479A9 /* CDEFileDownloadOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 0701770118C1EC4B00C4DA01 /* CDEFileDownloadOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07571EEB1910E171008479A9 /* CDEFileUploadOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 0701771318C25F2A00C4DA01 /* CDEFileUploadOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		07571EEC1910E171008479A9 /* CDEEventFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 070C675E18F43E2E00266A4E /* CDEEventFile.h */; };
 		07571EED1910E171008479A9 /* CDECloudFileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF377317F1853000C56F64 /* CDECloudFileSystem.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		07571EEE1910E171008479A9 /* CDECloudDirectory.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF376F17F1853000C56F64 /* CDECloudDirectory.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -498,7 +498,6 @@
 			isa = PBXGroup;
 			children = (
 				07BF374A17F184DD00C56F64 /* Source */,
-				07BF374B17F184DD00C56F64 /* Supporting Files */,
 				07571F121910EC02008479A9 /* Ensembles Resources iOS */,
 				07BF374717F184DD00C56F64 /* Frameworks */,
 				07BF374617F184DD00C56F64 /* Products */,
@@ -544,14 +543,6 @@
 				07D183FA1892824200E89B89 /* Baselines */,
 			);
 			name = Source;
-			path = "Ensembles iOS";
-			sourceTree = "<group>";
-		};
-		07BF374B17F184DD00C56F64 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = "Supporting Files";
 			path = "Ensembles iOS";
 			sourceTree = "<group>";
 		};
@@ -693,21 +684,21 @@
 			buildActionMask = 2147483647;
 			files = (
 				07571EE01910E171008479A9 /* Ensembles.h in Headers */,
-				07571EE11910E171008479A9 /* CDEDefines.h in Headers */,
-				07571EE81910E171008479A9 /* CDEICloudFileSystem.h in Headers */,
-				07571EED1910E171008479A9 /* CDECloudFileSystem.h in Headers */,
+				07571EE71910E171008479A9 /* CDEAsynchronousOperation.h in Headers */,
+				07571EE31910E171008479A9 /* CDEAsynchronousTaskQueue.h in Headers */,
+				07571EE21910E171008479A9 /* CDEAvailabilityMacros.h in Headers */,
 				07571EEE1910E171008479A9 /* CDECloudDirectory.h in Headers */,
 				07571EEF1910E171008479A9 /* CDECloudFile.h in Headers */,
-				07571EE91910E171008479A9 /* CDELocalCloudFileSystem.h in Headers */,
-				07571EF11910E171008479A9 /* CDEPersistentStoreEnsemble.h in Headers */,
-				07571EE21910E171008479A9 /* CDEAvailabilityMacros.h in Headers */,
-				07571EE31910E171008479A9 /* CDEAsynchronousTaskQueue.h in Headers */,
-				07571EE41910E171008479A9 /* CDEFoundationAdditions.h in Headers */,
-				07571EE51910E171008479A9 /* NSMapTable+CDEAdditions.h in Headers */,
-				07571EE61910E171008479A9 /* NSManagedObjectModel+CDEAdditions.h in Headers */,
-				07571EE71910E171008479A9 /* CDEAsynchronousOperation.h in Headers */,
+				07571EED1910E171008479A9 /* CDECloudFileSystem.h in Headers */,
+				07571EE11910E171008479A9 /* CDEDefines.h in Headers */,
 				07571EEA1910E171008479A9 /* CDEFileDownloadOperation.h in Headers */,
 				07571EEB1910E171008479A9 /* CDEFileUploadOperation.h in Headers */,
+				07571EE41910E171008479A9 /* CDEFoundationAdditions.h in Headers */,
+				07571EE81910E171008479A9 /* CDEICloudFileSystem.h in Headers */,
+				07571EE91910E171008479A9 /* CDELocalCloudFileSystem.h in Headers */,
+				07571EF11910E171008479A9 /* CDEPersistentStoreEnsemble.h in Headers */,
+				07571EE51910E171008479A9 /* NSMapTable+CDEAdditions.h in Headers */,
+				07571EE61910E171008479A9 /* NSManagedObjectModel+CDEAdditions.h in Headers */,
 				07571EEC1910E171008479A9 /* CDEEventFile.h in Headers */,
 				07571EF01910E171008479A9 /* CDECloudManager.h in Headers */,
 				07571EF21910E171008479A9 /* CDEPersistentStoreImporter.h in Headers */,
@@ -1114,6 +1105,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_NAME = Ensembles;
+				SKIP_INSTALL = YES;
 				WRAPPER_EXTENSION = bundle;
 			};
 			name = Debug;
@@ -1131,6 +1123,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				PRODUCT_NAME = Ensembles;
+				SKIP_INSTALL = YES;
 				WRAPPER_EXTENSION = bundle;
 			};
 			name = Release;
@@ -1260,6 +1253,7 @@
 				07571F071910E57C008479A9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		07571F191910EC02008479A9 /* Build configuration list for PBXNativeTarget "Ensembles Resources iOS" */ = {
 			isa = XCConfigurationList;
@@ -1268,6 +1262,7 @@
 				07571F1B1910EC02008479A9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		07BF374017F184DD00C56F64 /* Build configuration list for PBXProject "Ensembles iOS" */ = {
 			isa = XCConfigurationList;
