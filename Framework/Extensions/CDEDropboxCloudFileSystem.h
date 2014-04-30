@@ -7,9 +7,9 @@
 
 #import <Foundation/Foundation.h>
 #import <QuartzCore/QuartzCore.h>
+#import <Ensembles/Ensembles.h>
 
-#import "CDECloudFileSystem.h"
-#import "DBRestClient+OSX.h"
+#import "DBRestClient.h"
 
 @class CDEDropboxCloudFileSystem;
 

@@ -1,15 +1,12 @@
 //
 //  AppDelegate.m
-//  Magical Record
+//  Simple Sync
 //
-//  Created by Drew McCormack on 18/04/14.
-//  Copyright (c) 2014 Drew McCormack. All rights reserved.
+//  Created by Drew McCormack on 30/04/14.
+//  Copyright (c) 2014 The Mental Faculty B.V. All rights reserved.
 //
-
-#import <Ensembles/Ensembles.h>
 
 #import "AppDelegate.h"
-#import "CoreData+MagicalRecord.h"
 #import "ViewController.h"
 #import "NumberHolder.h"
 
@@ -20,32 +17,56 @@
 @implementation AppDelegate {
     CDEPersistentStoreEnsemble *ensemble;
     CDEICloudFileSystem *cloudFileSystem;
+    NSManagedObjectContext *managedObjectContext;
 }
+
+#pragma mark Core Data Stack
+
+- (void)setupCoreData
+{
+    NSError *error;
+    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"Model" withExtension:@"momd"];
+    NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
+    
+    [[NSFileManager defaultManager] createDirectoryAtURL:self.storeDirectoryURL withIntermediateDirectories:YES attributes:nil error:NULL];
+    
+    NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:model];
+    NSDictionary *options = @{NSMigratePersistentStoresAutomaticallyOption: @YES, NSInferMappingModelAutomaticallyOption: @YES};
+    [coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:self.storeURL options:options error:&error];
+    
+    managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
+    managedObjectContext.persistentStoreCoordinator = coordinator;
+    managedObjectContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
+}
+
+- (NSURL *)storeDirectoryURL
+{
+    NSURL *directoryURL = [[NSFileManager defaultManager] URLForDirectory:NSApplicationSupportDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:NULL];
+    directoryURL = [directoryURL URLByAppendingPathComponent:NSBundle.mainBundle.bundleIdentifier isDirectory:YES];
+    return directoryURL;
+}
+
+- (NSURL *)storeURL
+{
+    NSURL *storeURL = [self.storeDirectoryURL URLByAppendingPathComponent:@"store.sqlite"];
+    return storeURL;
+}
+
+#pragma mark Application Delegate Methods
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    // Load model. Don't use the standard 'merged model' of Magical Record, because that would include
-    // the Ensembles model. Don't want to merge models.
-    NSManagedObjectModel *model = [NSManagedObjectModel MR_newManagedObjectModelNamed:@"Model.momd"];
-    [NSManagedObjectModel MR_setDefaultManagedObjectModel:model];
-    
-    // Setup Core Data Stack
-    [MagicalRecord setShouldAutoCreateManagedObjectModel:NO];
-    [MagicalRecord setupAutoMigratingCoreDataStack];
+    // Core Data Stack
+    [self setupCoreData];
     
     // Create holder object if necessary. Ensure it is fully saved before we leech.
-    NumberHolder *numberHolder = [NumberHolder MR_findFirst];
-    if (!numberHolder) {
-        numberHolder = [NumberHolder MR_createEntity];
-        numberHolder.uniqueIdentifier = @"NumberHolder";
-    }
-    [[NSManagedObjectContext MR_defaultContext] MR_saveToPersistentStoreAndWait];
+    [NumberHolder numberHolderInManagedObjectContext:managedObjectContext];
+    [managedObjectContext save:NULL];
     
     // Setup Ensemble
-    NSURL *url = [NSPersistentStore MR_urlForStoreName:[MagicalRecord defaultStoreName]];
     NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"Model" withExtension:@"momd"];
     cloudFileSystem = [[CDEICloudFileSystem alloc] initWithUbiquityContainerIdentifier:nil];
-    ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"MagicalRecord" persistentStoreURL:url managedObjectModelURL:modelURL cloudFileSystem:cloudFileSystem];
+    ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"NumberStore" persistentStoreURL:self.storeURL managedObjectModelURL:modelURL cloudFileSystem:cloudFileSystem];
     ensemble.delegate = self;
     
     // Listen for local saves, and trigger merges
@@ -54,16 +75,19 @@
     
     [self syncWithCompletion:NULL];
     
+    // Pass context to controller
+    ViewController *controller = (id)self.window.rootViewController;
+    controller.managedObjectContext = managedObjectContext;
+    
     return YES;
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
     UIBackgroundTaskIdentifier identifier = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:NULL];
-    [[NSManagedObjectContext MR_defaultContext] MR_saveToPersistentStoreWithCompletion:^(BOOL success, NSError *error) {
-        [self syncWithCompletion:^{
-            [[UIApplication sharedApplication] endBackgroundTask:identifier];
-        }];
+    [managedObjectContext save:NULL];
+    [self syncWithCompletion:^{
+        [[UIApplication sharedApplication] endBackgroundTask:identifier];
     }];
 }
 
@@ -110,14 +134,8 @@
 
 - (void)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didSaveMergeChangesWithNotification:(NSNotification *)notification
 {
-    NSManagedObjectContext *rootContext = [NSManagedObjectContext MR_rootSavingContext];
-    [rootContext performBlockAndWait:^{
-        [rootContext mergeChangesFromContextDidSaveNotification:notification];
-    }];
-    
-    NSManagedObjectContext *mainContext = [NSManagedObjectContext MR_defaultContext];
-    [mainContext performBlockAndWait:^{
-        [mainContext mergeChangesFromContextDidSaveNotification:notification];
+    [managedObjectContext performBlockAndWait:^{
+        [managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
     }];
 }
 

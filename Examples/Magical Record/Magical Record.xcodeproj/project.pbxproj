@@ -16,27 +16,15 @@
 		073A5958190194050094FFAA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 073A5956190194050094FFAA /* Main.storyboard */; };
 		073A595B190194050094FFAA /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 073A595A190194050094FFAA /* ViewController.m */; };
 		073A595D190194050094FFAA /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 073A595C190194050094FFAA /* Images.xcassets */; };
-		073A5964190194050094FFAA /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 073A5963190194050094FFAA /* XCTest.framework */; };
-		073A5965190194050094FFAA /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 073A5944190194050094FFAA /* Foundation.framework */; };
-		073A5966190194050094FFAA /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 073A5948190194050094FFAA /* UIKit.framework */; };
-		073A596E190194050094FFAA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 073A596C190194050094FFAA /* InfoPlist.strings */; };
-		073A5970190194050094FFAA /* Magical_RecordTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 073A596F190194050094FFAA /* Magical_RecordTests.m */; };
 		073A5989190194420094FFAA /* libMagicalRecord-iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 073A5982190194180094FFAA /* libMagicalRecord-iOS.a */; };
-		073A59941901946C0094FFAA /* libensembles_ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 073A5991190194580094FFAA /* libensembles_ios.a */; };
+		073A59941901946C0094FFAA /* libensembles.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 073A5991190194580094FFAA /* libensembles.a */; };
 		073A5996190197140094FFAA /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 073A5995190197140094FFAA /* CoreData.framework */; };
 		073A599C19019C290094FFAA /* NumberHolder.m in Sources */ = {isa = PBXBuildFile; fileRef = 073A599B19019C290094FFAA /* NumberHolder.m */; };
-		073A59A81901B5110094FFAA /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 073A59A41901B5110094FFAA /* CDEEventStoreModel.xcdatamodeld */; };
 		07D71DE01902A3CC00DEEB71 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 07D71DDE1902A3CC00DEEB71 /* Model.xcdatamodeld */; };
+		07D7E56A191126E60086A2AE /* Ensembles.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 07D7E563191125FD0086A2AE /* Ensembles.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		073A5967190194050094FFAA /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 073A5939190194050094FFAA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 073A5940190194050094FFAA;
-			remoteInfo = "Magical Record";
-		};
 		073A5981190194180094FFAA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 073A5979190194180094FFAA /* MagicalRecord.xcodeproj */;
@@ -79,6 +67,20 @@
 			remoteGlobalIDString = 070D336118018A960054BA23;
 			remoteInfo = "Tests iOS";
 		};
+		07D7E562191125FD0086A2AE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 073A598A190194580094FFAA /* Ensembles iOS.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 07571F0F1910EC02008479A9;
+			remoteInfo = "Ensembles Resources iOS";
+		};
+		07D7E5681911266E0086A2AE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 073A598A190194580094FFAA /* Ensembles iOS.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 07571F0E1910EC02008479A9;
+			remoteInfo = "Ensembles Resources iOS";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -96,20 +98,12 @@
 		073A5959190194050094FFAA /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		073A595A190194050094FFAA /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		073A595C190194050094FFAA /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		073A5962190194050094FFAA /* Magical RecordTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Magical RecordTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		073A5963190194050094FFAA /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		073A596B190194050094FFAA /* Magical RecordTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Magical RecordTests-Info.plist"; sourceTree = "<group>"; };
-		073A596D190194050094FFAA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		073A596F190194050094FFAA /* Magical_RecordTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Magical_RecordTests.m; sourceTree = "<group>"; };
 		073A5979190194180094FFAA /* MagicalRecord.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = MagicalRecord.xcodeproj; path = ../../Vendor/MagicalRecord/MagicalRecord.xcodeproj; sourceTree = "<group>"; };
 		073A598A190194580094FFAA /* Ensembles iOS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "Ensembles iOS.xcodeproj"; path = "../../Framework/Ensembles iOS.xcodeproj"; sourceTree = "<group>"; };
 		073A5995190197140094FFAA /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		073A599A19019C290094FFAA /* NumberHolder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NumberHolder.h; sourceTree = "<group>"; };
 		073A599B19019C290094FFAA /* NumberHolder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NumberHolder.m; sourceTree = "<group>"; };
 		073A59A31901B0810094FFAA /* Magical Record.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Magical Record.entitlements"; sourceTree = "<group>"; };
-		073A59A51901B5110094FFAA /* CDEEventStoreModel_0.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_0.xcdatamodel; sourceTree = "<group>"; };
-		073A59A61901B5110094FFAA /* CDEEventStoreModel_1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_1.xcdatamodel; sourceTree = "<group>"; };
-		073A59A71901B5110094FFAA /* CDEEventStoreModel_2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_2.xcdatamodel; sourceTree = "<group>"; };
 		07D71DDF1902A3CC00DEEB71 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -119,21 +113,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				073A5996190197140094FFAA /* CoreData.framework in Frameworks */,
-				073A59941901946C0094FFAA /* libensembles_ios.a in Frameworks */,
+				073A59941901946C0094FFAA /* libensembles.a in Frameworks */,
 				073A5989190194420094FFAA /* libMagicalRecord-iOS.a in Frameworks */,
 				073A5947190194050094FFAA /* CoreGraphics.framework in Frameworks */,
 				073A5949190194050094FFAA /* UIKit.framework in Frameworks */,
 				073A5945190194050094FFAA /* Foundation.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		073A595F190194050094FFAA /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				073A5964190194050094FFAA /* XCTest.framework in Frameworks */,
-				073A5966190194050094FFAA /* UIKit.framework in Frameworks */,
-				073A5965190194050094FFAA /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -146,7 +130,6 @@
 				073A598A190194580094FFAA /* Ensembles iOS.xcodeproj */,
 				073A5979190194180094FFAA /* MagicalRecord.xcodeproj */,
 				073A594A190194050094FFAA /* Magical Record */,
-				073A5969190194050094FFAA /* Magical RecordTests */,
 				073A5943190194050094FFAA /* Frameworks */,
 				073A5942190194050094FFAA /* Products */,
 			);
@@ -156,7 +139,6 @@
 			isa = PBXGroup;
 			children = (
 				073A5941190194050094FFAA /* Magical Record.app */,
-				073A5962190194050094FFAA /* Magical RecordTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -168,7 +150,6 @@
 				073A5944190194050094FFAA /* Foundation.framework */,
 				073A5946190194050094FFAA /* CoreGraphics.framework */,
 				073A5948190194050094FFAA /* UIKit.framework */,
-				073A5963190194050094FFAA /* XCTest.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -193,30 +174,11 @@
 			isa = PBXGroup;
 			children = (
 				07D71DDE1902A3CC00DEEB71 /* Model.xcdatamodeld */,
-				073A59A41901B5110094FFAA /* CDEEventStoreModel.xcdatamodeld */,
 				073A5956190194050094FFAA /* Main.storyboard */,
 				073A594C190194050094FFAA /* Magical Record-Info.plist */,
 				073A594D190194050094FFAA /* InfoPlist.strings */,
 				073A5950190194050094FFAA /* main.m */,
 				073A5952190194050094FFAA /* Magical Record-Prefix.pch */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		073A5969190194050094FFAA /* Magical RecordTests */ = {
-			isa = PBXGroup;
-			children = (
-				073A596F190194050094FFAA /* Magical_RecordTests.m */,
-				073A596A190194050094FFAA /* Supporting Files */,
-			);
-			path = "Magical RecordTests";
-			sourceTree = "<group>";
-		};
-		073A596A190194050094FFAA /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				073A596B190194050094FFAA /* Magical RecordTests-Info.plist */,
-				073A596C190194050094FFAA /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -235,7 +197,8 @@
 		073A598B190194580094FFAA /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				073A5991190194580094FFAA /* libensembles_ios.a */,
+				073A5991190194580094FFAA /* libensembles.a */,
+				07D7E563191125FD0086A2AE /* Ensembles.bundle */,
 				073A5993190194580094FFAA /* Tests iOS.xctest */,
 			);
 			name = Products;
@@ -255,29 +218,12 @@
 			buildRules = (
 			);
 			dependencies = (
+				07D7E5691911266E0086A2AE /* PBXTargetDependency */,
 			);
 			name = "Magical Record";
 			productName = "Magical Record";
 			productReference = 073A5941190194050094FFAA /* Magical Record.app */;
 			productType = "com.apple.product-type.application";
-		};
-		073A5961190194050094FFAA /* Magical RecordTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 073A5976190194050094FFAA /* Build configuration list for PBXNativeTarget "Magical RecordTests" */;
-			buildPhases = (
-				073A595E190194050094FFAA /* Sources */,
-				073A595F190194050094FFAA /* Frameworks */,
-				073A5960190194050094FFAA /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				073A5968190194050094FFAA /* PBXTargetDependency */,
-			);
-			name = "Magical RecordTests";
-			productName = "Magical RecordTests";
-			productReference = 073A5962190194050094FFAA /* Magical RecordTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -295,9 +241,6 @@
 								enabled = 1;
 							};
 						};
-					};
-					073A5961190194050094FFAA = {
-						TestTargetID = 073A5940190194050094FFAA;
 					};
 				};
 			};
@@ -325,7 +268,6 @@
 			projectRoot = "";
 			targets = (
 				073A5940190194050094FFAA /* Magical Record */,
-				073A5961190194050094FFAA /* Magical RecordTests */,
 			);
 		};
 /* End PBXProject section */
@@ -359,10 +301,10 @@
 			remoteRef = 073A5987190194180094FFAA /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		073A5991190194580094FFAA /* libensembles_ios.a */ = {
+		073A5991190194580094FFAA /* libensembles.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
-			path = libensembles_ios.a;
+			path = libensembles.a;
 			remoteRef = 073A5990190194580094FFAA /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -371,6 +313,13 @@
 			fileType = wrapper.cfbundle;
 			path = "Tests iOS.xctest";
 			remoteRef = 073A5992190194580094FFAA /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		07D7E563191125FD0086A2AE /* Ensembles.bundle */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = Ensembles.bundle;
+			remoteRef = 07D7E562191125FD0086A2AE /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -383,14 +332,7 @@
 				073A595D190194050094FFAA /* Images.xcassets in Resources */,
 				073A594F190194050094FFAA /* InfoPlist.strings in Resources */,
 				073A5958190194050094FFAA /* Main.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		073A5960190194050094FFAA /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				073A596E190194050094FFAA /* InfoPlist.strings in Resources */,
+				07D7E56A191126E60086A2AE /* Ensembles.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -402,7 +344,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				073A599C19019C290094FFAA /* NumberHolder.m in Sources */,
-				073A59A81901B5110094FFAA /* CDEEventStoreModel.xcdatamodeld in Sources */,
 				073A595B190194050094FFAA /* ViewController.m in Sources */,
 				073A5955190194050094FFAA /* AppDelegate.m in Sources */,
 				073A5951190194050094FFAA /* main.m in Sources */,
@@ -410,21 +351,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		073A595E190194050094FFAA /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				073A5970190194050094FFAA /* Magical_RecordTests.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		073A5968190194050094FFAA /* PBXTargetDependency */ = {
+		07D7E5691911266E0086A2AE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 073A5940190194050094FFAA /* Magical Record */;
-			targetProxy = 073A5967190194050094FFAA /* PBXContainerItemProxy */;
+			name = "Ensembles Resources iOS";
+			targetProxy = 07D7E5681911266E0086A2AE /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -443,14 +376,6 @@
 				073A5957190194050094FFAA /* Base */,
 			);
 			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		073A596C190194050094FFAA /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				073A596D190194050094FFAA /* en */,
-			);
-			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -568,46 +493,6 @@
 			};
 			name = Release;
 		};
-		073A5977190194050094FFAA /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Magical Record.app/Magical Record";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Magical Record/Magical Record-Prefix.pch";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = "Magical RecordTests/Magical RecordTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Debug;
-		};
-		073A5978190194050094FFAA /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Magical Record.app/Magical Record";
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-					"$(DEVELOPER_FRAMEWORKS_DIR)",
-				);
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "Magical Record/Magical Record-Prefix.pch";
-				INFOPLIST_FILE = "Magical RecordTests/Magical RecordTests-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUNDLE_LOADER)";
-				WRAPPER_EXTENSION = xctest;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -629,31 +514,9 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		073A5976190194050094FFAA /* Build configuration list for PBXNativeTarget "Magical RecordTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				073A5977190194050094FFAA /* Debug */,
-				073A5978190194050094FFAA /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		073A59A41901B5110094FFAA /* CDEEventStoreModel.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				073A59A51901B5110094FFAA /* CDEEventStoreModel_0.xcdatamodel */,
-				073A59A61901B5110094FFAA /* CDEEventStoreModel_1.xcdatamodel */,
-				073A59A71901B5110094FFAA /* CDEEventStoreModel_2.xcdatamodel */,
-			);
-			currentVersion = 073A59A71901B5110094FFAA /* CDEEventStoreModel_2.xcdatamodel */;
-			name = CDEEventStoreModel.xcdatamodeld;
-			path = ../../../Framework/Resources/CDEEventStoreModel.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
 		07D71DDE1902A3CC00DEEB71 /* Model.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (

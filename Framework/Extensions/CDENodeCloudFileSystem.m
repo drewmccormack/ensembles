@@ -6,12 +6,6 @@
 //
 
 #import "CDENodeCloudFileSystem.h"
-#import "CDEDefines.h"
-#import "CDEFoundationAdditions.h"
-#import "CDECloudFile.h"
-#import "CDECloudDirectory.h"
-#import "CDEFileDownloadOperation.h"
-#import "CDEFileUploadOperation.h"
 
 @interface CDENodeCloudFileSystem ()
 

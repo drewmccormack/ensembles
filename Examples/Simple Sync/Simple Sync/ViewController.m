@@ -7,7 +7,6 @@
 //
 
 #import "ViewController.h"
-#import "CoreData+MagicalRecord.h"
 #import "NumberHolder.h"
 
 @interface ViewController ()
@@ -21,7 +20,8 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    self.numberHolder = [NumberHolder MR_findFirst];
+    
+    self.numberHolder = [NumberHolder numberHolderInManagedObjectContext:self.managedObjectContext];
     self.numberLabel.text = self.numberHolder.number.stringValue;
 }
 
@@ -33,7 +33,7 @@
     self.numberHolder.number = [NSNumber numberWithInteger:newNumber];
     self.numberLabel.text = self.numberHolder.number.stringValue;
     
-    [[NSManagedObjectContext MR_defaultContext] MR_saveToPersistentStoreAndWait];
+    [self.managedObjectContext save:NULL];
 }
 
 - (void)refresh

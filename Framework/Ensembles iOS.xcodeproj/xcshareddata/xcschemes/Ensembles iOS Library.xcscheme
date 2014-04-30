@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "07BF374417F184DD00C56F64"
-               BuildableName = "libensembles_ios.a"
+               BuildableName = "libensembles.a"
                BlueprintName = "Ensembles iOS"
                ReferencedContainer = "container:Ensembles iOS.xcodeproj">
             </BuildableReference>

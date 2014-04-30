@@ -3,7 +3,7 @@ Core Data Ensembles
 
 _Author:_ Drew McCormack<br>
 _Created:_ 29th September, 2013<br>
-_Last Updated:_ 22nd April, 2014
+_Last Updated:_ 30th April, 2014
 
 *You can kickstart integration of Ensembles in your app &mdash; and support the open source project &mdash; by purchasing a support and documentation package at [ensembles.io](http://www.ensembles.io).*
 
@@ -35,21 +35,23 @@ To add Ensembles to your App's Xcode Project with CocoaPods...
 To manually add Ensembles to your App's Xcode Project...
 
 1. In Finder, drag the `Ensembles iOS.xcodeproj` project from the `Framework` directory into your Xcode project.
-2. Select the App's project root, and the App target.
+2. Select your App's project root in the source list on the left, and then select the App's target.
 3. In the General tab, click the + button in the _Linked Frameworks and Libraries_ section.
-4. Choose the `libensembles_ios.a` library and add it.
-5. Select the Build Settings tab. Locate the Header Search Paths setting. 
-6. Add a path to the Ensembles directory `Framework`, and make the search path _recursive_. (You may want to form the path relative to your Xcode project, eg, `$(SRCROOT)/../ensembles/Framework`).
-7. Locate the Other Linker Flags setting, and add the flag `-ObjC`.
-8. Drag the `Framework/Resources` directory from the Ensembles project into your App project. Make sure the _Create groups for any added Folders_ option is selected.
+4. Choose the `libensembles.a` library and add it.
+5. Select the _Build Settings_ tab. Locate the _Other Linker Flags_ setting, and add the flag `-ObjC`.
+6. Select the _Build Phases_ tab. Open _Target Dependencies_, and click the + button.
+7. Locate the `Ensembles Resources iOS` product, and add that as a dependency.
+8. Open the `Ensembles iOS.xcodeproj` project in the source list, and open the Products group.
+9. Drag the `Ensembles.bundle` product into the _Copy Bundle Resources_ build phase of your app.
+10. Add the following import in your precompiled header file, or in any files using Ensembles.
 
+        #import <Ensembles/Ensembles.h>
+    
 #### Including Optional Cloud Services
 
 By default, Ensembles only includes support for iCloud. To use other cloud services, such as Dropbox, you may need to add a few steps to the procedure above. 
 
-If you are using Cocoapods, you should not need to do anything. The optional cloud services are included in the default install. 
-
-To exclude the optional services in your project, replace the standard pod command in your Podfile with the following
+If you are using Cocoapods, you should not need to do anything: the optional cloud services are included in the default install. If you are using Cocoapods and would like to exclude the optional services in your project, replace the standard pod command in your Podfile with the following
 
 		pod "Ensembles/Core", "~> 1.0"
 
@@ -61,19 +63,13 @@ By way of example, if you want to support Dropbox, you need to add the DropboxSD
 
 Idiomatic is a relatively simple example app which incorporates Ensembles and works with iCloud or Dropbox to sync across devices. The app allows you to record your ideas, include a photo, and add tags to group them. The Core Data model of the app has three entities, including a many-to-many relationship.
 
-The Idiomatic project is a good way to get acquainted with Ensembles, and how it is integrated in a Core Data app. Idiomatic can be run in the iPhone Simulator, or on a device, but in order to test it, you need to follow a few preparatory steps.
+The Idiomatic project is a good way to get acquainted with Ensembles, and how it is integrated in a Core Data app. Idiomatic can be downloaded from the App Store if you want to see how it works. If you want to build and run it yourself, you need to follow a few preparatory steps.
 
-1. Register an App ID for Idiomatic (eg com.yourcompany.idiomatic) in the Certificates, Identifiers & Profiles section of the iOS Developer Center, and make sure the iCloud service is enabled.
-2. Select the Idiomatic Project in the source list of the Xcode project, and then select the Idiomatic target.
-3. In the General section, set the bundle identifier (eg com.yourcompany.idiomatic).
-4. Select the _Capabilities_ section, turn on the iCloud switch, and replace the existing Ubiquity Container with your own.
-5. At the top of the `IDMSyncManager` class, locate this code
-
-		NSString * const IDMICloudContainerIdentifier = @"P7BXV6PHLD.com.mentalfaculty.idiomatic";
-
-6. Fill in the Ubiquity Container Identifier appropriate for your bundle identifier and team identifier. You can find this on the iOS Developer Center under the App ID you registered. Just combine the _Prefix_ entry with the _ID_.
-7. Build and install on devices and simulators that are logged into the same iCloud account.
-8. Add notes, and tag them as desired. The app will sync when it becomes active, but you can force a sync by tapping the button under the Groups table.
+1. Select the Idiomatic Project in the source list of the Xcode project, and then select the Idiomatic target.
+2. Select the _Capabilities_ section, turn on the iCloud switch.
+3. Build and install on devices and simulators that are logged into the same iCloud account.
+ 
+Add notes, and tag them as desired. The app will sync when it becomes active, but you can force a sync by tapping the button under the Groups table.
 
 Dropbox sync should work via The Mental Faculty account, but if you want to use your own developer account, you need to do the following:
 
@@ -98,6 +94,10 @@ Dropbox sync should work via The Mental Faculty account, but if you want to use 
 Idiomatic includes one more sync service: IdioSync. This is a custom service based on a Node.js server, and Amazon S3 storage. The source code for the server is provided to those purchasing a Priority Support Package at [ensembles.io](http://ensembles.io).
 
 #### Getting to Know Ensembles
+
+Before using Ensembles in any file, you should import the framework header, either in your precompiled header file, or in individual source code files.
+
+    #import <Ensembles/Ensembles.h>
 
 The most important class in the Ensembles framework is `CDEPersistentStoreEnsemble`. You create one instance of this class for each `NSPersistentStore` that you want to sync. This class monitors saves to your SQLite store, and merges in changes from other devices as they arrive.
 

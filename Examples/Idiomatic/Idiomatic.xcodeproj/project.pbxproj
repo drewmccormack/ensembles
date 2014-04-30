@@ -32,15 +32,16 @@
 		075157581805D7FD00C4D4F1 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 070F46F71805D51400EE36E5 /* Model.xcdatamodeld */; };
 		0751809918B743C500CE4264 /* IDMMediaFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 0751809818B743C500CE4264 /* IDMMediaFile.m */; };
 		0751809A18B743C500CE4264 /* IDMMediaFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 0751809818B743C500CE4264 /* IDMMediaFile.m */; };
-		075C271D18B3694B00A7BC25 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 075C271918B3694B00A7BC25 /* CDEEventStoreModel.xcdatamodeld */; };
-		075C271E18B3694B00A7BC25 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 075C271918B3694B00A7BC25 /* CDEEventStoreModel.xcdatamodeld */; };
+		07571F4D1910F738008479A9 /* libensembles.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 077F113F17F709ED0093A212 /* libensembles.a */; };
 		077231DE18C5FCDA0065BFEE /* IDMNodeSyncSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 077231DD18C5FCDA0065BFEE /* IDMNodeSyncSettingsViewController.m */; };
 		077231E018C604610065BFEE /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 077231DF18C604610065BFEE /* Security.framework */; };
 		077231E218C6080D0065BFEE /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 077231E118C6080D0065BFEE /* MobileCoreServices.framework */; };
 		07746AAF18C6276F00A267F5 /* IDMSyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 07746AAE18C6276F00A267F5 /* IDMSyncManager.m */; };
 		0791BCE317F6F58C00E7C31B /* Ensembles iOS.xcodeproj in Resources */ = {isa = PBXBuildFile; fileRef = 0791BCE217F6F58C00E7C31B /* Ensembles iOS.xcodeproj */; };
 		07973EF9183BE32C007F48CA /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07973EF8183BE32C007F48CA /* CoreData.framework */; };
-		07BF37D517F189EB00C56F64 /* libensembles_ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF37D417F189EB00C56F64 /* libensembles_ios.a */; };
+		07D9F0051910FD7600D191FA /* Ensembles.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 07571F411910F2BE008479A9 /* Ensembles.bundle */; };
+		07D9F0261911077900D191FA /* Ensembles.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07168C0418E037FC00153494 /* Ensembles.framework */; };
+		07D9F029191107FC00D191FA /* Ensembles.framework in Resources */ = {isa = PBXBuildFile; fileRef = 07168C0418E037FC00153494 /* Ensembles.framework */; };
 		9477ED311800137300C2A419 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9477ED301800137300C2A419 /* Cocoa.framework */; };
 		9477ED3B1800137300C2A419 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9477ED391800137300C2A419 /* InfoPlist.strings */; };
 		9477ED3D1800137300C2A419 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9477ED3C1800137300C2A419 /* main.m */; };
@@ -48,7 +49,6 @@
 		9477ED471800137300C2A419 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9477ED451800137300C2A419 /* MainMenu.xib */; };
 		9477ED491800137300C2A419 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9477ED481800137300C2A419 /* Images.xcassets */; };
 		9477ED621800140200C2A419 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9477ED611800140200C2A419 /* CoreData.framework */; };
-		9477ED631800143200C2A419 /* libensembles_mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9477ED281800132F00C2A419 /* libensembles_mac.a */; };
 		9477ED6B18001B7000C2A419 /* IDMAddNoteViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9477ED6918001B7000C2A419 /* IDMAddNoteViewController.m */; };
 		9477ED6C18001B7000C2A419 /* IDMAddNoteViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 9477ED6A18001B7000C2A419 /* IDMAddNoteViewController.xib */; };
 /* End PBXBuildFile section */
@@ -89,6 +89,20 @@
 			remoteGlobalIDString = D36931CC15088350003FBA23;
 			remoteInfo = DropboxOSX;
 		};
+		07571F401910F2BE008479A9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0791BCE217F6F58C00E7C31B /* Ensembles iOS.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 07571F0F1910EC02008479A9;
+			remoteInfo = "Ensembles Resources iOS";
+		};
+		07571F4B1910F700008479A9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0791BCE217F6F58C00E7C31B /* Ensembles iOS.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 07BF374417F184DD00C56F64;
+			remoteInfo = "Ensembles iOS";
+		};
 		077F113E17F709ED0093A212 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0791BCE217F6F58C00E7C31B /* Ensembles iOS.xcodeproj */;
@@ -96,12 +110,19 @@
 			remoteGlobalIDString = 07BF374517F184DD00C56F64;
 			remoteInfo = "Ensembles iOS";
 		};
-		9477ED271800132F00C2A419 /* PBXContainerItemProxy */ = {
+		07D9F0031910FD2400D191FA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0791BCE217F6F58C00E7C31B /* Ensembles iOS.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 07571F0E1910EC02008479A9;
+			remoteInfo = "Ensembles Resources iOS";
+		};
+		07D9F027191107B700D191FA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9477ED211800132E00C2A419 /* Ensembles Mac.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 07BF7933177F04B30029D500;
-			remoteInfo = "Ensembles Mac";
+			proxyType = 1;
+			remoteGlobalIDString = 6DAD10F818CA067900237084;
+			remoteInfo = Ensembles;
 		};
 		9477ED291800132F00C2A419 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -145,9 +166,6 @@
 		0751808F18B7418A00CE4264 /* Model_1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model_1.xcdatamodel; sourceTree = "<group>"; };
 		0751809718B743C500CE4264 /* IDMMediaFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IDMMediaFile.h; path = Shared/IDMMediaFile.h; sourceTree = "<group>"; };
 		0751809818B743C500CE4264 /* IDMMediaFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IDMMediaFile.m; path = Shared/IDMMediaFile.m; sourceTree = "<group>"; };
-		075C271A18B3694B00A7BC25 /* CDEEventStoreModel_0.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_0.xcdatamodel; sourceTree = "<group>"; };
-		075C271B18B3694B00A7BC25 /* CDEEventStoreModel_1.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_1.xcdatamodel; sourceTree = "<group>"; };
-		075C271C18B3694B00A7BC25 /* CDEEventStoreModel_2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_2.xcdatamodel; sourceTree = "<group>"; };
 		077231DC18C5FCDA0065BFEE /* IDMNodeSyncSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IDMNodeSyncSettingsViewController.h; sourceTree = "<group>"; };
 		077231DD18C5FCDA0065BFEE /* IDMNodeSyncSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDMNodeSyncSettingsViewController.m; sourceTree = "<group>"; };
 		077231DF18C604610065BFEE /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -184,11 +202,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				07571F4D1910F738008479A9 /* libensembles.a in Frameworks */,
 				077231E218C6080D0065BFEE /* MobileCoreServices.framework in Frameworks */,
 				077231E018C604610065BFEE /* Security.framework in Frameworks */,
 				0726FDC718AA47E300670262 /* libSDropboxSDK.a in Frameworks */,
 				07973EF9183BE32C007F48CA /* CoreData.framework in Frameworks */,
-				07BF37D517F189EB00C56F64 /* libensembles_ios.a in Frameworks */,
 				074B959E17EC783B0016F84D /* CoreGraphics.framework in Frameworks */,
 				074B95A017EC783B0016F84D /* UIKit.framework in Frameworks */,
 				074B959C17EC783B0016F84D /* Foundation.framework in Frameworks */,
@@ -199,8 +217,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				07D9F0261911077900D191FA /* Ensembles.framework in Frameworks */,
 				0726FDC818AA47EA00670262 /* DropboxOSX.framework in Frameworks */,
-				9477ED631800143200C2A419 /* libensembles_mac.a in Frameworks */,
 				9477ED621800140200C2A419 /* CoreData.framework in Frameworks */,
 				9477ED311800137300C2A419 /* Cocoa.framework in Frameworks */,
 			);
@@ -237,15 +255,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		07334EA3180AB25300CE9EF1 /* Ensembles Resources */ = {
-			isa = PBXGroup;
-			children = (
-				075C271918B3694B00A7BC25 /* CDEEventStoreModel.xcdatamodeld */,
-			);
-			name = "Ensembles Resources";
-			path = ../../Framework/Resources;
-			sourceTree = "<group>";
-		};
 		074B958F17EC783B0016F84D = {
 			isa = PBXGroup;
 			children = (
@@ -253,7 +262,6 @@
 				9477ED211800132E00C2A419 /* Ensembles Mac.xcodeproj */,
 				0791BCE217F6F58C00E7C31B /* Ensembles iOS.xcodeproj */,
 				070F46FC1805D69E00EE36E5 /* Shared */,
-				07334EA3180AB25300CE9EF1 /* Ensembles Resources */,
 				074B95A117EC783B0016F84D /* Idiomatic iOS */,
 				9477ED361800137300C2A419 /* Idiomatic Mac */,
 				074B959A17EC783B0016F84D /* Frameworks */,
@@ -326,7 +334,8 @@
 		077F113B17F709ED0093A212 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				077F113F17F709ED0093A212 /* libensembles_ios.a */,
+				077F113F17F709ED0093A212 /* libensembles.a */,
+				07571F411910F2BE008479A9 /* Ensembles.bundle */,
 				070F46F01805CDCB00EE36E5 /* Tests iOS.xctest */,
 			);
 			name = Products;
@@ -335,7 +344,6 @@
 		9477ED221800132E00C2A419 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				9477ED281800132F00C2A419 /* libensembles_mac.a */,
 				07168C0418E037FC00153494 /* Ensembles.framework */,
 				9477ED2A1800132F00C2A419 /* Tests Mac.xctest */,
 			);
@@ -394,6 +402,8 @@
 			buildRules = (
 			);
 			dependencies = (
+				07D9F0041910FD2400D191FA /* PBXTargetDependency */,
+				07571F4C1910F700008479A9 /* PBXTargetDependency */,
 			);
 			name = "Idiomatic iOS";
 			productName = Idiomatic;
@@ -411,6 +421,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				07D9F028191107B700D191FA /* PBXTargetDependency */,
 			);
 			name = "Idiomatic Mac";
 			productName = IdiomaticMac;
@@ -517,18 +528,18 @@
 			remoteRef = 0726FDC518AA47C700670262 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		077F113F17F709ED0093A212 /* libensembles_ios.a */ = {
+		07571F411910F2BE008479A9 /* Ensembles.bundle */ = {
 			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libensembles_ios.a;
-			remoteRef = 077F113E17F709ED0093A212 /* PBXContainerItemProxy */;
+			fileType = wrapper.cfbundle;
+			path = Ensembles.bundle;
+			remoteRef = 07571F401910F2BE008479A9 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		9477ED281800132F00C2A419 /* libensembles_mac.a */ = {
+		077F113F17F709ED0093A212 /* libensembles.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
-			path = libensembles_mac.a;
-			remoteRef = 9477ED271800132F00C2A419 /* PBXContainerItemProxy */;
+			path = libensembles.a;
+			remoteRef = 077F113E17F709ED0093A212 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		9477ED2A1800132F00C2A419 /* Tests Mac.xctest */ = {
@@ -548,6 +559,7 @@
 				0791BCE317F6F58C00E7C31B /* Ensembles iOS.xcodeproj in Resources */,
 				074B95B417EC783B0016F84D /* Images.xcassets in Resources */,
 				074B95A617EC783B0016F84D /* InfoPlist.strings in Resources */,
+				07D9F0051910FD7600D191FA /* Ensembles.bundle in Resources */,
 				074B95AF17EC783B0016F84D /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -560,6 +572,7 @@
 				9477ED3B1800137300C2A419 /* InfoPlist.strings in Resources */,
 				9477ED491800137300C2A419 /* Images.xcassets in Resources */,
 				9477ED471800137300C2A419 /* MainMenu.xib in Resources */,
+				07D9F029191107FC00D191FA /* Ensembles.framework in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -580,7 +593,6 @@
 				077231DE18C5FCDA0065BFEE /* IDMNodeSyncSettingsViewController.m in Sources */,
 				070F46F91805D51400EE36E5 /* IDMNote.m in Sources */,
 				074B95AC17EC783B0016F84D /* IDMAppDelegate.m in Sources */,
-				075C271D18B3694B00A7BC25 /* CDEEventStoreModel.xcdatamodeld in Sources */,
 				070176F118BD17DF00C4DA01 /* CDENodeCloudFileSystem.m in Sources */,
 				070F46FB1805D51400EE36E5 /* Model.xcdatamodeld in Sources */,
 				074B95DE17EC7DDF0016F84D /* IDMNotesViewController.m in Sources */,
@@ -595,7 +607,6 @@
 				9477ED6B18001B7000C2A419 /* IDMAddNoteViewController.m in Sources */,
 				075157581805D7FD00C4D4F1 /* Model.xcdatamodeld in Sources */,
 				0751809A18B743C500CE4264 /* IDMMediaFile.m in Sources */,
-				075C271E18B3694B00A7BC25 /* CDEEventStoreModel.xcdatamodeld in Sources */,
 				070176F218BD17DF00C4DA01 /* CDENodeCloudFileSystem.m in Sources */,
 				0726FDB618AA476800670262 /* CDEDropboxCloudFileSystem.m in Sources */,
 				9477ED3D1800137300C2A419 /* main.m in Sources */,
@@ -605,6 +616,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		07571F4C1910F700008479A9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Ensembles iOS";
+			targetProxy = 07571F4B1910F700008479A9 /* PBXContainerItemProxy */;
+		};
+		07D9F0041910FD2400D191FA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Ensembles Resources iOS";
+			targetProxy = 07D9F0031910FD2400D191FA /* PBXContainerItemProxy */;
+		};
+		07D9F028191107B700D191FA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Ensembles;
+			targetProxy = 07D9F027191107B700D191FA /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		074B95A417EC783B0016F84D /* InfoPlist.strings */ = {
@@ -736,6 +765,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = Idiomatic/Idiomatic.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Ensembles-bqnnqguhepfxlkgqvdamggjewche/Build/Products/Debug-iphoneos",
@@ -744,13 +774,12 @@
 				GCC_PREFIX_HEADER = "Idiomatic/Idiomatic-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(SRCROOT)/../../Framework/**",
 					"$(SRCROOT)/../../Vendor/DropboxSDK/**",
 				);
 				INFOPLIST_FILE = "Idiomatic/Idiomatic-Info.plist";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = Idiomatic;
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -762,7 +791,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = Idiomatic/Idiomatic.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Ensembles-bqnnqguhepfxlkgqvdamggjewche/Build/Products/Debug-iphoneos",
@@ -771,13 +801,12 @@
 				GCC_PREFIX_HEADER = "Idiomatic/Idiomatic-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(SRCROOT)/../../Framework/**",
 					"$(SRCROOT)/../../Vendor/DropboxSDK/**",
 				);
 				INFOPLIST_FILE = "Idiomatic/Idiomatic-Info.plist";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = Idiomatic;
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -803,8 +832,6 @@
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(SRCROOT)/../../Framework/**",
 					"$(SRCROOT)/../../Vendor/DropboxSDK/**",
 				);
 				INFOPLIST_FILE = "IdiomaticMac/IdiomaticMac-Info.plist";
@@ -834,8 +861,6 @@
 				GCC_PREFIX_HEADER = "IdiomaticMac/IdiomaticMac-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(SRCROOT)/../../Framework/**",
 					"$(SRCROOT)/../../Vendor/DropboxSDK/**",
 				);
 				INFOPLIST_FILE = "IdiomaticMac/IdiomaticMac-Info.plist";
@@ -889,18 +914,6 @@
 			currentVersion = 0751808F18B7418A00CE4264 /* Model_1.xcdatamodel */;
 			name = Model.xcdatamodeld;
 			path = Shared/Model.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
-		075C271918B3694B00A7BC25 /* CDEEventStoreModel.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				075C271A18B3694B00A7BC25 /* CDEEventStoreModel_0.xcdatamodel */,
-				075C271B18B3694B00A7BC25 /* CDEEventStoreModel_1.xcdatamodel */,
-				075C271C18B3694B00A7BC25 /* CDEEventStoreModel_2.xcdatamodel */,
-			);
-			currentVersion = 075C271C18B3694B00A7BC25 /* CDEEventStoreModel_2.xcdatamodel */;
-			path = CDEEventStoreModel.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
 		};

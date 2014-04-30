@@ -27,7 +27,7 @@ NSString * const IDMNodeS3Service = @"node";
 NSString * const IDMNodeS3EmailDefaultKey = @"IDMNodeS3EmailDefaultKey";
 
 // Set these with your account details
-NSString * const IDMICloudContainerIdentifier = @"P7BXV6PHLD.com.mentalfaculty.idiomatic";
+NSString * const IDMICloudContainerIdentifier = nil;
 NSString * const IDMDropboxAppKey = @"fjgu077wm7qffv0";
 NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 

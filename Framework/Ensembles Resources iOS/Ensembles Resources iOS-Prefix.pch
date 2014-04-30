@@ -6,5 +6,4 @@
 
 #ifdef __OBJC__
     #import <Cocoa/Cocoa.h>
-    #import <Ensembles/Ensembles.h>
 #endif
