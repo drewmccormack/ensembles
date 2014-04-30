@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "CoreDataEnsembles.h"
+#import <Ensembles/Ensembles.h>
 
 extern NSString * const IDMSyncActivityDidBeginNotification;
 extern NSString * const IDMSyncActivityDidEndNotification;

@@ -54,6 +54,8 @@
 		074DE61217B77BB6009755EB /* CDEEventMigratorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07157A2217B555A4004AAD22 /* CDEEventMigratorTests.m */; };
 		074DE61717B80325009755EB /* CDEEventIntegrator.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF79FA177F0A9D0029D500 /* CDEEventIntegrator.m */; };
 		0754307717F20BEE00FA4946 /* CDECloudManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07697A7117E0B6C000A9BB63 /* CDECloudManagerTests.m */; };
+		07571EDC1910DF88008479A9 /* Ensembles.h in Headers */ = {isa = PBXBuildFile; fileRef = 07571EDB1910DF88008479A9 /* Ensembles.h */; };
+		07571EDD1910DF88008479A9 /* Ensembles.h in Headers */ = {isa = PBXBuildFile; fileRef = 07571EDB1910DF88008479A9 /* Ensembles.h */; };
 		075754B5188BC952006803FA /* CDEAvailabilityMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 075754B4188BC952006803FA /* CDEAvailabilityMacros.h */; };
 		07592CA7177F2D1000816034 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF78E9177F03320029D500 /* XCTest.framework */; };
 		07592CAD177F2D1000816034 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 07592CAB177F2D1000816034 /* InfoPlist.strings */; };
@@ -111,7 +113,6 @@
 		07BF7A63177F0A9D0029D500 /* CDEObjectChange.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF7A1A177F0A9D0029D500 /* CDEObjectChange.m */; };
 		07BF7A67177F0A9D0029D500 /* CDEStoreModificationEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF7A1D177F0A9D0029D500 /* CDEStoreModificationEvent.h */; };
 		07BF7A69177F0A9D0029D500 /* CDEStoreModificationEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF7A1E177F0A9D0029D500 /* CDEStoreModificationEvent.m */; };
-		07CCA9D717E49CA80017B6C4 /* CoreDataEnsembles.h in Headers */ = {isa = PBXBuildFile; fileRef = 07CCA9D617E49CA80017B6C4 /* CoreDataEnsembles.h */; };
 		07CCA9D917E4AF0E0017B6C4 /* CDEOneWaySyncTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07CCA9D417E49B4A0017B6C4 /* CDEOneWaySyncTests.m */; };
 		07D2D632182D627E001D24BC /* NSManagedObjectModel+CDEAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 07D2D630182D627E001D24BC /* NSManagedObjectModel+CDEAdditions.h */; };
 		07D2D633182D627E001D24BC /* NSManagedObjectModel+CDEAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 07D2D631182D627E001D24BC /* NSManagedObjectModel+CDEAdditions.m */; };
@@ -119,7 +120,7 @@
 		07DCC6C7184FA4050097B4D9 /* CDEBaselineConsolidatorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07DCC6C6184FA4050097B4D9 /* CDEBaselineConsolidatorTests.m */; };
 		07DDA7E417C8FE25009C6F94 /* CDEIntegratorUpdateTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07DDA7E317C8FE25009C6F94 /* CDEIntegratorUpdateTests.m */; };
 		07DDA7E917CA256E009C6F94 /* CDERevisionManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07DDA7E817CA256E009C6F94 /* CDERevisionManagerTests.m */; };
-		07DDA7EA17CD1A4A009C6F94 /* libensembles_mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF7933177F04B30029D500 /* libensembles_mac.a */; };
+		07DDA7EA17CD1A4A009C6F94 /* libensembles.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF7933177F04B30029D500 /* libensembles.a */; };
 		07E2042417C8F2EB00ED9AB3 /* BasicIntegratorRelationshipTestsFixture.json in Resources */ = {isa = PBXBuildFile; fileRef = 07E2042317C8F2EB00ED9AB3 /* BasicIntegratorRelationshipTestsFixture.json */; };
 		07E2875417BF8D470008CC4F /* CDESaveMonitorRelationshipTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07E2875317BF8D470008CC4F /* CDESaveMonitorRelationshipTests.m */; };
 		07E64F5C18799F6800305C22 /* CDERebaser.h in Headers */ = {isa = PBXBuildFile; fileRef = 07E64F5A18799F6800305C22 /* CDERebaser.h */; };
@@ -128,7 +129,6 @@
 		6DAD112318CA070A00237084 /* CDEDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF7A08177F0A9D0029D500 /* CDEDefines.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6DAD112418CA070E00237084 /* CDEAvailabilityMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 075754B4188BC952006803FA /* CDEAvailabilityMacros.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6DAD112518CA071600237084 /* CDEDefines.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF7A09177F0A9D0029D500 /* CDEDefines.m */; };
-		6DAD112618CA071600237084 /* CoreDataEnsembles.h in Headers */ = {isa = PBXBuildFile; fileRef = 07CCA9D617E49CA80017B6C4 /* CoreDataEnsembles.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6DAD112718CA071600237084 /* CDEAsynchronousTaskQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF7A06177F0A9D0029D500 /* CDEAsynchronousTaskQueue.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6DAD112818CA071700237084 /* CDEAsynchronousTaskQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BF7A07177F0A9D0029D500 /* CDEAsynchronousTaskQueue.m */; };
 		6DAD112918CA071700237084 /* CDEFoundationAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF7A0A177F0A9D0029D500 /* CDEFoundationAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -192,8 +192,6 @@
 		6DAD116918CA074600237084 /* CDERebaser.h in Headers */ = {isa = PBXBuildFile; fileRef = 07E64F5A18799F6800305C22 /* CDERebaser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6DAD116A18CA074600237084 /* CDERebaser.m in Sources */ = {isa = PBXBuildFile; fileRef = 07E64F5B18799F6800305C22 /* CDERebaser.m */; };
 		6DAD116E18CA07B600237084 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6DAD116C18CA07B600237084 /* InfoPlist.strings */; };
-		6DAD11E418CA09A000237084 /* Ensembles.h in Headers */ = {isa = PBXBuildFile; fileRef = 6DAD11E218CA09A000237084 /* Ensembles.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		6DAD11E518CA09A000237084 /* Ensembles.m in Sources */ = {isa = PBXBuildFile; fileRef = 6DAD11E318CA09A000237084 /* Ensembles.m */; };
 		9477ED641800146900C2A419 /* CDERevisionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 07DDA7E617C9ECF6009C6F94 /* CDERevisionManager.m */; };
 /* End PBXBuildFile section */
 
@@ -250,6 +248,7 @@
 		0747CDA317C3E0A300221ED7 /* CDEIntegratorTestCase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEIntegratorTestCase.h; sourceTree = "<group>"; };
 		0747CDA417C3E0A300221ED7 /* CDEIntegratorTestCase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEIntegratorTestCase.m; sourceTree = "<group>"; };
 		074DE61017B779D8009755EB /* CDERevisionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDERevisionTests.m; sourceTree = "<group>"; };
+		07571EDB1910DF88008479A9 /* Ensembles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Ensembles.h; path = General/Ensembles.h; sourceTree = "<group>"; };
 		075754B4188BC952006803FA /* CDEAvailabilityMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEAvailabilityMacros.h; sourceTree = "<group>"; };
 		07592CA6177F2D1000816034 /* Tests Mac.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests Mac.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		07592CAA177F2D1000816034 /* Tests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Tests-Info.plist"; sourceTree = "<group>"; };
@@ -292,7 +291,7 @@
 		07BAB4BC184677640096318D /* CDEBaselineConsolidator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEBaselineConsolidator.m; sourceTree = "<group>"; };
 		07BAE701178D65D00036E743 /* CDESaveMonitorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDESaveMonitorTests.m; sourceTree = "<group>"; };
 		07BF78E9177F03320029D500 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		07BF7933177F04B30029D500 /* libensembles_mac.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libensembles_mac.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		07BF7933177F04B30029D500 /* libensembles.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libensembles.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		07BF79F6177F0A9D0029D500 /* CDEPersistentStoreEnsemble.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEPersistentStoreEnsemble.h; sourceTree = "<group>"; };
 		07BF79F7177F0A9D0029D500 /* CDEPersistentStoreEnsemble.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEPersistentStoreEnsemble.m; sourceTree = "<group>"; };
 		07BF79F9177F0A9D0029D500 /* CDEEventIntegrator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEEventIntegrator.h; sourceTree = "<group>"; };
@@ -321,7 +320,6 @@
 		07BF7A1E177F0A9D0029D500 /* CDEStoreModificationEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEStoreModificationEvent.m; sourceTree = "<group>"; };
 		07BF7A72177F0D570029D500 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		07CCA9D417E49B4A0017B6C4 /* CDEOneWaySyncTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEOneWaySyncTests.m; sourceTree = "<group>"; };
-		07CCA9D617E49CA80017B6C4 /* CoreDataEnsembles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreDataEnsembles.h; sourceTree = "<group>"; };
 		07D2D630182D627E001D24BC /* NSManagedObjectModel+CDEAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSManagedObjectModel+CDEAdditions.h"; sourceTree = "<group>"; };
 		07D2D631182D627E001D24BC /* NSManagedObjectModel+CDEAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSManagedObjectModel+CDEAdditions.m"; sourceTree = "<group>"; };
 		07D2D637182D65FB001D24BC /* CDEManagedObjectModelTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEManagedObjectModelTests.m; sourceTree = "<group>"; };
@@ -343,8 +341,6 @@
 		6DAD110F18CA067A00237084 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		6DAD116B18CA07B000237084 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = "Supporting Files/Info.plist"; sourceTree = SOURCE_ROOT; };
 		6DAD116D18CA07B600237084 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Supporting Files/en.lproj/InfoPlist.strings"; sourceTree = SOURCE_ROOT; };
-		6DAD11E218CA09A000237084 /* Ensembles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Ensembles.h; sourceTree = "<group>"; };
-		6DAD11E318CA09A000237084 /* Ensembles.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Ensembles.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -352,7 +348,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				07DDA7EA17CD1A4A009C6F94 /* libensembles_mac.a in Frameworks */,
+				07DDA7EA17CD1A4A009C6F94 /* libensembles.a in Frameworks */,
 				07592CA7177F2D1000816034 /* XCTest.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -463,8 +459,7 @@
 		0777BF0F17183FD500F1D0D2 /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				6DAD11E218CA09A000237084 /* Ensembles.h */,
-				6DAD11E318CA09A000237084 /* Ensembles.m */,
+				07571EDB1910DF88008479A9 /* Ensembles.h */,
 				07BF7A03177F0A9D0029D500 /* General */,
 				07973F00183BE44A007F48CA /* Cloud File Systems */,
 				07973F09183BE466007F48CA /* Cloud Management */,
@@ -579,7 +574,6 @@
 				07BF7A08177F0A9D0029D500 /* CDEDefines.h */,
 				07BF7A09177F0A9D0029D500 /* CDEDefines.m */,
 				075754B4188BC952006803FA /* CDEAvailabilityMacros.h */,
-				07CCA9D617E49CA80017B6C4 /* CoreDataEnsembles.h */,
 				07BF7A06177F0A9D0029D500 /* CDEAsynchronousTaskQueue.h */,
 				07BF7A07177F0A9D0029D500 /* CDEAsynchronousTaskQueue.m */,
 				07BF7A0A177F0A9D0029D500 /* CDEFoundationAdditions.h */,
@@ -641,7 +635,7 @@
 		07E492E717172CB200FE81B5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				07BF7933177F04B30029D500 /* libensembles_mac.a */,
+				07BF7933177F04B30029D500 /* libensembles.a */,
 				07592CA6177F2D1000816034 /* Tests Mac.xctest */,
 				6DAD10F918CA067900237084 /* Ensembles.framework */,
 			);
@@ -688,11 +682,11 @@
 			files = (
 				07BF7A47177F0A9D0029D500 /* CDEAsynchronousTaskQueue.h in Headers */,
 				072A87E017EEE55600F8B2CB /* CDEEventBuilder.h in Headers */,
-				07CCA9D717E49CA80017B6C4 /* CoreDataEnsembles.h in Headers */,
 				07BF7A38177F0A9D0029D500 /* CDEEventMigrator.h in Headers */,
 				07BF7A3B177F0A9D0029D500 /* CDEEventStore.h in Headers */,
 				07BF7A3E177F0A9D0029D500 /* CDESaveMonitor.h in Headers */,
 				07BF7A61177F0A9D0029D500 /* CDEObjectChange.h in Headers */,
+				07571EDC1910DF88008479A9 /* Ensembles.h in Headers */,
 				07BF7A67177F0A9D0029D500 /* CDEStoreModificationEvent.h in Headers */,
 				07BF7A41177F0A9D0029D500 /* CDEPropertyChangeValue.h in Headers */,
 				070C675A18F4162E00266A4E /* CDEEventFile.h in Headers */,
@@ -735,6 +729,7 @@
 				6DAD114418CA072A00237084 /* CDEEventStore.h in Headers */,
 				6DAD114818CA072A00237084 /* CDEEventMigrator.h in Headers */,
 				6DAD115218CA073000237084 /* CDEObjectChange.h in Headers */,
+				07571EDD1910DF88008479A9 /* Ensembles.h in Headers */,
 				6DAD112718CA071600237084 /* CDEAsynchronousTaskQueue.h in Headers */,
 				6DAD114C18CA072A00237084 /* CDEEventBuilder.h in Headers */,
 				6DAD116318CA074100237084 /* CDERevision.h in Headers */,
@@ -753,7 +748,6 @@
 				6DAD112B18CA071700237084 /* NSManagedObjectModel+CDEAdditions.h in Headers */,
 				6DAD114218CA072300237084 /* CDEPersistentStoreImporter.h in Headers */,
 				6DAD115818CA073000237084 /* CDEDataFile.h in Headers */,
-				6DAD112618CA071600237084 /* CoreDataEnsembles.h in Headers */,
 				6DAD114018CA072300237084 /* CDEPersistentStoreEnsemble.h in Headers */,
 				6DAD113918CA072000237084 /* CDECloudDirectory.h in Headers */,
 				6DAD112418CA070E00237084 /* CDEAvailabilityMacros.h in Headers */,
@@ -761,7 +755,6 @@
 				6DAD114E18CA073000237084 /* CDEEventRevision.h in Headers */,
 				6DAD114618CA072A00237084 /* CDEEventIntegrator.h in Headers */,
 				6DAD114A18CA072A00237084 /* CDESaveMonitor.h in Headers */,
-				6DAD11E418CA09A000237084 /* Ensembles.h in Headers */,
 				070C675B18F4162E00266A4E /* CDEEventFile.h in Headers */,
 				6DAD115018CA073000237084 /* CDEGlobalIdentifier.h in Headers */,
 			);
@@ -802,7 +795,7 @@
 			);
 			name = "Ensembles Mac";
 			productName = "Syncophant Mac";
-			productReference = 07BF7933177F04B30029D500 /* libensembles_mac.a */;
+			productReference = 07BF7933177F04B30029D500 /* libensembles.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 		6DAD10F818CA067900237084 /* Ensembles */ = {
@@ -1002,7 +995,6 @@
 				6DAD112518CA071600237084 /* CDEDefines.m in Sources */,
 				6DAD112E18CA071700237084 /* NSMapTable+CDEAdditions.m in Sources */,
 				6DAD116218CA074100237084 /* CDERevisionManager.m in Sources */,
-				6DAD11E518CA09A000237084 /* Ensembles.m in Sources */,
 				6DAD113C18CA072000237084 /* CDECloudFile.m in Sources */,
 				6DAD116A18CA074600237084 /* CDERebaser.m in Sources */,
 				6DAD114B18CA072A00237084 /* CDESaveMonitor.m in Sources */,
@@ -1132,7 +1124,7 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				PRODUCT_NAME = ensembles_mac;
+				PRODUCT_NAME = ensembles;
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../Vendor/DropboxSDK/DropboxSDK/Classes/**";
 			};
@@ -1158,7 +1150,7 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
-				PRODUCT_NAME = ensembles_mac;
+				PRODUCT_NAME = ensembles;
 				SDKROOT = macosx;
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../Vendor/DropboxSDK/DropboxSDK/Classes/**";
 			};

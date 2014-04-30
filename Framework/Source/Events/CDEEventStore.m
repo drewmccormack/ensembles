@@ -468,9 +468,24 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 
 #pragma mark - Core Data Stack
 
+- (NSURL *)eventStoreModelURL
+{
+    NSBundle *bundle = [NSBundle bundleForClass:[CDEEventStore class]];
+    NSURL *modelURL = [bundle URLForResource:@"CDEEventStoreModel" withExtension:@"momd"];
+    if (!modelURL) {
+        // Search for bundle
+        NSURL *resourcesBundleURL = [bundle URLForResource:@"Ensembles" withExtension:@"bundle"];
+        NSBundle *resourceBundle = resourcesBundleURL ? [NSBundle bundleWithURL:resourcesBundleURL] : nil;
+        modelURL = [resourceBundle URLForResource:@"CDEEventStoreModel" withExtension:@"momd"];
+    }
+    return modelURL;
+}
+
 - (BOOL)setupCoreDataStack:(NSError * __autoreleasing *)error
 {
-    NSURL *modelURL = [[NSBundle bundleForClass:[CDEEventStore class]] URLForResource:@"CDEEventStoreModel" withExtension:@"momd"];
+    NSURL *modelURL = [self eventStoreModelURL];
+    NSAssert(modelURL != nil, @"Ensembles internal model resource not found. Make sure it is copied into your app bundle");
+    
     NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
     NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:model];
     

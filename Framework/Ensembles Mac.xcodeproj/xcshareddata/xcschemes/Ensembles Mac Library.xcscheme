@@ -56,7 +56,7 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-com.apple.CoreData.ThreadingDebug 1"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>

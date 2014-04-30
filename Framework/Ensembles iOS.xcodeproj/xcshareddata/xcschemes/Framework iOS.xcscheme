@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "07BF374417F184DD00C56F64"
-               BuildableName = "libensembles.a"
-               BlueprintName = "Ensembles iOS"
+               BlueprintIdentifier = "07571F041910E57C008479A9"
+               BuildableName = "Framework iOS"
+               BlueprintName = "Framework iOS"
                ReferencedContainer = "container:Ensembles iOS.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -28,26 +28,6 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       buildConfiguration = "Debug">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "07BF375417F184DD00C56F64"
-               BuildableName = "Ensembles iOSTests.xctest"
-               BlueprintName = "Ensembles iOSTests"
-               ReferencedContainer = "container:Ensembles iOS.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "070D336018018A960054BA23"
-               BuildableName = "Tests iOS.xctest"
-               BlueprintName = "Tests iOS"
-               ReferencedContainer = "container:Ensembles iOS.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

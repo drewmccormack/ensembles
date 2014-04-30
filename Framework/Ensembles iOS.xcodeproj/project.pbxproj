@@ -18,6 +18,19 @@
 			name = Documentation;
 			productName = Documentation;
 		};
+		07571F041910E57C008479A9 /* Framework iOS */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 07571F051910E57C008479A9 /* Build configuration list for PBXAggregateTarget "Framework iOS" */;
+			buildPhases = (
+				07571F0A1910E5B9008479A9 /* ShellScript */,
+			);
+			dependencies = (
+				07571F1D1910ECF5008479A9 /* PBXTargetDependency */,
+				07571F091910E596008479A9 /* PBXTargetDependency */,
+			);
+			name = "Framework iOS";
+			productName = "Framework iOS";
+		};
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
@@ -65,12 +78,49 @@
 		070D33C718018AAD0054BA23 /* IntegratorUpdateTestsFixture2.json in Resources */ = {isa = PBXBuildFile; fileRef = 070D33A118018AAD0054BA23 /* IntegratorUpdateTestsFixture2.json */; };
 		070D33C918018B8E0054BA23 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF37CE17F185DE00C56F64 /* CoreData.framework */; };
 		070D33D21801A0770054BA23 /* CDEGlobalIdentifierTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 070D33D11801A0770054BA23 /* CDEGlobalIdentifierTests.m */; };
-		072BA97F180AACD9003AA94E /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 072BA97C180AACD9003AA94E /* CDEEventStoreModel.xcdatamodeld */; };
 		072BA980180AAD0E003AA94E /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 072BA97C180AACD9003AA94E /* CDEEventStoreModel.xcdatamodeld */; };
+		07571EE01910E171008479A9 /* Ensembles.h in Headers */ = {isa = PBXBuildFile; fileRef = 07571EDE1910DFB9008479A9 /* Ensembles.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07571EE11910E171008479A9 /* CDEDefines.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF379117F1853000C56F64 /* CDEDefines.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07571EE21910E171008479A9 /* CDEAvailabilityMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 34700E9D188B225700FD00B1 /* CDEAvailabilityMacros.h */; };
+		07571EE31910E171008479A9 /* CDEAsynchronousTaskQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF378F17F1853000C56F64 /* CDEAsynchronousTaskQueue.h */; };
+		07571EE41910E171008479A9 /* CDEFoundationAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF379317F1853000C56F64 /* CDEFoundationAdditions.h */; };
+		07571EE51910E171008479A9 /* NSMapTable+CDEAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF379617F1853000C56F64 /* NSMapTable+CDEAdditions.h */; };
+		07571EE61910E171008479A9 /* NSManagedObjectModel+CDEAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 07D2D639182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.h */; };
+		07571EE71910E171008479A9 /* CDEAsynchronousOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 0701770418C1EDE700C4DA01 /* CDEAsynchronousOperation.h */; };
+		07571EE81910E171008479A9 /* CDEICloudFileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 07973EFA183BE40A007F48CA /* CDEICloudFileSystem.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07571EE91910E171008479A9 /* CDELocalCloudFileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 07973EFC183BE40A007F48CA /* CDELocalCloudFileSystem.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07571EEA1910E171008479A9 /* CDEFileDownloadOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 0701770118C1EC4B00C4DA01 /* CDEFileDownloadOperation.h */; };
+		07571EEB1910E171008479A9 /* CDEFileUploadOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 0701771318C25F2A00C4DA01 /* CDEFileUploadOperation.h */; };
+		07571EEC1910E171008479A9 /* CDEEventFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 070C675E18F43E2E00266A4E /* CDEEventFile.h */; };
+		07571EED1910E171008479A9 /* CDECloudFileSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF377317F1853000C56F64 /* CDECloudFileSystem.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07571EEE1910E171008479A9 /* CDECloudDirectory.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF376F17F1853000C56F64 /* CDECloudDirectory.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07571EEF1910E171008479A9 /* CDECloudFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF377117F1853000C56F64 /* CDECloudFile.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07571EF01910E171008479A9 /* CDECloudManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF377417F1853000C56F64 /* CDECloudManager.h */; };
+		07571EF11910E171008479A9 /* CDEPersistentStoreEnsemble.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF377D17F1853000C56F64 /* CDEPersistentStoreEnsemble.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07571EF21910E171008479A9 /* CDEPersistentStoreImporter.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF377F17F1853000C56F64 /* CDEPersistentStoreImporter.h */; };
+		07571EF31910E171008479A9 /* CDEEventStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF378817F1853000C56F64 /* CDEEventStore.h */; };
+		07571EF41910E171008479A9 /* CDEEventBuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF378217F1853000C56F64 /* CDEEventBuilder.h */; };
+		07571EF51910E171008479A9 /* CDEEventIntegrator.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF378417F1853000C56F64 /* CDEEventIntegrator.h */; };
+		07571EF61910E171008479A9 /* CDEEventMigrator.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF378617F1853000C56F64 /* CDEEventMigrator.h */; };
+		07571EF71910E171008479A9 /* CDEPropertyChangeValue.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF378A17F1853000C56F64 /* CDEPropertyChangeValue.h */; };
+		07571EF81910E171008479A9 /* CDESaveMonitor.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF378C17F1853000C56F64 /* CDESaveMonitor.h */; };
+		07571EF91910E171008479A9 /* CDEEventRevision.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF379917F1853000C56F64 /* CDEEventRevision.h */; };
+		07571EFA1910E171008479A9 /* CDEGlobalIdentifier.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF379D17F1853000C56F64 /* CDEGlobalIdentifier.h */; };
+		07571EFB1910E171008479A9 /* CDEObjectChange.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF379F17F1853000C56F64 /* CDEObjectChange.h */; };
+		07571EFC1910E171008479A9 /* CDEStoreModificationEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF37A117F1853000C56F64 /* CDEStoreModificationEvent.h */; };
+		07571EFD1910E171008479A9 /* CDEDataFile.h in Headers */ = {isa = PBXBuildFile; fileRef = 07ABB5A218B24A6B006FC638 /* CDEDataFile.h */; };
+		07571EFE1910E171008479A9 /* CDERevision.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF37A417F1853000C56F64 /* CDERevision.h */; };
+		07571EFF1910E171008479A9 /* CDERevisionManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF37A617F1853000C56F64 /* CDERevisionManager.h */; };
+		07571F001910E171008479A9 /* CDERevisionSet.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BF37A817F1853000C56F64 /* CDERevisionSet.h */; };
+		07571F011910E171008479A9 /* CDEBaselineConsolidator.h in Headers */ = {isa = PBXBuildFile; fileRef = 07D183FB1892824200E89B89 /* CDEBaselineConsolidator.h */; };
+		07571F021910E171008479A9 /* CDERebaser.h in Headers */ = {isa = PBXBuildFile; fileRef = 07D183FD1892824200E89B89 /* CDERebaser.h */; };
+		07571F111910EC02008479A9 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07571F101910EC02008479A9 /* CoreFoundation.framework */; };
+		07571F171910EC02008479A9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 07571F151910EC02008479A9 /* InfoPlist.strings */; };
+		07571F1E1910EDA1008479A9 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 072BA97C180AACD9003AA94E /* CDEEventStoreModel.xcdatamodeld */; };
 		075B3FB318096C720089D4D3 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 075B3FB218096C720089D4D3 /* QuartzCore.framework */; };
 		075B3FCB18097A080089D4D3 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 075B3FB218096C720089D4D3 /* QuartzCore.framework */; };
 		075B3FCC18097A140089D4D3 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07C002351809662E0077E204 /* Security.framework */; };
-		075B3FCD18097A260089D4D3 /* libensembles_ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF374517F184DD00C56F64 /* libensembles_ios.a */; };
+		075B3FCD18097A260089D4D3 /* libensembles.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 07BF374517F184DD00C56F64 /* libensembles.a */; };
 		075B3FCF18097A370089D4D3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 075B3FCE18097A370089D4D3 /* UIKit.framework */; };
 		075FDCE5183628F90020E1C9 /* CDEIntegratorMergeRepairTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 075FDCDF183628F90020E1C9 /* CDEIntegratorMergeRepairTests.m */; };
 		075FDCE6183628F90020E1C9 /* CDEMockLocalFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 075FDCE1183628F90020E1C9 /* CDEMockLocalFileSystem.m */; };
@@ -121,6 +171,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = 07BF374417F184DD00C56F64;
 			remoteInfo = "Ensembles iOS";
+		};
+		07571F081910E596008479A9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 07BF373D17F184DD00C56F64 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 07BF374417F184DD00C56F64;
+			remoteInfo = "Ensembles iOS";
+		};
+		07571F1C1910ECF5008479A9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 07BF373D17F184DD00C56F64 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 07571F0E1910EC02008479A9;
+			remoteInfo = "Ensembles Resources iOS";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -192,6 +256,12 @@
 		070D33D11801A0770054BA23 /* CDEGlobalIdentifierTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEGlobalIdentifierTests.m; sourceTree = "<group>"; };
 		072BA97D180AACD9003AA94E /* CDEEventStoreModel_0.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_0.xcdatamodel; sourceTree = "<group>"; };
 		072BA97E180AACD9003AA94E /* CDEEventStoreModel_1.xcdatamodel */ = {isa = PBXFileReference; explicitFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_1.xcdatamodel; sourceTree = "<group>"; };
+		07571EDE1910DFB9008479A9 /* Ensembles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Ensembles.h; path = Source/General/Ensembles.h; sourceTree = SOURCE_ROOT; };
+		07571F0F1910EC02008479A9 /* Ensembles.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Ensembles.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		07571F101910EC02008479A9 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		07571F141910EC02008479A9 /* Ensembles Resources iOS-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Ensembles Resources iOS-Info.plist"; sourceTree = "<group>"; };
+		07571F161910EC02008479A9 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		07571F181910EC02008479A9 /* Ensembles Resources iOS-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Ensembles Resources iOS-Prefix.pch"; sourceTree = "<group>"; };
 		075B3FB218096C720089D4D3 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		075B3FCE18097A370089D4D3 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		075FDCDF183628F90020E1C9 /* CDEIntegratorMergeRepairTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEIntegratorMergeRepairTests.m; sourceTree = "<group>"; };
@@ -207,7 +277,7 @@
 		07ABB5A118B245CF006FC638 /* CDEEventStoreModel_2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CDEEventStoreModel_2.xcdatamodel; sourceTree = "<group>"; };
 		07ABB5A218B24A6B006FC638 /* CDEDataFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEDataFile.h; sourceTree = "<group>"; };
 		07ABB5A318B24A6B006FC638 /* CDEDataFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEDataFile.m; sourceTree = "<group>"; };
-		07BF374517F184DD00C56F64 /* libensembles_ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libensembles_ios.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		07BF374517F184DD00C56F64 /* libensembles.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libensembles.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		07BF374817F184DD00C56F64 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		07BF376F17F1853000C56F64 /* CDECloudDirectory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDECloudDirectory.h; sourceTree = "<group>"; };
 		07BF377017F1853000C56F64 /* CDECloudDirectory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDECloudDirectory.m; sourceTree = "<group>"; };
@@ -238,7 +308,6 @@
 		07BF379217F1853000C56F64 /* CDEDefines.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEDefines.m; sourceTree = "<group>"; };
 		07BF379317F1853000C56F64 /* CDEFoundationAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEFoundationAdditions.h; sourceTree = "<group>"; };
 		07BF379417F1853000C56F64 /* CDEFoundationAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEFoundationAdditions.m; sourceTree = "<group>"; };
-		07BF379517F1853000C56F64 /* CoreDataEnsembles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreDataEnsembles.h; sourceTree = "<group>"; };
 		07BF379617F1853000C56F64 /* NSMapTable+CDEAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSMapTable+CDEAdditions.h"; sourceTree = "<group>"; };
 		07BF379717F1853000C56F64 /* NSMapTable+CDEAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSMapTable+CDEAdditions.m"; sourceTree = "<group>"; };
 		07BF379917F1853000C56F64 /* CDEEventRevision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEEventRevision.h; sourceTree = "<group>"; };
@@ -276,12 +345,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				075B3FCF18097A370089D4D3 /* UIKit.framework in Frameworks */,
-				075B3FCD18097A260089D4D3 /* libensembles_ios.a in Frameworks */,
+				075B3FCD18097A260089D4D3 /* libensembles.a in Frameworks */,
 				075B3FCC18097A140089D4D3 /* Security.framework in Frameworks */,
 				075B3FCB18097A080089D4D3 /* QuartzCore.framework in Frameworks */,
 				070D33C918018B8E0054BA23 /* CoreData.framework in Frameworks */,
 				070D336318018A960054BA23 /* XCTest.framework in Frameworks */,
 				070D336418018A960054BA23 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		07571F0C1910EC02008479A9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				07571F111910EC02008479A9 /* CoreFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -399,11 +476,30 @@
 			name = "Sync System Tests";
 			sourceTree = "<group>";
 		};
+		07571F121910EC02008479A9 /* Ensembles Resources iOS */ = {
+			isa = PBXGroup;
+			children = (
+				07571F131910EC02008479A9 /* Supporting Files */,
+			);
+			path = "Ensembles Resources iOS";
+			sourceTree = "<group>";
+		};
+		07571F131910EC02008479A9 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				07571F141910EC02008479A9 /* Ensembles Resources iOS-Info.plist */,
+				07571F151910EC02008479A9 /* InfoPlist.strings */,
+				07571F181910EC02008479A9 /* Ensembles Resources iOS-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 		07BF373C17F184DD00C56F64 = {
 			isa = PBXGroup;
 			children = (
 				07BF374A17F184DD00C56F64 /* Source */,
 				07BF374B17F184DD00C56F64 /* Supporting Files */,
+				07571F121910EC02008479A9 /* Ensembles Resources iOS */,
 				07BF374717F184DD00C56F64 /* Frameworks */,
 				07BF374617F184DD00C56F64 /* Products */,
 				070D337518018AAD0054BA23 /* Tests */,
@@ -413,8 +509,9 @@
 		07BF374617F184DD00C56F64 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				07BF374517F184DD00C56F64 /* libensembles_ios.a */,
+				07BF374517F184DD00C56F64 /* libensembles.a */,
 				070D336118018A960054BA23 /* Tests iOS.xctest */,
+				07571F0F1910EC02008479A9 /* Ensembles.bundle */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -428,6 +525,7 @@
 				07BF37CE17F185DE00C56F64 /* CoreData.framework */,
 				07BF374817F184DD00C56F64 /* Foundation.framework */,
 				070D336218018A960054BA23 /* XCTest.framework */,
+				07571F101910EC02008479A9 /* CoreFoundation.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -435,6 +533,7 @@
 		07BF374A17F184DD00C56F64 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				07571EDE1910DFB9008479A9 /* Ensembles.h */,
 				07BF378E17F1853000C56F64 /* General */,
 				07BF37C417F1854F00C56F64 /* Cloud File Systems */,
 				07BF376E17F1853000C56F64 /* Cloud Management */,
@@ -508,7 +607,6 @@
 		07BF378E17F1853000C56F64 /* General */ = {
 			isa = PBXGroup;
 			children = (
-				07BF379517F1853000C56F64 /* CoreDataEnsembles.h */,
 				07BF379117F1853000C56F64 /* CDEDefines.h */,
 				07BF379217F1853000C56F64 /* CDEDefines.m */,
 				34700E9D188B225700FD00B1 /* CDEAvailabilityMacros.h */,
@@ -589,6 +687,51 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		07571EDF1910E12C008479A9 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				07571EE01910E171008479A9 /* Ensembles.h in Headers */,
+				07571EE11910E171008479A9 /* CDEDefines.h in Headers */,
+				07571EE81910E171008479A9 /* CDEICloudFileSystem.h in Headers */,
+				07571EED1910E171008479A9 /* CDECloudFileSystem.h in Headers */,
+				07571EEE1910E171008479A9 /* CDECloudDirectory.h in Headers */,
+				07571EEF1910E171008479A9 /* CDECloudFile.h in Headers */,
+				07571EE91910E171008479A9 /* CDELocalCloudFileSystem.h in Headers */,
+				07571EF11910E171008479A9 /* CDEPersistentStoreEnsemble.h in Headers */,
+				07571EE21910E171008479A9 /* CDEAvailabilityMacros.h in Headers */,
+				07571EE31910E171008479A9 /* CDEAsynchronousTaskQueue.h in Headers */,
+				07571EE41910E171008479A9 /* CDEFoundationAdditions.h in Headers */,
+				07571EE51910E171008479A9 /* NSMapTable+CDEAdditions.h in Headers */,
+				07571EE61910E171008479A9 /* NSManagedObjectModel+CDEAdditions.h in Headers */,
+				07571EE71910E171008479A9 /* CDEAsynchronousOperation.h in Headers */,
+				07571EEA1910E171008479A9 /* CDEFileDownloadOperation.h in Headers */,
+				07571EEB1910E171008479A9 /* CDEFileUploadOperation.h in Headers */,
+				07571EEC1910E171008479A9 /* CDEEventFile.h in Headers */,
+				07571EF01910E171008479A9 /* CDECloudManager.h in Headers */,
+				07571EF21910E171008479A9 /* CDEPersistentStoreImporter.h in Headers */,
+				07571EF31910E171008479A9 /* CDEEventStore.h in Headers */,
+				07571EF41910E171008479A9 /* CDEEventBuilder.h in Headers */,
+				07571EF51910E171008479A9 /* CDEEventIntegrator.h in Headers */,
+				07571EF61910E171008479A9 /* CDEEventMigrator.h in Headers */,
+				07571EF71910E171008479A9 /* CDEPropertyChangeValue.h in Headers */,
+				07571EF81910E171008479A9 /* CDESaveMonitor.h in Headers */,
+				07571EF91910E171008479A9 /* CDEEventRevision.h in Headers */,
+				07571EFA1910E171008479A9 /* CDEGlobalIdentifier.h in Headers */,
+				07571EFB1910E171008479A9 /* CDEObjectChange.h in Headers */,
+				07571EFC1910E171008479A9 /* CDEStoreModificationEvent.h in Headers */,
+				07571EFD1910E171008479A9 /* CDEDataFile.h in Headers */,
+				07571EFE1910E171008479A9 /* CDERevision.h in Headers */,
+				07571EFF1910E171008479A9 /* CDERevisionManager.h in Headers */,
+				07571F001910E171008479A9 /* CDERevisionSet.h in Headers */,
+				07571F011910E171008479A9 /* CDEBaselineConsolidator.h in Headers */,
+				07571F021910E171008479A9 /* CDERebaser.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
 		070D336018018A960054BA23 /* Tests iOS */ = {
 			isa = PBXNativeTarget;
@@ -608,6 +751,23 @@
 			productReference = 070D336118018A960054BA23 /* Tests iOS.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		07571F0E1910EC02008479A9 /* Ensembles Resources iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 07571F191910EC02008479A9 /* Build configuration list for PBXNativeTarget "Ensembles Resources iOS" */;
+			buildPhases = (
+				07571F0B1910EC02008479A9 /* Sources */,
+				07571F0C1910EC02008479A9 /* Frameworks */,
+				07571F0D1910EC02008479A9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Ensembles Resources iOS";
+			productName = "Ensembles Resources iOS";
+			productReference = 07571F0F1910EC02008479A9 /* Ensembles.bundle */;
+			productType = "com.apple.product-type.bundle";
+		};
 		07BF374417F184DD00C56F64 /* Ensembles iOS */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 07BF376817F184DD00C56F64 /* Build configuration list for PBXNativeTarget "Ensembles iOS" */;
@@ -615,6 +775,8 @@
 				07BF374117F184DD00C56F64 /* Sources */,
 				07BF374217F184DD00C56F64 /* Frameworks */,
 				07BF374317F184DD00C56F64 /* CopyFiles */,
+				07571EDF1910E12C008479A9 /* Headers */,
+				07571F031910E2E4008479A9 /* Prepare Framework */,
 			);
 			buildRules = (
 			);
@@ -622,7 +784,7 @@
 			);
 			name = "Ensembles iOS";
 			productName = "Ensembles iOS";
-			productReference = 07BF374517F184DD00C56F64 /* libensembles_ios.a */;
+			productReference = 07BF374517F184DD00C56F64 /* libensembles.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -652,6 +814,8 @@
 			projectRoot = "";
 			targets = (
 				07BF374417F184DD00C56F64 /* Ensembles iOS */,
+				07571F0E1910EC02008479A9 /* Ensembles Resources iOS */,
+				07571F041910E57C008479A9 /* Framework iOS */,
 				070D336018018A960054BA23 /* Tests iOS */,
 				0710512B18C9FB4200C23158 /* Documentation */,
 			);
@@ -679,6 +843,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		07571F0D1910EC02008479A9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				07571F171910EC02008479A9 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
@@ -694,6 +866,33 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "/usr/local/bin/appledoc --docset-bundle-id com.mentalfaculty.ensembles --project-name \"Ensembles\" --project-company \"The Mental Faculty B.V.\" --company-id com.mentalfaculty --output ~/Desktop/appledoc.output --create-docset --install-docset --create-html --exit-threshold 2 --no-repeat-first-par \"${SRCROOT}/Source\"\n\n# Other useful flags: --keep-undocumented-objects --keep-undocumented-members";
+		};
+		07571F031910E2E4008479A9 /* Prepare Framework */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Prepare Framework";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\n\nFRAMEWORK_NAME=Ensembles\nFRAMEWORK_ROOT=\"${BUILT_PRODUCTS_DIR}/${FRAMEWORK_NAME}.framework\"\nmkdir -p \"${FRAMEWORK_ROOT}/Versions/A/Headers\"\n\n# Link the \"Current\" version to \"A\"\n/bin/ln -sfh A \"${FRAMEWORK_ROOT}/Versions/Current\"\n/bin/ln -sfh Versions/Current/Headers \"${FRAMEWORK_ROOT}/Headers\"\n/bin/ln -sfh \"Versions/Current/${FRAMEWORK_NAME}\" \"${FRAMEWORK_ROOT}/${FRAMEWORK_NAME}\"\n\n# The -a ensures that the headers maintain the source modification date so that we don't constantly\n# cause propagating rebuilds of files that import these headers.\n/bin/cp -a \"${TARGET_BUILD_DIR}/${PUBLIC_HEADERS_FOLDER_PATH}/\" \"${FRAMEWORK_ROOT}/Versions/A/Headers\"\n";
+		};
+		07571F0A1910E5B9008479A9 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\nset +u\n\n# Avoid recursively calling this script.\nif [[ $SF_MASTER_SCRIPT_RUNNING ]]\nthen\n    exit 0\nfi\nset -u\nexport SF_MASTER_SCRIPT_RUNNING=1\n\nSF_FRAMEWORK_NAME=\"Ensembles\"\nSF_EXECUTABLE_PATH=\"libensembles.a\"\nSF_WRAPPER_NAME=\"Ensembles.framework\"\n\n# The following conditionals come from\n# https://github.com/kstenerud/iOS-Universal-Framework\n\nif [[ \"$SDK_NAME\" =~ ([A-Za-z]+) ]]\nthen\n    SF_SDK_PLATFORM=${BASH_REMATCH[1]}\nelse\n    echo \"Could not find platform name from SDK_NAME: $SDK_NAME\"\n    exit 1\nfi\n\nif [[ \"$SDK_NAME\" =~ ([0-9]+.*$) ]]\nthen\n    SF_SDK_VERSION=${BASH_REMATCH[1]}\nelse\n    echo \"Could not find sdk version from SDK_NAME: $SDK_NAME\"\n    exit 1\nfi\n\nif [[ \"$SF_SDK_PLATFORM\" = \"iphoneos\" ]]\nthen\n    SF_OTHER_PLATFORM=iphonesimulator\nelse\n    SF_OTHER_PLATFORM=iphoneos\nfi\n\nif [[ \"$BUILT_PRODUCTS_DIR\" =~ (.*)$SF_SDK_PLATFORM$ ]]\nthen\n    SF_OTHER_BUILT_PRODUCTS_DIR=\"${BASH_REMATCH[1]}${SF_OTHER_PLATFORM}\"\nelse\n    echo \"Could not find platform name from build products directory: $BUILT_PRODUCTS_DIR\"\n    exit 1\nfi\n\n# Build the other platform.\nxcrun xcodebuild -project \"${PROJECT_FILE_PATH}\" -target \"${TARGET_NAME}\" -configuration \"${CONFIGURATION}\" -sdk ${SF_OTHER_PLATFORM}${SF_SDK_VERSION} BUILD_DIR=\"${BUILD_DIR}\" OBJROOT=\"${OBJROOT}\" BUILD_ROOT=\"${BUILD_ROOT}\" SYMROOT=\"${SYMROOT}\" $ACTION\n\n# Smash the two static libraries into one fat binary and store it in the .framework\nxcrun lipo -create \"${BUILT_PRODUCTS_DIR}/${SF_EXECUTABLE_PATH}\" \"${SF_OTHER_BUILT_PRODUCTS_DIR}/${SF_EXECUTABLE_PATH}\" -output \"${BUILT_PRODUCTS_DIR}/${SF_WRAPPER_NAME}/Versions/A/${SF_FRAMEWORK_NAME}\"\n\n# Copy the binary to the other architecture folder to have a complete framework in both.\ncp -a \"${BUILT_PRODUCTS_DIR}/${SF_WRAPPER_NAME}/Versions/A/${SF_FRAMEWORK_NAME}\" \"${SF_OTHER_BUILT_PRODUCTS_DIR}/${SF_WRAPPER_NAME}/Versions/A/${SF_FRAMEWORK_NAME}\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -739,6 +938,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		07571F0B1910EC02008479A9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				07571F1E1910EDA1008479A9 /* CDEEventStoreModel.xcdatamodeld in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		07BF374117F184DD00C56F64 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -760,7 +967,6 @@
 				07BF37C017F1853000C56F64 /* CDEStoreModificationEvent.m in Sources */,
 				07BF37B117F1853000C56F64 /* CDEPersistentStoreImporter.m in Sources */,
 				07BF37C117F1853000C56F64 /* CDERevision.m in Sources */,
-				072BA97F180AACD9003AA94E /* CDEEventStoreModel.xcdatamodeld in Sources */,
 				07BF37B717F1853000C56F64 /* CDESaveMonitor.m in Sources */,
 				07D184001892824200E89B89 /* CDERebaser.m in Sources */,
 				07BF37B817F1853000C56F64 /* CDEAsynchronousTaskQueue.m in Sources */,
@@ -787,6 +993,16 @@
 			target = 07BF374417F184DD00C56F64 /* Ensembles iOS */;
 			targetProxy = 070D337018018A960054BA23 /* PBXContainerItemProxy */;
 		};
+		07571F091910E596008479A9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 07BF374417F184DD00C56F64 /* Ensembles iOS */;
+			targetProxy = 07571F081910E596008479A9 /* PBXContainerItemProxy */;
+		};
+		07571F1D1910ECF5008479A9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 07571F0E1910EC02008479A9 /* Ensembles Resources iOS */;
+			targetProxy = 07571F1C1910ECF5008479A9 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -794,6 +1010,14 @@
 			isa = PBXVariantGroup;
 			children = (
 				070D339418018AAD0054BA23 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		07571F151910EC02008479A9 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				07571F161910EC02008479A9 /* en */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -861,6 +1085,56 @@
 			};
 			name = Release;
 		};
+		07571F061910E57C008479A9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		07571F071910E57C008479A9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		07571F1A1910EC02008479A9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Ensembles Resources iOS/Ensembles Resources iOS-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = "Ensembles Resources iOS/Ensembles Resources iOS-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_NAME = Ensembles;
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Debug;
+		};
+		07571F1B1910EC02008479A9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Ensembles Resources iOS/Ensembles Resources iOS-Prefix.pch";
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = "Ensembles Resources iOS/Ensembles Resources iOS-Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_NAME = Ensembles;
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Release;
+		};
 		07BF376617F184DD00C56F64 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -878,6 +1152,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -893,8 +1168,10 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
+				PUBLIC_HEADERS_FOLDER_PATH = EnsemblesiOSHeaders;
 				SDKROOT = iphoneos;
+				STRIP_STYLE = "non-global";
 			};
 			name = Debug;
 		};
@@ -914,7 +1191,8 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				COPY_PHASE_STRIP = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = NO;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -925,7 +1203,9 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				ONLY_ACTIVE_ARCH = NO;
+				PUBLIC_HEADERS_FOLDER_PATH = EnsemblesiOSHeaders;
 				SDKROOT = iphoneos;
+				STRIP_STYLE = "non-global";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -935,7 +1215,7 @@
 			buildSettings = {
 				DSTROOT = /tmp/Ensembles_iOS.dst;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = ensembles_ios;
+				PRODUCT_NAME = ensembles;
 				SKIP_INSTALL = YES;
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../Vendor/DropboxSDK/DropboxSDK/Classes/**";
 			};
@@ -946,7 +1226,7 @@
 			buildSettings = {
 				DSTROOT = /tmp/Ensembles_iOS.dst;
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = ensembles_ios;
+				PRODUCT_NAME = ensembles;
 				SKIP_INSTALL = YES;
 				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../Vendor/DropboxSDK/DropboxSDK/Classes/**";
 			};
@@ -972,6 +1252,22 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		07571F051910E57C008479A9 /* Build configuration list for PBXAggregateTarget "Framework iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				07571F061910E57C008479A9 /* Debug */,
+				07571F071910E57C008479A9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		07571F191910EC02008479A9 /* Build configuration list for PBXNativeTarget "Ensembles Resources iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				07571F1A1910EC02008479A9 /* Debug */,
+				07571F1B1910EC02008479A9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		07BF374017F184DD00C56F64 /* Build configuration list for PBXProject "Ensembles iOS" */ = {
 			isa = XCConfigurationList;
