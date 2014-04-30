@@ -117,26 +117,12 @@
 			remoteGlobalIDString = 07571F0E1910EC02008479A9;
 			remoteInfo = "Ensembles Resources iOS";
 		};
-		07D9F01F1911042300D191FA /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 9477ED211800132E00C2A419 /* Ensembles Mac.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 07D9F00D1911039D00D191FA;
-			remoteInfo = "Ensembles Resources Mac";
-		};
 		07D9F027191107B700D191FA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 9477ED211800132E00C2A419 /* Ensembles Mac.xcodeproj */;
 			proxyType = 1;
 			remoteGlobalIDString = 6DAD10F818CA067900237084;
 			remoteInfo = Ensembles;
-		};
-		9477ED271800132F00C2A419 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 9477ED211800132E00C2A419 /* Ensembles Mac.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 07BF7933177F04B30029D500;
-			remoteInfo = "Ensembles Mac";
 		};
 		9477ED291800132F00C2A419 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -358,10 +344,8 @@
 		9477ED221800132E00C2A419 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				9477ED281800132F00C2A419 /* libensembles.a */,
 				07168C0418E037FC00153494 /* Ensembles.framework */,
 				9477ED2A1800132F00C2A419 /* Tests Mac.xctest */,
-				07D9F0201911042300D191FA /* Ensembles.bundle */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -556,20 +540,6 @@
 			fileType = archive.ar;
 			path = libensembles.a;
 			remoteRef = 077F113E17F709ED0093A212 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		07D9F0201911042300D191FA /* Ensembles.bundle */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = Ensembles.bundle;
-			remoteRef = 07D9F01F1911042300D191FA /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		9477ED281800132F00C2A419 /* libensembles.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libensembles.a;
-			remoteRef = 9477ED271800132F00C2A419 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		9477ED2A1800132F00C2A419 /* Tests Mac.xctest */ = {
@@ -795,6 +765,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = Idiomatic/Idiomatic.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Ensembles-bqnnqguhepfxlkgqvdamggjewche/Build/Products/Debug-iphoneos",
@@ -808,6 +779,7 @@
 				INFOPLIST_FILE = "Idiomatic/Idiomatic-Info.plist";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = Idiomatic;
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -819,7 +791,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = Idiomatic/Idiomatic.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(USER_LIBRARY_DIR)/Developer/Xcode/DerivedData/Ensembles-bqnnqguhepfxlkgqvdamggjewche/Build/Products/Debug-iphoneos",
@@ -833,6 +806,7 @@
 				INFOPLIST_FILE = "Idiomatic/Idiomatic-Info.plist";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = Idiomatic;
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

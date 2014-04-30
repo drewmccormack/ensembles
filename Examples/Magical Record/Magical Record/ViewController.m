@@ -29,7 +29,7 @@
 {
     NSUInteger oldNumber = self.numberHolder.number.unsignedIntegerValue;
     NSUInteger newNumber = 0;
-    while (oldNumber == newNumber) newNumber = rand()%100;
+    do newNumber = rand()%100; while (oldNumber == newNumber);
     self.numberHolder.number = [NSNumber numberWithInteger:newNumber];
     self.numberLabel.text = self.numberHolder.number.stringValue;
     
