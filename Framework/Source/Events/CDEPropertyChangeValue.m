@@ -72,19 +72,13 @@
     self = [super init];
     if (self) {
         self.propertyName = [aDecoder decodeObjectForKey:@"propertyName"];
+        self.type = [aDecoder decodeIntegerForKey:@"type"];
+        self.filename = [aDecoder decodeObjectForKey:@"filename"];
         self.value = [aDecoder decodeObjectForKey:@"value"];
         self.relatedIdentifier = [aDecoder decodeObjectForKey:@"relatedIdentifier"];
         self.addedIdentifiers = [aDecoder decodeObjectForKey:@"addedIdentifiers"];
         self.removedIdentifiers = [aDecoder decodeObjectForKey:@"removedIdentifiers"];
         self.movedIdentifiersByIndex = [aDecoder decodeObjectForKey:@"movedIdentifiersByIndex"];
-        self.type = [aDecoder decodeIntegerForKey:@"type"];
-        
-        if ([aDecoder decodeIntegerForKey:@"classVersion"] > 0) {
-            self.filename = [aDecoder decodeObjectForKey:@"filename"];
-        }
-        else {
-            self.filename = nil;
-        }
     }
     return self;
 }
@@ -94,13 +88,14 @@
     static const NSInteger classVersion = 1;
     [aCoder encodeInteger:classVersion forKey:@"classVersion"];
     [aCoder encodeObject:self.propertyName forKey:@"propertyName"];
-    [aCoder encodeObject:self.value forKey:@"value"];
-    [aCoder encodeObject:self.filename forKey:@"filename"];
-    [aCoder encodeObject:self.relatedIdentifier forKey:@"relatedIdentifier"];
-    [aCoder encodeObject:self.addedIdentifiers forKey:@"addedIdentifiers"];
-    [aCoder encodeObject:self.removedIdentifiers forKey:@"removedIdentifiers"];
-    [aCoder encodeObject:self.movedIdentifiersByIndex forKey:@"movedIdentifiersByIndex"];
     [aCoder encodeInteger:self.type forKey:@"type"];
+
+    if (self.value) [aCoder encodeObject:self.value forKey:@"value"];
+    if (self.filename) [aCoder encodeObject:self.filename forKey:@"filename"];
+    if (self.relatedIdentifier) [aCoder encodeObject:self.relatedIdentifier forKey:@"relatedIdentifier"];
+    if (self.addedIdentifiers) [aCoder encodeObject:self.addedIdentifiers forKey:@"addedIdentifiers"];
+    if (self.removedIdentifiers) [aCoder encodeObject:self.removedIdentifiers forKey:@"removedIdentifiers"];
+    if (self.movedIdentifiersByIndex) [aCoder encodeObject:self.movedIdentifiersByIndex forKey:@"movedIdentifiersByIndex"];
 }
 
 

@@ -24,7 +24,7 @@
 - (BOOL)validatePropertyChangeValues:(id *)value error:(NSError * __autoreleasing *)error
 {
     if (self.type != CDEObjectChangeTypeDelete && *value == nil) {
-        *error = [NSError errorWithDomain:CDEErrorDomain code:-1 userInfo:nil];
+        if (error) *error = [NSError errorWithDomain:CDEErrorDomain code:-1 userInfo:nil];
         return NO;
     }
     return YES;

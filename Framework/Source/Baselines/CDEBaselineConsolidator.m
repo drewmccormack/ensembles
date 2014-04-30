@@ -244,7 +244,8 @@
     CDERevisionSet *newRevisionSet = [CDERevisionSet revisionSetByTakingStoreWiseMaximumOfRevisionSets:[baselines valueForKeyPath:@"revisionSet"]];
     NSString *persistentStoreId = self.eventStore.persistentStoreIdentifier;
     [firstBaseline setRevisionSet:newRevisionSet forPersistentStoreIdentifier:persistentStoreId];
-    
+    if (firstBaseline.eventRevision.revisionNumber == -1) firstBaseline.eventRevision.revisionNumber = 0;
+
     // Retrieve all global identifiers. Map global ids to object changes.
     [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:@[firstBaseline]];
     NSMapTable *objectChangesByGlobalId = [NSMapTable strongToStrongObjectsMapTable];

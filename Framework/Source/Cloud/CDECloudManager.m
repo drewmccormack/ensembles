@@ -296,7 +296,7 @@
         NSString *path = [self.localDownloadDirectory stringByAppendingPathComponent:file];
         BOOL success = [self.eventStore importDataFile:path];
         if (!success) {
-            *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFileAccessFailed userInfo:nil];
+            if (error) *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFileAccessFailed userInfo:nil];
             return NO;
         }
     }
@@ -415,7 +415,7 @@
     for (NSString *file in toTransfer) {
         BOOL success = [self.eventStore exportDataFile:file toDirectory:self.localUploadDirectory];
         if (!success) {
-            *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFileAccessFailed userInfo:nil];
+            if (error) *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFileAccessFailed userInfo:nil];
             return NO;
         }
     }

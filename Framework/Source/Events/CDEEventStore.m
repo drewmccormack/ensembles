@@ -352,12 +352,14 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 
 #pragma mark - Flushing out queued operations
 
-- (void)flush:(NSError * __autoreleasing *)error
+- (BOOL)flush:(NSError * __autoreleasing *)error
 {
+    __block BOOL success = YES;
     [self saveStoreMetadata];
     [self.managedObjectContext performBlockAndWait:^{
-        [managedObjectContext save:error];
+        success = [managedObjectContext save:error];
     }];
+    return success;
 }
 
 
