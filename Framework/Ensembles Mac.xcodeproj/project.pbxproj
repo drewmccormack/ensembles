@@ -255,9 +255,6 @@
 		07D2D631182D627E001D24BC /* NSManagedObjectModel+CDEAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSManagedObjectModel+CDEAdditions.m"; sourceTree = "<group>"; };
 		07D2D637182D65FB001D24BC /* CDEManagedObjectModelTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEManagedObjectModelTests.m; sourceTree = "<group>"; };
 		07D9F00E1911039D00D191FA /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
-		07D9F0121911039D00D191FA /* Ensembles Resources Mac-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Ensembles Resources Mac-Info.plist"; sourceTree = "<group>"; };
-		07D9F0141911039D00D191FA /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		07D9F0161911039D00D191FA /* Ensembles Resources Mac-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Ensembles Resources Mac-Prefix.pch"; sourceTree = "<group>"; };
 		07DCC6C6184FA4050097B4D9 /* CDEBaselineConsolidatorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEBaselineConsolidatorTests.m; sourceTree = "<group>"; };
 		07DDA7E317C8FE25009C6F94 /* CDEIntegratorUpdateTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEIntegratorUpdateTests.m; sourceTree = "<group>"; };
 		07DDA7E517C9ECF6009C6F94 /* CDERevisionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDERevisionManager.h; path = Source/Revisioning/CDERevisionManager.h; sourceTree = SOURCE_ROOT; };
@@ -536,24 +533,6 @@
 			path = Model;
 			sourceTree = "<group>";
 		};
-		07D9F0101911039D00D191FA /* Ensembles Resources Mac */ = {
-			isa = PBXGroup;
-			children = (
-				07D9F0111911039D00D191FA /* Supporting Files */,
-			);
-			path = "Ensembles Resources Mac";
-			sourceTree = "<group>";
-		};
-		07D9F0111911039D00D191FA /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				07D9F0121911039D00D191FA /* Ensembles Resources Mac-Info.plist */,
-				07D9F0131911039D00D191FA /* InfoPlist.strings */,
-				07D9F0161911039D00D191FA /* Ensembles Resources Mac-Prefix.pch */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
 		07E2042217C8F2EB00ED9AB3 /* Integrator Test Fixtures */ = {
 			isa = PBXGroup;
 			children = (
@@ -572,7 +551,6 @@
 				0777BF0F17183FD500F1D0D2 /* Source */,
 				6DAD110118CA067A00237084 /* Supporting Files */,
 				07592CA8177F2D1000816034 /* Tests */,
-				07D9F0101911039D00D191FA /* Ensembles Resources Mac */,
 				07E492E817172CB200FE81B5 /* Frameworks */,
 				07E492E717172CB200FE81B5 /* Products */,
 			);
@@ -864,14 +842,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				07592CAC177F2D1000816034 /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		07D9F0131911039D00D191FA /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				07D9F0141911039D00D191FA /* en */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
