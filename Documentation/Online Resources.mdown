@@ -18,6 +18,11 @@
 * [MealPlan Sync with Ensembles](http://blog.stevex.net/2014/03/mealplan-sync-with-ensembles/) by Steve Tibbett
 
 ### Articles Related to Sync
+* [Syncing Data Edition of objc.io (10): Data Synchronization](http://www.objc.io/issue-10/data-synchronization.html) by Drew McCormack
+* [Syncing Data Edition of objc.io (10): iCloud and Core Data](http://www.objc.io/issue-10/icloud-core-data.html) by Matthew Bischoff &amp; Brian Capps
+* [Syncing Data Edition of objc.io (10): Mastering the iCloud Document Store](http://www.objc.io/issue-10/icloud-document-store.html) by  Friedrich Gräter &amp; Max Seelemann
+* [Syncing Data Edition of objc.io (10): A Sync Case Study](http://www.objc.io/issue-10/sync-case-study.html) by Florian Kugler
+* [Syncing Data Edition of objc.io (10): A Networked Core Data Application](http://www.objc.io/issue-10/networked-core-data-application.html) by Chris Eidhof
 * [A Comparison of Syncing Technologies](http://grasmeyer.com/blog/2013/10/8/a-comparison-of-syncing-technologies) by Joel Grasmeyer
 * [Introducing ZumeroIncrementalStore](http://grasmeyer.com/blog/2013/10/8/introducing-zumeroincrementalstore) by Joel Grasmeyer
 * [Clear in the Cloud](http://blog.helftone.com/clear-in-the-icloud/) by Milen Dzhumerov
