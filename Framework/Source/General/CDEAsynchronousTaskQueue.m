@@ -62,7 +62,9 @@
 - (void)start
 {
     if (![NSThread isMainThread]) {
-        [self performSelectorOnMainThread:@selector(start) withObject:nil waitUntilDone:NO];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self start];
+        });
         return;
     }
     
@@ -78,7 +80,9 @@
     self.numberOfTasksCompleted = 0;
 
     taskEnumerator = [tasks objectEnumerator];
-    [self performSelector:@selector(startNextTask) withObject:nil afterDelay:0.0];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self startNextTask];
+    });
 }
 
 - (NSError *)combineErrors
@@ -96,13 +100,17 @@
 - (void)startNextTask
 {
     if (![NSThread isMainThread]) {
-        [self performSelectorOnMainThread:@selector(startNextTask) withObject:nil waitUntilDone:NO];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self startNextTask];
+        });
         return;
     }
     
     @autoreleasepool {
         if (self.isCancelled) {
-            [self performSelector:@selector(finish) withObject:nil afterDelay:0.0];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self finish];
+            });
             return;
         }
         
@@ -119,15 +127,22 @@
                 [errors addObject:(error ? : [NSNull null])];
                 if (stop) shouldStop = YES;
                 if (shouldStop) {
-                    [self performSelector:@selector(finish) withObject:nil afterDelay:0.0];
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self finish];
+                    });
                 }
-                else
-                    [self performSelector:@selector(startNextTask) withObject:nil afterDelay:0.0];
+                else {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self startNextTask];
+                    });
+                }
             } copy];
             block(next);
         }
         else {
-            [self performSelector:@selector(finish) withObject:nil afterDelay:0.0];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self finish];
+            });
         }
     }
 }
@@ -135,7 +150,9 @@
 - (void)finish
 {
     if (![NSThread isMainThread]) {
-        [self performSelectorOnMainThread:@selector(finish) withObject:nil waitUntilDone:NO];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self finish];
+        });
         return;
     }
     
