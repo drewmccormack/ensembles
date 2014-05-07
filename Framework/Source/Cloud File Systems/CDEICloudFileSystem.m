@@ -26,7 +26,14 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
     NSOperationQueue *downloadTrackingQueue;
 }
 
+@synthesize relativePathToRootInContainer = relativePathToRootInContainer;
+
 - (instancetype)initWithUbiquityContainerIdentifier:(NSString *)newIdentifier
+{
+    return [self initWithUbiquityContainerIdentifier:newIdentifier relativePathToRootInContainer:nil];
+}
+
+- (instancetype)initWithUbiquityContainerIdentifier:(NSString *)newIdentifier relativePathToRootInContainer:(NSString *)rootSubPath
 {
     self = [super init];
     if (self) {
@@ -42,6 +49,7 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
         initiatingDownloadsQueue = dispatch_queue_create("com.mentalfaculty.ensembles.queue.initiatedownloads", DISPATCH_QUEUE_SERIAL);
         
         rootDirectoryURL = nil;
+        relativePathToRootInContainer = [rootSubPath copy] ? : @"com.mentalfaculty.ensembles.clouddata";
         metadataQuery = nil;
         ubiquityContainerIdentifier = [newIdentifier copy];
         ubiquityIdentityObserver = nil;
@@ -98,7 +106,7 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
 {
     [operationQueue addOperationWithBlock:^{
         NSURL *newURL = [fileManager URLForUbiquityContainerIdentifier:ubiquityContainerIdentifier];
-        newURL = [newURL URLByAppendingPathComponent:@"com.mentalfaculty.ensembles.clouddata"];
+        newURL = [newURL URLByAppendingPathComponent:relativePathToRootInContainer];
         rootDirectoryURL = newURL;
         if (!rootDirectoryURL) {
             NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeServerError userInfo:@{NSLocalizedDescriptionKey : @"Could not retrieve URLForUbiquityContainerIdentifier. Check container id for iCloud."}];

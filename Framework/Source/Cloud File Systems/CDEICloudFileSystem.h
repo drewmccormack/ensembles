@@ -13,6 +13,9 @@ extern NSString * const CDEICloudFileSystemDidDownloadFilesNotification;
 
 @interface CDEICloudFileSystem : NSObject <CDECloudFileSystem>
 
+@property (nonatomic, readonly) NSString *relativePathToRootInContainer;
+
 - (instancetype)initWithUbiquityContainerIdentifier:(NSString *)newIdentifier;
+- (instancetype)initWithUbiquityContainerIdentifier:(NSString *)newIdentifier relativePathToRootInContainer:(NSString *)rootSubPath;
 
 @end
