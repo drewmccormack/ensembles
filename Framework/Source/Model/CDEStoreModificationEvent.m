@@ -155,8 +155,12 @@
     
     NSError *error;
     NSArray *events = [context executeFetchRequest:fetch error:&error];
-    NSAssert(events, @"Could not fetch store mod events: %@", error);
-    NSAssert(events.count < 2, @"CDEStoreModificationEvent is not unique in fetchStoreModification...");
+
+    if (nil == events) CDELog(CDELoggingLevelError, @"Could not fetch store mod events: %@", error);
+    if (events.count > 1) {
+        CDELog(CDELoggingLevelError, @"Multiple events with same revision from same device found: %@", events);
+        events = nil;
+    }
     
     return events.lastObject;
 }
@@ -168,8 +172,12 @@
     
     NSError *error;
     NSArray *events = [context executeFetchRequest:fetch error:&error];
-    NSAssert(events, @"Could not fetch store mod events: %@", error);
-    NSAssert(events.count < 2, @"CDEStoreModificationEvent is not unique in fetchStoreModification...");
+
+    if (nil == events) CDELog(CDELoggingLevelError, @"Could not fetch store mod events: %@", error);
+    if (events.count > 1) {
+        CDELog(CDELoggingLevelError, @"Multiple events with same revision from same device found: %@", events);
+        events = nil;
+    }
     
     return events.lastObject;
 }
@@ -185,8 +193,12 @@
     
     NSError *error;
     NSArray *events = [context executeFetchRequest:fetch error:&error];
-    NSAssert(events, @"Could not fetch store mod events: %@", error);
-    NSAssert(events.count < 2, @"Multiple events with same revision");
+    
+    if (nil == events) CDELog(CDELoggingLevelError, @"Could not fetch store mod events: %@", error);
+    if (events.count > 1) {
+        CDELog(CDELoggingLevelError, @"Multiple events with same revision from same device found: %@", events);
+        events = nil;
+    }
     
     return events.lastObject;
 }
@@ -204,7 +216,8 @@
 
     NSError *error;
     NSArray *events = [context executeFetchRequest:fetch error:&error];
-    
+    if (nil == events) CDELog(CDELoggingLevelError, @"Could not fetch store mod events: %@", error);
+
     return events;
 }
 
