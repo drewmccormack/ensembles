@@ -272,14 +272,14 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  You should not attempt to merge unless the ensemble is leeched, or attempt to leech an ensemble that is already
  leeched. Either will lead to an error.
  */
-@property (nonatomic, assign, readonly, getter = isLeeched) BOOL leeched;
+@property (atomic, assign, readonly, getter = isLeeched) BOOL leeched;
 
 /**
  Whether the ensemble is currently in the process of merging changes from other devices.
  
  Attempting to merge while another merge is in progress will lead to an error.
  */
-@property (nonatomic, assign, readonly, getter = isMerging) BOOL merging;
+@property (atomic, assign, readonly, getter = isMerging) BOOL merging;
 
 
 ///
