@@ -253,7 +253,7 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
 
 - (void)initiateDownloads
 {
-    // Suspend to acumulate file downloads before checking whether they are complete.
+    // Suspend to accumulate file downloads before checking whether they are complete.
     // This prevents excessive notifications
     [downloadTrackingQueue setSuspended:YES];
     
@@ -282,9 +282,12 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
                             }
                             
                             // If there were downloads, and aren't anymore, fire notification
+                            // Use a delay to coalesce, because there often seems to be many small
+                            // metadata updates in a row
                             if (complete) {
                                 dispatch_async(dispatch_get_main_queue(), ^{
-                                    [[NSNotificationCenter defaultCenter] postNotificationName:CDEICloudFileSystemDidDownloadFilesNotification object:self];
+                                    [self.class cancelPreviousPerformRequestsWithTarget:self selector:@selector(postDidDownloadNotification) object:nil];
+                                    [self performSelector:@selector(postDidDownloadNotification) withObject:nil afterDelay:2.0];
                                 });
                             }
                         }];
@@ -297,6 +300,11 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
     }
     
     [downloadTrackingQueue setSuspended:NO];
+}
+
+- (void)postDidDownloadNotification
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:CDEICloudFileSystemDidDownloadFilesNotification object:self];
 }
 
 #pragma mark - File Operations
