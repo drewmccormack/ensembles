@@ -266,14 +266,18 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
     NSAssert(self.cloudFileSystem, @"No cloud file system set");
     NSAssert([NSThread isMainThread], @"leech method called off main thread");
     
-    if (self.isLeeched) {
-        NSError *error = [[NSError alloc] initWithDomain:CDEErrorDomain code:CDEErrorCodeDisallowedStateChange userInfo:nil];
-        [self dispatchCompletion:completion withError:error];
-        return;
-    }
-
     NSMutableArray *tasks = [NSMutableArray array];
-    
+
+    CDEAsynchronousTaskBlock setupTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        if (self.isLeeched) {
+            NSError *error = [[NSError alloc] initWithDomain:CDEErrorDomain code:CDEErrorCodeDisallowedStateChange userInfo:nil];
+            next(error, NO);
+            return;
+        }
+        next(nil, NO);
+    };
+    [tasks addObject:setupTask];
+
     CDEAsynchronousTaskBlock connectTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self.cloudFileSystem connect:^(NSError *error) {
             next(error, NO);
@@ -361,7 +365,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
         if (saveOccurredDuringImport) {
             NSError *error = nil;
             error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeSaveOccurredDuringLeeching userInfo:nil];
-            [self performSelector:@selector(forceDeleechDueToError:) withObject:error afterDelay:0.0];
+            [self forceDeleechDueToError:error];
             next(error, NO);
             return;
         }
@@ -467,7 +471,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
     BOOL identityValid = [self.cloudFileSystem.identityToken isEqual:self.eventStore.cloudFileSystemIdentityToken];
     if (self.leeched && !identityValid) {
         NSError *deleechError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeCloudIdentityChanged userInfo:nil];
-        [self performSelector:@selector(forceDeleechDueToError:) withObject:deleechError afterDelay:0.0];
+        [self forceDeleechDueToError:deleechError];
         if (completion) completion(deleechError);
     }
     else {
@@ -486,7 +490,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
     [self.cloudManager retrieveRegistrationInfoForStoreWithIdentifier:storeId completion:^(NSDictionary *info, NSError *error) {
         if (!error && !info) {
             NSError *unregisteredError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeStoreUnregistered userInfo:nil];
-            [self performSelector:@selector(forceDeleechDueToError:) withObject:unregisteredError afterDelay:0.0];
+            [self forceDeleechDueToError:unregisteredError];
             if (completion) completion(unregisteredError);
         }
         else {
@@ -510,30 +514,29 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
 {
     NSAssert([NSThread isMainThread], @"Merge method called off main thread");
     
-    if (!self.leeched) {
-        NSError *error = [[NSError alloc] initWithDomain:CDEErrorDomain code:CDEErrorCodeDisallowedStateChange userInfo:@{NSLocalizedDescriptionKey : @"Attempt to merge a store that is not leeched."}];
-        [self dispatchCompletion:completion withError:error];
-        return;
-    }
-    
-    if (self.merging) {
-        NSError *error = [[NSError alloc] initWithDomain:CDEErrorDomain code:CDEErrorCodeDisallowedStateChange userInfo:@{NSLocalizedDescriptionKey : @"Attempt to merge when merge is already underway."}];
-        [self dispatchCompletion:completion withError:error];
-        return;
-    }
-    
-    NSFileManager *fileManager = [[NSFileManager alloc] init];
-    if (![fileManager fileExistsAtPath:storeURL.path]) {
-        NSError *error = nil;
-        error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeMissingStore userInfo:nil];
-        [self dispatchCompletion:completion withError:error];
-        return;
-    }
-    
-    self.merging = YES;
-    [self.eventIntegrator startMonitoringSaves]; // Will cancel merge if save occurs
-
     NSMutableArray *tasks = [NSMutableArray array];
+    
+    CDEAsynchronousTaskBlock setupTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        if (!self.leeched) {
+            NSError *error = [[NSError alloc] initWithDomain:CDEErrorDomain code:CDEErrorCodeDisallowedStateChange userInfo:@{NSLocalizedDescriptionKey : @"Attempt to merge a store that is not leeched."}];
+            next(error, NO);
+            return;
+        }
+        
+        NSFileManager *fileManager = [[NSFileManager alloc] init];
+        if (![fileManager fileExistsAtPath:storeURL.path]) {
+            NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeMissingStore userInfo:nil];
+            next(error, NO);
+            return;
+        }
+        
+        self.merging = YES;
+        
+        [self.eventIntegrator startMonitoringSaves]; // Will cancel merge if save occurs
+        
+        next(nil, NO);
+    };
+    [tasks addObject:setupTask];
     
     CDEAsynchronousTaskBlock checkIdentityTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self checkCloudFileSystemIdentityWithCompletion:^(NSError *error) {
