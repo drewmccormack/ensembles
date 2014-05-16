@@ -6,6 +6,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <Ensembles/Ensembles.h>
 
 @class CDENodeCloudFileSystem;
 
