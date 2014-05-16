@@ -216,14 +216,29 @@
 {
     NSMutableArray *entityHashDictionaries = [[NSMutableArray alloc] initWithCapacity:10];
     NSFileManager *fileManager = [[NSFileManager alloc] init];
-    NSDirectoryEnumerator *dirEnum = [fileManager enumeratorAtURL:url includingPropertiesForKeys:nil options:(NSDirectoryEnumerationSkipsSubdirectoryDescendants | NSDirectoryEnumerationSkipsHiddenFiles) errorHandler:NULL];
-    for (NSURL *fileURL in dirEnum) {
-        if ([[fileURL pathExtension] isEqualToString:@"mom"]) {
-            NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:fileURL];
-            NSDictionary *entityHashesByName = model.entityVersionHashesByName;
-            if (entityHashesByName) [entityHashDictionaries addObject:entityHashesByName];
+    
+    BOOL isDir;
+    if (![fileManager fileExistsAtPath:url.path isDirectory:&isDir]) {
+        @throw [NSException exceptionWithName:CDEException reason:@"Could not find model file" userInfo:nil];
+    }
+    else if (!isDir) {
+        // A single file is an unversioned model
+        NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:url];
+        NSDictionary *entityHashesByName = model.entityVersionHashesByName;
+        if (entityHashesByName) [entityHashDictionaries addObject:entityHashesByName];
+    }
+    else {
+        // Treat a directory as a versioned model
+        NSDirectoryEnumerator *dirEnum = [fileManager enumeratorAtURL:url includingPropertiesForKeys:nil options:(NSDirectoryEnumerationSkipsSubdirectoryDescendants | NSDirectoryEnumerationSkipsHiddenFiles) errorHandler:NULL];
+        for (NSURL *fileURL in dirEnum) {
+            if ([fileURL.pathExtension isEqualToString:@"mom"]) {
+                NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:fileURL];
+                NSDictionary *entityHashesByName = model.entityVersionHashesByName;
+                if (entityHashesByName) [entityHashDictionaries addObject:entityHashesByName];
+            }
         }
     }
+    
     return entityHashDictionaries;
 }
 
