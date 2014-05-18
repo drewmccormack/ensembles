@@ -147,7 +147,7 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
 
 - (void)dispatchCompletion:(CDECompletionBlock)completion withError:(NSError *)error
 {
-    dispatch_sync(dispatch_get_main_queue(), ^{
+    dispatch_async(dispatch_get_main_queue(), ^{
         if (completion) completion(error);
     });
 }
