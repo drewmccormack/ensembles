@@ -3,7 +3,7 @@
 ### Presentations
 * [Everything — but the kitchen — syncs](http://www.iosdevuk.com/talks/) Drew McCormack at iOSDevUK 2013
 * [Everything — but the kitchen — syncs (Video)](http://gotocon.com/video) Drew McCormack at GOTO Aarhus 2013
-* [Core Data Sync with Ensembles](http://nsconference.com) Drew McCormack at NSConference 2014
+* [Core Data Sync with Ensembles](http://vimeo.com/95398295) Drew McCormack at NSConference 2014
 
 ### Podcasts
 * [NSBrief #110](http://nsbrief.com/110-drew-mccormack/) featuring Drew McCormack
