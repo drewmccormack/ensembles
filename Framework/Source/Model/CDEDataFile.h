@@ -19,4 +19,6 @@
 + (NSSet *)allFilenamesInManagedObjectContext:(NSManagedObjectContext *)context;
 + (NSSet *)filenamesInStoreModificationEvents:(NSArray *)events;
 
++ (NSSet *)unreferencedFilenamesInManagedObjectContext:(NSManagedObjectContext *)context;
+
 @end

@@ -28,7 +28,7 @@ static NSString *testStoreFile;
     _lastMergeRevisionSaved = -1;
     _identifierOfBaselineUsedToConstructStore = @"store1baseline";
     _currentBaselineIdentifier = @"store1";
-    _dataFilenames = [NSSet set];
+    _allDataFilenames = [NSSet set];
     _lock = [[NSRecursiveLock alloc] init];
     return self;
 }

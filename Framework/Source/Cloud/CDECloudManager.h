@@ -33,6 +33,7 @@
 - (void)exportDataFilesWithCompletion:(CDECompletionBlock)completion;
 
 - (void)removeOutdatedRemoteFilesWithCompletion:(CDECompletionBlock)completion;
+- (BOOL)removeOutOfDateNewlyImportedFiles:(NSError * __autoreleasing *)error;
 
 - (void)retrieveRegistrationInfoForStoreWithIdentifier:(NSString *)identifier completion:(void(^)(NSDictionary *info, NSError *error))completion;
 - (void)setRegistrationInfo:(NSDictionary *)info forStoreWithIdentifier:(NSString *)identifier completion:(CDECompletionBlock)completion;

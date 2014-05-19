@@ -29,6 +29,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 @property (nonatomic, copy, readwrite) NSString *pathToEventStoreRootDirectory;
 @property (nonatomic, strong, readonly) NSString *pathToEventStore;
 @property (nonatomic, strong, readonly) NSString *pathToDataFileDirectory;
+@property (nonatomic, strong, readonly) NSString *pathToNewlyImportedDataFileDirectory;
 @property (nonatomic, strong, readonly) NSString *pathToStoreInfoFile;
 @property (nonatomic, copy, readwrite) NSString *persistentStoreIdentifier;
 
@@ -284,25 +285,38 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 
 #pragma mark - Data Files
 
-- (NSSet *)dataFilenames
+- (NSSet *)allDataFilenames
+{
+    return [[self previouslyReferencedDataFilenames] setByAddingObjectsFromSet:[self newlyImportedDataFilenames]];
+}
+
+- (NSSet *)previouslyReferencedDataFilenames
 {
     NSError *error;
-    NSArray *filenames = [fileManager contentsOfDirectoryAtPath:self.pathToDataFileDirectory error:&error];
-    if (!filenames) CDELog(CDELoggingLevelError, @"Could not get data filenames: %@", error);
-    return [NSSet setWithArray:filenames];
+    NSArray *newFilenames = [fileManager contentsOfDirectoryAtPath:self.pathToDataFileDirectory error:&error];
+    if (!newFilenames) CDELog(CDELoggingLevelError, @"Could not get data filenames: %@", error);
+    return [NSSet setWithArray:newFilenames];
+}
+
+- (NSSet *)newlyImportedDataFilenames
+{
+    NSError *error;
+    NSArray *newFilenames = [fileManager contentsOfDirectoryAtPath:self.pathToNewlyImportedDataFileDirectory error:&error];
+    if (!newFilenames) CDELog(CDELoggingLevelError, @"Could not get data filenames: %@", error);
+    return [NSSet setWithArray:newFilenames];
 }
 
 - (BOOL)importDataFile:(NSString *)fromPath
 {
     NSError *error;
     NSString *filename = [fromPath lastPathComponent];
-    NSString *toPath = [self.pathToDataFileDirectory stringByAppendingPathComponent:filename];
+    NSString *toPath = [self.pathToNewlyImportedDataFileDirectory stringByAppendingPathComponent:filename];
     BOOL success = [fileManager moveItemAtPath:fromPath toPath:toPath error:&error];
     if (!success) CDELog(CDELoggingLevelError, @"Could not move file to event store data directory: %@", error);
     return success;
 }
 
-- (NSString *)importData:(NSData *)data
+- (NSString *)storeDataInFile:(NSData *)data
 {
     NSString *filename = [[NSProcessInfo processInfo] globallyUniqueString];
     NSString *toPath = [self.pathToDataFileDirectory stringByAppendingPathComponent:filename];
@@ -324,18 +338,34 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 - (NSData *)dataForFile:(NSString *)filename
 {
     NSError *error = nil;
-    NSString *path = [self.pathToDataFileDirectory stringByAppendingPathComponent:filename];
-    NSData *data = [NSData dataWithContentsOfFile:path options:(NSDataReadingMappedIfSafe | NSDataReadingUncached) error:&error];
+    NSString *filePath = [self.pathToDataFileDirectory stringByAppendingPathComponent:filename];
+    NSString *newFilePath = [self.pathToNewlyImportedDataFileDirectory stringByAppendingPathComponent:filename];
+    
+    // If file is newly imported, move it across to the standard data files first.
+    if (![fileManager fileExistsAtPath:filePath] && [fileManager fileExistsAtPath:newFilePath]) {
+        BOOL success = [fileManager moveItemAtPath:newFilePath toPath:filePath error:&error];
+        if (!success) CDELog(CDELoggingLevelError, @"Could not move file: %@", error);
+    }
+    
+    NSData *data = [NSData dataWithContentsOfFile:filePath options:(NSDataReadingMappedIfSafe | NSDataReadingUncached) error:&error];
     if (!data) CDELog(CDELoggingLevelError, @"Failed to get file data for file %@: %@", filename, error);
+    
     return data;
 }
 
-- (BOOL)removeDataFile:(NSString *)filename
+- (BOOL)removePreviouslyReferencedDataFile:(NSString *)filename
 {
     NSString *path = [self.pathToDataFileDirectory stringByAppendingPathComponent:filename];
     NSError *error;
     BOOL success = [fileManager removeItemAtPath:path error:&error];
-    if (!success) CDELog(CDELoggingLevelError, @"Could not remove file: %@", error);
+    return success;
+}
+
+- (BOOL)removeNewlyImportedDataFile:(NSString *)filename
+{
+    NSString *path = [self.pathToNewlyImportedDataFileDirectory stringByAppendingPathComponent:filename];
+    NSError *error;
+    BOOL success = [fileManager removeItemAtPath:path error:&error];
     return success;
 }
 
@@ -343,9 +373,9 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 {
     [self.managedObjectContext performBlockAndWait:^{
         NSSet *contextFilenames = [CDEDataFile allFilenamesInManagedObjectContext:self.managedObjectContext];
-        NSMutableSet *filenames = [self.dataFilenames mutableCopy];
+        NSMutableSet *filenames = [self.previouslyReferencedDataFilenames mutableCopy];
         [filenames minusSet:contextFilenames];
-        for (NSString *filename in filenames) [self removeDataFile:filename];
+        for (NSString *filename in filenames) [self removePreviouslyReferencedDataFile:filename];
     }];
 }
 
@@ -434,6 +464,11 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
     return [self.pathToEventStoreRootDirectory stringByAppendingPathComponent:@"data"];
 }
 
+- (NSString *)pathToNewlyImportedDataFileDirectory
+{
+    return [self.pathToEventStoreRootDirectory stringByAppendingPathComponent:@"newdata"];
+}
+
 - (BOOL)createDirectoryIfNecessary:(NSString *)path error:(NSError * __autoreleasing *)error
 {
     BOOL success = YES;
@@ -449,7 +484,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 
 - (BOOL)createEventStoreDirectoriesIfNecessary:(NSError * __autoreleasing *)error
 {
-    NSArray *paths = @[self.pathToEventStoreRootDirectory, self.pathToDataFileDirectory];
+    NSArray *paths = @[self.pathToEventStoreRootDirectory, self.pathToDataFileDirectory, self.pathToNewlyImportedDataFileDirectory];
     for (NSString *path in paths) {
         if (![self createDirectoryIfNecessary:path error:error]) return NO;
     }

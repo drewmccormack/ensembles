@@ -170,9 +170,14 @@ static NSString *rootTestDirectory;
     [@"Hi there" writeToFile:file atomically:NO encoding:NSUTF8StringEncoding error:NULL];
     XCTAssertTrue([store importDataFile:file], @"Import failed");
     
-    NSString *storePath = [store.pathToEventDataRootDirectory stringByAppendingPathComponent:@"test/data/fileToImport"];
+    NSString *storePath = [store.pathToEventDataRootDirectory stringByAppendingPathComponent:@"test/newdata/fileToImport"];
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:storePath], @"No file found in data dir");
     XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:file], @"Original file should be gone");
+    
+    [store dataForFile:@"file"]; // Should cause it not to be new any more, ie, move directories
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:storePath], @"Newly created file should be gone");
+    storePath = [store.pathToEventDataRootDirectory stringByAppendingPathComponent:@"test/data/fileToImport"];
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:storePath], @"Prereferenced file should be there");
 }
 
 - (void)testExportingDataFile
@@ -199,7 +204,7 @@ static NSString *rootTestDirectory;
     [@"Hi there" writeToFile:storePath atomically:NO encoding:NSUTF8StringEncoding error:NULL];
     
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:storePath], @"No file found in data dir");
-    [store removeDataFile:@"fileToRemove"];
+    [store removePreviouslyReferencedDataFile:@"fileToRemove"];
     XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:storePath], @"File is not gone");
 }
 
@@ -209,10 +214,10 @@ static NSString *rootTestDirectory;
 
     NSString *storePath = [store.pathToEventDataRootDirectory stringByAppendingPathComponent:@"test/data/file1"];
     [@"Hi there" writeToFile:storePath atomically:NO encoding:NSUTF8StringEncoding error:NULL];
-    storePath = [store.pathToEventDataRootDirectory stringByAppendingPathComponent:@"test/data/file2"];
+    storePath = [store.pathToEventDataRootDirectory stringByAppendingPathComponent:@"test/newdata/file2"];
     [@"Hi there" writeToFile:storePath atomically:NO encoding:NSUTF8StringEncoding error:NULL];
     
-    NSSet *files = store.dataFilenames;
+    NSSet *files = store.allDataFilenames;
     XCTAssertEqual(files.count, (NSUInteger)2, @"Wrong file count");
     XCTAssertTrue([files.anyObject hasPrefix:@"file"], @"Wrong file name prefix");
 }
@@ -241,11 +246,15 @@ static NSString *rootTestDirectory;
     NSString *storePath3 = [store.pathToEventDataRootDirectory stringByAppendingPathComponent:@"test/data/345"];
     [@"Hi" writeToFile:storePath3 atomically:NO encoding:NSUTF8StringEncoding error:NULL];
     
+    NSString *storePath4 = [store.pathToEventDataRootDirectory stringByAppendingPathComponent:@"test/newdata/789"];
+    [@"Hi" writeToFile:storePath4 atomically:NO encoding:NSUTF8StringEncoding error:NULL];
+    
     [store removeUnreferencedDataFiles];
     
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:storePath1], @"Should have file 123");
     XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:storePath2], @"Should not have file 234");
     XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:storePath3], @"Should not have file 345, because it is not attached to a CDEObjectChange");
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:storePath4], @"Should have file 789, because is newly imported");
 }
 
 @end

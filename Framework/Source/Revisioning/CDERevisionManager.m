@@ -326,7 +326,7 @@
     __block BOOL result = YES;
     [eventManagedObjectContext performBlockAndWait:^{
         NSSet *filenamesInEvents = [CDEDataFile filenamesInStoreModificationEvents:events];
-        NSSet *filenames = self.eventStore.dataFilenames;
+        NSSet *filenames = self.eventStore.allDataFilenames;
         result = [filenamesInEvents isSubsetOfSet:filenames];
     }];
     return result;

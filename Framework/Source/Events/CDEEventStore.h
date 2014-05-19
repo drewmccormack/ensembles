@@ -29,7 +29,9 @@
 @property (nonatomic, assign, readonly) CDERevisionNumber lastRevisionSaved;
 @property (nonatomic, assign, readonly) CDERevisionNumber baselineRevision;
 
-@property (nonatomic, strong, readonly) NSSet *dataFilenames;
+@property (nonatomic, strong, readonly) NSSet *allDataFilenames;
+@property (nonatomic, strong, readonly) NSSet *newlyImportedDataFilenames;
+@property (nonatomic, strong, readonly) NSSet *previouslyReferencedDataFilenames;
 
 @property (nonatomic, copy, readwrite) NSString *identifierOfBaselineUsedToConstructStore;
 @property (nonatomic, copy, readonly) NSString *currentBaselineIdentifier;
@@ -50,10 +52,12 @@
 - (void)removeUnusedDataWithCompletion:(CDECompletionBlock)completion;
 
 - (BOOL)importDataFile:(NSString *)path;
-- (NSString *)importData:(NSData *)data; // Returns filename
+- (NSString *)storeDataInFile:(NSData *)data; // Returns filename
 - (BOOL)exportDataFile:(NSString *)filename toDirectory:(NSString *)dirPath;
 - (NSData *)dataForFile:(NSString *)filename;
-- (BOOL)removeDataFile:(NSString *)filename;
+
+- (BOOL)removePreviouslyReferencedDataFile:(NSString *)filename;
+- (BOOL)removeNewlyImportedDataFile:(NSString *)filename;
 - (void)removeUnreferencedDataFiles;
 
 @end

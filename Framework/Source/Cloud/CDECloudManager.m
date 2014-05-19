@@ -227,7 +227,7 @@
 {
     NSAssert(snapshotDataFilenames, @"No snapshot files");
     NSMutableSet *toRetrieve = [self.snapshotDataFilenames mutableCopy];
-    NSSet *storeFilenames = self.eventStore.dataFilenames;
+    NSSet *storeFilenames = self.eventStore.allDataFilenames;
     [toRetrieve minusSet:storeFilenames];
     [self transferRemoteFiles:toRetrieve.allObjects fromRemoteDirectory:self.remoteDataDirectory withCompletion:completion];
 }
@@ -409,7 +409,7 @@
     BOOL success = [self removeFilesInDirectory:self.localUploadDirectory error:error];
     if (!success) return NO;
     
-    NSMutableSet *toTransfer = [self.eventStore.dataFilenames mutableCopy];
+    NSMutableSet *toTransfer = [self.eventStore.previouslyReferencedDataFilenames mutableCopy];
     [toTransfer minusSet:snapshotDataFilenames];
     
     for (NSString *file in toTransfer) {
@@ -545,6 +545,22 @@
 
 #pragma mark Removing Outdated Files
 
+- (BOOL)removeOutOfDateNewlyImportedFiles:(NSError * __autoreleasing *)error
+{
+    // Remove files that are found locally but no longer found remotely.
+    NSMutableSet *filesToRemove = [self.eventStore.newlyImportedDataFilenames mutableCopy];
+    [filesToRemove minusSet:snapshotDataFilenames];
+    for (NSString *file in filesToRemove) {
+        BOOL success = [self.eventStore removeNewlyImportedDataFile:file];
+        if (!success) {
+            NSDictionary *info = @{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Could not remove data file: %@", file]};
+            if (error) *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFileAccessFailed userInfo:info];
+            return NO;
+        }
+    }
+    return YES;
+}
+
 // Requires a snapshot already exist
 - (void)removeOutdatedRemoteFilesWithCompletion:(CDECompletionBlock)completion
 {
@@ -583,7 +599,7 @@
     CDELog(CDELoggingLevelVerbose, @"Event files to remove: %@", nonBaselinesToRemove);
     
     // Determine data files to remove
-    NSSet *dataFilesForEventStore = self.eventStore.dataFilenames;
+    NSSet *dataFilesForEventStore = self.eventStore.allDataFilenames;
     NSMutableSet *dataFilesToRemove = [snapshotDataFilenames mutableCopy];
     [dataFilesToRemove minusSet:dataFilesForEventStore];
     CDELog(CDELoggingLevelVerbose, @"Data files in cloud: %@", snapshotDataFilenames);

@@ -573,6 +573,13 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
     };
     [tasks addObject:snapshotRemoteFilesTask];
     
+    CDEAsynchronousTaskBlock removeOutOfDateNewlyImportedFiles = ^(CDEAsynchronousTaskCallbackBlock next) {
+        NSError *error = nil;
+        BOOL success = [self.cloudManager removeOutOfDateNewlyImportedFiles:&error];
+        next((success ? nil : error), NO);
+    };
+    [tasks addObject:removeOutOfDateNewlyImportedFiles];
+    
     CDEAsynchronousTaskBlock importDataFilesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self.cloudManager importNewDataFilesWithCompletion:^(NSError *error) {
             next(error, NO);

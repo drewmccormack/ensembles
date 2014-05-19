@@ -45,4 +45,17 @@
     return filenames;
 }
 
++ (NSSet *)unreferencedFilenamesInManagedObjectContext:(NSManagedObjectContext *)context
+{
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEDataFile"];
+    fetch.predicate = [NSPredicate predicateWithFormat:@"objectChange = NIL"];
+    
+    NSError *error;
+    NSArray *results = [context executeFetchRequest:fetch error:&error];
+    if (!results) CDELog(CDELoggingLevelError, @"Could not fetch data files: %@", error);
+    
+    NSSet *filenames = [NSSet setWithArray:[results valueForKeyPath:@"filename"]];
+    return filenames;
+}
+
 @end

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="2" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="3401" systemVersion="13B42" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
+<model userDefinedModelVersionIdentifier="2" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="5064" systemVersion="13C1021" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="CDEDataFile" representedClassName="CDEDataFile" syncable="YES">
         <attribute name="filename" attributeType="String" syncable="YES"/>
         <relationship name="objectChange" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDEObjectChange" inverseName="dataFiles" inverseEntity="CDEObjectChange" syncable="YES"/>
