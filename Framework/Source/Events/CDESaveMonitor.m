@@ -163,19 +163,24 @@
     CDELog(CDELoggingLevelVerbose, @"Storing changes post-save");
     
     // Store changes
-    [self storeChangesForContext:context changedObjectsDictionary:notif.userInfo];
+    [self asynchronouslyStoreChangesForContext:context changedObjectsDictionary:notif.userInfo];
     
     // Notification
     NSDictionary *userInfo = self.ensemble ? @{@"persistentStoreEnsemble" : self.ensemble} : nil;
     [[NSNotificationCenter defaultCenter] postNotificationName:CDEMonitoredManagedObjectContextDidSaveNotification object:context userInfo:userInfo];
 }
 
-- (void)storeChangesForContext:(NSManagedObjectContext *)context changedObjectsDictionary:(NSDictionary *)changedObjectsDictionary
+- (void)asynchronouslyStoreChangesForContext:(NSManagedObjectContext *)context changedObjectsDictionary:(NSDictionary *)changedObjectsDictionary
 {
+    // Get the changed objects
     NSSet *insertedObjects = [changedObjectsDictionary objectForKey:NSInsertedObjectsKey];
     NSSet *deletedObjects = [changedObjectsDictionary objectForKey:NSDeletedObjectsKey];
     NSSet *updatedObjects = [changedObjectsDictionary objectForKey:NSUpdatedObjectsKey];
     if (insertedObjects.count + deletedObjects.count + updatedObjects.count == 0) return;
+    
+    // Register event, so if there is a crash, we can detect it and clean up
+    NSString *newUniqueId = [[NSProcessInfo processInfo] globallyUniqueString];
+    [self.eventStore registerIncompleteEventIdentifier:newUniqueId isMandatory:YES];
     
     // Reduce to just the objects belonging to the store
     insertedObjects = [self monitoredManagedObjectsInSet:insertedObjects];
@@ -189,13 +194,10 @@
     NSDictionary *insertData = [eventBuilder changesDataForInsertedObjects:insertedObjects objectsAreSaved:YES inManagedObjectContext:context];
     NSDictionary *updateData = [eventBuilder changesDataForUpdatedObjects:updatedObjects inManagedObjectContext:context options:CDEUpdateStoreOptionSavedValue propertyChangeValuesByObjectID:changedValuesByObjectID];
     NSDictionary *deleteData = [eventBuilder changesDataForDeletedObjects:deletedObjects inManagedObjectContext:context];
+    [changedValuesByContext removeObjectForKey:context];
 
     // Make sure the event is saved atomically
-    [self.eventStore.managedObjectContext performBlockAndWait:^{
-        // Register event, so if there is a crash, we can detect it and clean up
-        NSString *newUniqueId = [[NSProcessInfo processInfo] globallyUniqueString];
-        [self.eventStore registerIncompleteEventIdentifier:newUniqueId isMandatory:YES];
-        
+    [self.eventStore.managedObjectContext performBlock:^{
         // Add a store mod event
         [eventBuilder makeNewEventOfType:CDEStoreModificationEventTypeSave uniqueIdentifier:newUniqueId];
     
@@ -216,7 +218,6 @@
         
         // Deregister event, and clean up
         [self.eventStore deregisterIncompleteEventIdentifier:eventBuilder.event.uniqueIdentifier];
-        [changedValuesByContext removeObjectForKey:context];
     }];
 }
 

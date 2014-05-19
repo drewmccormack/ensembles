@@ -93,7 +93,11 @@
 - (void)save
 {
     [self.testManagedObjectContext save:NULL];
-    [self.eventStore updateRevisionsForSave];
+    
+    // Make sure async recording of save is complete
+    [eventMOC performBlockAndWait:^{
+        [self.eventStore updateRevisionsForSave];
+    }];
 }
 
 - (NSArray *)fetchModEvents

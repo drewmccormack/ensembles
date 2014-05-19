@@ -57,6 +57,16 @@
     [super tearDown];
 }
 
+- (void)saveContext
+{
+    XCTAssertTrue([self.testManagedObjectContext save:NULL], @"Save failed");
+    
+    // This ensures the async created save event is in the event store
+    [eventMOC performBlockAndWait:^{
+        [self.eventStore updateRevisionsForSave];
+    }];
+}
+
 - (void)testNoSaveTriggersNoEventCreation
 {
     [eventMOC performBlockAndWait:^{
@@ -69,9 +79,7 @@
 
 - (void)testIfSaveTriggersEventCreation
 {
-    XCTAssertTrue([self.testManagedObjectContext save:NULL], @"Save failed");
-    [self.eventStore updateRevisionsForSave];
-
+    [self saveContext];
     [eventMOC performBlockAndWait:^{
         NSError *error = nil;
         NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
@@ -94,9 +102,7 @@
 
 - (void)testInsertGeneratesObjectChange
 {
-    XCTAssertTrue([self.testManagedObjectContext save:NULL], @"Save failed");
-    [self.eventStore updateRevisionsForSave];
-    
+    [self saveContext];
     [eventMOC performBlockAndWait:^{
         NSArray *modEvents = [self fetchModEvents];
         XCTAssertNotNil(modEvents, @"Fetch failed");
@@ -127,8 +133,7 @@
 
 - (void)testObjectChangeTypeForInsert
 {
-    XCTAssertTrue([self.testManagedObjectContext save:NULL], @"Save failed");
-    [self.eventStore updateRevisionsForSave];
+    [self saveContext];
     [eventMOC performBlockAndWait:^{
         NSArray *modEvents = [self fetchModEvents];
         CDEStoreModificationEvent *modEvent = modEvents.lastObject;
@@ -164,13 +169,11 @@
 
 - (void)testGlobalCountForTwoSaves
 {
-    XCTAssertTrue([self.testManagedObjectContext save:NULL], @"Save failed");
-    [self.eventStore updateRevisionsForSave];
+    [self saveContext];
     
     NSDate *newDate = [NSDate dateWithTimeIntervalSinceReferenceDate:0.1];
     [parent setValue:newDate forKey:@"date"];
-    XCTAssertTrue([self.testManagedObjectContext save:NULL], @"Second save failed");
-    [self.eventStore updateRevisionsForSave];
+    [self saveContext];
     
     [eventMOC performBlockAndWait:^{
         NSArray *modEvents = [self fetchModEvents];
@@ -196,8 +199,7 @@
 
 - (void)testUpdateWithNilValue
 {
-    XCTAssertTrue([self.testManagedObjectContext save:NULL], @"Save failed");
-    [self.eventStore updateRevisionsForSave];
+    [self saveContext];
 
     [parent setValue:nil forKey:@"name"];
     XCTAssertTrue([self.testManagedObjectContext save:NULL], @"Second save failed");
@@ -218,14 +220,12 @@
 
 - (void)testSaveRevisionNumbers
 {
-    XCTAssertTrue([self.testManagedObjectContext save:NULL], @"Save failed");
-    [self.eventStore updateRevisionsForSave];
+    [self saveContext];
     
     NSDate *newDate = [NSDate dateWithTimeIntervalSinceReferenceDate:0.1];
     [parent setValue:newDate forKey:@"date"];
-    XCTAssertTrue([self.testManagedObjectContext save:NULL], @"Second save failed");
-    [self.eventStore updateRevisionsForSave];
-    
+    [self saveContext];
+
     [eventMOC performBlockAndWait:^{
         NSArray *modEvents = [self fetchModEvents];
         CDEStoreModificationEvent *firstEvent = modEvents[0];
@@ -239,9 +239,7 @@
 
 - (void)testRevisionNumbersOfOtherStoresForASingleStore
 {
-    XCTAssertTrue([self.testManagedObjectContext save:NULL], @"Save failed");
-    [self.eventStore updateRevisionsForSave];
-    
+    [self saveContext];
     [eventMOC performBlockAndWait:^{
         NSArray *modEvents = [self fetchModEvents];
         CDEStoreModificationEvent *firstEvent = modEvents[0];
@@ -266,8 +264,7 @@
 {
     [self addEventForRevision:4 store:@"store0"];
     
-    XCTAssertTrue([self.testManagedObjectContext save:NULL], @"Save failed");
-    [self.eventStore updateRevisionsForSave];
+    [self saveContext];
     
     [eventMOC performBlockAndWait:^{
         NSArray *modEvents = [self fetchModEvents];
@@ -304,8 +301,7 @@
     [self addEventForRevision:4 store:@"store0"];
     [self addMergeEventForOtherStoreIds:@[@"store0"]];
 
-    XCTAssertTrue([self.testManagedObjectContext save:NULL], @"Save failed");
-    [self.eventStore updateRevisionsForSave];
+    [self saveContext];
 
     [eventMOC performBlockAndWait:^{
         NSArray *modEvents = [self fetchModEvents];
@@ -325,8 +321,7 @@
     [self addEventForRevision:4 store:@"store0"];
     [self addMergeEventForOtherStoreIds:@[@"store0"]];
 
-    XCTAssertTrue([self.testManagedObjectContext save:NULL], @"Save failed");
-    [self.eventStore updateRevisionsForSave];
+    [self saveContext];
     
     [eventMOC performBlockAndWait:^{
         NSArray *modEvents = [self fetchModEvents];
@@ -362,13 +357,11 @@
 
 - (void)testUpdateGeneratesObjectChanges
 {
-    XCTAssertTrue([self.testManagedObjectContext save:NULL], @"Save failed");
-    [self.eventStore updateRevisionsForSave];
+    [self saveContext];
     
     NSDate *newDate = [NSDate dateWithTimeIntervalSinceReferenceDate:0.1];
     [parent setValue:newDate forKey:@"date"];
-    XCTAssertTrue([self.testManagedObjectContext save:NULL], @"Second save failed");
-    [self.eventStore updateRevisionsForSave];
+    [self saveContext];
     
     [eventMOC performBlockAndWait:^{
         NSArray *modEvents = [self fetchModEvents];
@@ -386,8 +379,7 @@
 
 - (void)testDeletionGeneratesObjectChange
 {
-    XCTAssertTrue([self.testManagedObjectContext save:NULL], @"Save failed");
-    [self.eventStore updateRevisionsForSave];
+    [self saveContext];
 
     [self.testManagedObjectContext deleteObject:parent];
     
