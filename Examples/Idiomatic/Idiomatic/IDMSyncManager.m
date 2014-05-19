@@ -57,6 +57,15 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
     return sharedInstance;
 }
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(icloudDidDownload:) name:CDEICloudFileSystemDidDownloadFilesNotification object:nil];
+    }
+    return self;
+}
+
 #pragma mark - Setting Up and Resetting
 
 - (void)setup
@@ -136,6 +145,11 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 }
 
 #pragma mark - Sync Methods
+
+- (void)icloudDidDownload:(NSNotification *)notif
+{
+    [self synchronizeWithCompletion:NULL];
+}
 
 - (BOOL)canSynchronize
 {
