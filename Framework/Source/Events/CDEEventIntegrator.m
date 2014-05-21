@@ -1078,7 +1078,14 @@
 
 - (void)storeChangesFromContextDidSaveNotification:(NSNotification *)notif
 {
-    saveInfoDictionary = notif.userInfo;
+    NSMutableDictionary *info = [[NSMutableDictionary alloc] initWithCapacity:3];
+    id insertedIds = [notif.userInfo[NSInsertedObjectsKey] valueForKeyPath:@"objectID"];
+    id updatedIds = [notif.userInfo[NSUpdatedObjectsKey] valueForKeyPath:@"objectID"];
+    id deletedIds = [notif.userInfo[NSDeletedObjectsKey] valueForKeyPath:@"objectID"];
+    if (insertedIds) info[NSInsertedObjectsKey] = insertedIds;
+    if (updatedIds) info[NSUpdatedObjectsKey] = updatedIds;
+    if (deletedIds) info[NSDeletedObjectsKey] = deletedIds;
+    saveInfoDictionary = info;
 }
 
 @end

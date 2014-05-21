@@ -34,11 +34,11 @@ extern NSString * const CDEMonitoredManagedObjectContextWillSaveNotification;
 extern NSString * const CDEMonitoredManagedObjectContextDidSaveNotification;
 
 /**
- This notification is fired after the ensemble has merged changes and performed a background save into the persistent store. You can use this notification to invoke the `mergeChangesFromContextDidSaveNotification`: method on any of the contexts that depend on the content of the store. Alternatively, you can implement the `persistentStoreEnsemble`:didSaveMergeChangesWithNotification: method for this purpose.
+ This notification is fired after the ensemble has merged changes and performed a background save into the persistent store. You can use this notification to invoke the `mergeChangesFromContextDidSaveNotification`: method on any of the contexts that depend on the content of the store. Alternatively, you can implement the `persistentStoreEnsemble:didSaveMergeChangesWithNotification:` method for this purpose.
  
  The object for the notification is the ensemble. The save notification, which is what is passed to the `mergeChangesFromContextDidSaveNotification`: method, is provided in the `userInfo` dictionary with the key `CDEManagedObjectContextSaveNotificationKey`.
  
- @warning This notification is posted on the background thread where the merge save occurred. It is important to invoke the `mergeChangesFromContextDidSaveNotification`: method on the thread/queue corresponding to the `NSManagedObjectContext` merging the changes.
+ @warning This notification is posted on the background thread. It is important to invoke the `mergeChangesFromContextDidSaveNotification`: method on the thread/queue corresponding to the `NSManagedObjectContext` merging the changes.
  */
 extern NSString * const CDEPersistentStoreEnsembleDidSaveMergeChangesNotification;
 
@@ -121,14 +121,14 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
 /**
  Invoked after the ensemble successfully saves merged changes into the persistent store.
  
- This method is invoked on the thread used for saving the changes. The notification passed includes the `userInfo` dictionary from the notification that was posted when the context saved. It can be used to determine what object insertions, updates, and deletions occurred.
+ This method is invoked on a background thread. The notification passed includes a `userInfo` dictionary based on the notification that was posted when the context saved. It contains the `NSManagedObjectID` instances for all insertions, updates, and deletions that were included in the save.
  
  You will usually want to pass this notification to the `mergeChangesFromContextDidSaveNotification`: method of any context that accesses the persistent store, be it directly or indirectly. This will allow the context to account for the changes.
  
  @warning Be sure to invoke the `mergeChangesFromContextDidSaveNotification`: method on the thread/queue corresponding to the messaged context.
  
  @param ensemble The `CDEPersistentStoreEnsemble` that saved the changes
- @param notification A notification object containing the `userInfo` included by the saving context in the `NSManagedObjectContextDidSaveNotification` notification
+ @param notification A notification object containing the `userInfo` from the saving context in the `NSManagedObjectContextDidSaveNotification` notification
  
  @see `CDEPersistentStoreEnsembleDidSaveMergeChangesNotification`
  */
