@@ -27,7 +27,7 @@
     __weak NSManagedObjectContext *weakTestMoc = self.testManagedObjectContext;
     integrator.didSaveBlock = ^(NSManagedObjectContext *context, NSDictionary *info) {
         dispatch_sync(dispatch_get_main_queue(), ^{
-            NSNotification *notif = [[NSNotification alloc] initWithName:@"" object:nil userInfo:info];
+            NSNotification *notif = [[NSNotification alloc] initWithName:NSManagedObjectContextDidSaveNotification object:context userInfo:info];
             [weakTestMoc mergeChangesFromContextDidSaveNotification:notif];
         });
     };
