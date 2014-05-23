@@ -43,6 +43,7 @@
 @synthesize shouldSaveBlock = shouldSaveBlock;
 @synthesize didSaveBlock = didSaveBlock;
 @synthesize failedSaveBlock = failedSaveBlock;
+@synthesize persistentStoreOptions = persistentStoreOptions;
 
 
 #pragma mark Initialization
@@ -57,6 +58,7 @@
         shouldSaveBlock = NULL;
         didSaveBlock = NULL;
         failedSaveBlock = NULL;
+        persistentStoreOptions = nil;
         queue = dispatch_queue_create("com.mentalfaculty.ensembles.eventintegrator", DISPATCH_QUEUE_SERIAL);
     }
     return self;
@@ -137,7 +139,7 @@
     // Setup a context for accessing the main store
     NSError *error;
     NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:managedObjectModel];
-    NSPersistentStore *persistentStore = [coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:nil error:&error];
+    NSPersistentStore *persistentStore = [coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:self.persistentStoreOptions error:&error];
     if (!persistentStore) {
         [self failWithError:error];
         return;

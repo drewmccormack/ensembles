@@ -50,7 +50,7 @@
     cloudFileSystem1 = [[CDELocalCloudFileSystem alloc] initWithRootDirectory:cloudRootDir];
     eventDataRoot1 = [testRootDirectory stringByAppendingPathComponent:@"eventData1"];
     NSURL *eventDataRoot1URL = [NSURL fileURLWithPath:eventDataRoot1];
-    ensemble1 = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"com.ensembles.synctest" persistentStoreURL:testStoreURL1 managedObjectModelURL:testModelURL cloudFileSystem:cloudFileSystem1 localDataRootDirectoryURL:eventDataRoot1URL];
+    ensemble1 = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"com.ensembles.synctest" persistentStoreURL:testStoreURL1 persistentStoreOptions:nil managedObjectModelURL:testModelURL cloudFileSystem:cloudFileSystem1 localDataRootDirectoryURL:eventDataRoot1URL];
     ensemble1.delegate = self;
     
     // Second store
@@ -68,7 +68,7 @@
     cloudFileSystem2 = [[CDELocalCloudFileSystem alloc] initWithRootDirectory:cloudRootDir];
     eventDataRoot2 = [testRootDirectory stringByAppendingPathComponent:@"eventData2"];
     NSURL *eventDataRoot2URL = [NSURL fileURLWithPath:eventDataRoot2];
-    ensemble2 = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"com.ensembles.synctest" persistentStoreURL:testStoreURL2 managedObjectModelURL:testModelURL cloudFileSystem:cloudFileSystem2 localDataRootDirectoryURL:eventDataRoot2URL];
+    ensemble2 = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"com.ensembles.synctest" persistentStoreURL:testStoreURL2 persistentStoreOptions:nil managedObjectModelURL:testModelURL cloudFileSystem:cloudFileSystem2 localDataRootDirectoryURL:eventDataRoot2URL];
     ensemble2.delegate = self;
 }
 
