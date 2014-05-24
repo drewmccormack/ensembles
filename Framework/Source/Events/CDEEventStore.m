@@ -382,14 +382,17 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 
 #pragma mark - Flushing out queued operations
 
-- (BOOL)flush:(NSError * __autoreleasing *)error
+- (void)flushWithCompletion:(CDECompletionBlock)completion
 {
     __block BOOL success = YES;
     [self saveStoreMetadata];
-    [self.managedObjectContext performBlockAndWait:^{
-        success = [managedObjectContext save:error];
+    [self.managedObjectContext performBlock:^{
+        NSError *error = nil;
+        success = [managedObjectContext save:&error];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (completion) completion(success ? nil : error);
+        });
     }];
-    return success;
 }
 
 

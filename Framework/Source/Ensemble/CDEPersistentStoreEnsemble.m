@@ -557,9 +557,9 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
     [tasks addObject:checkRegistrationTask];
     
     CDEAsynchronousTaskBlock processChangesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
-        NSError *error = nil;
-        [eventStore flush:&error];
-        next(error, NO);
+        [eventStore flushWithCompletion:^(NSError *error) {
+            next(error, NO);
+        }];
     };
     [tasks addObject:processChangesTask];
     
@@ -710,9 +710,9 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
     }
     
     [operationQueue addOperationWithBlock:^{
-        NSError *error = nil;
-        [eventStore flush:&error];
-        [self dispatchCompletion:completion withError:error];
+        [eventStore flushWithCompletion:^(NSError *error) {
+            [self dispatchCompletion:completion withError:error];
+        }];
     }];
 }
 
