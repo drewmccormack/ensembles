@@ -21,7 +21,7 @@
 #import "CDERevision.h"
 #import "CDERevisionManager.h"
 
-@implementation CDEEventBuilder
+@implementation CDEEventBuilder 
 
 @synthesize event = event;
 @synthesize eventStore = eventStore;
@@ -113,8 +113,10 @@
     if (insertedObjects.count == 0) return;
     
     // This method must be called on context thread
-    NSDictionary *changesData = [self changesDataForInsertedObjects:insertedObjects objectsAreSaved:saved inManagedObjectContext:context];
-    
+    NSMutableDictionary *changesData = [[self changesDataForInsertedObjects:insertedObjects objectsAreSaved:saved inManagedObjectContext:context] mutableCopy];
+    NSArray *globalIds = [self addGlobalIdentifiersForInsertChangesData:changesData];
+    changesData[@"globalIds"] = globalIds;
+
     // Add changes
     [self addInsertChangesForChangesData:changesData];
 }
@@ -155,9 +157,7 @@
     // Make global ids for all objects before creating object changes.
     // We need all global ids to exist before trying to store relationships which utilize global ids.
     NSDictionary *changesData = @{@"changeArrays" : changeArrays, @"entityNames" : entityNames, @"globalIdStrings" : (globalIdStrings ? : [NSNull null])};
-    NSArray *globalIds = [self addGlobalIdentifiersForInsertChangesData:changesData];
-    
-    return @{@"changeArrays" : changeArrays, @"entityNames" : entityNames, @"globalIds" : globalIds};
+    return changesData;
 }
 
 - (void)addInsertChangesForChangesData:(NSDictionary *)changesData

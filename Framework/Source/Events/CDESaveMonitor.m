@@ -191,13 +191,17 @@
     CDEEventBuilder *eventBuilder = [[CDEEventBuilder alloc] initWithEventStore:self.eventStore];
     eventBuilder.ensemble = self.ensemble;
     NSDictionary *changedValuesByObjectID = [changedValuesByContext objectForKey:context];
-    NSDictionary *insertData = [eventBuilder changesDataForInsertedObjects:insertedObjects objectsAreSaved:YES inManagedObjectContext:context];
+    NSMutableDictionary *insertData = [[eventBuilder changesDataForInsertedObjects:insertedObjects objectsAreSaved:YES inManagedObjectContext:context] mutableCopy];
     NSDictionary *updateData = [eventBuilder changesDataForUpdatedObjects:updatedObjects inManagedObjectContext:context options:CDEUpdateStoreOptionSavedValue propertyChangeValuesByObjectID:changedValuesByObjectID];
     NSDictionary *deleteData = [eventBuilder changesDataForDeletedObjects:deletedObjects inManagedObjectContext:context];
     [changedValuesByContext removeObjectForKey:context];
 
     // Make sure the event is saved atomically
     [self.eventStore.managedObjectContext performBlock:^{
+        // Global Ids
+        NSArray *globalIds = [eventBuilder addGlobalIdentifiersForInsertChangesData:insertData];
+        insertData[@"globalIds"] = globalIds;
+        
         // Add a store mod event
         [eventBuilder makeNewEventOfType:CDEStoreModificationEventTypeSave uniqueIdentifier:newUniqueId];
     
