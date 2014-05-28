@@ -3,7 +3,7 @@ Core Data Ensembles
 
 _Author:_ Drew McCormack<br>
 _Created:_ 29th September, 2013<br>
-_Last Updated:_ 30th April, 2014
+_Last Updated:_ 28th May, 2014
 
 *You can kickstart integration of Ensembles in your app &mdash; and support the open source project &mdash; by purchasing a support and documentation package at [ensembles.io](http://www.ensembles.io).*
 
