@@ -63,12 +63,12 @@ To manually add Ensembles to your App's Xcode Project...
 3. In the General tab, click the + button in the _Linked Frameworks and Libraries_ section.
 4. Choose `Ensembles.framework` and add it.
 5. Create a new build phase to copy frameworks into your app bundle (if you don’t already have one). To do this...
-    A. Select the project root in the source list, then select your app’s target.
-    B. Open the *Build Phases* tab.
-    C. Click the + button at the top of the list.
-    D. Choose *New Copy Files Build Phase* from the popup menu.
-    E. Disclose the contents of the new *Copy Files* phase, and choose *Frameworks* from the *Destination* popup button.
-    F. Click the + button at the bottom of the *Copy Files* phase section, choose *Ensembles.framework*, and click *Add*.
+ * Select the project root in the source list, then select your app’s target.
+ * Open the *Build Phases* tab.
+ * Click the + button at the top of the list.
+ * Choose *New Copy Files Build Phase* from the popup menu.
+ * Disclose the contents of the new *Copy Files* phase, and choose *Frameworks* from the *Destination* popup button.
+ * Click the + button at the bottom of the *Copy Files* phase section, choose *Ensembles.framework*, and click *Add*.
 6. Add the following import in your precompiled header file, or in any files using Ensembles.
 
         #import <Ensembles/Ensembles.h>
