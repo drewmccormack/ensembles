@@ -46,6 +46,25 @@ To manually add Ensembles to your App's Xcode Project...
 10. Add the following import in your precompiled header file, or in any files using Ensembles.
 
         #import <Ensembles/Ensembles.h>
+        
+### Incorporating Ensembles in an OS X Project
+   
+To add Ensembles to your App's Xcode Project with CocoaPods...
+
+1. Add the following to your Podfile 
+	
+		platform :osx, '10.9'
+		pod "Ensembles", "~> 1.0"
+			
+To manually add Ensembles to your App's Xcode Project...
+
+1. In Finder, drag the `Ensembles Mac.xcodeproj` project from the `Framework` directory into your Xcode project.
+2. Select your App's project root in the source list on the left, and then select the App's target.
+3. In the General tab, click the + button in the _Linked Frameworks and Libraries_ section.
+4. Choose `Ensembles.framework` and add it.
+5. Add the following import in your precompiled header file, or in any files using Ensembles.
+
+        #import <Ensembles/Ensembles.h>
     
 #### Including Optional Cloud Services
 
