@@ -217,7 +217,9 @@
             }
 
             // Notify of save
-            if (didSaveBlock) didSaveBlock(managedObjectContext, saveInfoDictionary);
+            [self.managedObjectContext performBlockAndWait:^{
+                if (didSaveBlock) didSaveBlock(managedObjectContext, saveInfoDictionary);
+            }];
             saveInfoDictionary = nil;
             
             // Complete
@@ -265,6 +267,7 @@
     }
     if (newEventUniqueId) [self.eventStore deregisterIncompleteEventIdentifier:newEventUniqueId];
     newEventUniqueId = nil;
+    managedObjectContext = nil;
     
     dispatch_async(dispatch_get_main_queue(), ^{
         if (completion) completion(error);
@@ -275,6 +278,7 @@
 {
     if (newEventUniqueId) [self.eventStore deregisterIncompleteEventIdentifier:newEventUniqueId];
     newEventUniqueId = nil;
+    managedObjectContext = nil;
     dispatch_async(dispatch_get_main_queue(), ^{
         if (completion) completion(nil);
     });
@@ -1080,14 +1084,7 @@
 
 - (void)storeChangesFromContextDidSaveNotification:(NSNotification *)notif
 {
-    NSMutableDictionary *info = [[NSMutableDictionary alloc] initWithCapacity:3];
-    id insertedIds = [notif.userInfo[NSInsertedObjectsKey] valueForKeyPath:@"objectID"];
-    id updatedIds = [notif.userInfo[NSUpdatedObjectsKey] valueForKeyPath:@"objectID"];
-    id deletedIds = [notif.userInfo[NSDeletedObjectsKey] valueForKeyPath:@"objectID"];
-    if (insertedIds) info[NSInsertedObjectsKey] = insertedIds;
-    if (updatedIds) info[NSUpdatedObjectsKey] = updatedIds;
-    if (deletedIds) info[NSDeletedObjectsKey] = deletedIds;
-    saveInfoDictionary = info;
+    saveInfoDictionary = notif.userInfo;
 }
 
 @end
