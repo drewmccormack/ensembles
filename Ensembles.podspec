@@ -26,8 +26,7 @@ Pod::Spec.new do |s|
 
   s.source        = { 
     :git => 'https://github.com/drewmccormack/ensembles.git', 
-    :tag => s.version.to_s, 
-    :submodules => true
+    :tag => s.version.to_s
   }
   
   s.requires_arc  = true
@@ -45,7 +44,7 @@ Pod::Spec.new do |s|
     ss.dependency 'Ensembles/Core'
     ss.ios.dependency 'Dropbox-iOS-SDK'
     ss.osx.dependency 'Dropbox-OSX-SDK'
-    ss.source_files = 'Framework/Extensions/CDEDropboxCloudFileSystem.{h,m}', 'Vendor/DropboxSDK/DropboxSDK/Classes/**/*.h'
+    ss.source_files = 'Framework/Extensions/CDEDropboxCloudFileSystem.{h,m}'
   end
   
   s.subspec 'Node' do |ss|
