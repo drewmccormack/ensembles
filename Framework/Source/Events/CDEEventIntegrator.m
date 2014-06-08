@@ -352,13 +352,20 @@
         NSMutableDictionary *insertedObjectIDsByEntity = needFullIntegration ? [[NSMutableDictionary alloc] init] : nil;
         for (CDEStoreModificationEvent *storeModEvent in storeModEvents) {
             @autoreleasepool {
+                // Determine which entities have changes
+                NSSet *changedEntityNames = [storeModEvent.objectChanges valueForKeyPath:@"nameOfEntity"];
+                NSMutableArray *changedEntities = [[changedEntityNames.allObjects cde_arrayByTransformingObjectsWithBlock:^(NSString *name) {
+                    return managedObjectModel.entitiesByName[name];
+                }] mutableCopy];
+                [changedEntities removeObject:[NSNull null]];
+                
                 // Insertions are split into two parts: first, we perform an insert without applying property changes,
                 // and later, we do an update to set the properties.
                 // This is because the object inserts must be carried out before trying to set relationships,
                 // otherwise related objects may not exist. So we create objects first, and only
                 // set relationships in the next phase.
                 NSMutableDictionary *appliedInsertsByEntity = [NSMutableDictionary dictionary];
-                for (NSEntityDescription *entity in managedObjectModel) {
+                for (NSEntityDescription *entity in changedEntities) {
                     NSArray *appliedInsertChanges = [self insertObjectsForStoreModificationEvents:@[storeModEvent] entity:entity error:error];
                     if (!appliedInsertChanges) {
                         success = NO;
@@ -372,14 +379,14 @@
                 
                 // Now that all objects exist, we can apply property changes.
                 // We treat insertions on a par with updates here.
-                for (NSEntityDescription *entity in managedObjectModel) {
+                for (NSEntityDescription *entity in changedEntities) {
                     NSArray *inserts = appliedInsertsByEntity[entity.name];
                     success = [self updateObjectsForStoreModificationEvents:@[storeModEvent] entity:entity includingInsertedObjects:inserts error:error];
                     if (!success) return;
                 }
                 
                 // Finally deletions
-                for (NSEntityDescription *entity in managedObjectModel) {
+                for (NSEntityDescription *entity in changedEntities) {
                     success = [self deleteObjectsForStoreModificationEvents:@[storeModEvent] entity:entity error:error];
                     if (!success) return;
                 }

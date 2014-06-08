@@ -33,7 +33,7 @@
 {
     NSMutableArray *result = [[NSMutableArray alloc] init];
     for (id object in self) {
-        [result addObject:block(object)];
+        [result addObject:(block(object) ? : [NSNull null])];
     }
     return result;
 }
