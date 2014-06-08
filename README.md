@@ -3,7 +3,7 @@ Core Data Ensembles
 
 _Author:_ Drew McCormack<br>
 _Created:_ 29th September, 2013<br>
-_Last Updated:_ 30th April, 2014
+_Last Updated:_ 28th May, 2014
 
 *You can kickstart integration of Ensembles in your app &mdash; and support the open source project &mdash; by purchasing a support and documentation package at [ensembles.io](http://www.ensembles.io).*
 
@@ -46,7 +46,33 @@ To manually add Ensembles to your App's Xcode Project...
 10. Add the following import in your precompiled header file, or in any files using Ensembles.
 
         #import <Ensembles/Ensembles.h>
-    
+        
+#### Incorporating Ensembles in an OS X Project
+   
+To add Ensembles to your App's Xcode Project with CocoaPods...
+
+1. Add the following to your Podfile 
+	
+		platform :osx, '10.9'
+		pod "Ensembles", "~> 1.0"
+			
+To manually add Ensembles to your App's Xcode Project...
+
+1. In Finder, drag the `Ensembles Mac.xcodeproj` project from the `Framework` directory into your Xcode project.
+2. Select your App's project root in the source list on the left, and then select the App's target.
+3. In the General tab, click the + button in the _Linked Frameworks and Libraries_ section.
+4. Choose `Ensembles.framework` and add it.
+5. Create a new build phase to copy frameworks into your app bundle (if you don’t already have one). To do this...
+ * Select the project root in the source list, then select your app’s target.
+ * Open the *Build Phases* tab.
+ * Click the + button at the top of the list.
+ * Choose *New Copy Files Build Phase* from the popup menu.
+ * Disclose the contents of the new *Copy Files* phase, and choose *Frameworks* from the *Destination* popup button.
+ * Click the + button at the bottom of the *Copy Files* phase section, choose *Ensembles.framework*, and click *Add*.
+6. Add the following import in your precompiled header file, or in any files using Ensembles.
+
+        #import <Ensembles/Ensembles.h>
+
 #### Including Optional Cloud Services
 
 By default, Ensembles only includes support for iCloud. To use other cloud services, such as Dropbox, you may need to add a few steps to the procedure above. 
