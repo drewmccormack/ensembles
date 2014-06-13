@@ -21,8 +21,8 @@
 
 - (void)deleteEventsPreceedingBaselineWithCompletion:(CDECompletionBlock)completion;
 
-- (float)estimatedEventStoreCompactionFollowingRebase;
-- (BOOL)shouldRebase;
+- (void)estimatEventStoreCompactionFollowingRebaseWithCompletion:(void(^)(float compaction))completion;
+- (void)shouldRebaseWithCompletion:(void(^)(BOOL result))completion;
 
 - (void)rebaseWithCompletion:(CDECompletionBlock)completion;
 

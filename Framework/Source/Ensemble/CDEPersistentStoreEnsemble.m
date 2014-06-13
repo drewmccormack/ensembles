@@ -626,14 +626,16 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
     [tasks addObject:removeOutdatedEventsTask];
     
     CDEAsynchronousTaskBlock rebaseTask = ^(CDEAsynchronousTaskCallbackBlock next) {
-        if ([self.rebaser shouldRebase]) {
-            [self.rebaser rebaseWithCompletion:^(NSError *error) {
-                next(error, NO);
-            }];
-        }
-        else {
-            next(nil, NO);
-        }
+        [self.rebaser shouldRebaseWithCompletion:^(BOOL result) {
+            if (result) {
+                [self.rebaser rebaseWithCompletion:^(NSError *error) {
+                    next(error, NO);
+                }];
+            }
+            else {
+                next(nil, NO);
+            }
+        }];
     };
     [tasks addObject:rebaseTask];
     

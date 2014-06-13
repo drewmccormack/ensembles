@@ -38,15 +38,26 @@
     rebaser = [[CDERebaser alloc] initWithEventStore:(id)self.eventStore];
 }
 
+- (BOOL)shouldRebase
+{
+    __block BOOL should = NO;
+    [rebaser shouldRebaseWithCompletion:^(BOOL result) {
+        should = result;
+        [self stopAsyncOp];
+    }];
+    [self waitForAsyncOpToFinish];
+    return should;
+}
+
 - (void)testEmptyEventStoreNeedsRebasing
 {
-    XCTAssertTrue([rebaser shouldRebase], @"Empty store should be rebased to give it a baseline");
+    XCTAssertTrue([self shouldRebase], @"Empty store should be rebased to give it a baseline");
 }
 
 - (void)testEventStoreWithNoBaselineNeedsRebasing
 {
     [self addEventsForType:CDEStoreModificationEventTypeMerge storeId:@"123" globalCounts:@[@0] revisions:@[@0]];
-    XCTAssertTrue([rebaser shouldRebase], @"Store with events, but no baseline, should need a new baseline");
+    XCTAssertTrue([self shouldRebase], @"Store with events, but no baseline, should need a new baseline");
 }
 
 - (void)testEventStoreWithFewEventsDoesNotNeedRebasing
@@ -63,14 +74,14 @@
 
     [self addEventsForType:CDEStoreModificationEventTypeMerge storeId:@"123" globalCounts:@[@1, @2] revisions:@[@1, @2]];
     
-    XCTAssertFalse([rebaser shouldRebase], @"Store with only a few events should not rebase, even if baseline is small");
+    XCTAssertFalse([self shouldRebase], @"Store with only a few events should not rebase, even if baseline is small");
 }
 
 - (void)testBaselineMissingADeviceNeedsRebasing
 {
     [self addEventsForType:CDEStoreModificationEventTypeBaseline storeId:@"store1" globalCounts:@[@0] revisions:@[@0]];
     [self addEventsForType:CDEStoreModificationEventTypeMerge storeId:@"123" globalCounts:@[@1, @2] revisions:@[@1, @2]];
-    XCTAssertTrue([rebaser shouldRebase], @"If baseline misses a device, it should rebase");
+    XCTAssertTrue([self shouldRebase], @"If baseline misses a device, it should rebase");
 }
 
 - (void)testRebasingEmptyEventStoreGeneratesBaseline
