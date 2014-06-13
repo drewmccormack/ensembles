@@ -1,5 +1,9 @@
 # Links to Ensembles Resources
 
+### Ensembles Feeds
+* [ensembles.io/news](http://www.ensembles.io/news/) Blog of Ensembles related news
+* [@ensemblesio](http://twitter.com/ensemblesio) The Ensembles Twitter Account
+
 ### Presentations
 * [Everything — but the kitchen — syncs](http://www.iosdevuk.com/talks/) Drew McCormack at iOSDevUK 2013
 * [Everything — but the kitchen — syncs (Video)](http://gotocon.com/video) Drew McCormack at GOTO Aarhus 2013
