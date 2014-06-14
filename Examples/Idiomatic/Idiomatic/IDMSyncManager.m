@@ -14,6 +14,7 @@
 #import "CDEDropboxCloudFileSystem.h"
 #import "CDENodeCloudFileSystem.h"
 #import "IDMNodeSyncSettingsViewController.h"
+#import "CDEMultipeerCloudFileSystem.h"
 
 
 NSString * const IDMSyncActivityDidBeginNotification = @"IDMSyncActivityDidBegin";
@@ -23,6 +24,7 @@ NSString * const IDMCloudServiceUserDefaultKey = @"IDMCloudServiceUserDefaultKey
 NSString * const IDMICloudService = @"icloud";
 NSString * const IDMDropboxService = @"dropbox";
 NSString * const IDMNodeS3Service = @"node";
+NSString * const IDMMultipeerService = @"multipeer";
 
 NSString * const IDMNodeS3EmailDefaultKey = @"IDMNodeS3EmailDefaultKey";
 
@@ -140,6 +142,21 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
         newNodeFileSystem.username = username;
         newNodeFileSystem.password = password;
         newSystem = newNodeFileSystem;
+    }
+    else if ([cloudService isEqualToString:IDMMultipeerService]) {
+        CDEMultipeerCloudFileSystem *multiPeerCloudFileSystem = [[CDEMultipeerCloudFileSystem alloc] init];
+        newSystem = multiPeerCloudFileSystem;
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(synchronize)
+                                                     name:nMultipeerCloudFileSystemDidImportFiles
+                                                   object:nil];
+
+
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(pushChangesToPeers)
+                                                     name:CDEMonitoredManagedObjectContextDidSaveNotification
+                                                   object:nil];
     }
     return newSystem;
 }
@@ -339,6 +356,29 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 {
     NSDictionary *keychainQuery = [self keychainQuery];
     SecItemDelete((__bridge CFDictionaryRef)keychainQuery);
+}
+
+#pragma mark - CDEMultipeerCloudFileSystem
+
+- (void)pushChangesToPeers {
+    dispatch_async(dispatch_get_main_queue(), ^{
+	    [ensemble mergeWithCompletion:^(NSError *error) {
+	        [self decrementMergeCount];
+
+            if (error) {
+                NSLog(@"Error merging: %@", error);
+            }
+            else {
+                [(CDEMultipeerCloudFileSystem *)ensemble.cloudFileSystem sendStatusMessageToAllPeers];
+            }
+        }];
+    });
+}
+
+- (void)synchronize {
+	dispatch_async(dispatch_get_main_queue(), ^{
+        [self synchronizeWithCompletion:nil];
+    });
 }
 
 @end
