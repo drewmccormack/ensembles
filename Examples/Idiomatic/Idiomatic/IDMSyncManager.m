@@ -165,7 +165,7 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
     if (!ensemble.isLeeched) {
         [ensemble leechPersistentStoreWithCompletion:^(NSError *error) {
             [self decrementMergeCount];
-            if (error) {
+            if (error && !ensemble.isLeeched) {
                 NSLog(@"Could not leech to ensemble: %@", error);
                 [self disconnectFromSyncServiceWithCompletion:^{
                     if (completion) completion(error);
