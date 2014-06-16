@@ -12,6 +12,14 @@
 #import "CDEAvailabilityMacros.h"
 
 NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFileSystemDidUpdateFilesNotification";
+NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEICloudFileSystemDidMakeDownloadProgressNotification";
+
+@interface CDEICloudFileSystem ()
+
+@property (atomic, readwrite) unsigned long long bytesRemainingToDownload;
+
+@end
+
 
 @implementation CDEICloudFileSystem {
     NSFileManager *fileManager;
@@ -24,9 +32,12 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
     id ubiquityIdentityObserver;
     NSUInteger numberOfUnfinishedDownloads;
     NSOperationQueue *downloadTrackingQueue;
+    NSDate *lastProgressNotificationDate;
 }
 
 @synthesize relativePathToRootInContainer = relativePathToRootInContainer;
+@synthesize bytesRemainingToDownload = bytesRemainingToDownload;
+@synthesize isConnected = isConnected;
 
 - (instancetype)initWithUbiquityContainerIdentifier:(NSString *)newIdentifier
 {
@@ -38,6 +49,8 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
     self = [super init];
     if (self) {
         fileManager = [[NSFileManager alloc] init];
+        
+        isConnected = NO;
         
         operationQueue = [[NSOperationQueue alloc] init];
         operationQueue.maxConcurrentOperationCount = 1;
@@ -53,6 +66,9 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
         metadataQuery = nil;
         ubiquityContainerIdentifier = [newIdentifier copy];
         ubiquityIdentityObserver = nil;
+        
+        bytesRemainingToDownload = 0;
+        lastProgressNotificationDate = nil;
         
         [self performInitialPreparation:NULL];
     }
@@ -76,28 +92,52 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
 
 - (id <NSObject, NSCoding, NSCopying>)identityToken
 {
-    return [fileManager ubiquityIdentityToken];
+    if ([fileManager respondsToSelector:@selector(ubiquityIdentityToken)]) {
+        return [fileManager ubiquityIdentityToken];
+    }
+    return @"User";
 }
 
 #pragma mark - Initial Preparation
 
+- (void)checkUserIsLoggedIn:(CDEBooleanQueryBlock)completion
+{
+    [operationQueue addOperationWithBlock:^{
+        BOOL loggedIn = NO;
+        if ([fileManager respondsToSelector:@selector(ubiquityIdentityToken)]) {
+            loggedIn = [fileManager ubiquityIdentityToken] != nil;
+        }
+        else {
+            loggedIn = [fileManager URLForUbiquityContainerIdentifier:ubiquityContainerIdentifier] != nil;
+        }
+        
+        isConnected = loggedIn;
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (completion) completion(nil, loggedIn);
+        });
+    }];
+}
+
 - (void)performInitialPreparation:(CDECompletionBlock)completion
 {
-    if (fileManager.ubiquityIdentityToken) {
-        [self setupRootDirectory:^(NSError *error) {
-            [self startMonitoringMetadata];
+    [self checkUserIsLoggedIn:^(NSError *error, BOOL loggedIn) {
+        if (loggedIn) {
+            [self setupRootDirectory:^(NSError *error) {
+                [self startMonitoringMetadata];
+                [self addUbiquityContainerNotificationObservers];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (completion) completion(error);
+                });
+            }];
+        }
+        else {
             [self addUbiquityContainerNotificationObservers];
             dispatch_async(dispatch_get_main_queue(), ^{
-                if (completion) completion(error);
+                if (completion) completion(nil);
             });
-        }];
-    }
-    else {
-        [self addUbiquityContainerNotificationObservers];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (completion) completion(nil);
-        });
-    }
+        }
+    }];
 }
 
 #pragma mark - Root Directory
@@ -161,7 +201,7 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
 
 - (void)removeUbiquityContainerNotificationObservers
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:ubiquityIdentityObserver];
+    if (ubiquityIdentityObserver) [[NSNotificationCenter defaultCenter] removeObserver:ubiquityIdentityObserver];
     ubiquityIdentityObserver = nil;
 }
 
@@ -169,29 +209,25 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
 {
     [self removeUbiquityContainerNotificationObservers];
     
-    __weak typeof(self) weakSelf = self;
-    ubiquityIdentityObserver = [[NSNotificationCenter defaultCenter] addObserverForName:NSUbiquityIdentityDidChangeNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *note) {
-        __strong typeof(weakSelf) strongSelf = weakSelf;
-        [strongSelf stopMonitoring];
-        [strongSelf willChangeValueForKey:@"identityToken"];
-        [strongSelf didChangeValueForKey:@"identityToken"];
-    }];
+    if (&NSUbiquityIdentityDidChangeNotification != NULL) {
+        __weak typeof(self) weakSelf = self;
+        ubiquityIdentityObserver = [[NSNotificationCenter defaultCenter] addObserverForName:NSUbiquityIdentityDidChangeNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *note) {
+            __strong typeof(weakSelf) strongSelf = weakSelf;
+            [strongSelf stopMonitoring];
+            [strongSelf willChangeValueForKey:@"identityToken"];
+            [strongSelf didChangeValueForKey:@"identityToken"];
+        }];
+    }
 }
 
 #pragma mark - Connection
 
-- (BOOL)isConnected
-{
-    return fileManager.ubiquityIdentityToken != nil;
-}
-
 - (void)connect:(CDECompletionBlock)completion
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        BOOL loggedIn = fileManager.ubiquityIdentityToken != nil;
-        NSError *error = loggedIn ? nil : [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeAuthenticationFailure userInfo:@{NSLocalizedDescriptionKey : NSLocalizedString(@"User is not logged into iCloud.", @"")} ];
+    [self checkUserIsLoggedIn:^(NSError *error, BOOL loggedIn) {
+        error = loggedIn && !error ? nil : [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeAuthenticationFailure userInfo:@{NSLocalizedDescriptionKey : NSLocalizedString(@"User is not logged into iCloud.", @"")} ];
         if (completion) completion(error);
-    });
+    }];
 }
 
 #pragma mark - Metadata Query to download new files
@@ -261,12 +297,25 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
     for ( NSUInteger i = 0; i < count; i++ ) {
         @autoreleasepool {
             NSURL *url = [metadataQuery valueOfAttribute:NSMetadataItemURLKey forResultAtIndex:i];
+            NSNumber *percentDownloaded = [metadataQuery valueOfAttribute:NSMetadataUbiquitousItemPercentDownloadedKey forResultAtIndex:i];
+            NSNumber *downloaded = [metadataQuery valueOfAttribute:NSMetadataUbiquitousItemIsDownloadedKey forResultAtIndex:i];
+            NSNumber *fileSizeNumber = [metadataQuery valueOfAttribute:NSMetadataItemFSSizeKey forResultAtIndex:i];
+        
             dispatch_async(initiatingDownloadsQueue, ^{
                 NSError *error;
                 BOOL startedDownload = [fileManager startDownloadingUbiquitousItemAtURL:url error:&error];
                 if ( startedDownload ) {
+                    unsigned long long bytesRemainingForThisFile = 0;
+                    
                     @synchronized(self) {
                         numberOfUnfinishedDownloads++;
+                        
+                        unsigned long long fileSize = fileSizeNumber ? fileSizeNumber.unsignedLongLongValue : 0;
+                        if ( downloaded && !downloaded.boolValue ) {
+                            double percentage = percentDownloaded ? percentDownloaded.doubleValue : 0.0;
+                            bytesRemainingForThisFile = (1.0 - percentage / 100.0) * fileSize;
+                            self.bytesRemainingToDownload += bytesRemainingForThisFile;
+                        }
                     }
                     
                     [downloadTrackingQueue addOperationWithBlock:^{
@@ -276,14 +325,23 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
                             BOOL complete = NO;
                             @synchronized(self) {
                                 numberOfUnfinishedDownloads--;
+                                self.bytesRemainingToDownload -= bytesRemainingForThisFile;
                                 if (numberOfUnfinishedDownloads == 0) {
                                     complete = YES;
+                                    self.bytesRemainingToDownload = 0;
                                 }
                             }
                             
                             // If there were downloads, and aren't anymore, fire notification
                             // Use a delay to coalesce, because there often seems to be many small
                             // metadata updates in a row
+                            NSDate *now = [NSDate date];
+                            if (!lastProgressNotificationDate || [now timeIntervalSinceDate:lastProgressNotificationDate] > 2.0) {
+                                lastProgressNotificationDate = now;
+                                dispatch_async(dispatch_get_main_queue(), ^{
+                                    [self postDidMakeDownloadProgressNotification];
+                                });
+                            }
                             if (complete) {
                                 dispatch_async(dispatch_get_main_queue(), ^{
                                     [self.class cancelPreviousPerformRequestsWithTarget:self selector:@selector(postDidDownloadNotification) object:nil];
@@ -304,7 +362,17 @@ NSString * const CDEICloudFileSystemDidDownloadFilesNotification = @"CDEICloudFi
 
 - (void)postDidDownloadNotification
 {
+    [self postDidMakeDownloadProgressNotification];
+    lastProgressNotificationDate = nil;
+
     [[NSNotificationCenter defaultCenter] postNotificationName:CDEICloudFileSystemDidDownloadFilesNotification object:self];
+    
+    [self startMonitoringMetadata]; // Refresh query, which often gets 'stuck'
+}
+
+- (void)postDidMakeDownloadProgressNotification
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:CDEICloudFileSystemDidMakeDownloadProgressNotification object:self];
 }
 
 #pragma mark - File Operations

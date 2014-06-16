@@ -10,6 +10,38 @@
 
 @implementation NSMapTable (CDEAdditions)
 
++ (instancetype)cde_weakToStrongObjectsMapTable
+{
+    id result = nil;
+    
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#if TARGET_OS_IPHONE
+    result = [NSMapTable weakToStrongObjectsMapTable];
+#else
+    result = [NSMapTable respondsToSelector:@selector(weakToStrongObjectsMapTable)] ? [NSMapTable weakToStrongObjectsMapTable] : [NSMapTable mapTableWithWeakToStrongObjects];
+#endif
+#pragma clang diagnostic pop
+    
+    return result;
+}
+
++ (instancetype)cde_strongToStrongObjectsMapTable
+{
+    id result = nil;
+    
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#if TARGET_OS_IPHONE
+    result = [NSMapTable strongToStrongObjectsMapTable];
+#else
+    result = [NSMapTable respondsToSelector:@selector(strongToStrongObjectsMapTable)] ? [NSMapTable strongToStrongObjectsMapTable] : [NSMapTable mapTableWithStrongToStrongObjects];
+#endif
+#pragma clang diagnostic pop
+    
+    return result;
+}
+
 - (void)cde_addEntriesFromMapTable:(NSMapTable *)otherTable
 {
     for (id key in otherTable) {

@@ -248,7 +248,7 @@
 
     // Retrieve all global identifiers. Map global ids to object changes.
     [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:@[firstBaseline]];
-    NSMapTable *objectChangesByGlobalId = [NSMapTable strongToStrongObjectsMapTable];
+    NSMapTable *objectChangesByGlobalId = [NSMapTable cde_strongToStrongObjectsMapTable];
     NSSet *objectChanges = firstBaseline.objectChanges;
     for (CDEObjectChange *change in objectChanges) {
         [objectChangesByGlobalId setObject:change forKey:change.globalIdentifier];

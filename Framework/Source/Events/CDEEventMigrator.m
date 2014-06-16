@@ -116,7 +116,7 @@ static NSString *kCDEDefaultStoreType;
         if (!events) @throw [[NSException alloc] initWithName:CDEException reason:@"" userInfo:nil];
         [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:events];
         
-        NSMapTable *toStoreObjectsByFromStoreObject = [NSMapTable strongToStrongObjectsMapTable];
+        NSMapTable *toStoreObjectsByFromStoreObject = [NSMapTable cde_strongToStrongObjectsMapTable];
         for (CDEStoreModificationEvent *event in events) {
             [self migrateObject:event andRelatedObjectsToManagedObjectContext:exportContext withMigratedObjectsMap:toStoreObjectsByFromStoreObject];
         }
@@ -202,7 +202,7 @@ static NSString *kCDEDefaultStoreType;
     [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:storeModEventsToMigrate];
     
     // Migrate mod events
-    NSMapTable *toObjectsByFromObject = [NSMapTable strongToStrongObjectsMapTable];
+    NSMapTable *toObjectsByFromObject = [NSMapTable cde_strongToStrongObjectsMapTable];
     [toObjectsByFromObject cde_addEntriesFromMapTable:toGlobalIdsByFromGlobalId];
     @try {
         for (CDEStoreModificationEvent *fromStoreModEvent in storeModEventsToMigrate) {
@@ -298,7 +298,7 @@ static NSString *kCDEDefaultStoreType;
     NSDictionary *toStoreObjectsByUniqueValue = [[NSDictionary alloc] initWithObjects:toContextObjects forKeys:toStoreKeys];
     NSDictionary *fromStoreObjectsByUniqueValue = [[NSDictionary alloc] initWithObjects:fromContextObjects forKeys:fromStoreKeys];
     
-    NSMapTable *toObjectByFromObject = [NSMapTable strongToStrongObjectsMapTable];
+    NSMapTable *toObjectByFromObject = [NSMapTable cde_strongToStrongObjectsMapTable];
     for (id uniqueValue in fromStoreObjectsByUniqueValue) {
         NSManagedObject *toContextObject = toStoreObjectsByUniqueValue[uniqueValue];
         NSManagedObject *fromContextObject = fromStoreObjectsByUniqueValue[uniqueValue];

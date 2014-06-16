@@ -13,6 +13,9 @@
 @property (readonly) NSArray *cde_allValues;
 @property (readonly) NSArray *cde_allKeys;
 
++ (instancetype)cde_weakToStrongObjectsMapTable;
++ (instancetype)cde_strongToStrongObjectsMapTable;
+
 - (void)cde_addEntriesFromMapTable:(NSMapTable *)otherTable;
 
 @end

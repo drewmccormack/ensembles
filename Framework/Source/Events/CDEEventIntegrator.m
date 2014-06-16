@@ -624,7 +624,7 @@
     NSMapTable *objectsByGlobalId = [self fetchObjectsByGlobalIdentifierForObjectChanges:changes error:error];
     if (!objectsByGlobalId) return NO;
     
-    NSMapTable *globalIdsByObject = [NSMapTable strongToStrongObjectsMapTable];
+    NSMapTable *globalIdsByObject = [NSMapTable cde_strongToStrongObjectsMapTable];
     for (CDEGlobalIdentifier *globalId in objectsByGlobalId) {
         id object = [objectsByGlobalId objectForKey:globalId];
         [globalIdsByObject setObject:globalId forKey:object];
@@ -752,7 +752,7 @@
         
         // Merge indexes for global ids
         NSMutableOrderedSet *relatedObjects = [object mutableOrderedSetValueForKey:relationshipChange.propertyName];
-        NSMapTable *finalIndexesByObject = [NSMapTable strongToStrongObjectsMapTable];
+        NSMapTable *finalIndexesByObject = [NSMapTable cde_strongToStrongObjectsMapTable];
         for (NSUInteger index = 0; index < relatedObjects.count; index++) {
             [finalIndexesByObject setObject:@(index) forKey:relatedObjects[index]];
         }
@@ -869,7 +869,7 @@
     // Setup mappings between types of identifiers
     NSPersistentStoreCoordinator *coordinator = managedObjectContext.persistentStoreCoordinator;
     NSMutableSet *objectIDs = [[NSMutableSet alloc] initWithCapacity:[globalIdentifiers count]];
-    NSMapTable *objectIDByGlobalId = [NSMapTable strongToStrongObjectsMapTable];
+    NSMapTable *objectIDByGlobalId = [NSMapTable cde_strongToStrongObjectsMapTable];
     for (CDEGlobalIdentifier *globalId in globalIdentifiers) {
         NSString *storeIdString = globalId.storeURI;
         if (!storeIdString) continue; // Doesn't exist in store
@@ -897,7 +897,7 @@
     NSDictionary *objectByObjectID = [[NSDictionary alloc] initWithObjects:objects forKeys:objectIDsOfFetched];
     
     // Prepare results
-    NSMapTable *result = [NSMapTable strongToStrongObjectsMapTable];
+    NSMapTable *result = [NSMapTable cde_strongToStrongObjectsMapTable];
     for (CDEGlobalIdentifier *globalId in globalIdentifiers) {
         NSManagedObjectID *objectID = [objectIDByGlobalId objectForKey:globalId];
         [result setObject:objectByObjectID[objectID] forKey:globalId];
@@ -919,7 +919,7 @@
     // to sort an ordered relationship, and this involves all objects, whether they are new or not.
     NSMapTable *relatedOrderedObjectsByIdString = [self fetchObjectsByIdStringForRelatedObjectsInOrderedRelationshipsOfObjectChanges:objectChanges];
     
-    NSMapTable *result = [NSMapTable strongToStrongObjectsMapTable];
+    NSMapTable *result = [NSMapTable cde_strongToStrongObjectsMapTable];
     [result cde_addEntriesFromMapTable:changeObjectsByIdString];
     [result cde_addEntriesFromMapTable:relatedOrderedObjectsByIdString];
     
@@ -928,7 +928,7 @@
 
 - (NSMapTable *)fetchObjectsByIdStringForRelatedObjectsInOrderedRelationshipsOfObjectChanges:(id)objectChanges
 {
-    NSMapTable *changedOrderedPropertiesByGlobalId = [NSMapTable strongToStrongObjectsMapTable];
+    NSMapTable *changedOrderedPropertiesByGlobalId = [NSMapTable cde_strongToStrongObjectsMapTable];
     for (CDEObjectChange *change in objectChanges) {
         NSArray *propertyChangeValues = change.propertyChangeValues;
         for (CDEPropertyChangeValue *value in propertyChangeValues) {
@@ -963,7 +963,7 @@
     NSArray *objectIDs = [relatedObjects valueForKeyPath:@"objectID"];
     NSArray *globalIds = [CDEGlobalIdentifier fetchGlobalIdentifiersForObjectIDs:objectIDs inManagedObjectContext:self.eventStore.managedObjectContext];
 
-    NSMapTable *relatedObjectsByGlobalId = [NSMapTable strongToStrongObjectsMapTable];
+    NSMapTable *relatedObjectsByGlobalId = [NSMapTable cde_strongToStrongObjectsMapTable];
     [relatedObjects enumerateObjectsUsingBlock:^(id object, NSUInteger index, BOOL *stop) {
         CDEGlobalIdentifier *globalId = globalIds[index];
         if (globalId == (id)[NSNull null]) {
@@ -979,7 +979,7 @@
 - (NSMapTable *)fetchObjectsByIdStringForGlobalIdentifiers:(NSArray *)globalIds
 {
     NSDictionary *globalIdsByEntityName = [self entityGroupedGlobalIdentifiersForIdentifiers:globalIds];
-    NSMapTable *results = [NSMapTable strongToStrongObjectsMapTable];
+    NSMapTable *results = [NSMapTable cde_strongToStrongObjectsMapTable];
     for (NSString *entityName in globalIdsByEntityName) {
         NSSet *entityGlobalIds = globalIdsByEntityName[entityName];
         NSError *error;

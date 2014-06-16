@@ -10,10 +10,12 @@
 #import "CDECloudFileSystem.h"
 
 extern NSString * const CDEICloudFileSystemDidDownloadFilesNotification;
+extern NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification;
 
 @interface CDEICloudFileSystem : NSObject <CDECloudFileSystem>
 
 @property (nonatomic, readonly) NSString *relativePathToRootInContainer;
+@property (atomic, readonly) unsigned long long bytesRemainingToDownload;
 
 - (instancetype)initWithUbiquityContainerIdentifier:(NSString *)newIdentifier;
 - (instancetype)initWithUbiquityContainerIdentifier:(NSString *)newIdentifier relativePathToRootInContainer:(NSString *)rootSubPath;

@@ -9,6 +9,7 @@
 #import "CDERebaser.h"
 #import "NSManagedObjectModel+CDEAdditions.h"
 #import "CDEFoundationAdditions.h"
+#import "NSMapTable+CDEAdditions.h"
 #import "CDEDefines.h"
 #import "CDEEventStore.h"
 #import "CDEPersistentStoreEnsemble.h"
@@ -216,7 +217,7 @@
 {
     // Create map of existing object changes
     [CDEStoreModificationEvent prefetchRelatedObjectsForStoreModificationEvents:@[baseline]];
-    NSMapTable *objectChangesByGlobalId = [NSMapTable strongToStrongObjectsMapTable];
+    NSMapTable *objectChangesByGlobalId = [NSMapTable cde_strongToStrongObjectsMapTable];
     NSSet *objectChanges = baseline.objectChanges;
     for (CDEObjectChange *change in objectChanges) {
         [objectChangesByGlobalId setObject:change forKey:change.globalIdentifier];
