@@ -7,6 +7,7 @@
 //
 
 #import "CDESaveMonitor.h"
+#import "NSMapTable+CDEAdditions.h"
 #import "CDEPersistentStoreEnsemble.h"
 #import "CDEEventBuilder.h"
 #import "CDEEventIntegrator.h"
@@ -30,7 +31,7 @@
     if (self) {
         self.storePath = [newPath copy];
         
-        changedValuesByContext = [NSMapTable weakToStrongObjectsMapTable];
+        changedValuesByContext = [NSMapTable cde_weakToStrongObjectsMapTable];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contextDidSave:) name:NSManagedObjectContextDidSaveNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(contextWillSave:) name:NSManagedObjectContextWillSaveNotification object:nil];
     }

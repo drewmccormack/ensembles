@@ -493,7 +493,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
     }
     
     // Prevent event store being backed up
-    if (NSURLIsExcludedFromBackupKey) {
+    if (&NSURLIsExcludedFromBackupKey != NULL) {
         NSURL *url = [NSURL fileURLWithPath:self.pathToEventStoreRootDirectory];
         NSError *metadataError;
         BOOL success = [url setResourceValue:@YES forKey:NSURLIsExcludedFromBackupKey error:&metadataError];
