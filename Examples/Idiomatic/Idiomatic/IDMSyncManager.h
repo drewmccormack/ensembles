@@ -16,6 +16,7 @@ extern NSString * const IDMCloudServiceUserDefaultKey;
 extern NSString * const IDMICloudService;
 extern NSString * const IDMDropboxService;
 extern NSString * const IDMNodeS3Service;
+extern NSString * const IDMMultipeerService;
 
 @interface IDMSyncManager : NSObject
 
