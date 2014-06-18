@@ -30,9 +30,9 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
     dispatch_queue_t timeOutQueue;
     dispatch_queue_t initiatingDownloadsQueue;
     id ubiquityIdentityObserver;
-    NSUInteger numberOfUnfinishedDownloads;
     NSOperationQueue *downloadTrackingQueue;
     NSDate *lastProgressNotificationDate;
+    NSMutableSet *downloadingURLs;
 }
 
 @synthesize relativePathToRootInContainer = relativePathToRootInContainer;
@@ -69,6 +69,8 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
         
         bytesRemainingToDownload = 0;
         lastProgressNotificationDate = nil;
+    
+        downloadingURLs = [NSMutableSet set];
         
         [self performInitialPreparation:NULL];
     }
@@ -297,10 +299,14 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
     for ( NSUInteger i = 0; i < count; i++ ) {
         @autoreleasepool {
             NSURL *url = [metadataQuery valueOfAttribute:NSMetadataItemURLKey forResultAtIndex:i];
+            @synchronized(self) {
+                if ([downloadingURLs containsObject:url]) continue;
+            }
+            
             NSNumber *percentDownloaded = [metadataQuery valueOfAttribute:NSMetadataUbiquitousItemPercentDownloadedKey forResultAtIndex:i];
             NSNumber *downloaded = [metadataQuery valueOfAttribute:NSMetadataUbiquitousItemIsDownloadedKey forResultAtIndex:i];
             NSNumber *fileSizeNumber = [metadataQuery valueOfAttribute:NSMetadataItemFSSizeKey forResultAtIndex:i];
-        
+            
             dispatch_async(initiatingDownloadsQueue, ^{
                 NSError *error;
                 BOOL startedDownload = [fileManager startDownloadingUbiquitousItemAtURL:url error:&error];
@@ -308,7 +314,7 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
                     unsigned long long bytesRemainingForThisFile = 0;
                     
                     @synchronized(self) {
-                        numberOfUnfinishedDownloads++;
+                        [downloadingURLs addObject:url];
                         
                         unsigned long long fileSize = fileSizeNumber ? fileSizeNumber.unsignedLongLongValue : 0;
                         if ( downloaded && !downloaded.boolValue ) {
@@ -324,9 +330,9 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
                         [coordinator coordinateReadingItemAtURL:url options:0 error:&error byAccessor:^(NSURL *newURL) {
                             BOOL complete = NO;
                             @synchronized(self) {
-                                numberOfUnfinishedDownloads--;
+                                [downloadingURLs removeObject:url];
                                 self.bytesRemainingToDownload -= bytesRemainingForThisFile;
-                                if (numberOfUnfinishedDownloads == 0) {
+                                if (downloadingURLs.count == 0) {
                                     complete = YES;
                                     self.bytesRemainingToDownload = 0;
                                 }
