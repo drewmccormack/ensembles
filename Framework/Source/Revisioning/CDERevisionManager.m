@@ -330,7 +330,24 @@
         result = [filenamesInEvents isSubsetOfSet:filenames];
     }];
     return result;
+}
 
+- (BOOL)checkThatLocalPersistentStoreHasNotBeenAbandoned:(NSError * __autoreleasing *)error
+{
+    __block BOOL passed = NO;
+    [eventManagedObjectContext performBlockAndWait:^{
+        // Check for merge events newer than baseline. Ignore save events, because they may get generated at any time, and could be based on a newly imported baseline.
+        NSArray *localMergeEvents = [CDEStoreModificationEvent fetchStoreModificationEventsWithTypes:@[@(CDEStoreModificationEventTypeMerge)] persistentStoreIdentifier:self.eventStore.persistentStoreIdentifier inManagedObjectContext:eventManagedObjectContext];
+        CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchMostRecentBaselineStoreModificationEventInManagedObjectContext:eventManagedObjectContext];
+        for (CDEStoreModificationEvent *event in localMergeEvents) {
+            if ([event.revisionSet compare:baseline.revisionSet] == NSOrderedDescending) {
+                // This event comes after baseline, so store is not abandoned
+                passed = YES;
+                return;
+            }
+        }
+    }];
+    return passed;
 }
 
 #pragma mark Global Count

@@ -19,8 +19,6 @@
 
 - (instancetype)initWithEventStore:(CDEEventStore *)eventStore;
 
-- (BOOL)persistentStoreHasBeenAbandoned;
-
 - (BOOL)baselineNeedsConsolidation;
 - (void)consolidateBaselineWithCompletion:(CDECompletionBlock)completion;
 

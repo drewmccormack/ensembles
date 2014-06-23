@@ -43,41 +43,6 @@
     return fetch;
 }
 
-- (BOOL)persistentStoreHasBeenAbandoned
-{
-    // If there are multiple baselines with the unique identifier of the local store,
-    // see if the revision number is unchanged between them. If so, consider this store
-    // abandoned, as it did not commit any new changes before the rebase.
-    __block BOOL result = NO;
-    NSManagedObjectContext *context = self.eventStore.managedObjectContext;
-    [context performBlockAndWait:^{
-        NSError *error;
-        NSString *baselineId = self.eventStore.identifierOfBaselineUsedToConstructStore;
-        if (nil == baselineId) return;
-        
-        NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEStoreModificationEvent"];
-        fetch.predicate = [NSPredicate predicateWithFormat:@"type = %d AND uniqueIdentifier = %@", CDEStoreModificationEventTypeBaseline, baselineId];
-        NSArray *baselines = [context executeFetchRequest:fetch error:&error];
-        if (!baselines) CDELog(CDELoggingLevelError, @"Failed to fetch baselines: %@", error);
-        if (baselines.count <= 1) return;
-        
-        NSString *storeId = self.eventStore.persistentStoreIdentifier;
-        NSMutableSet *baselineRevisions = [NSMutableSet set];
-        NSUInteger countOfBaselinesWithStore = 0;
-        for (CDEStoreModificationEvent *baseline in baselines) {
-            CDERevisionSet *revSet = baseline.revisionSet;
-            CDERevision *storeRevision = [revSet revisionForPersistentStoreIdentifier:storeId];
-            if (!storeRevision) continue;
-            [baselineRevisions addObject:@(storeRevision.revisionNumber)];
-            countOfBaselinesWithStore++;
-        }
-        
-        // If revisions are not unique, should get different count to baselines
-        result = baselineRevisions.count != countOfBaselinesWithStore;
-    }];
-    return result;
-}
-
 - (BOOL)baselineNeedsConsolidation
 {
     __block BOOL result = NO;
