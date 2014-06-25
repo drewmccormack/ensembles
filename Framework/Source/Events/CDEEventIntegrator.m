@@ -522,7 +522,7 @@
             }
             else {
                 NSManagedObjectID *objectID = [managedObjectContext.persistentStoreCoordinator managedObjectIDForURIRepresentation:url];
-                NSManagedObject *object = [managedObjectContext existingObjectWithID:objectID error:NULL];
+                NSManagedObject *object = objectID ? [managedObjectContext existingObjectWithID:objectID error:NULL] : nil;
                 objectNeedsCreating = !object || object.isDeleted || nil == object.managedObjectContext;
             }
             if (objectNeedsCreating) [indexesNeedingNewObjects addObject:@(i)];
