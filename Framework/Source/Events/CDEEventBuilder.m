@@ -56,7 +56,7 @@
         
         CDERevisionNumber lastRevision = eventStore.lastRevisionSaved;
         NSString *persistentStoreId = self.eventStore.persistentStoreIdentifier;
-        
+
         CDERevisionManager *revisionManager = [[CDERevisionManager alloc] initWithEventStore:eventStore];
         revisionManager.managedObjectModelURL = self.ensemble.managedObjectModelURL;
         CDEGlobalCount globalCountBeforeMakingEvent = [revisionManager maximumGlobalCount];
@@ -86,7 +86,8 @@
             event.revisionSetOfOtherStoresAtCreation = mostRecentSet;
         }
         
-        returnRevision = [event.revisionSet revisionForPersistentStoreIdentifier:persistentStoreId];
+        [eventManagedObjectContext processPendingChanges];
+        if (persistentStoreId) returnRevision = [event.revisionSet revisionForPersistentStoreIdentifier:persistentStoreId];
     }];
     
     return returnRevision;
