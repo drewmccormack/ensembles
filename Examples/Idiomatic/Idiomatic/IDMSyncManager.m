@@ -15,7 +15,7 @@
 #import "CDENodeCloudFileSystem.h"
 #import "IDMNodeSyncSettingsViewController.h"
 #import "CDEMultipeerCloudFileSystem.h"
-#import "MyMultipeerImplementation.h"
+#import "IDMMultipeerManager.h"
 
 NSString * const IDMSyncActivityDidBeginNotification = @"IDMSyncActivityDidBegin";
 NSString * const IDMSyncActivityDidEndNotification = @"IDMSyncActivityDidEnd";
@@ -43,7 +43,7 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
     CDECompletionBlock dropboxLinkSessionCompletion;
     CDECompletionBlock nodeCredentialUpdateCompletion;
     DBSession *dropboxSession;
-    MyMultipeerImplementation *multipeerImplementation;
+    IDMMultipeerManager *multipeerManager;
 }
 
 @synthesize ensemble = ensemble;
@@ -78,11 +78,18 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 
 - (void)reset
 {
+    [multipeerManager stop];
+    [multipeerManager.multipeerCloudFileSystem removeAllFiles];
+    multipeerManager = nil;
+
     [self clearNodePassword];
+    
     [dropboxSession unlinkAll];
     dropboxSession = nil;
+    
     ensemble.delegate = nil;
     ensemble = nil;
+    
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:IDMCloudServiceUserDefaultKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
@@ -145,25 +152,17 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
         newSystem = newNodeFileSystem;
     }
     else if ([cloudService isEqualToString:IDMMultipeerService]) {
-        CDEMultipeerCloudFileSystem *multiPeerCloudFileSystem = [[CDEMultipeerCloudFileSystem alloc] init];
-        newSystem = multiPeerCloudFileSystem;
+        multipeerManager = [[IDMMultipeerManager alloc] init];
 
-        multipeerImplementation = [[MyMultipeerImplementation alloc] init];
-        multipeerImplementation.multipeerCloudFileSystem = multiPeerCloudFileSystem;
-        [multipeerImplementation start];
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+        NSString *path = [paths.lastObject stringByAppendingPathComponent:@"Idiomatic/Multipeer"];
+        CDEMultipeerCloudFileSystem *multipeerCloudFileSystem = [[CDEMultipeerCloudFileSystem alloc] initWithRootDirectory:path multipeerConnection:multipeerManager];
+        multipeerManager.multipeerCloudFileSystem = multipeerCloudFileSystem;
+        [multipeerManager start];
+        
+        newSystem = multipeerCloudFileSystem;
 
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(didImportFiles)
-                                                     name:nMultipeerCloudFileSystemDidImportFiles
-                                                   object:nil];
-
-
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(pushChangesToPeers)
-                                                     name:CDEMonitoredManagedObjectContextDidSaveNotification
-                                                   object:nil];
-
-
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didImportFiles) name:CDEMultipeerCloudFileSystemDidImportFilesNotification object:nil];
     }
     
     return newSystem;
@@ -204,6 +203,7 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
     else {
         [ensemble mergeWithCompletion:^(NSError *error) {
             [self decrementMergeCount];
+            [multipeerManager syncFilesWithAllPeers];
             if (error) NSLog(@"Error merging: %@", error);
             if (completion) completion(error);
         }];
@@ -368,25 +368,9 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 
 #pragma mark - CDEMultipeerCloudFileSystem
 
-- (void)pushChangesToPeers {
-    dispatch_async(dispatch_get_main_queue(), ^{
-	    [ensemble mergeWithCompletion:^(NSError *error) {
-	        [self decrementMergeCount];
-
-            if (error) {
-                NSLog(@"Error merging: %@", error);
-            }
-            else {
-                [multipeerImplementation synchronizeWithAllPeers];
-            }
-        }];
-    });
-}
-
-- (void)didImportFiles {
-	dispatch_async(dispatch_get_main_queue(), ^{
-        [self synchronizeWithCompletion:nil];
-    });
+- (void)didImportFiles
+{
+    [self synchronizeWithCompletion:nil];
 }
 
 @end

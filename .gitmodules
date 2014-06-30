@@ -4,3 +4,6 @@
 [submodule "Vendor/MagicalRecord"]
 	path = Vendor/MagicalRecord
 	url = https://github.com/magicalpanda/MagicalRecord.git
+[submodule "Vendor/SSZipArchive"]
+	path = Vendor/SSZipArchive
+	url = https://github.com/soffes/ssziparchive.git

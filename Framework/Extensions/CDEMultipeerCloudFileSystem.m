@@ -10,40 +10,33 @@
 #import "CDEMultipeerCloudFileSystem.h"
 #import "SSZipArchive.h"
 
-// PEER MESSAGE
-typedef NS_ENUM (NSInteger, PeerMessageType) {
-	PeerMessageTypeStatus = 1,
-	PeerMessageTypeRequest = 2
+typedef NS_ENUM (NSInteger, CDEMultipeerMessageType) {
+	CDEMultipeerMessageTypeFileRetrievalRequest = 1,
+    CDEMultipeerMessageTypeFileRetrievalResponse = 2
 };
 
-NSString *const nMultipeerCloudFileSystemDidImportFiles = @"MultipeerCloudFileSystemDidImportFiles";
-NSString *const CloudFilesDirectoryName = @"cloudfiles";
-NSString *const PeerMessageFilesPaths = @"filesPaths";
-NSString *const PeerMessageMessageType = @"messageType";
+NSString * const CDEMultipeerCloudFileSystemDidImportFilesNotification = @"CDEMultipeerCloudFileSystemDidImportFilesNotification";
 
-@interface CDEMultipeerCloudFileSystem ()
-{
-	__strong NSFileManager *fileManager;
-    __strong NSString *localRootDirectoryPath;
+NSString * const CDEMultipeerFilesPathsKey = @"filesPaths";
+NSString * const CDEMultipeerMessageTypeKey = @"messageType";
+
+
+@implementation CDEMultipeerCloudFileSystem {
+	NSFileManager *fileManager;
 }
-@end
 
-@implementation CDEMultipeerCloudFileSystem
+@synthesize rootDirectory = rootDirectory;
+@synthesize multipeerConnection = multipeerConnection;
 
-- (instancetype)init
+- (instancetype)initWithRootDirectory:(NSString *)rootDir multipeerConnection:(id <CDEMultipeerConnection>)newConnection
 {
 	self = [super init];
-
     if (self) {
+        multipeerConnection = newConnection;
 		fileManager = [[NSFileManager alloc] init];
-
-        NSURL *directoryURL = [fileManager URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:NULL];
-        directoryURL = [directoryURL URLByAppendingPathComponent:CloudFilesDirectoryName isDirectory:YES];
-		localRootDirectoryPath = directoryURL.path;
-
-        [fileManager createDirectoryAtPath:directoryURL.path withIntermediateDirectories:YES attributes:nil error:NULL];
+        rootDirectory = [rootDir copy];
+        [fileManager createDirectoryAtPath:rootDirectory withIntermediateDirectories:YES attributes:nil error:NULL];
 	}
-
 	return self;
 }
 
@@ -54,31 +47,26 @@ NSString *const PeerMessageMessageType = @"messageType";
 
 - (void)connect:(CDECompletionBlock)completion
 {
-    if (completion) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            completion(nil);
-        });
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (completion) completion(nil);
+    });
 }
 
 - (id <NSObject, NSCoding, NSCopying>)identityToken
 {
-    return NSUserName();
+    return @"User";
 }
 
-- (void)fileExistsAtPath:(NSString *)path completion:(void(^)(BOOL exists, BOOL isDirectory, NSError *error))block
+- (void)fileExistsAtPath:(NSString *)path completion:(void(^)(BOOL exists, BOOL isDirectory, NSError *error))completion
 {
     BOOL exists, isDir;
     exists = [fileManager fileExistsAtPath:[self fullPathForRelativePath:path] isDirectory:&isDir];
-
-    if (block) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            block(exists, isDir, nil);
-        });
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (completion) completion(exists, isDir, nil);
+    });
 }
 
-- (void)contentsOfDirectoryAtPath:(NSString *)path completion:(void(^)(NSArray *contents, NSError *error))block
+- (void)contentsOfDirectoryAtPath:(NSString *)path completion:(void(^)(NSArray *contents, NSError *error))completion
 {
     NSMutableArray *contents = [[NSMutableArray alloc] init];
     NSDirectoryEnumerator *dirEnum = [fileManager enumeratorAtPath:[self fullPathForRelativePath:path]];
@@ -104,206 +92,122 @@ NSString *const PeerMessageMessageType = @"messageType";
         }
     }
 
-    if (block) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            block(contents, nil);
-        });
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (completion) completion(contents, nil);
+    });
 }
 
-- (void)createDirectoryAtPath:(NSString *)path completion:(CDECompletionBlock)block
+- (void)createDirectoryAtPath:(NSString *)path completion:(CDECompletionBlock)completion
 {
     NSError *error = nil;
     [fileManager createDirectoryAtPath:[self fullPathForRelativePath:path] withIntermediateDirectories:NO attributes:nil error:&error];
-
-    if (block) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            block(error);
-        });
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (completion) completion(error);
+    });
 }
 
-- (void)removeItemAtPath:(NSString *)fromPath completion:(CDECompletionBlock)block
+- (void)removeItemAtPath:(NSString *)fromPath completion:(CDECompletionBlock)completion
 {
     NSError *error = nil;
     [fileManager removeItemAtPath:[self fullPathForRelativePath:fromPath] error:&error];
-
-    if (block) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            block(error);
-        });
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (completion) completion(error);
+    });
 }
 
-- (void)uploadLocalFile:(NSString *)fromPath toPath:(NSString *)toPath completion:(CDECompletionBlock)block
+- (void)uploadLocalFile:(NSString *)fromPath toPath:(NSString *)toPath completion:(CDECompletionBlock)completion
 {
     NSError *error = nil;
     [fileManager copyItemAtPath:fromPath toPath:[self fullPathForRelativePath:toPath] error:&error];
-
-    if (block) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            block(error);
-        });
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (completion) completion(error);
+    });
 }
 
-- (void)downloadFromPath:(NSString *)fromPath toLocalFile:(NSString *)toPath completion:(CDECompletionBlock)block
+- (void)downloadFromPath:(NSString *)fromPath toLocalFile:(NSString *)toPath completion:(CDECompletionBlock)completion
 {
     NSError *error = nil;
     [fileManager copyItemAtPath:[self fullPathForRelativePath:fromPath] toPath:toPath error:&error];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (completion) completion(error);
+    });
+}
 
-    if (block) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            block(error);
-        });
+#pragma mark - Remove Files
+
+- (void)removeAllFiles
+{
+    [fileManager removeItemAtPath:self.rootDirectory error:NULL];
+}
+
+#pragma mark - Retrieving Files
+
+- (void)retrieveFilesFromPeersWithIDs:(NSArray *)peerIDs
+{
+    NSSet *localFilesPaths = [self localFilePaths];
+    NSDictionary *peerMessage = @{
+        CDEMultipeerMessageTypeKey : @(CDEMultipeerMessageTypeFileRetrievalRequest),
+        CDEMultipeerFilesPathsKey : localFilesPaths
+    };
+    NSData *peerMessageData = [NSKeyedArchiver archivedDataWithRootObject:peerMessage];
+    
+    for (id peerID in peerIDs) {
+        BOOL success = [self.multipeerConnection sendData:peerMessageData toPeerWithID:peerID];
+        if (!success) CDELog(CDELoggingLevelError, @"Could not send data to peer: %@", peerID);
     }
 }
 
-#pragma mark - Public
-
-- (BOOL)synchronizeFilesViaMultipeerSession:(MCSession *)session withSpecificPeers:(NSArray *)specificPeers
+- (NSString *)fullPathForRelativePath:(NSString *)path
 {
-    BOOL success = NO;
-    NSArray *peersToSendTo = nil == specificPeers ? session.connectedPeers : specificPeers;
-
-	if (peersToSendTo.count == 0) {
-		CDELog(CDELoggingLevelVerbose, @"MPC sendStatusMessageToPeers : NO peer to send data to");
-	}
-    else {
-        NSSet *localFilesPaths = [self localFilePaths];
-        NSDictionary *peerMessage = @{ PeerMessageMessageType : @(PeerMessageTypeStatus), PeerMessageFilesPaths : localFilesPaths};
-
-        if (localFilesPaths.count > 0 && peersToSendTo) {
-            NSData *peerMessageData = [NSKeyedArchiver archivedDataWithRootObject:peerMessage];
-            NSError *error;
-            success = [session sendData:peerMessageData toPeers:peersToSendTo withMode:MCSessionSendDataReliable error:&error];
-
-            if (error || NO == success) {
-                CDELog(CDELoggingLevelError, @"MultiPeer ERROR Sending HeaderData A : %@", error);
-            }
-        }
-    }
-
-	return success;
+	return [rootDirectory stringByAppendingPathComponent:path];
 }
 
-- (void)handleMessageData:(NSData *)data fromPeer:(MCPeerID *)peerID inSession:(MCSession *)session;
-{
-    CDELog(CDELoggingLevelVerbose, @"MPC didReceiveData");
+#pragma mark - Responses
 
-    if (data.length == 0) {
-        CDELog(CDELoggingLevelVerbose, @"MPC didReceiveData DATA IS EMPTY");
+- (void)receiveData:(NSData *)data fromPeerWithID:(id<NSObject,NSCopying,NSCoding>)peerID
+{
+    CDELog(CDELoggingLevelVerbose, @"Received data from peer: %@", peerID);
+    
+    NSDictionary *peerMessage = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    
+    NSInteger messageType = [peerMessage[CDEMultipeerMessageTypeKey] integerValue];
+    if (CDEMultipeerMessageTypeFileRetrievalRequest == messageType) {
+        NSSet *remoteFiles = peerMessage[CDEMultipeerFilesPathsKey];
+        [self handleFileRetrievalRequestFromPeerWithID:peerID withRemotePaths:remoteFiles];
+    }
+}
+
+- (void)handleFileRetrievalRequestFromPeerWithID:(id <NSObject, NSCopying, NSCoding>)peerID withRemotePaths:(NSSet *)remotePaths
+{
+    CDELog(CDELoggingLevelVerbose, @"Handling status message");
+    
+    NSSet *localFiles = [self localFilePaths];
+    NSMutableSet *filesMissingRemotely = [localFiles mutableCopy];
+    [filesMissingRemotely minusSet:remotePaths];
+    CDELog(CDELoggingLevelVerbose, @"Sending files to peer: %@", filesMissingRemotely);
+    
+    NSURL *tempURL = [self makeArchiveForPaths:filesMissingRemotely];
+    if (!tempURL) {
+        CDELog(CDELoggingLevelError, @"Could not create archive of files");
         return;
     }
-
-    NSDictionary *peerMessage = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-    NSSet *remoteFiles = peerMessage[PeerMessageFilesPaths];
-
-    if (PeerMessageTypeStatus == [peerMessage[PeerMessageMessageType] integerValue]) {
-        CDELog(CDELoggingLevelVerbose, @"PeerManager didReceiveData: PeerMessageTypeStatus");
-        NSSet *localFiles = [self localFilePaths];
-
-        NSMutableSet *unionObjects = [localFiles mutableCopy];
-        [unionObjects addObjectsFromArray:remoteFiles.allObjects];
-
-        NSMutableSet *missingLocalFiles = [unionObjects mutableCopy];
-        [missingLocalFiles minusSet:localFiles];
-
-        NSMutableSet *missingRemoteFiles = [unionObjects mutableCopy];
-        [missingRemoteFiles minusSet:remoteFiles];
-
-        if (missingLocalFiles.count > 0) {
-            CDELog(CDELoggingLevelVerbose, @"Missing files LOCALLY");
-            NSDictionary *peerMessageRequest = @{ PeerMessageMessageType : @(PeerMessageTypeRequest), PeerMessageFilesPaths : missingLocalFiles};
-
-            if (remoteFiles.count > 0) {
-                NSData *peerMessageData = [NSKeyedArchiver archivedDataWithRootObject:peerMessageRequest];
-                NSError *error;
-                BOOL success = [session sendData:peerMessageData toPeers:@[peerID] withMode:MCSessionSendDataReliable error:&error];
-
-                if (error || NO == success) {
-                    CDELog(CDELoggingLevelError, @"MultiPeer ERROR Sending HeaderData : %@", error);
-                }
-            }
-        }
-
-        if (missingRemoteFiles.count > 0) {
-            CDELog(CDELoggingLevelVerbose, @"Missing files REMOTELY");
-            NSDictionary *peerMessageRequest = @{ PeerMessageMessageType : @(PeerMessageTypeStatus), PeerMessageFilesPaths : remoteFiles};
-            BOOL success = NO;
-
-            if (remoteFiles.count > 0) {
-                NSData *peerMessageData = [NSKeyedArchiver archivedDataWithRootObject:peerMessageRequest];
-                NSError *error;
-                success = [session sendData:peerMessageData toPeers:@[peerID] withMode:MCSessionSendDataReliable error:&error];
-
-                if (error || NO == success) {
-                    CDELog(CDELoggingLevelError, @"MultiPeer ERROR Sending HeaderData : %@", error);
-                }
-            }
-        }
-
-        if (missingRemoteFiles == 0 && missingRemoteFiles == 0) {
-            CDELog(CDELoggingLevelVerbose, @"NOT Missing files");
-        }
-    }
-    else if (PeerMessageTypeRequest == [peerMessage[PeerMessageMessageType] integerValue]) {
-        CDELog(CDELoggingLevelVerbose, @"PeerManager didReceiveData: PeerMessageTypeRequest");
-        NSURL *urlOfTempFile = [self archiveURLForFilesPaths:remoteFiles];
-
-        if (urlOfTempFile) {
-            NSString *resourceName = [urlOfTempFile lastPathComponent];
-            CDELog(CDELoggingLevelVerbose, @"PeerManager sendResourceAtURL: %@", resourceName);
-
-            [session sendResourceAtURL:urlOfTempFile withName:resourceName toPeer:peerID withCompletionHandler: ^(NSError *error) {
-                if (error) {
-                    CDELog(CDELoggingLevelError, @"ERROR Finish sending : %@", error);
-                }
-                else {
-                    CDELog(CDELoggingLevelVerbose, @"Finish sending file data %@", resourceName);
-                }
-
-                NSError *removeFileError;
-                BOOL success = [[NSFileManager defaultManager] removeItemAtURL:urlOfTempFile error:&removeFileError];
-
-                if (removeFileError || NO == success) {
-                    CDELog(CDELoggingLevelError, @"PeerManager ERROR Deleting temp zip : %@", removeFileError);
-                }
-                
-                success = [[NSFileManager defaultManager] removeItemAtURL:[urlOfTempFile URLByDeletingPathExtension] error:&removeFileError];
-                
-                if (removeFileError || NO == success) {
-                    CDELog(CDELoggingLevelError, @"PeerManager ERROR Deleting temp directory : %@", removeFileError);
-                }
-            }];
-        }
-    }
+    
+    NSString *resourceName = [tempURL lastPathComponent];
+    CDELog(CDELoggingLevelVerbose, @"PeerManager sendResourceAtURL: %@", resourceName);
+    
+    [multipeerConnection sendAndDiscardFileAtURL:tempURL toPeerWithID:peerID];
 }
 
-- (void)importArchiveAtURL:(NSURL *)archiveURL archiveName:(NSString *)archiveName
+- (void)receiveResourceAtURL:(NSURL *)archiveURL fromPeerWithID:(id<NSObject,NSCopying,NSCoding>)peerID
 {
     NSURL *contentURLDirectory = [[archiveURL URLByDeletingLastPathComponent] URLByAppendingPathComponent:archiveURL.pathExtension];
-    CDELog(CDELoggingLevelVerbose, @"IMPORTING ZIP FILE AT PATH: %@", archiveURL.path);
-
-    BOOL successUnarchive = [SSZipArchive unzipFileAtPath:archiveURL.path toDestination:contentURLDirectory.path delegate:nil];
-
-    if (NO == successUnarchive) {
-        CDELog(CDELoggingLevelError, @"Decompression failed");
-    }
-
-    NSDirectoryEnumerator *enumerator = [fileManager enumeratorAtURL:contentURLDirectory
-                                          includingPropertiesForKeys:@[NSURLNameKey, NSURLIsDirectoryKey]
-                                                             options:NSDirectoryEnumerationSkipsHiddenFiles
-                                                        errorHandler: ^BOOL (NSURL *url, NSError *error) {
-                                                            CDELog(CDELoggingLevelError, @"[Error] %@ (%@)", error, url);
-
-                                                            return YES;
-                                                        }];
-
-    NSMutableSet *mutableFilePaths = [NSMutableSet set];
-
-    BOOL hasImportedData = NO;
-
+    CDELog(CDELoggingLevelVerbose, @"Importing zip file: %@", archiveURL.path);
+    
+    [SSZipArchive unzipFileAtPath:archiveURL.path toDestination:contentURLDirectory.path delegate:nil];
+    
+    NSDirectoryEnumerator *enumerator = [fileManager enumeratorAtURL:contentURLDirectory includingPropertiesForKeys:@[NSURLNameKey, NSURLIsDirectoryKey] options:NSDirectoryEnumerationSkipsHiddenFiles errorHandler:NULL];
+    NSURL *rootURL = [[NSURL fileURLWithPath:rootDirectory] URLByResolvingSymlinksInPath];
+    NSURL *contentURL = [contentURLDirectory URLByResolvingSymlinksInPath];
     for (NSURL *fileURL in enumerator) {
         NSString *filename;
         [fileURL getResourceValue:&filename forKey:NSURLNameKey error:nil];
@@ -311,134 +215,90 @@ NSString *const PeerMessageMessageType = @"messageType";
         NSNumber *isDirectory;
         [fileURL getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
 
-        if (NO == [isDirectory boolValue]) {
-            [mutableFilePaths addObject:[self pathForFileURL:fileURL relativeToURL:contentURLDirectory]];
+        if (!isDirectory.boolValue) {
+            NSString *filePath = [self pathForFileURL:fileURL relativeToURL:contentURLDirectory];
+            NSURL *localFileURL = [rootURL URLByAppendingPathComponent:filePath];
+            NSURL *temporaryFileURL = [contentURL URLByAppendingPathComponent:filePath];
+            NSError *error = nil;
+            BOOL success = [fileManager moveItemAtURL:temporaryFileURL toURL:localFileURL error:&error];
+            if (!success) CDELog(CDELoggingLevelError, @"Could not move file from expanded zip archive: %@", localFileURL);
         }
     }
-
-    for (NSString *filePath in mutableFilePaths) {
-        NSURL *localFileURL = [[[NSURL fileURLWithPath:localRootDirectoryPath] URLByResolvingSymlinksInPath] URLByAppendingPathComponent:filePath];
-        NSURL *temporaryFileURL = [[contentURLDirectory URLByResolvingSymlinksInPath] URLByAppendingPathComponent:filePath];
-
-        if (NO == [fileManager fileExistsAtPath:localFileURL.path]) {
-            NSError *copyFileError;
-            BOOL success = [fileManager moveItemAtURL:temporaryFileURL toURL:localFileURL error:&copyFileError];
-            hasImportedData = YES;
-
-            if (copyFileError || NO == success) {
-                CDELog(CDELoggingLevelError, @"ERROR MOVING FILES AFTER UNARCHIVING : %@", copyFileError);
-            }
-        }
-    }
-
-    NSError *removeDirectoryError;
-    BOOL successRemoveDirectory = [fileManager removeItemAtURL:contentURLDirectory error:&removeDirectoryError];
-
-    if (removeDirectoryError || NO == successRemoveDirectory) {
-        CDELog(CDELoggingLevelError, @"ERROR Deleting temp directory B : %@", removeDirectoryError);
-    }
-
-    NSError *removeArchiveError;
-    BOOL successRemoveArchiveError = [fileManager removeItemAtURL:archiveURL error:&removeArchiveError];
-
-    if (removeArchiveError || NO == successRemoveArchiveError) {
-        CDELog(CDELoggingLevelError, @"ERROR Deleting archive : %@", removeDirectoryError);
-    }
-
-    if (hasImportedData) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:nMultipeerCloudFileSystemDidImportFiles object:nil];
-    }
+    
+    [fileManager removeItemAtURL:contentURLDirectory error:NULL];
+    [fileManager removeItemAtURL:archiveURL error:NULL];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:CDEMultipeerCloudFileSystemDidImportFilesNotification object:self];
+    });
 }
 
 #pragma mark - Directory methods
 
-- (NSString *)fullPathForRelativePath:(NSString *)path
-{
-	return [localRootDirectoryPath stringByAppendingPathComponent:path];
-}
-
 - (NSString *)pathForFileURL:(NSURL *)fileURL relativeToURL:(NSURL *)baseURL
 {
-	NSString *localAbsolutePath = fileURL.URLByResolvingSymlinksInPath.absoluteURL.path;
+    NSString *localAbsolutePath = fileURL.URLByResolvingSymlinksInPath.absoluteURL.path;
     NSString *localBasePath = baseURL.URLByResolvingSymlinksInPath.absoluteURL.path;
     NSRange aRange = [localAbsolutePath rangeOfString:localBasePath options:NSAnchoredSearch];
     NSString *relativePath = [localAbsolutePath substringFromIndex:aRange.length];
-
-	if ([relativePath hasPrefix:@"/"]) {
-		relativePath = [relativePath stringByReplacingCharactersInRange:NSMakeRange(0, 1) withString:@""];
-	}
-
-	return relativePath;
+    
+    if ([relativePath hasPrefix:@"/"]) {
+        relativePath = [relativePath stringByReplacingCharactersInRange:NSMakeRange(0, 1) withString:@""];
+    }
+    
+    return relativePath;
 }
 
 - (NSSet *)localFilePaths
 {
-	NSDirectoryEnumerator *enumerator = [fileManager enumeratorAtURL:[NSURL fileURLWithPath:localRootDirectoryPath]
-                                          includingPropertiesForKeys:@[NSURLNameKey, NSURLIsDirectoryKey]
-                                                             options:NSDirectoryEnumerationSkipsHiddenFiles
-                                                        errorHandler: ^BOOL (NSURL *url, NSError *error) {
-                                                            CDELog(CDELoggingLevelError, @"[Error] %@ (%@)", error, url);
-                                                            return YES;
-                                                        }];
-
-	NSMutableSet *mutableFilePaths = [NSMutableSet set];
-
-	for (NSURL *fileURL in enumerator) {
-		NSString *filename;
-		[fileURL getResourceValue:&filename forKey:NSURLNameKey error:nil];
-
-		NSNumber *isDirectory;
-		[fileURL getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
-
-		if (NO == [isDirectory boolValue]) {
-			[mutableFilePaths addObject:[self pathForFileURL:fileURL relativeToURL:[NSURL fileURLWithPath:localRootDirectoryPath]]];
-		}
-	}
-
-	return [mutableFilePaths copy];
+    NSDirectoryEnumerator *enumerator = [fileManager enumeratorAtURL:[NSURL fileURLWithPath:rootDirectory] includingPropertiesForKeys:@[NSURLNameKey, NSURLIsDirectoryKey] options:NSDirectoryEnumerationSkipsHiddenFiles errorHandler:^BOOL (NSURL *url, NSError *error) {
+        CDELog(CDELoggingLevelError, @"[Error] %@ (%@)", error, url);
+        return YES;
+    }];
+    
+    NSMutableSet *mutableFilePaths = [NSMutableSet set];
+    for (NSURL *fileURL in enumerator) {
+        NSString *filename;
+        [fileURL getResourceValue:&filename forKey:NSURLNameKey error:nil];
+        
+        NSNumber *isDirectory;
+        [fileURL getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:nil];
+        
+        if (![isDirectory boolValue]) {
+            [mutableFilePaths addObject:[self pathForFileURL:fileURL relativeToURL:[NSURL fileURLWithPath:rootDirectory]]];
+        }
+    }
+    
+    return [mutableFilePaths copy];
 }
 
-- (BOOL)missingLocalFilesForFilesPaths:(NSSet *)filesPaths
+- (NSURL *)makeArchiveForPaths:(NSSet *)filesPaths
 {
-	for (NSString *path in filesPaths) {
-		NSURL *localFileURL = [[[NSURL fileURLWithPath:localRootDirectoryPath] URLByResolvingSymlinksInPath] URLByAppendingPathComponent:path];
-
-		if (NO == [fileManager fileExistsAtPath:localFileURL.path]) {
-			return YES;
-		}
-	}
-
-	return NO;
-}
-
-- (NSURL *)archiveURLForFilesPaths:(NSSet *)filesPaths
-{
-	if (filesPaths.count == 0) {
-		return nil;
-	}
-
-	NSURL *rootTemporaryURL = [NSURL fileURLWithPath:NSTemporaryDirectory() isDirectory:YES];
-	NSURL *contentDirectoryTemporaryURL = [rootTemporaryURL URLByAppendingPathComponent:[[NSProcessInfo processInfo] globallyUniqueString] isDirectory:YES];
-
-	for (NSString *path in filesPaths) {
-		NSString *localPath = [localRootDirectoryPath stringByAppendingPathComponent:path];
-
-		if (YES == [fileManager fileExistsAtPath:localPath]) {
+    NSURL *rootTemporaryURL = [NSURL fileURLWithPath:NSTemporaryDirectory() isDirectory:YES];
+    NSURL *contentDirectoryTemporaryURL = [rootTemporaryURL URLByAppendingPathComponent:[[NSProcessInfo processInfo] globallyUniqueString] isDirectory:YES];
+    
+    for (NSString *path in filesPaths) {
+        NSString *localPath = [rootDirectory stringByAppendingPathComponent:path];
+        if ([fileManager fileExistsAtPath:localPath]) {
             NSString *tempPath = [contentDirectoryTemporaryURL.path stringByAppendingPathComponent:path];
-            NSError *error;
-            [fileManager createDirectoryAtPath:[tempPath stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:&error];
-            [fileManager copyItemAtPath:localPath toPath:tempPath error:&error];
-		}
-	}
-
-	NSURL *zipFileURL = [contentDirectoryTemporaryURL URLByAppendingPathExtension:@"zip"];
+            [fileManager createDirectoryAtPath:[tempPath stringByDeletingLastPathComponent] withIntermediateDirectories:YES attributes:nil error:NULL];
+            NSError *error = nil;
+            BOOL success = [fileManager copyItemAtPath:localPath toPath:tempPath error:&error];
+            if (!success) {
+                CDELog(CDELoggingLevelError, @"Failed to copy file: %@", error);
+                return nil;
+            }
+        }
+    }
+    
+    NSURL *zipFileURL = [contentDirectoryTemporaryURL URLByAppendingPathExtension:@"zip"];
     BOOL successArchive = [SSZipArchive createZipFileAtPath:zipFileURL.path withContentsOfDirectory:contentDirectoryTemporaryURL.path];
-
-	if (NO == successArchive) {
-		CDELog(CDELoggingLevelError, @"Compression failed");
-	}
-
-	return zipFileURL;
+    if (!successArchive) CDELog(CDELoggingLevelError, @"Compression failed");
+    
+    return successArchive ? zipFileURL : nil;
 }
 
 @end
+
+
+

@@ -39,17 +39,17 @@
 		07746AAF18C6276F00A267F5 /* IDMSyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 07746AAE18C6276F00A267F5 /* IDMSyncManager.m */; };
 		0791BCE317F6F58C00E7C31B /* Ensembles iOS.xcodeproj in Resources */ = {isa = PBXBuildFile; fileRef = 0791BCE217F6F58C00E7C31B /* Ensembles iOS.xcodeproj */; };
 		07973EF9183BE32C007F48CA /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07973EF8183BE32C007F48CA /* CoreData.framework */; };
+		07B85F4319574CDF00269E75 /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = 07B85F3919574CDF00269E75 /* ioapi.c */; };
+		07B85F4419574CDF00269E75 /* mztools.c in Sources */ = {isa = PBXBuildFile; fileRef = 07B85F3B19574CDF00269E75 /* mztools.c */; };
+		07B85F4519574CDF00269E75 /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = 07B85F3D19574CDF00269E75 /* unzip.c */; };
+		07B85F4619574CDF00269E75 /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = 07B85F3F19574CDF00269E75 /* zip.c */; };
+		07B85F4719574CDF00269E75 /* SSZipArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 07B85F4219574CDF00269E75 /* SSZipArchive.m */; };
 		07D9F0051910FD7600D191FA /* Ensembles.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 07571F411910F2BE008479A9 /* Ensembles.bundle */; };
 		07D9F0261911077900D191FA /* Ensembles.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07168C0418E037FC00153494 /* Ensembles.framework */; };
 		07D9F029191107FC00D191FA /* Ensembles.framework in Resources */ = {isa = PBXBuildFile; fileRef = 07168C0418E037FC00153494 /* Ensembles.framework */; };
 		0BA4D0F319572DED00FA29F9 /* CDEMultipeerCloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BA4D0F219572DED00FA29F9 /* CDEMultipeerCloudFileSystem.m */; };
 		0BA4D0F519572DFF00FA29F9 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0BA4D0F419572DFF00FA29F9 /* libz.dylib */; };
-		0BA833F719572D53001FA15B /* MyMultipeerImplementation.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BA833E919572D53001FA15B /* MyMultipeerImplementation.m */; };
-		0BA833F819572D53001FA15B /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = 0BA833ED19572D53001FA15B /* ioapi.c */; };
-		0BA833F919572D53001FA15B /* mztools.c in Sources */ = {isa = PBXBuildFile; fileRef = 0BA833EF19572D53001FA15B /* mztools.c */; };
-		0BA833FA19572D53001FA15B /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = 0BA833F119572D53001FA15B /* unzip.c */; };
-		0BA833FB19572D53001FA15B /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = 0BA833F319572D53001FA15B /* zip.c */; };
-		0BA833FC19572D53001FA15B /* SSZipArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BA833F619572D53001FA15B /* SSZipArchive.m */; };
+		0BA833F719572D53001FA15B /* IDMMultipeerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BA833E919572D53001FA15B /* IDMMultipeerManager.m */; };
 		9477ED311800137300C2A419 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9477ED301800137300C2A419 /* Cocoa.framework */; };
 		9477ED3B1800137300C2A419 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9477ED391800137300C2A419 /* InfoPlist.strings */; };
 		9477ED3D1800137300C2A419 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 9477ED3C1800137300C2A419 /* main.m */; };
@@ -182,24 +182,24 @@
 		07746AAE18C6276F00A267F5 /* IDMSyncManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDMSyncManager.m; sourceTree = "<group>"; };
 		0791BCE217F6F58C00E7C31B /* Ensembles iOS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "Ensembles iOS.xcodeproj"; path = "../../Framework/Ensembles iOS.xcodeproj"; sourceTree = "<group>"; };
 		07973EF8183BE32C007F48CA /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		07B85F3819574CDF00269E75 /* crypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypt.h; sourceTree = "<group>"; };
+		07B85F3919574CDF00269E75 /* ioapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ioapi.c; sourceTree = "<group>"; };
+		07B85F3A19574CDF00269E75 /* ioapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ioapi.h; sourceTree = "<group>"; };
+		07B85F3B19574CDF00269E75 /* mztools.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mztools.c; sourceTree = "<group>"; };
+		07B85F3C19574CDF00269E75 /* mztools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mztools.h; sourceTree = "<group>"; };
+		07B85F3D19574CDF00269E75 /* unzip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = unzip.c; sourceTree = "<group>"; };
+		07B85F3E19574CDF00269E75 /* unzip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unzip.h; sourceTree = "<group>"; };
+		07B85F3F19574CDF00269E75 /* zip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = zip.c; sourceTree = "<group>"; };
+		07B85F4019574CDF00269E75 /* zip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zip.h; sourceTree = "<group>"; };
+		07B85F4119574CDF00269E75 /* SSZipArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SSZipArchive.h; sourceTree = "<group>"; };
+		07B85F4219574CDF00269E75 /* SSZipArchive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SSZipArchive.m; sourceTree = "<group>"; };
 		07BF372E17F17D4100C56F64 /* Idiomatic.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Idiomatic.entitlements; sourceTree = "<group>"; };
 		07BF37D417F189EB00C56F64 /* libensembles_ios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libensembles_ios.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		0BA4D0F119572DED00FA29F9 /* CDEMultipeerCloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDEMultipeerCloudFileSystem.h; path = ../../Framework/Extensions/CDEMultipeerCloudFileSystem.h; sourceTree = "<group>"; };
 		0BA4D0F219572DED00FA29F9 /* CDEMultipeerCloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDEMultipeerCloudFileSystem.m; path = ../../Framework/Extensions/CDEMultipeerCloudFileSystem.m; sourceTree = "<group>"; };
 		0BA4D0F419572DFF00FA29F9 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
-		0BA833E819572D53001FA15B /* MyMultipeerImplementation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyMultipeerImplementation.h; sourceTree = "<group>"; };
-		0BA833E919572D53001FA15B /* MyMultipeerImplementation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyMultipeerImplementation.m; sourceTree = "<group>"; };
-		0BA833EC19572D53001FA15B /* crypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypt.h; sourceTree = "<group>"; };
-		0BA833ED19572D53001FA15B /* ioapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ioapi.c; sourceTree = "<group>"; };
-		0BA833EE19572D53001FA15B /* ioapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ioapi.h; sourceTree = "<group>"; };
-		0BA833EF19572D53001FA15B /* mztools.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mztools.c; sourceTree = "<group>"; };
-		0BA833F019572D53001FA15B /* mztools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mztools.h; sourceTree = "<group>"; };
-		0BA833F119572D53001FA15B /* unzip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = unzip.c; sourceTree = "<group>"; };
-		0BA833F219572D53001FA15B /* unzip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unzip.h; sourceTree = "<group>"; };
-		0BA833F319572D53001FA15B /* zip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = zip.c; sourceTree = "<group>"; };
-		0BA833F419572D53001FA15B /* zip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zip.h; sourceTree = "<group>"; };
-		0BA833F519572D53001FA15B /* SSZipArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SSZipArchive.h; sourceTree = "<group>"; };
-		0BA833F619572D53001FA15B /* SSZipArchive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SSZipArchive.m; sourceTree = "<group>"; };
+		0BA833E819572D53001FA15B /* IDMMultipeerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IDMMultipeerManager.h; path = Multipeer/IDMMultipeerManager.h; sourceTree = "<group>"; };
+		0BA833E919572D53001FA15B /* IDMMultipeerManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IDMMultipeerManager.m; path = Multipeer/IDMMultipeerManager.m; sourceTree = "<group>"; };
 		9477ED211800132E00C2A419 /* Ensembles Mac.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "Ensembles Mac.xcodeproj"; path = "../../Framework/Ensembles Mac.xcodeproj"; sourceTree = "<group>"; };
 		9477ED2F1800137300C2A419 /* Idiomatic Mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Idiomatic Mac.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9477ED301800137300C2A419 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
@@ -308,6 +308,7 @@
 		074B959A17EC783B0016F84D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				07B85F3619574CDF00269E75 /* SSZipArchive */,
 				0BA4D0F419572DFF00FA29F9 /* libz.dylib */,
 				077231E118C6080D0065BFEE /* MobileCoreServices.framework */,
 				077231DF18C604610065BFEE /* Security.framework */,
@@ -331,6 +332,8 @@
 				074B95AB17EC783B0016F84D /* IDMAppDelegate.m */,
 				07746AAD18C6276F00A267F5 /* IDMSyncManager.h */,
 				07746AAE18C6276F00A267F5 /* IDMSyncManager.m */,
+				0BA833E819572D53001FA15B /* IDMMultipeerManager.h */,
+				0BA833E919572D53001FA15B /* IDMMultipeerManager.m */,
 				074B95D917EC7DCD0016F84D /* IDMTagsViewController.h */,
 				074B95DA17EC7DCD0016F84D /* IDMTagsViewController.m */,
 				074B95DC17EC7DDF0016F84D /* IDMNotesViewController.h */,
@@ -339,8 +342,6 @@
 				074B95E017EC9F470016F84D /* IDMNoteEditingViewController.m */,
 				077231DC18C5FCDA0065BFEE /* IDMNodeSyncSettingsViewController.h */,
 				077231DD18C5FCDA0065BFEE /* IDMNodeSyncSettingsViewController.m */,
-				0BA833E719572D53001FA15B /* Multipeer */,
-				0BA833EA19572D53001FA15B /* SSZipArchive */,
 				074B95A217EC783B0016F84D /* Supporting Files */,
 			);
 			name = "Idiomatic iOS";
@@ -371,37 +372,29 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		0BA833E719572D53001FA15B /* Multipeer */ = {
+		07B85F3619574CDF00269E75 /* SSZipArchive */ = {
 			isa = PBXGroup;
 			children = (
-				0BA833E819572D53001FA15B /* MyMultipeerImplementation.h */,
-				0BA833E919572D53001FA15B /* MyMultipeerImplementation.m */,
+				07B85F3719574CDF00269E75 /* minizip */,
+				07B85F4119574CDF00269E75 /* SSZipArchive.h */,
+				07B85F4219574CDF00269E75 /* SSZipArchive.m */,
 			);
-			path = Multipeer;
+			name = SSZipArchive;
+			path = ../../Vendor/SSZipArchive/SSZipArchive;
 			sourceTree = "<group>";
 		};
-		0BA833EA19572D53001FA15B /* SSZipArchive */ = {
+		07B85F3719574CDF00269E75 /* minizip */ = {
 			isa = PBXGroup;
 			children = (
-				0BA833EB19572D53001FA15B /* minizip */,
-				0BA833F519572D53001FA15B /* SSZipArchive.h */,
-				0BA833F619572D53001FA15B /* SSZipArchive.m */,
-			);
-			path = SSZipArchive;
-			sourceTree = "<group>";
-		};
-		0BA833EB19572D53001FA15B /* minizip */ = {
-			isa = PBXGroup;
-			children = (
-				0BA833EC19572D53001FA15B /* crypt.h */,
-				0BA833ED19572D53001FA15B /* ioapi.c */,
-				0BA833EE19572D53001FA15B /* ioapi.h */,
-				0BA833EF19572D53001FA15B /* mztools.c */,
-				0BA833F019572D53001FA15B /* mztools.h */,
-				0BA833F119572D53001FA15B /* unzip.c */,
-				0BA833F219572D53001FA15B /* unzip.h */,
-				0BA833F319572D53001FA15B /* zip.c */,
-				0BA833F419572D53001FA15B /* zip.h */,
+				07B85F3819574CDF00269E75 /* crypt.h */,
+				07B85F3919574CDF00269E75 /* ioapi.c */,
+				07B85F3A19574CDF00269E75 /* ioapi.h */,
+				07B85F3B19574CDF00269E75 /* mztools.c */,
+				07B85F3C19574CDF00269E75 /* mztools.h */,
+				07B85F3D19574CDF00269E75 /* unzip.c */,
+				07B85F3E19574CDF00269E75 /* unzip.h */,
+				07B85F3F19574CDF00269E75 /* zip.c */,
+				07B85F4019574CDF00269E75 /* zip.h */,
 			);
 			path = minizip;
 			sourceTree = "<group>";
@@ -504,7 +497,7 @@
 				ORGANIZATIONNAME = "The Mental Faculty B.V.";
 				TargetAttributes = {
 					074B959717EC783B0016F84D = {
-						DevelopmentTeam = HX7UT22XZZ;
+						DevelopmentTeam = P7BXV6PHLD;
 						SystemCapabilities = {
 							com.apple.iCloud = {
 								enabled = 1;
@@ -648,26 +641,26 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				07B85F4519574CDF00269E75 /* unzip.c in Sources */,
 				0726FDB518AA476800670262 /* CDEDropboxCloudFileSystem.m in Sources */,
 				07746AAF18C6276F00A267F5 /* IDMSyncManager.m in Sources */,
-				0BA833F919572D53001FA15B /* mztools.c in Sources */,
-				0BA833FB19572D53001FA15B /* zip.c in Sources */,
-				0BA833FC19572D53001FA15B /* SSZipArchive.m in Sources */,
 				074B95A817EC783B0016F84D /* main.m in Sources */,
 				0751809918B743C500CE4264 /* IDMMediaFile.m in Sources */,
 				070F46FA1805D51400EE36E5 /* IDMTag.m in Sources */,
+				07B85F4619574CDF00269E75 /* zip.c in Sources */,
 				074B95DB17EC7DCD0016F84D /* IDMTagsViewController.m in Sources */,
 				074B95E117EC9F470016F84D /* IDMNoteEditingViewController.m in Sources */,
+				07B85F4419574CDF00269E75 /* mztools.c in Sources */,
 				077231DE18C5FCDA0065BFEE /* IDMNodeSyncSettingsViewController.m in Sources */,
 				0BA4D0F319572DED00FA29F9 /* CDEMultipeerCloudFileSystem.m in Sources */,
 				070F46F91805D51400EE36E5 /* IDMNote.m in Sources */,
-				0BA833F819572D53001FA15B /* ioapi.c in Sources */,
-				0BA833FA19572D53001FA15B /* unzip.c in Sources */,
+				07B85F4319574CDF00269E75 /* ioapi.c in Sources */,
 				074B95AC17EC783B0016F84D /* IDMAppDelegate.m in Sources */,
 				070176F118BD17DF00C4DA01 /* CDENodeCloudFileSystem.m in Sources */,
+				07B85F4719574CDF00269E75 /* SSZipArchive.m in Sources */,
 				070F46FB1805D51400EE36E5 /* Model.xcdatamodeld in Sources */,
 				074B95DE17EC7DDF0016F84D /* IDMNotesViewController.m in Sources */,
-				0BA833F719572D53001FA15B /* MyMultipeerImplementation.m in Sources */,
+				0BA833F719572D53001FA15B /* IDMMultipeerManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

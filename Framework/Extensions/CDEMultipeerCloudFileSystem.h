@@ -1,5 +1,5 @@
 //
-//  CDELocalFileSystem.h
+//  CDEMultipeerCloudFileSystem.h
 //  Ensembles
 //
 //  Created by Drew McCormack on 02/09/13.
@@ -7,15 +7,37 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <MultipeerConnectivity/MultipeerConnectivity.h>
 #import <Ensembles/Ensembles.h>
 
-extern NSString * const nMultipeerCloudFileSystemDidImportFiles;
+extern NSString * const CDEMultipeerCloudFileSystemDidImportFilesNotification;
+
+
+@protocol CDEMultipeerConnection <NSObject>
+
+@required
+- (BOOL)sendData:(NSData *)data toPeerWithID:(id <NSObject, NSCopying, NSCoding>)peerID;
+- (BOOL)sendAndDiscardFileAtURL:(NSURL *)url toPeerWithID:(id <NSObject, NSCopying, NSCoding>)peerID;
+
+@end
+
 
 @interface CDEMultipeerCloudFileSystem : NSObject <CDECloudFileSystem>
 
-- (BOOL)synchronizeFilesViaMultipeerSession:(MCSession *)session withSpecificPeers:(NSArray *)specificPeers;
-- (void)handleMessageData:(NSData *)data fromPeer:(MCPeerID *)peerID inSession:(MCSession *)session;
-- (void)importArchiveAtURL:(NSURL *)archiveURL archiveName:(NSString *)archiveName;
+@property (readonly, nonatomic) NSString *rootDirectory;
+@property (readonly, weak, nonatomic) id <CDEMultipeerConnection> multipeerConnection;
+
+- (instancetype)initWithRootDirectory:(NSString *)rootDir multipeerConnection:(id <CDEMultipeerConnection>)connection;
+
+- (void)retrieveFilesFromPeersWithIDs:(NSArray *)peerIDs;
+
+- (void)removeAllFiles;
+
+@end
+
+
+@interface CDEMultipeerCloudFileSystem (MultipeerResponses)
+
+- (void)receiveData:(NSData *)data fromPeerWithID:(id <NSObject, NSCopying, NSCoding>)peerID;
+- (void)receiveResourceAtURL:(NSURL *)url fromPeerWithID:(id <NSObject, NSCopying, NSCoding>)peerID;
 
 @end

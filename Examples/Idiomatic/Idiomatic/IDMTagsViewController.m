@@ -104,7 +104,7 @@
         }];
     }
     else {
-        syncServiceActionSheet = [[UIActionSheet alloc] initWithTitle:@"What service would you like?" delegate:self cancelButtonTitle:@"None" destructiveButtonTitle:nil otherButtonTitles:@"iCloud", @"Dropbox", @"IdioSync", nil];
+        syncServiceActionSheet = [[UIActionSheet alloc] initWithTitle:@"What service would you like?" delegate:self cancelButtonTitle:@"None" destructiveButtonTitle:nil otherButtonTitles:@"iCloud", @"Dropbox", @"IdioSync", @"Multipeer", nil];
         [syncServiceActionSheet showFromToolbar:self.navigationController.toolbar];
         [self updateButtons];
     }
@@ -123,6 +123,9 @@
         }
         else if (buttonIndex == actionSheet.firstOtherButtonIndex+2) {
             service = IDMNodeS3Service;
+        }
+        else if (buttonIndex == actionSheet.firstOtherButtonIndex+3) {
+            service = IDMMultipeerService;
         }
         
         [self updateButtons];

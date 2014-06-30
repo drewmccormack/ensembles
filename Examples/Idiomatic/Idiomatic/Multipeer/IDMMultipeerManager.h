@@ -8,15 +8,16 @@
 
 #import <Foundation/Foundation.h>
 #import <MultipeerConnectivity/MultipeerConnectivity.h>
+#import "CDEMultipeerCloudFileSystem.h"
 
 @class CDEMultipeerCloudFileSystem;
 
-@interface MyMultipeerImplementation : NSObject
+@interface IDMMultipeerManager : NSObject <CDEMultipeerConnection>
 
 @property (nonatomic) CDEMultipeerCloudFileSystem *multipeerCloudFileSystem;
 
 - (void)start;
 - (void)stop;
-- (void)synchronizeWithAllPeers;
+- (void)syncFilesWithAllPeers;
 
 @end
