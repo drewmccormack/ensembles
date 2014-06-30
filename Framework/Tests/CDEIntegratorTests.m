@@ -144,11 +144,4 @@
     XCTAssertTrue([self.integrator needsFullIntegration], @"With different ids, should do full integration");
 }
 
-- (void)testMatchingBaselineIdsDoNotRequireFullIntegration
-{
-    self.eventStore.identifierOfBaselineUsedToConstructStore = @"2";
-    self.eventStore.currentBaselineIdentifier = @"2";
-    XCTAssertFalse([self.integrator needsFullIntegration], @"With same ids, should not do full integration");
-}
-
 @end

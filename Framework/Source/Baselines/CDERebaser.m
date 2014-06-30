@@ -21,17 +21,24 @@
 #import "CDERevisionSet.h"
 #import "CDERevision.h"
 
+@interface CDERebaser ()
+
+@property (nonatomic, readwrite, assign) BOOL forceRebase; // Used only for testing
+
+@end
 
 @implementation CDERebaser
 
 @synthesize eventStore = eventStore;
 @synthesize ensemble = ensemble;
+@synthesize forceRebase = forceRebase;
 
 - (instancetype)initWithEventStore:(CDEEventStore *)newStore
 {
     self = [super init];
     if (self) {
         eventStore = newStore;
+        forceRebase = NO;
     }
     return self;
 }
@@ -81,7 +88,7 @@
 
 #pragma mark Determining When to Rebase
 
-- (void)estimatEventStoreCompactionFollowingRebaseWithCompletion:(void(^)(float compaction))completion
+- (void)estimateEventStoreCompactionFollowingRebaseWithCompletion:(void(^)(float compaction))completion
 {
     NSParameterAssert(completion);
     [self.eventStore.managedObjectContext performBlock:^{
@@ -113,6 +120,13 @@
 - (void)shouldRebaseWithCompletion:(void(^)(BOOL result))completion
 {
     NSParameterAssert(completion);
+    
+    if (self.forceRebase) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (completion) completion(YES);
+        });
+        return;
+    }
 
     // Rebase if there are more than 500 object changes, or we can reduce data by more than 50%,
     // or if there is no baseline at all
@@ -132,7 +146,7 @@
         BOOL hasManyEvents = [self countOfStoreModificationEvents] > 50;
         BOOL hasAdequateChanges = [self countOfAllObjectChanges] >= 500;
         
-        [self estimatEventStoreCompactionFollowingRebaseWithCompletion:^(float compaction) {
+        [self estimateEventStoreCompactionFollowingRebaseWithCompletion:^(float compaction) {
             BOOL compactionIsAdequate = compaction > 0.5f;
             BOOL result = !hasBaseline || !hasAllDevicesInBaseline || hasManyEvents || (hasAdequateChanges && compactionIsAdequate);
             if (completion) completion(result);

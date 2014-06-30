@@ -17,6 +17,7 @@
 @synthesize persistentStorePath = persistentStorePath;
 @synthesize eventStore = eventStore;
 @synthesize managedObjectModel = managedObjectModel;
+@synthesize persistentStoreOptions = persistentStoreOptions;
 
 - (id)initWithPersistentStoreAtPath:(NSString *)newPath managedObjectModel:(NSManagedObjectModel *)newModel eventStore:(CDEEventStore *)newEventStore;
 {
@@ -25,6 +26,7 @@
         persistentStorePath = [newPath copy];
         eventStore = newEventStore;
         managedObjectModel = newModel;
+        persistentStoreOptions = nil;
     }
     return self;
 }
@@ -42,8 +44,11 @@
         context.undoManager = nil;
         
         NSURL *storeURL = [NSURL fileURLWithPath:persistentStorePath];
-        NSDictionary *options = @{NSMigratePersistentStoresAutomaticallyOption: @YES, NSInferMappingModelAutomaticallyOption: @YES};
+        NSDictionary *options = self.persistentStoreOptions;
+        if (!options) options = @{NSMigratePersistentStoresAutomaticallyOption: @YES, NSInferMappingModelAutomaticallyOption: @YES};
+        [coordinator lock];
         [coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:options error:&error];
+        [coordinator unlock];
     }];
     
     if (error) {

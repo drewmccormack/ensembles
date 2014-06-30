@@ -137,7 +137,7 @@
     newEventUniqueId = nil;
     
     // Setup a context for accessing the main store
-    NSError *error;
+    NSError *error = nil;
     NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:managedObjectModel];
     NSPersistentStore *persistentStore = [coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:self.persistentStoreOptions error:&error];
     if (!persistentStore) {
@@ -290,11 +290,20 @@
 - (BOOL)needsFullIntegration
 {
     // Determine if we need to do a full integration of all data.
-    // This is the case if the baseline identity has changed.
+    // First case is if the baseline identity has changed.
     NSString *storeBaselineId = self.eventStore.identifierOfBaselineUsedToConstructStore;
     NSString *currentBaselineId = self.eventStore.currentBaselineIdentifier;
-    BOOL needFullIntegration = !storeBaselineId || ![storeBaselineId isEqualToString:currentBaselineId];
-    return needFullIntegration;
+    if (!storeBaselineId || ![storeBaselineId isEqualToString:currentBaselineId]) return YES;
+    
+    // Determine if a full integration is needed due to abandonment during rebasing
+    // This is the case if no events exist that are newer than the baseline.
+    CDERevisionManager *revisionManager = [[CDERevisionManager alloc] initWithEventStore:self.eventStore];
+    NSError *error = nil;
+    BOOL passed = [revisionManager checkThatLocalPersistentStoreHasNotBeenAbandoned:&error];
+    if (error) CDELog(CDELoggingLevelError, @"Error determining if store is abandoned: %@", error);
+    if (!passed) return YES;
+    
+    return NO;
 }
 
 // Called on background queue.
@@ -513,7 +522,7 @@
             }
             else {
                 NSManagedObjectID *objectID = [managedObjectContext.persistentStoreCoordinator managedObjectIDForURIRepresentation:url];
-                NSManagedObject *object = [managedObjectContext existingObjectWithID:objectID error:NULL];
+                NSManagedObject *object = objectID ? [managedObjectContext existingObjectWithID:objectID error:NULL] : nil;
                 objectNeedsCreating = !object || object.isDeleted || nil == object.managedObjectContext;
             }
             if (objectNeedsCreating) [indexesNeedingNewObjects addObject:@(i)];

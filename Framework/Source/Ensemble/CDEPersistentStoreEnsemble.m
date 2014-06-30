@@ -20,6 +20,8 @@
 #import "CDEEventBuilder.h"
 #import "CDEBaselineConsolidator.h"
 #import "CDERebaser.h"
+#import "CDERevisionManager.h"
+
 
 static NSString * const kCDEIdentityTokenContext = @"kCDEIdentityTokenContext";
 
@@ -77,6 +79,10 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
 
 - (instancetype)initWithEnsembleIdentifier:(NSString *)identifier persistentStoreURL:(NSURL *)newStoreURL persistentStoreOptions:(NSDictionary *)storeOptions managedObjectModelURL:(NSURL *)modelURL cloudFileSystem:(id <CDECloudFileSystem>)newCloudFileSystem localDataRootDirectoryURL:(NSURL *)eventDataRootURL
 {
+    NSParameterAssert(identifier != nil);
+    NSParameterAssert(newStoreURL != nil);
+    NSParameterAssert(modelURL != nil);
+    NSParameterAssert(newCloudFileSystem != nil);
     self = [super init];
     if (self) {
         persistentStoreOptions = storeOptions;
@@ -323,6 +329,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
         }
         
         CDEPersistentStoreImporter *importer = [[CDEPersistentStoreImporter alloc] initWithPersistentStoreAtPath:self.storeURL.path managedObjectModel:self.managedObjectModel eventStore:self.eventStore];
+        importer.persistentStoreOptions = self.persistentStoreOptions;
         importer.ensemble = self;
         [importer importWithCompletion:^(NSError *error) {
             [self endObservingSaveNotifications];
@@ -593,12 +600,6 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
 
     CDEAsynchronousTaskBlock importBaselinesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self.cloudManager importNewBaselineEventsWithCompletion:^(NSError *error) {
-            if (nil == error) {
-                // Check if store has been 'left behind'. If so, need full integration later
-                if ([self.baselineConsolidator persistentStoreHasBeenAbandoned]) {
-                    self.eventStore.identifierOfBaselineUsedToConstructStore = nil;
-                }
-            }
             next(error, NO);
         }];
     };

@@ -203,8 +203,148 @@
     baselineFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cloudBaselinesDir error:NULL];
     eventFiles = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:cloudEventsDir error:NULL];
     XCTAssertEqual(baselineFiles.count, (NSUInteger)1, @"Should be one baseline file");
-    XCTAssertEqual(eventFiles.count, (NSUInteger)11, @"Should be 5 events from store 1 after rebasing");
+    XCTAssertEqual(eventFiles.count, (NSUInteger)12, @"Wrong number of events");
     XCTAssertEqual([baselineFiles.lastObject integerValue], (NSInteger)1, @"Wrong global count for baseline");
+}
+
+- (void)testRebasingWithLocalStoreLeftBehind
+{
+    [self leechStores];
+    [self syncChanges];
+    
+    [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context2];
+    [context2 save:NULL]; // Save event
+    [self mergeEnsemble:ensemble2];
+    
+    // This leaves behind the context1 store, ie, local store
+    // Context1 will need a full integration to recover
+    [ensemble1 setValue:@YES forKeyPath:@"rebaser.forceRebase"];
+    [self mergeEnsemble:ensemble1];
+    [ensemble1 setValue:@NO forKeyPath:@"rebaser.forceRebase"];
+    
+    // Should be fully synced here
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
+    NSArray *parents1 = [context1 executeFetchRequest:fetch error:NULL];
+    NSArray *parents2 = [context2 executeFetchRequest:fetch error:NULL];
+    XCTAssertEqual(parents1.count, parents2.count, @"Unequal number of parents");
+}
+
+- (void)testConsolidatingBaselinesAfterRebasingCausesFullIntegrationIfStoreLeftBehind
+{
+    [self leechStores];
+    [self syncChanges];
+    
+    [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context2];
+    [context2 save:NULL]; // Save event
+    [self mergeEnsemble:ensemble2];
+    
+    [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context1];
+    [context1 save:NULL]; // Save event
+    
+    // This incorporates all events in the baseline.
+    // Full integrations are needed for both stores.
+    [ensemble1 setValue:@YES forKeyPath:@"rebaser.forceRebase"];
+    [self mergeEnsemble:ensemble1];
+    [ensemble1 setValue:@NO forKeyPath:@"rebaser.forceRebase"];
+    
+    [self mergeEnsemble:ensemble2];
+    
+    // Should be fully synced here
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
+    NSArray *parents1 = [context1 executeFetchRequest:fetch error:NULL];
+    NSArray *parents2 = [context2 executeFetchRequest:fetch error:NULL];
+    XCTAssertEqual(parents1.count, parents2.count, @"Unequal number of parents");
+}
+
+- (void)testConcurrentRebasing
+{
+    [self leechStores];
+    [self syncChanges];
+    
+    for (NSUInteger i = 0; i < 50; i++) [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context2];
+    [context2 save:NULL]; // Save event
+
+    for (NSUInteger i = 0; i < 20; i++) [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context1];
+    [context1 save:NULL]; // Save event
+    for (NSUInteger i = 0; i < 20; i++) [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context1];
+    [context1 save:NULL]; // Save event
+    
+    [ensemble2 setValue:@YES forKeyPath:@"rebaser.forceRebase"];
+    [ensemble1 setValue:@YES forKeyPath:@"rebaser.forceRebase"];
+    __block BOOL finished1 = NO, finished2 = NO;
+    [ensemble1 mergeWithCompletion:^(NSError *error) {
+        finished1 = YES;
+        CFRunLoopStop(CFRunLoopGetCurrent());
+    }];
+    [ensemble2 mergeWithCompletion:^(NSError *error) {
+        finished2 = YES;
+        CFRunLoopStop(CFRunLoopGetCurrent());
+    }];
+    while ( !finished1 || !finished2 ) CFRunLoopRun();
+    [ensemble2 setValue:@NO forKeyPath:@"rebaser.forceRebase"];
+    [ensemble1 setValue:@NO forKeyPath:@"rebaser.forceRebase"];
+    
+    [self syncChanges];
+    
+    // Should be fully synced here
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
+    NSArray *parents1 = [context1 executeFetchRequest:fetch error:NULL];
+    NSArray *parents2 = [context2 executeFetchRequest:fetch error:NULL];
+    XCTAssertEqual(parents1.count, (NSUInteger)90, @"Wrong numbmer of parents");
+    XCTAssertEqual(parents1.count, parents2.count, @"Unequal number of parents");
+}
+
+- (void)testRandomRebasing
+{
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
+
+    [self leechStores];
+    [self syncChanges];
+    
+    srand(55557);
+    
+    [ensemble2 setValue:@YES forKeyPath:@"rebaser.forceRebase"];
+    [ensemble1 setValue:@YES forKeyPath:@"rebaser.forceRebase"];
+    
+    for (NSUInteger i = 0; i < 20; i++) {
+        if (rand()%2 == 0) {
+            [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context2];
+            [context2 save:NULL];
+        }
+        if (rand()%2 == 0) {
+            [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context1];
+            [context1 save:NULL];
+        }
+        if (rand()%2 == 0) [self mergeEnsemble:ensemble1];
+        
+        if (rand()%2 == 0) {
+            [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context2];
+            [context2 save:NULL];
+        }
+        if (rand()%2 == 0) {
+            [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context1];
+            [context1 save:NULL];
+        }
+        
+        if (rand()%2 == 0) [self mergeEnsemble:ensemble2];
+        
+        if (rand()%2 == 0) {
+            id parent = [[context1 executeFetchRequest:fetch error:NULL] lastObject];
+            if (parent) [context1 deleteObject:parent];
+            [context1 save:NULL];
+        }
+        if (rand()%2 == 0) {
+            id parent = [[context2 executeFetchRequest:fetch error:NULL] lastObject];
+            if (parent) [context2 deleteObject:parent];
+            [context2 save:NULL];
+        }
+    }
+
+    [self syncChanges];
+    
+    NSArray *parents1 = [context1 executeFetchRequest:fetch error:NULL];
+    NSArray *parents2 = [context2 executeFetchRequest:fetch error:NULL];
+    XCTAssertEqual(parents1.count, parents2.count, @"Unequal number of parents");
 }
 
 - (NSManagedObjectContext *)eventFileContextForURL:(NSURL *)baselineURL

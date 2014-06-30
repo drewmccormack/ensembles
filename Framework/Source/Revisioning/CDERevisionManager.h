@@ -36,6 +36,8 @@
 
 - (BOOL)checkRebasingPrerequisitesForEvents:(NSArray *)events error:(NSError * __autoreleasing *)error;
 
+- (BOOL)checkThatLocalPersistentStoreHasNotBeenAbandoned:(NSError * __autoreleasing *)error;
+
 - (CDEGlobalCount)maximumGlobalCount;
 - (CDERevisionSet *)revisionSetOfMostRecentEvents;
 - (NSSet *)allPersistentStoreIdentifiers;
