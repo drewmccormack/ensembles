@@ -28,18 +28,26 @@ NSString *const kDiscoveryInfoUniqueIdentifer = @"DiscoveryInfoUniqueIdentifer";
 	self = [super init];
 
     if (self) {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(start) name:UIApplicationDidBecomeActiveNotification object:nil];
+        uniqueIdentifier = [[NSProcessInfo processInfo] globallyUniqueString];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(stopAndStart) name:UIApplicationDidBecomeActiveNotification object:nil];
 	}
     
 	return self;
 }
 
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+#pragma mark - Start and Stop Connecting
+
 - (void)start
 {
-	[self stop];
-
-    if (!uniqueIdentifier) uniqueIdentifier = [[NSProcessInfo processInfo] globallyUniqueString];
-
+    if (peerSession && peerAdvertizer && peerBrowser) return;
+    
+    [self stop];
+    
 	MCPeerID *peerID = [[MCPeerID alloc] initWithDisplayName:[[UIDevice currentDevice] name]];
 	peerSession = [[MCSession alloc] initWithPeer:peerID securityIdentity:nil encryptionPreference:MCEncryptionRequired];
 	peerSession.delegate = self;
@@ -55,14 +63,23 @@ NSString *const kDiscoveryInfoUniqueIdentifer = @"DiscoveryInfoUniqueIdentifer";
 
 - (void)stop
 {
+    peerSession.delegate = nil;
     [peerSession disconnect];
 	peerSession = nil;
 
+    peerBrowser.delegate = nil;
 	[peerBrowser stopBrowsingForPeers];
 	peerBrowser = nil;
 
+    peerAdvertizer.delegate = nil;
 	[peerAdvertizer stopAdvertisingPeer];
 	peerAdvertizer = nil;
+}
+
+- (void)stopAndStart
+{
+    [self stop];
+    [self start];
 }
 
 #pragma mark - Syncing Files
@@ -81,11 +98,11 @@ NSString *const kDiscoveryInfoUniqueIdentifer = @"DiscoveryInfoUniqueIdentifer";
 
 - (BOOL)sendAndDiscardFileAtURL:(NSURL *)url toPeerWithID:(id<NSObject,NSCopying,NSCoding>)peerID
 {
-    BOOL success = [peerSession sendResourceAtURL:url withName:[url lastPathComponent] toPeer:(id)peerID withCompletionHandler:^(NSError *error) {
+    NSProgress *progress = [peerSession sendResourceAtURL:url withName:[url lastPathComponent] toPeer:(id)peerID withCompletionHandler:^(NSError *error) {
         if (error) CDELog(CDELoggingLevelError, @"Failed to send resource to peerID: %@", peerID);
         [[NSFileManager defaultManager] removeItemAtURL:url error:NULL];
     }];
-    return success;
+    return progress != nil;
 }
 
 - (BOOL)sendData:(NSData *)data toPeerWithID:(id<NSObject,NSCopying,NSCoding>)peerID
@@ -103,6 +120,7 @@ NSString *const kDiscoveryInfoUniqueIdentifer = @"DiscoveryInfoUniqueIdentifer";
 
 - (void)session:(MCSession *)session didFinishReceivingResourceWithName:(NSString *)resourceName fromPeer:(MCPeerID *)peerID atURL:(NSURL *)localURL withError:(NSError *)error
 {
+    if (localURL == nil) return;
     [self.multipeerCloudFileSystem receiveResourceAtURL:localURL fromPeerWithID:peerID];
 }
 
@@ -121,7 +139,9 @@ NSString *const kDiscoveryInfoUniqueIdentifer = @"DiscoveryInfoUniqueIdentifer";
         [peerAdvertizer startAdvertisingPeer];
     }
     else if (state == MCSessionStateConnected) {
-        [self syncFilesWithAllPeers];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self syncFilesWithAllPeers];
+        });
     }
 }
 
@@ -129,7 +149,13 @@ NSString *const kDiscoveryInfoUniqueIdentifer = @"DiscoveryInfoUniqueIdentifer";
 
 - (void)browser:(MCNearbyServiceBrowser *)browser foundPeer:(MCPeerID *)peerID withDiscoveryInfo:(NSDictionary *)info
 {
+    if ([peerID isEqual:peerSession.myPeerID]) return;
     if ([peerSession.connectedPeers containsObject:peerID]) return;
+    
+    NSString *otherPeerUniqueIdentifier = info[kDiscoveryInfoUniqueIdentifer];
+    BOOL shouldAccept = ([otherPeerUniqueIdentifier compare:uniqueIdentifier] != NSOrderedDescending);
+    if (!shouldAccept) return;
+    
     NSData *context = [uniqueIdentifier dataUsingEncoding:NSUTF8StringEncoding];
     [browser invitePeer:peerID toSession:peerSession withContext:context timeout:30.0];
     CDELog(CDELoggingLevelVerbose, @"Inviting %@", peerID.displayName);
@@ -148,7 +174,9 @@ NSString *const kDiscoveryInfoUniqueIdentifer = @"DiscoveryInfoUniqueIdentifer";
 
 - (void)advertiser:(MCNearbyServiceAdvertiser *)advertiser didReceiveInvitationFromPeer:(MCPeerID *)peerID withContext:(NSData *)context invitationHandler:(void (^)(BOOL accept, MCSession *session))invitationHandler
 {
-    if (![peerSession.connectedPeers containsObject:peerID]) {
+    NSString *otherPeerUniqueIdentifier = [NSString stringWithUTF8String:context.bytes];
+    BOOL shouldInvite = ([otherPeerUniqueIdentifier compare:uniqueIdentifier] == NSOrderedDescending);
+    if (![peerSession.connectedPeers containsObject:peerID] && shouldInvite) {
         CDELog(CDELoggingLevelVerbose, @"Accepting invite from peer %@", peerID.displayName);
         invitationHandler(YES, peerSession);
     }

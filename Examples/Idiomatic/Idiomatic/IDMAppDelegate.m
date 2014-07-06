@@ -39,6 +39,11 @@
     syncManager.storePath = self.storeURL.path;
     [syncManager setup];
     
+    // Monitor saves
+    [[NSNotificationCenter defaultCenter] addObserverForName:NSManagedObjectContextDidSaveNotification object:managedObjectContext queue:nil usingBlock:^(NSNotification *note) {
+        [syncManager synchronizeWithCompletion:NULL];
+    }];
+    
     // Setup UI
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     UINavigationController *navController = (id)self.window.rootViewController;

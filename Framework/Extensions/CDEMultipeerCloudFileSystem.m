@@ -168,8 +168,15 @@ NSString * const CDEMultipeerMessageTypeKey = @"messageType";
 {
     CDELog(CDELoggingLevelVerbose, @"Received data from peer: %@", peerID);
     
-    NSDictionary *peerMessage = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-    
+    NSDictionary *peerMessage = nil;
+    @try {
+        peerMessage = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+    }
+    @catch (NSException *exception) {
+        CDELog(CDELoggingLevelError, @"Could not unarchive message from peer");
+        return;
+    }
+
     NSInteger messageType = [peerMessage[CDEMultipeerMessageTypeKey] integerValue];
     if (CDEMultipeerMessageTypeFileRetrievalRequest == messageType) {
         NSSet *remoteFiles = peerMessage[CDEMultipeerFilesPathsKey];
@@ -185,6 +192,8 @@ NSString * const CDEMultipeerMessageTypeKey = @"messageType";
     NSMutableSet *filesMissingRemotely = [localFiles mutableCopy];
     [filesMissingRemotely minusSet:remotePaths];
     CDELog(CDELoggingLevelVerbose, @"Sending files to peer: %@", filesMissingRemotely);
+    
+    if (filesMissingRemotely.count == 0) return;
     
     NSURL *tempURL = [self makeArchiveForPaths:filesMissingRemotely];
     if (!tempURL) {
@@ -208,6 +217,8 @@ NSString * const CDEMultipeerMessageTypeKey = @"messageType";
     NSDirectoryEnumerator *enumerator = [fileManager enumeratorAtURL:contentURLDirectory includingPropertiesForKeys:@[NSURLNameKey, NSURLIsDirectoryKey] options:NSDirectoryEnumerationSkipsHiddenFiles errorHandler:NULL];
     NSURL *rootURL = [[NSURL fileURLWithPath:rootDirectory] URLByResolvingSymlinksInPath];
     NSURL *contentURL = [contentURLDirectory URLByResolvingSymlinksInPath];
+    BOOL success = NO;
+    NSUInteger count = 0;
     for (NSURL *fileURL in enumerator) {
         NSString *filename;
         [fileURL getResourceValue:&filename forKey:NSURLNameKey error:nil];
@@ -220,17 +231,24 @@ NSString * const CDEMultipeerMessageTypeKey = @"messageType";
             NSURL *localFileURL = [rootURL URLByAppendingPathComponent:filePath];
             NSURL *temporaryFileURL = [contentURL URLByAppendingPathComponent:filePath];
             NSError *error = nil;
-            BOOL success = [fileManager moveItemAtURL:temporaryFileURL toURL:localFileURL error:&error];
-            if (!success) CDELog(CDELoggingLevelError, @"Could not move file from expanded zip archive: %@", localFileURL);
+            success = [fileManager moveItemAtURL:temporaryFileURL toURL:localFileURL error:&error];
+            if (!success) {
+                CDELog(CDELoggingLevelError, @"Could not move file from expanded zip archive: %@", localFileURL);
+            }
+            else {
+                count++;
+            }
         }
     }
     
     [fileManager removeItemAtURL:contentURLDirectory error:NULL];
     [fileManager removeItemAtURL:archiveURL error:NULL];
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:CDEMultipeerCloudFileSystemDidImportFilesNotification object:self];
-    });
+    if (count > 0) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:CDEMultipeerCloudFileSystemDidImportFilesNotification object:self];
+        });
+    }
 }
 
 #pragma mark - Directory methods
