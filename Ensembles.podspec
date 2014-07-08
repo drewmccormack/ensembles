@@ -47,6 +47,11 @@ Pod::Spec.new do |s|
     ss.source_files = 'Framework/Extensions/CDEDropboxCloudFileSystem.{h,m}'
   end
   
+  s.subspec 'Multipeer' do |ss|
+    ss.dependency 'Ensembles/Core'
+    ss.source_files = 'Framework/Extensions/CDEMultipeerCloudFileSystem.{h,m}'
+  end
+  
   s.subspec 'Node' do |ss|
     ss.dependency 'Ensembles/Core'
     ss.source_files = 'Framework/Extensions/CDENodeCloudFileSystem.{h,m}'
