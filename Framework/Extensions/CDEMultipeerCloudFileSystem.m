@@ -6,7 +6,6 @@
 //  Copyright (c) 2013 Drew McCormack. All rights reserved.
 //
 
-#import <MultipeerConnectivity/MultipeerConnectivity.h>
 #import "CDEMultipeerCloudFileSystem.h"
 #import "SSZipArchive.h"
 
