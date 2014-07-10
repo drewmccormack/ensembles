@@ -113,7 +113,7 @@
 {
     NSManagedObjectContext *context = notif.object;
     if (self.managedObjectContext == context) return;
-    if (context.parentContext == self.managedObjectContext) return;
+    if (context.parentContext) return; // Only handle contexts saving directly to store
     
     NSArray *stores = context.persistentStoreCoordinator.persistentStores;
     for (NSPersistentStore *store in stores) {
