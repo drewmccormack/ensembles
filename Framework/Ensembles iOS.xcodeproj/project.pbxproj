@@ -1162,7 +1162,8 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PUBLIC_HEADERS_FOLDER_PATH = EnsemblesiOSHeaders;
 				SDKROOT = iphoneos;
-				STRIP_STYLE = "non-global";
+				STRIP_INSTALLED_PRODUCT = NO;
+				STRIP_STYLE = debugging;
 			};
 			name = Debug;
 		};
@@ -1196,7 +1197,8 @@
 				ONLY_ACTIVE_ARCH = NO;
 				PUBLIC_HEADERS_FOLDER_PATH = EnsemblesiOSHeaders;
 				SDKROOT = iphoneos;
-				STRIP_STYLE = "non-global";
+				STRIP_INSTALLED_PRODUCT = NO;
+				STRIP_STYLE = debugging;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
