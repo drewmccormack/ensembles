@@ -32,7 +32,7 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
     id ubiquityIdentityObserver;
     NSOperationQueue *downloadTrackingQueue;
     NSDate *lastProgressNotificationDate;
-    NSMutableSet *downloadingURLs;
+    NSMutableSet *downloadingURLs, *handlingURLs;
 }
 
 @synthesize relativePathToRootInContainer = relativePathToRootInContainer;
@@ -69,8 +69,9 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
         
         bytesRemainingToDownload = 0;
         lastProgressNotificationDate = nil;
-    
+        
         downloadingURLs = [NSMutableSet set];
+        handlingURLs = [NSMutableSet set];
         
         [self performInitialPreparation:NULL];
     }
@@ -291,16 +292,13 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
 
 - (void)initiateDownloads
 {
-    // Suspend to accumulate file downloads before checking whether they are complete.
-    // This prevents excessive notifications
-    [downloadTrackingQueue setSuspended:YES];
-    
     NSUInteger count = [metadataQuery resultCount];
     for ( NSUInteger i = 0; i < count; i++ ) {
         @autoreleasepool {
             NSURL *url = [metadataQuery valueOfAttribute:NSMetadataItemURLKey forResultAtIndex:i];
             @synchronized(self) {
-                if ([downloadingURLs containsObject:url]) continue;
+                if ([downloadingURLs containsObject:url] || [handlingURLs containsObject:url]) continue;
+                [handlingURLs addObject:url];
             }
             
             NSNumber *percentDownloaded = [metadataQuery valueOfAttribute:NSMetadataUbiquitousItemPercentDownloadedKey forResultAtIndex:i];
@@ -315,6 +313,7 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
                     
                     @synchronized(self) {
                         [downloadingURLs addObject:url];
+                        [handlingURLs removeObject:url];
                         
                         unsigned long long fileSize = fileSizeNumber ? fileSizeNumber.unsignedLongLongValue : 0;
                         if ( downloaded && !downloaded.boolValue ) {
@@ -322,55 +321,77 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
                             bytesRemainingForThisFile = (1.0 - percentage / 100.0) * fileSize;
                             self.bytesRemainingToDownload += bytesRemainingForThisFile;
                         }
+                        
+                        [self postProgressNotificationIfNecessary];
                     }
                     
                     [downloadTrackingQueue addOperationWithBlock:^{
                         NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
                         NSError *error = nil;
+                        __block BOOL complete = NO;
                         [coordinator coordinateReadingItemAtURL:url options:0 error:&error byAccessor:^(NSURL *newURL) {
-                            BOOL complete = NO;
                             @synchronized(self) {
-                                [downloadingURLs removeObject:url];
-                                self.bytesRemainingToDownload -= bytesRemainingForThisFile;
-                                if (downloadingURLs.count == 0) {
-                                    complete = YES;
-                                    self.bytesRemainingToDownload = 0;
-                                }
-                            }
-                            
-                            // If there were downloads, and aren't anymore, fire notification
-                            // Use a delay to coalesce, because there often seems to be many small
-                            // metadata updates in a row
-                            NSDate *now = [NSDate date];
-                            if (!lastProgressNotificationDate || [now timeIntervalSinceDate:lastProgressNotificationDate] > 2.0) {
-                                lastProgressNotificationDate = now;
-                                dispatch_async(dispatch_get_main_queue(), ^{
-                                    [self postDidMakeDownloadProgressNotification];
-                                });
-                            }
-                            if (complete) {
-                                dispatch_async(dispatch_get_main_queue(), ^{
-                                    [self.class cancelPreviousPerformRequestsWithTarget:self selector:@selector(postDidDownloadNotification) object:nil];
-                                    [self performSelector:@selector(postDidDownloadNotification) withObject:nil afterDelay:2.0];
-                                });
+                                complete = [self removeDownloadingURL:url bytes:bytesRemainingForThisFile];
+                                [self postProgressNotificationIfNecessary];
                             }
                         }];
+                        
+                        if (error) {
+                            @synchronized(self) {
+                                complete = [self removeDownloadingURL:url bytes:bytesRemainingForThisFile];
+                                [self postProgressNotificationIfNecessary];
+                            }
+                        }
+                        
+                        // If there were downloads, and aren't anymore, fire notification
+                        // Use a delay to coalesce, because there often seems to be many small
+                        // metadata updates in a row
+                        if (complete) {
+                            dispatch_async(dispatch_get_main_queue(), ^{
+                                [self.class cancelPreviousPerformRequestsWithTarget:self selector:@selector(postDidDownloadNotification) object:nil];
+                                [self performSelector:@selector(postDidDownloadNotification) withObject:nil afterDelay:2.0];
+                            });
+                        }
                     }];
                 } else {
+                    @synchronized(self) {
+                        [handlingURLs removeObject:url];
+                    }
                     CDELog(CDELoggingLevelWarning, @"Error starting download: %@", error);
                 }
             });
         }
     }
-    
-    [downloadTrackingQueue setSuspended:NO];
+}
+
+- (BOOL)removeDownloadingURL:(NSURL *)url bytes:(unsigned long long)bytes
+{
+    BOOL complete = NO;
+    [downloadingURLs removeObject:url];
+    self.bytesRemainingToDownload -= bytes;
+    if (downloadingURLs.count == 0) {
+        complete = YES;
+        self.bytesRemainingToDownload = 0;
+    }
+    return complete;
+}
+
+- (void)postProgressNotificationIfNecessary
+{
+    NSDate *now = [NSDate date];
+    if (!lastProgressNotificationDate || [now timeIntervalSinceDate:lastProgressNotificationDate] > 2.0) {
+        lastProgressNotificationDate = now;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self postDidMakeDownloadProgressNotification];
+        });
+    }
 }
 
 - (void)postDidDownloadNotification
 {
     [self postDidMakeDownloadProgressNotification];
     lastProgressNotificationDate = nil;
-
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:CDEICloudFileSystemDidDownloadFilesNotification object:self];
     
     [self startMonitoringMetadata]; // Refresh query, which often gets 'stuck'
