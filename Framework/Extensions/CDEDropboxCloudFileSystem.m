@@ -341,6 +341,10 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
     
     NSMutableArray *contents = [[NSMutableArray alloc] initWithCapacity:metadata.contents.count];
     for (DBMetadata *child in metadata.contents) {
+        // Dropbox inserts parenthesized indexes when two files with
+        // same name are uploaded. Ignore these files.
+        if ([child.filename rangeOfString:@")"].location != NSNotFound) continue;
+        
         if (child.isDirectory) {
             CDECloudDirectory *dir = [CDECloudDirectory new];
             dir.name = child.filename;
