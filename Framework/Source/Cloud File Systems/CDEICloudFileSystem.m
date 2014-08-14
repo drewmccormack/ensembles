@@ -26,6 +26,7 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
     NSURL *rootDirectoryURL;
     NSMetadataQuery *metadataQuery;
     NSOperationQueue *operationQueue;
+    NSOperationQueue *presenterQueue;
     NSString *ubiquityContainerIdentifier;
     dispatch_queue_t timeOutQueue;
     dispatch_queue_t initiatingDownloadsQueue;
@@ -54,6 +55,9 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
         
         operationQueue = [[NSOperationQueue alloc] init];
         operationQueue.maxConcurrentOperationCount = 1;
+        
+        presenterQueue = [[NSOperationQueue alloc] init];
+        presenterQueue.maxConcurrentOperationCount = 1;
         
         downloadTrackingQueue = [[NSOperationQueue alloc] init];
         downloadTrackingQueue.maxConcurrentOperationCount = 1;
@@ -161,7 +165,7 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
         NSError *error = nil;
         __block BOOL fileExistsAtPath = NO;
         __block BOOL existingFileIsDirectory = NO;
-        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:self];
         [coordinator coordinateReadingItemAtURL:rootDirectoryURL options:NSFileCoordinatorReadingWithoutChanges error:&error byAccessor:^(NSURL *newURL) {
             fileExistsAtPath = [fileManager fileExistsAtPath:newURL.path isDirectory:&existingFileIsDirectory];
         }];
@@ -261,6 +265,8 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
     [notifationCenter addObserver:self selector:@selector(metadataQueryDidUpdate:) name:NSMetadataQueryDidUpdateNotification object:metadataQuery];
     
     [metadataQuery startQuery];
+    
+    [NSFileCoordinator addFilePresenter:self];
 }
 
 - (void)stopMonitoring
@@ -274,6 +280,9 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
     [[NSNotificationCenter defaultCenter] removeObserver:self name:NSMetadataQueryDidUpdateNotification object:metadataQuery];
     
     metadataQuery = nil;
+    
+    [presenterQueue cancelAllOperations];
+    [NSFileCoordinator removeFilePresenter:self];
 }
 
 - (void)metadataQueryDidFinishGathering:(NSNotification *)notif
@@ -326,7 +335,7 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
                     }
                     
                     [downloadTrackingQueue addOperationWithBlock:^{
-                        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+                        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:self];
                         NSError *error = nil;
                         __block BOOL complete = NO;
                         [coordinator coordinateReadingItemAtURL:url options:0 error:&error byAccessor:^(NSURL *newURL) {
@@ -349,7 +358,7 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
                         if (complete) {
                             dispatch_async(dispatch_get_main_queue(), ^{
                                 [self.class cancelPreviousPerformRequestsWithTarget:self selector:@selector(postDidDownloadNotification) object:nil];
-                                [self performSelector:@selector(postDidDownloadNotification) withObject:nil afterDelay:2.0];
+                                [self performSelector:@selector(postDidDownloadNotification) withObject:nil afterDelay:5.0];
                             });
                         }
                     }];
@@ -378,28 +387,58 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
 
 - (void)postProgressNotificationIfNecessary
 {
-    NSDate *now = [NSDate date];
-    if (!lastProgressNotificationDate || [now timeIntervalSinceDate:lastProgressNotificationDate] > 2.0) {
-        lastProgressNotificationDate = now;
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self postDidMakeDownloadProgressNotification];
-        });
+    @synchronized(self) {
+        NSDate *now = [NSDate date];
+        if (!lastProgressNotificationDate || [now timeIntervalSinceDate:lastProgressNotificationDate] > 5.0) {
+            lastProgressNotificationDate = now;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self postDidMakeDownloadProgressNotification];
+            });
+        }
     }
 }
 
 - (void)postDidDownloadNotification
 {
-    [self postDidMakeDownloadProgressNotification];
-    lastProgressNotificationDate = nil;
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:CDEICloudFileSystemDidDownloadFilesNotification object:self];
-    
-    [self startMonitoringMetadata]; // Refresh query, which often gets 'stuck'
+    @synchronized(self) {
+        [self postDidMakeDownloadProgressNotification];
+        lastProgressNotificationDate = nil;
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:CDEICloudFileSystemDidDownloadFilesNotification object:self];
+        
+        [self startMonitoringMetadata]; // Refresh query, which often gets 'stuck'
+    }
 }
 
 - (void)postDidMakeDownloadProgressNotification
 {
     [[NSNotificationCenter defaultCenter] postNotificationName:CDEICloudFileSystemDidMakeDownloadProgressNotification object:self];
+}
+
+#pragma mark - File Presentation
+
+- (NSURL *)presentedItemURL
+{
+    return rootDirectoryURL;
+}
+
+- (NSOperationQueue *)presentedItemOperationQueue
+{
+    return presenterQueue;
+}
+
+- (void)presentedSubitemDidChangeAtURL:(NSURL *)url
+{
+    @synchronized(self) {
+        // If metadata query has not fired, schedule a notification.
+        // Really only an issue on Mac, which can download files
+        // without them being requested.
+        if (downloadingURLs.count > 0) return;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.class cancelPreviousPerformRequestsWithTarget:self selector:@selector(postDidDownloadNotification) object:nil];
+            [self performSelector:@selector(postDidDownloadNotification) withObject:nil afterDelay:5.0];
+        });
+    }
 }
 
 #pragma mark - File Operations
@@ -437,7 +476,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
         __block BOOL isDirectory = NO;
         __block BOOL exists = NO;
         
-        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:self];
         
         dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, CDEFileCoordinatorTimeOut * NSEC_PER_SEC);
         dispatch_after(popTime, timeOutQueue, ^{
@@ -477,7 +516,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
         __block NSError *fileManagerError = nil;
         __block BOOL coordinatorExecuted = NO;
         
-        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:self];
         
         dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, CDEFileCoordinatorTimeOut * NSEC_PER_SEC);
         dispatch_after(popTime, timeOutQueue, ^{
@@ -546,7 +585,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
         __block NSError *fileManagerError = nil;
         __block BOOL coordinatorExecuted = NO;
         
-        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:self];
         
         dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, CDEFileCoordinatorTimeOut * NSEC_PER_SEC);
         dispatch_after(popTime, timeOutQueue, ^{
@@ -586,7 +625,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
         __block NSError *fileManagerError = nil;
         __block BOOL coordinatorExecuted = NO;
         
-        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:self];
         
         dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, CDEFileCoordinatorTimeOut * NSEC_PER_SEC);
         dispatch_after(popTime, timeOutQueue, ^{
@@ -626,7 +665,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
         __block NSError *fileManagerError = nil;
         __block BOOL coordinatorExecuted = NO;
         
-        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:self];
         
         dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, CDEFileCoordinatorTimeOut * NSEC_PER_SEC);
         dispatch_after(popTime, timeOutQueue, ^{
@@ -668,7 +707,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
         __block NSError *fileManagerError = nil;
         __block BOOL coordinatorExecuted = NO;
         
-        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:self];
         
         dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, CDEFileCoordinatorTimeOut * NSEC_PER_SEC);
         dispatch_after(popTime, timeOutQueue, ^{

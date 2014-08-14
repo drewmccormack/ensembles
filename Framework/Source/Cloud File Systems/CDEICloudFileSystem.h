@@ -12,7 +12,7 @@
 extern NSString * const CDEICloudFileSystemDidDownloadFilesNotification;
 extern NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification;
 
-@interface CDEICloudFileSystem : NSObject <CDECloudFileSystem>
+@interface CDEICloudFileSystem : NSObject <CDECloudFileSystem, NSFilePresenter>
 
 @property (nonatomic, readonly) NSString *relativePathToRootInContainer;
 @property (atomic, readonly) unsigned long long bytesRemainingToDownload;
