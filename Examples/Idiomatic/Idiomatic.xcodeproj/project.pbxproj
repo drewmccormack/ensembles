@@ -900,6 +900,7 @@
 					"$(SRCROOT)/../../Vendor/DropboxSDK/**",
 				);
 				INFOPLIST_FILE = "IdiomaticMac/IdiomaticMac-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -929,6 +930,7 @@
 					"$(SRCROOT)/../../Vendor/DropboxSDK/**",
 				);
 				INFOPLIST_FILE = "IdiomaticMac/IdiomaticMac-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
