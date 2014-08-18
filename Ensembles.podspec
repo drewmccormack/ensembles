@@ -52,8 +52,8 @@ Pod::Spec.new do |s|
     ss.dependency 'SSZipArchive'
     ss.framework = 'MultipeerConnectivity'
     ss.source_files = 'Framework/Extensions/CDEMultipeerCloudFileSystem.{h,m}'
-    s.ios.deployment_target = '7.0'
-    s.osx.deployment_target = '10.10'
+    ss.ios.deployment_target = '7.0'
+    ss.osx.deployment_target = '10.10'
   end
   
   s.subspec 'Node' do |ss|
