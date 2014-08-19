@@ -311,8 +311,14 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
             }
             
             NSNumber *percentDownloaded = [metadataQuery valueOfAttribute:NSMetadataUbiquitousItemPercentDownloadedKey forResultAtIndex:i];
-            NSNumber *downloaded = [metadataQuery valueOfAttribute:NSMetadataUbiquitousItemIsDownloadedKey forResultAtIndex:i];
             NSNumber *fileSizeNumber = [metadataQuery valueOfAttribute:NSMetadataItemFSSizeKey forResultAtIndex:i];
+
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_7_0) && (__MAC_OS_X_VERSION_MIN_REQUIRED < __MAC_10_9)
+            NSNumber *downloaded = [metadataQuery valueOfAttribute:NSMetadataUbiquitousItemIsDownloadedKey forResultAtIndex:i];
+#else
+            NSString *downloadingStatus = [metadataQuery valueOfAttribute:NSMetadataUbiquitousItemDownloadingStatusKey forResultAtIndex:i];
+            NSNumber *downloaded = @([downloadingStatus isEqualToString:NSMetadataUbiquitousItemDownloadingStatusNotDownloaded]);
+#endif
             
             dispatch_async(initiatingDownloadsQueue, ^{
                 NSError *error;
