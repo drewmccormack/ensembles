@@ -535,8 +535,16 @@
     for (NSString *file in files) {
         if ([file hasPrefix:@"."]) continue; // Ignore system files
         NSString *path = [dir stringByAppendingPathComponent:file];
-        BOOL success = [fileManager removeItemAtPath:path error:error];
-        if (!success) return NO;
+        
+        NSError *localError = nil;
+        BOOL success = [fileManager removeItemAtPath:path error:&localError];
+        if (!success) {
+            BOOL noSuchFileError = [localError.domain isEqualToString:NSCocoaErrorDomain] && localError.code == NSFileReadNoSuchFileError;
+            if (!noSuchFileError) {
+                if (error) *error = localError;
+                return NO;
+            }
+        }
     }
     
     return YES;
