@@ -220,6 +220,9 @@
         case NSFetchedResultsChangeDelete:
             [tableView deleteRowsAtIndexPaths:@[adjustedPathDeletion] withRowAnimation:UITableViewRowAnimationTop];
             break;
+            
+        default:
+            break;
     }
 }
 
