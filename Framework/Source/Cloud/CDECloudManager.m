@@ -62,9 +62,14 @@
         operationQueue = [[NSOperationQueue alloc] init];
         operationQueue.maxConcurrentOperationCount = 1;
         
-        [self createTransitCacheDirectories];
+        [self setup];
     }
     return self;
+}
+
+- (void)setup
+{
+    [self createTransitCacheDirectories];
 }
 
 

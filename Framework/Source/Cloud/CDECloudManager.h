@@ -19,6 +19,8 @@
 
 - (instancetype)initWithEventStore:(CDEEventStore *)newStore cloudFileSystem:(id <CDECloudFileSystem>)cloudFileSystem;
 
+- (void)setup;
+
 - (void)createRemoteDirectoryStructureWithCompletion:(CDECompletionBlock)completion;
 
 - (void)snapshotRemoteFilesWithCompletion:(CDECompletionBlock)completion;
