@@ -20,10 +20,10 @@ Pod::Spec.new do |s|
     :file => 'LICENCE.txt' 
   }
   s.author = { "Drew McCormack" => "drewmccormack@mac.com" }
-  
+
   s.ios.deployment_target = '6.0'
   s.osx.deployment_target = '10.7'
-
+  
   s.source        = { 
     :git => 'https://github.com/drewmccormack/ensembles.git', 
     :tag => s.version.to_s
@@ -52,8 +52,6 @@ Pod::Spec.new do |s|
     ss.dependency 'SSZipArchive'
     ss.framework = 'MultipeerConnectivity'
     ss.source_files = 'Framework/Extensions/CDEMultipeerCloudFileSystem.{h,m}'
-    ss.ios.deployment_target = '7.0'
-    ss.osx.deployment_target = '10.10'
   end
   
   s.subspec 'Node' do |ss|
