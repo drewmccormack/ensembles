@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "Ensembles"
-  s.version      = "1.2.3"
+  s.version      = "1.2.4"
   s.summary      = "A peer-to-peer synchronization framework for Core Data."
 
   s.description  =  <<-DESC
@@ -44,6 +44,7 @@ Pod::Spec.new do |s|
     ss.dependency 'Ensembles/Core'
     ss.ios.dependency 'Dropbox-iOS-SDK'
     ss.osx.dependency 'Dropbox-OSX-SDK'
+    ss.source = {:git => 'git://github.com/drewmccormack/dropbox-sdk-ios.git'}
     ss.source_files = 'Framework/Extensions/CDEDropboxCloudFileSystem.{h,m}'
   end
   
