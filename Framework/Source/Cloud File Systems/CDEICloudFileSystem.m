@@ -77,7 +77,13 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
         downloadingURLs = [NSMutableSet set];
         handlingURLs = [NSMutableSet set];
         
-        [self performInitialPreparation:NULL];
+        [operationQueue addOperationWithBlock:^{
+            [self updateRootDirectoryURL];
+        }];
+        
+        [self performInitialPreparation:^(NSError *error) {
+            if (error) CDELog(CDELoggingLevelError, @"Error setting up iCloud container: %@", error);
+        }];
     }
     return self;
 }
@@ -112,7 +118,7 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
     [operationQueue addOperationWithBlock:^{
         BOOL loggedIn = NO;
         if ([fileManager respondsToSelector:@selector(ubiquityIdentityToken)]) {
-            loggedIn = [fileManager ubiquityIdentityToken] != nil;
+            loggedIn = [fileManager ubiquityIdentityToken] != nil && ([fileManager URLForUbiquityContainerIdentifier:ubiquityContainerIdentifier] != nil);
         }
         else {
             loggedIn = [fileManager URLForUbiquityContainerIdentifier:ubiquityContainerIdentifier] != nil;
@@ -149,12 +155,17 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
 
 #pragma mark - Root Directory
 
+- (void)updateRootDirectoryURL
+{
+    NSURL *newURL = [fileManager URLForUbiquityContainerIdentifier:ubiquityContainerIdentifier];
+    newURL = [newURL URLByAppendingPathComponent:relativePathToRootInContainer];
+    rootDirectoryURL = newURL;
+}
+
 - (void)setupRootDirectory:(CDECompletionBlock)completion
 {
     [operationQueue addOperationWithBlock:^{
-        NSURL *newURL = [fileManager URLForUbiquityContainerIdentifier:ubiquityContainerIdentifier];
-        newURL = [newURL URLByAppendingPathComponent:relativePathToRootInContainer];
-        rootDirectoryURL = newURL;
+        [self updateRootDirectoryURL];
         if (!rootDirectoryURL) {
             NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeServerError userInfo:@{NSLocalizedDescriptionKey : @"Could not retrieve URLForUbiquityContainerIdentifier. Check container id for iCloud."}];
             CDELog(CDELoggingLevelError, @"Failed to get the URL of the iCloud ubiquity container: %@", error);
@@ -232,8 +243,17 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
 - (void)connect:(CDECompletionBlock)completion
 {
     [self checkUserIsLoggedIn:^(NSError *error, BOOL loggedIn) {
-        error = loggedIn && !error ? nil : [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeAuthenticationFailure userInfo:@{NSLocalizedDescriptionKey : NSLocalizedString(@"User is not logged into iCloud.", @"")} ];
-        if (completion) completion(error);
+        if (loggedIn) {
+            [self setupRootDirectory:^(NSError *error) {
+                [self startMonitoringMetadata];
+                [self addUbiquityContainerNotificationObservers];
+                if (completion) completion(error);
+            }];
+        }
+        else {
+            error = loggedIn && !error ? nil : [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeAuthenticationFailure userInfo:@{NSLocalizedDescriptionKey : NSLocalizedString(@"User is not logged into iCloud.", @"")} ];
+            if (completion) completion(error);
+        }
     }];
 }
 
@@ -469,7 +489,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
 - (void)fileExistsAtPath:(NSString *)path completion:(void(^)(BOOL exists, BOOL isDirectory, NSError *error))block
 {
     [operationQueue addOperationWithBlock:^{
-        if (!self.isConnected) {
+        if (!self.isConnected || !rootDirectoryURL) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (block) block(NO, NO, [self notConnectedError]);
             });
@@ -492,7 +512,8 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
             }
         });
         
-        NSURL *url = [NSURL fileURLWithPath:[self fullPathForPath:path]];
+        NSString *fullPath = [self fullPathForPath:path];
+        NSURL *url = [NSURL fileURLWithPath:fullPath];
         [coordinator coordinateReadingItemAtURL:url options:0 error:&fileCoordinatorError byAccessor:^(NSURL *newURL) {
             dispatch_sync(timeOutQueue, ^{ coordinatorExecuted = YES; });
             if (timeoutError) return;
@@ -510,7 +531,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
 - (void)contentsOfDirectoryAtPath:(NSString *)path completion:(void(^)(NSArray *contents, NSError *error))block
 {
     [operationQueue addOperationWithBlock:^{
-        if (!self.isConnected) {
+        if (!self.isConnected || !rootDirectoryURL) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (block) block(nil, [self notConnectedError]);
             });
@@ -579,7 +600,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
 - (void)createDirectoryAtPath:(NSString *)path completion:(CDECompletionBlock)block
 {
     [operationQueue addOperationWithBlock:^{
-        if (!self.isConnected) {
+        if (!self.isConnected || !rootDirectoryURL) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (block) block([self notConnectedError]);
             });
@@ -619,7 +640,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
 - (void)removeItemAtPath:(NSString *)path completion:(CDECompletionBlock)block
 {
     [operationQueue addOperationWithBlock:^{
-        if (!self.isConnected) {
+        if (!self.isConnected || !rootDirectoryURL) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (block) block([self notConnectedError]);
             });
@@ -659,7 +680,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
 - (void)uploadLocalFile:(NSString *)fromPath toPath:(NSString *)toPath completion:(CDECompletionBlock)block
 {
     [operationQueue addOperationWithBlock:^{
-        if (!self.isConnected) {
+        if (!self.isConnected || !rootDirectoryURL) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (block) block([self notConnectedError]);
             });
@@ -701,7 +722,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
 - (void)downloadFromPath:(NSString *)fromPath toLocalFile:(NSString *)toPath completion:(CDECompletionBlock)block
 {
     [operationQueue addOperationWithBlock:^{
-        if (!self.isConnected) {
+        if (!self.isConnected || !rootDirectoryURL) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (block) block([self notConnectedError]);
             });
