@@ -305,6 +305,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
     }
 
     CDEAsynchronousTaskBlock remoteStructureTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        [self.cloudManager setup];
         [self.cloudManager createRemoteDirectoryStructureWithCompletion:^(NSError *error) {
             next(error, NO);
         }];

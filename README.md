@@ -69,7 +69,8 @@ To manually add Ensembles to your App's Xcode Project...
  * Choose *New Copy Files Build Phase* from the popup menu.
  * Disclose the contents of the new *Copy Files* phase, and choose *Frameworks* from the *Destination* popup button.
  * Click the + button at the bottom of the *Copy Files* phase section, choose *Ensembles.framework*, and click *Add*.
-6. Add the following import in your precompiled header file, or in any files using Ensembles.
+6. Locate the _Runpath Search Path_ build setting, and add `@loader_path/../Frameworks`.
+7. Add the following import in your precompiled header file, or in any files using Ensembles.
 
         #import <Ensembles/Ensembles.h>
 

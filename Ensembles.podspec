@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "Ensembles"
-  s.version      = "1.2"
+  s.version      = "1.2.4"
   s.summary      = "A peer-to-peer synchronization framework for Core Data."
 
   s.description  =  <<-DESC
@@ -20,10 +20,10 @@ Pod::Spec.new do |s|
     :file => 'LICENCE.txt' 
   }
   s.author = { "Drew McCormack" => "drewmccormack@mac.com" }
-  
+
   s.ios.deployment_target = '6.0'
   s.osx.deployment_target = '10.7'
-
+  
   s.source        = { 
     :git => 'https://github.com/drewmccormack/ensembles.git', 
     :tag => s.version.to_s
@@ -44,6 +44,7 @@ Pod::Spec.new do |s|
     ss.dependency 'Ensembles/Core'
     ss.ios.dependency 'Dropbox-iOS-SDK'
     ss.osx.dependency 'Dropbox-OSX-SDK'
+    ss.source = {:git => 'git://github.com/drewmccormack/dropbox-sdk-ios.git'}
     ss.source_files = 'Framework/Extensions/CDEDropboxCloudFileSystem.{h,m}'
   end
   
@@ -52,8 +53,6 @@ Pod::Spec.new do |s|
     ss.dependency 'SSZipArchive'
     ss.framework = 'MultipeerConnectivity'
     ss.source_files = 'Framework/Extensions/CDEMultipeerCloudFileSystem.{h,m}'
-    s.ios.deployment_target = '7.0'
-    s.osx.deployment_target = '10.10'
   end
   
   s.subspec 'Node' do |ss|

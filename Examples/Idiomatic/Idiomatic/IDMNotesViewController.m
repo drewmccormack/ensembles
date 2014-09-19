@@ -108,6 +108,9 @@
                 cell.textLabel.text = note.text;
             }
             break;
+            
+        default:
+            break;
     }
 }
 

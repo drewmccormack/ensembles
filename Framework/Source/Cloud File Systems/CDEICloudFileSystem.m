@@ -83,6 +83,10 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
             [self updateRootDirectoryURL];
         }];
         
+        [operationQueue addOperationWithBlock:^{
+            [self updateRootDirectoryURL];
+        }];
+        
         [self performInitialPreparation:^(NSError *error) {
             if (error) CDELog(CDELoggingLevelError, @"Error setting up iCloud container: %@", error);
         }];

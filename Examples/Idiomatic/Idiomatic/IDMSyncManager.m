@@ -38,7 +38,7 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 @end
 
 @implementation IDMSyncManager {
-    CDEICloudFileSystem *cloudFileSystem;
+    id <CDECloudFileSystem> cloudFileSystem;
     NSUInteger activeMergeCount;
     CDECompletionBlock dropboxLinkSessionCompletion;
     CDECompletionBlock nodeCredentialUpdateCompletion;
