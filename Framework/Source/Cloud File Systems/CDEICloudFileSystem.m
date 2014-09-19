@@ -465,7 +465,7 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
         BOOL local = [locallyModifiedURLs containsObject:url];
         [locallyModifiedURLs removeObject:url];
         if (local) return;
-
+ 
         // If metadata query has not fired, schedule a notification.
         // Really only an issue on Mac, which can download files
         // without them being requested.
