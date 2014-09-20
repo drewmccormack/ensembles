@@ -34,7 +34,7 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
     NSOperationQueue *downloadTrackingQueue;
     NSDate *lastProgressNotificationDate;
     NSMutableSet *downloadingURLs, *handlingURLs;
-    NSMutableSet *locallyModifiedURLs;
+    NSMutableSet *locallyModifiedPaths;
 }
 
 @synthesize relativePathToRootInContainer = relativePathToRootInContainer;
@@ -77,7 +77,7 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
         
         downloadingURLs = [NSMutableSet set];
         handlingURLs = [NSMutableSet set];
-        locallyModifiedURLs = [NSMutableSet set];
+        locallyModifiedPaths = [NSMutableSet set];
         
         [operationQueue addOperationWithBlock:^{
             [self updateRootDirectoryURL];
@@ -462,8 +462,9 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
 - (void)presentedSubitemDidChangeAtURL:(NSURL *)url
 {
     @synchronized(self) {
-        BOOL local = [locallyModifiedURLs containsObject:url];
-        [locallyModifiedURLs removeObject:url];
+        NSString *path = [url.path stringByStandardizingPath];
+        BOOL local = [locallyModifiedPaths containsObject:path];
+        [locallyModifiedPaths removeObject:path];
         if (local) return;
  
         // If metadata query has not fired, schedule a notification.
@@ -633,7 +634,8 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
         });
         
         NSURL *url = [NSURL fileURLWithPath:[self fullPathForPath:path]];
-        [locallyModifiedURLs addObject:url];
+        NSString *path = [url.path stringByStandardizingPath];
+        [locallyModifiedPaths addObject:path];
         
         [coordinator coordinateWritingItemAtURL:url options:0 error:&fileCoordinatorError byAccessor:^(NSURL *newURL) {
             dispatch_sync(timeOutQueue, ^{ coordinatorExecuted = YES; });
@@ -675,8 +677,9 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
         });
         
         NSURL *url = [NSURL fileURLWithPath:[self fullPathForPath:path]];
-        [locallyModifiedURLs addObject:url];
-
+        NSString *path = [url.path stringByStandardizingPath];
+        [locallyModifiedPaths addObject:path];
+        
         [coordinator coordinateWritingItemAtURL:url options:NSFileCoordinatorWritingForDeleting error:&fileCoordinatorError byAccessor:^(NSURL *newURL) {
             dispatch_sync(timeOutQueue, ^{ coordinatorExecuted = YES; });
             if (timeoutError) return;
@@ -718,8 +721,9 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
         
         NSURL *fromURL = [NSURL fileURLWithPath:fromPath];
         NSURL *toURL = [NSURL fileURLWithPath:[self fullPathForPath:toPath]];
-        [locallyModifiedURLs addObject:toURL];
-
+        NSString *path = [toURL.path stringByStandardizingPath];
+        [locallyModifiedPaths addObject:path];
+        
         [coordinator coordinateReadingItemAtURL:fromURL options:0 writingItemAtURL:toURL options:NSFileCoordinatorWritingForReplacing error:&fileCoordinatorError byAccessor:^(NSURL *newReadingURL, NSURL *newWritingURL) {
             dispatch_sync(timeOutQueue, ^{ coordinatorExecuted = YES; });
             if (timeoutError) return;
