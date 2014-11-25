@@ -12,6 +12,7 @@
 ### Podcasts
 * [NSBrief #110](http://nsbrief.com/110-drew-mccormack/) featuring Drew McCormack
 * [CocoaRadio #4](http://carpeaqua.com/cocoaradio/#04) featuring Drew McCormack
+* [iDeveloper #133](http://shownotes.ideveloper.co/issues/10) featuring Drew McCormack
 
 ### Articles on Ensembles
 * [Introducing Ensembles: Core Data sync the way it should be](http://mentalfaculty.tumblr.com/post/62909673342/introducing-ensembles-core-data-sync-the-way-it-should) by Drew McCormack
