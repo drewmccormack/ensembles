@@ -9,7 +9,11 @@
 #import <QuartzCore/QuartzCore.h>
 #import <Ensembles/Ensembles.h>
 
-#import "DBRestClient.h"
+#if TARGET_OS_IPHONE
+#import "DropboxSDK.h"
+#else
+#import <DropboxOSX/DropboxOSX.h>
+#endif
 
 @class CDEDropboxCloudFileSystem;
 

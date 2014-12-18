@@ -6,8 +6,6 @@
 //
 
 #import "CDEDropboxCloudFileSystem.h"
-#import "DBMetadata.h"
-#import "DBRestClient.h"
 
 static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
 
