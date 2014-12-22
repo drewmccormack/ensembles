@@ -214,6 +214,46 @@
     XCTAssertEqualObjects(syncedChild, [syncedParent valueForKey:@"child"], @"Relationship not set");
 }
 
+- (void)testChangeRelationshipWithNoGlobalIdentifiersProvided
+{
+    ensemble1.delegate = nil;
+    ensemble2.delegate = nil;
+    [self leechStores];
+    
+    id parent = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context1];
+    id child1 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context1];
+    id child2 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context1];
+    XCTAssertTrue([context1 save:NULL], @"Could not save");
+    
+    [child1 setValue:parent forKey:@"parent"];
+    XCTAssertTrue([context1 save:NULL], @"Could not save");
+
+    XCTAssertNil([self syncChanges], @"Sync failed");
+    
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
+    NSArray *parents = [context2 executeFetchRequest:fetch error:NULL];
+    XCTAssertEqual(parents.count, (NSUInteger)1, @"No parent found");
+    
+    fetch = [NSFetchRequest fetchRequestWithEntityName:@"Child"];
+    NSMutableArray *children = [[context2 executeFetchRequest:fetch error:NULL] mutableCopy];
+    XCTAssertEqual(children.count, (NSUInteger)2, @"No child found");
+    
+    id syncedParent = parents.lastObject;
+    id syncedChild = [syncedParent valueForKey:@"child"];
+    XCTAssertNotNil(syncedChild, @"Relationship not set");
+    
+    [children removeObject:syncedChild];
+    id otherChild = children.lastObject;
+    [syncedParent setValue:otherChild forKey:@"child"];
+    
+    [context2 save:NULL];
+    
+    [self syncChanges];
+    
+    [context1 refreshObject:parent mergeChanges:NO];
+    XCTAssertEqualObjects(child2, [parent valueForKey:@"child"]);
+}
+
 - (void)testSmallDataAttributeLeadsToNoExternalDataFiles
 {
     [self leechStores];
