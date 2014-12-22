@@ -140,6 +140,33 @@
     XCTAssertEqual(parents.count, (NSUInteger)1, @"Wrong number of parents found");
 }
 
+- (void)testImportOfSameObjectOnMultipleDevices
+{
+    id parent1 = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context1];
+    NSDate *date = [NSDate dateWithTimeIntervalSinceReferenceDate:10.0];
+    [parent1 setValue:@"bob" forKey:@"name"];
+    [parent1 setValue:date forKey:@"date"];
+    XCTAssertTrue([context1 save:NULL], @"Could not save");
+    
+    id parent2 = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context2];
+    [parent2 setValue:@"bob" forKey:@"name"];
+    [parent2 setValue:date forKey:@"date"];
+    XCTAssertTrue([context2 save:NULL], @"Could not save");
+    
+    ensemble1.delegate = self;
+    ensemble2.delegate = self;
+    [self leechStores];
+    
+    [self syncChanges];
+    
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
+    NSArray *parents = [context2 executeFetchRequest:fetch error:NULL];
+    XCTAssertEqual(parents.count, (NSUInteger)1, @"Wrong number of parents found");
+    
+    parents = [context1 executeFetchRequest:fetch error:NULL];
+    XCTAssertEqual(parents.count, (NSUInteger)1, @"Wrong number of parents found");
+}
+
 - (NSArray *)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble globalIdentifiersForManagedObjects:(NSArray *)objects
 {
     return [objects valueForKeyPath:@"name"];
