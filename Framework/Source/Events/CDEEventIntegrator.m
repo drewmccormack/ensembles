@@ -580,9 +580,6 @@
     
     for (CDEObjectChange *change in changes) {
         NSManagedObject *object = [objectsByGlobalId objectForKey:change.globalIdentifier.globalIdentifier];
-        
-        // Clear the store URI in the global id
-        change.globalIdentifier.storeURI = nil;
 
         [managedObjectContext performBlockAndWait:^{
             [self nullifyRelationshipsAndDeleteObject:object];
