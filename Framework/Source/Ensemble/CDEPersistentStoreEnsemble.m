@@ -550,6 +550,18 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
     };
     [tasks addObject:setupTask];
     
+    CDEAsynchronousTaskBlock repairTask = ^(CDEAsynchronousTaskCallbackBlock next) {
+        if ([cloudFileSystem respondsToSelector:@selector(repairEnsembleDirectory:completion:)]) {
+            [cloudFileSystem repairEnsembleDirectory:self.cloudManager.remoteEnsembleDirectory completion:^(NSError *error) {
+                next(error, NO);
+            }];
+        }
+        else {
+            next(nil, NO);
+        }
+    };
+    [tasks addObject:repairTask];
+    
     CDEAsynchronousTaskBlock checkIdentityTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self checkCloudFileSystemIdentityWithCompletion:^(NSError *error) {
             next(error, NO);

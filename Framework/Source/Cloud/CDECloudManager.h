@@ -16,6 +16,7 @@
 
 @property (nonatomic, strong, readonly) CDEEventStore *eventStore;
 @property (nonatomic, strong, readonly) id <CDECloudFileSystem> cloudFileSystem;
+@property (nonatomic, strong, readonly) NSString *remoteEnsembleDirectory;
 
 - (instancetype)initWithEventStore:(CDEEventStore *)newStore cloudFileSystem:(id <CDECloudFileSystem>)cloudFileSystem;
 

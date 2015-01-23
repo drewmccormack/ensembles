@@ -143,4 +143,22 @@ typedef void (^CDEDirectoryContentsCallback)(NSArray *contents, NSError *error);
  */
 - (void)performInitialPreparation:(CDECompletionBlock)completion;
 
+
+///
+/// @name Repair
+///
+
+/**
+ An optional method which can be implemented to perform any repairs that are needed prior to merging.
+ 
+ Eg. Systems like iCloud and Dropbox can sometimes create duplicate files or folders. This is a good place to 'fix' that.
+ 
+ The completion block takes an `NSError`, which should be `nil` upon successful completion. The block should be called on the main thread.
+ 
+ @param ensembleDir Path to the directory of the ensemble.
+ @param block The completion block, which takes one argument, an `NSError`.
+ */
+- (void)repairEnsembleDirectory:(NSString *)ensembleDir completion:(CDECompletionBlock)completion;
+
+
 @end

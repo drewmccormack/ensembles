@@ -28,7 +28,6 @@
 @property (nonatomic, strong, readonly) NSString *localDownloadDirectory;
 @property (nonatomic, strong, readonly) NSString *localUploadDirectory;
 
-@property (nonatomic, strong, readonly) NSString *remoteEnsembleDirectory;
 @property (nonatomic, strong, readonly) NSString *remoteStoresDirectory;
 @property (nonatomic, strong, readonly) NSString *remoteEventsDirectory;
 @property (nonatomic, strong, readonly) NSString *remoteBaselinesDirectory;
