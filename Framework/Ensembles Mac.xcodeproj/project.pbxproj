@@ -53,6 +53,8 @@
 		07D2D638182D65FB001D24BC /* CDEManagedObjectModelTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07D2D637182D65FB001D24BC /* CDEManagedObjectModelTests.m */; };
 		07D7E4DB19110ED90086A2AE /* Ensembles.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6DAD10F918CA067900237084 /* Ensembles.framework */; };
 		07D7E4DC19110FC30086A2AE /* CDEMockLocalFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 075FDCDC183615C60020E1C9 /* CDEMockLocalFileSystem.m */; };
+		07DBC83E1A725DD40031594C /* NSFileCoordinator+CDEAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 07DBC83C1A725DD40031594C /* NSFileCoordinator+CDEAdditions.h */; };
+		07DBC83F1A725DD40031594C /* NSFileCoordinator+CDEAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 07DBC83D1A725DD40031594C /* NSFileCoordinator+CDEAdditions.m */; };
 		07DCC6C7184FA4050097B4D9 /* CDEBaselineConsolidatorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07DCC6C6184FA4050097B4D9 /* CDEBaselineConsolidatorTests.m */; };
 		07DDA7E417C8FE25009C6F94 /* CDEIntegratorUpdateTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07DDA7E317C8FE25009C6F94 /* CDEIntegratorUpdateTests.m */; };
 		07DDA7E917CA256E009C6F94 /* CDERevisionManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07DDA7E817CA256E009C6F94 /* CDERevisionManagerTests.m */; };
@@ -255,6 +257,8 @@
 		07D2D631182D627E001D24BC /* NSManagedObjectModel+CDEAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSManagedObjectModel+CDEAdditions.m"; sourceTree = "<group>"; };
 		07D2D637182D65FB001D24BC /* CDEManagedObjectModelTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEManagedObjectModelTests.m; sourceTree = "<group>"; };
 		07D9F00E1911039D00D191FA /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		07DBC83C1A725DD40031594C /* NSFileCoordinator+CDEAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileCoordinator+CDEAdditions.h"; sourceTree = "<group>"; };
+		07DBC83D1A725DD40031594C /* NSFileCoordinator+CDEAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileCoordinator+CDEAdditions.m"; sourceTree = "<group>"; };
 		07DCC6C6184FA4050097B4D9 /* CDEBaselineConsolidatorTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEBaselineConsolidatorTests.m; sourceTree = "<group>"; };
 		07DDA7E317C8FE25009C6F94 /* CDEIntegratorUpdateTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEIntegratorUpdateTests.m; sourceTree = "<group>"; };
 		07DDA7E517C9ECF6009C6F94 /* CDERevisionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDERevisionManager.h; path = Source/Revisioning/CDERevisionManager.h; sourceTree = SOURCE_ROOT; };
@@ -509,6 +513,8 @@
 				07BF7A05177F0A9D0029D500 /* NSMapTable+CDEAdditions.m */,
 				0701770718C1EF7400C4DA01 /* CDEAsynchronousOperation.h */,
 				0701770818C1EF7400C4DA01 /* CDEAsynchronousOperation.m */,
+				07DBC83C1A725DD40031594C /* NSFileCoordinator+CDEAdditions.h */,
+				07DBC83D1A725DD40031594C /* NSFileCoordinator+CDEAdditions.m */,
 			);
 			path = General;
 			sourceTree = "<group>";
@@ -631,6 +637,7 @@
 				6DAD116918CA074600237084 /* CDERebaser.h in Headers */,
 				6DAD114C18CA072A00237084 /* CDEEventBuilder.h in Headers */,
 				6DAD113E18CA072000237084 /* CDECloudManager.h in Headers */,
+				07DBC83E1A725DD40031594C /* NSFileCoordinator+CDEAdditions.h in Headers */,
 				6DAD115818CA073000237084 /* CDEDataFile.h in Headers */,
 				6DAD115218CA073000237084 /* CDEObjectChange.h in Headers */,
 				6DAD114418CA072A00237084 /* CDEEventStore.h in Headers */,
@@ -797,6 +804,7 @@
 				6DAD115A18CA073300237084 /* CDEEventStoreModel.xcdatamodeld in Sources */,
 				6DAD113218CA071C00237084 /* CDEICloudFileSystem.m in Sources */,
 				6DAD115118CA073000237084 /* CDEGlobalIdentifier.m in Sources */,
+				07DBC83F1A725DD40031594C /* NSFileCoordinator+CDEAdditions.m in Sources */,
 				6DAD115318CA073000237084 /* CDEObjectChange.m in Sources */,
 				6DAD114918CA072A00237084 /* CDEEventMigrator.m in Sources */,
 				6DAD115718CA073000237084 /* CDEStoreModificationEvent.m in Sources */,

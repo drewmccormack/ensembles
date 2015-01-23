@@ -161,6 +161,8 @@
 		07D184001892824200E89B89 /* CDERebaser.m in Sources */ = {isa = PBXBuildFile; fileRef = 07D183FE1892824200E89B89 /* CDERebaser.m */; };
 		07D2D63B182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 07D2D63A182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.m */; };
 		07D2D640182D6887001D24BC /* CDEManagedObjectModelTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07D2D63F182D6887001D24BC /* CDEManagedObjectModelTests.m */; };
+		07DBC8421A7269D00031594C /* NSFileCoordinator+CDEAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 07DBC8401A7269D00031594C /* NSFileCoordinator+CDEAdditions.h */; };
+		07DBC8431A7269D00031594C /* NSFileCoordinator+CDEAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 07DBC8411A7269D00031594C /* NSFileCoordinator+CDEAdditions.m */; };
 		07F001BE18427645001A0504 /* IntegratorMergeTestsFixture.json in Resources */ = {isa = PBXBuildFile; fileRef = 07F001BD18427645001A0504 /* IntegratorMergeTestsFixture.json */; };
 /* End PBXBuildFile section */
 
@@ -335,6 +337,8 @@
 		07D2D639182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSManagedObjectModel+CDEAdditions.h"; sourceTree = "<group>"; };
 		07D2D63A182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSManagedObjectModel+CDEAdditions.m"; sourceTree = "<group>"; };
 		07D2D63F182D6887001D24BC /* CDEManagedObjectModelTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEManagedObjectModelTests.m; sourceTree = "<group>"; };
+		07DBC8401A7269D00031594C /* NSFileCoordinator+CDEAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSFileCoordinator+CDEAdditions.h"; sourceTree = "<group>"; };
+		07DBC8411A7269D00031594C /* NSFileCoordinator+CDEAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSFileCoordinator+CDEAdditions.m"; sourceTree = "<group>"; };
 		07F001BD18427645001A0504 /* IntegratorMergeTestsFixture.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = IntegratorMergeTestsFixture.json; sourceTree = "<group>"; };
 		34700E9D188B225700FD00B1 /* CDEAvailabilityMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEAvailabilityMacros.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -607,6 +611,8 @@
 				07BF379417F1853000C56F64 /* CDEFoundationAdditions.m */,
 				07BF379617F1853000C56F64 /* NSMapTable+CDEAdditions.h */,
 				07BF379717F1853000C56F64 /* NSMapTable+CDEAdditions.m */,
+				07DBC8401A7269D00031594C /* NSFileCoordinator+CDEAdditions.h */,
+				07DBC8411A7269D00031594C /* NSFileCoordinator+CDEAdditions.m */,
 				07D2D639182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.h */,
 				07D2D63A182D6846001D24BC /* NSManagedObjectModel+CDEAdditions.m */,
 				0701770418C1EDE700C4DA01 /* CDEAsynchronousOperation.h */,
@@ -709,6 +715,7 @@
 				07571EF71910E171008479A9 /* CDEPropertyChangeValue.h in Headers */,
 				07571EF81910E171008479A9 /* CDESaveMonitor.h in Headers */,
 				07571EF91910E171008479A9 /* CDEEventRevision.h in Headers */,
+				07DBC8421A7269D00031594C /* NSFileCoordinator+CDEAdditions.h in Headers */,
 				07571EFA1910E171008479A9 /* CDEGlobalIdentifier.h in Headers */,
 				07571EFB1910E171008479A9 /* CDEObjectChange.h in Headers */,
 				07571EFC1910E171008479A9 /* CDEStoreModificationEvent.h in Headers */,
@@ -941,6 +948,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				07DBC8431A7269D00031594C /* NSFileCoordinator+CDEAdditions.m in Sources */,
 				0701770318C1EC4B00C4DA01 /* CDEFileDownloadOperation.m in Sources */,
 				07BF37BC17F1853000C56F64 /* CDEEventRevision.m in Sources */,
 				0701770618C1EDE700C4DA01 /* CDEAsynchronousOperation.m in Sources */,
