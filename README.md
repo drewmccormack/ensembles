@@ -5,7 +5,9 @@ _Author:_ Drew McCormack<br>
 _Created:_ 29th September, 2013<br>
 _Last Updated:_ 24th September, 2014
 
-*Ensembles 2 is now available for purchase at [ensembles.io](http://www.ensembles.io). It has performance improvements, extra backends (eg CloudKit), and other features. This version of Ensembles continues to be maintained and supported.*
+*Ensembles 2 is now available for purchase at [ensembles.io](http://www.ensembles.io). It has performance improvements, extra backends (eg CloudKit, Dropbox Sync), and other features. This version of Ensembles continues to be maintained and supported.*
+
+*There is a [Google Group](https://groups.google.com/forum/#!forum/ensembles) for discussing best practices with other developers.*
 
 Ensembles extends Apple's Core Data framework to add peer-to-peer synchronization for Mac OS and iOS. Multiple SQLite persistent stores can be coupled together via a file synchronization platform like iCloud or Dropbox. The framework can be readily extended to support any service capable of moving files between devices, including custom servers.
 
