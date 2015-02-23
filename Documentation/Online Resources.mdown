@@ -5,7 +5,7 @@
 * [@ensemblesio](http://twitter.com/ensemblesio) The Ensembles Twitter Account
 
 ### Forums and Mailing Lists
-* [Ensembles Mailing List](https://groups.google.com/forum/#!forum/ensembles] Hosted by Google Groups
+* [Ensembles Mailing List](https://groups.google.com/forum/#!forum/ensembles) Hosted by Google Groups
 
 ### Presentations
 * [Everything — but the kitchen — syncs](http://www.iosdevuk.com/talks/) Drew McCormack at iOSDevUK 2013
