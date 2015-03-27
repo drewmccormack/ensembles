@@ -108,8 +108,6 @@
 
 - (void)syncWithCompletion:(void(^)(void))completion
 {
-    if (ensemble.isMerging) return;
-    
     ViewController *viewController = (id)self.window.rootViewController;
     [viewController.activityIndicator startAnimating];
     if (!ensemble.isLeeched) {
