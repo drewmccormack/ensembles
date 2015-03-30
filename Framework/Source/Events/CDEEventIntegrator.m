@@ -210,6 +210,7 @@
                 else {
                     error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeSaveOccurredDuringMerge userInfo:nil];
                 }
+                [eventStoreContext reset];
             }];
             if (!eventSaveSucceeded) {
                 [self failWithError:error];
