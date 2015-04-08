@@ -69,6 +69,23 @@
     XCTAssertFalse(ensemble1.isLeeched, @"Should not be leeched");
 }
 
+- (void)testImportingExistingData
+{
+    id parent1 = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context1];
+    id parent2 = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context1];
+    [parent2 setValue:parent1 forKey:@"relatedParent"];
+    XCTAssertTrue([context1 save:NULL], @"Could not save");
+
+    [self leechStores];
+    XCTAssertNil([self syncChanges], @"Sync failed");
+
+    NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"Parent"];
+    NSArray *parents = [context2 executeFetchRequest:fetch error:NULL];
+    id parent = parents.lastObject;
+    XCTAssertEqual(parents.count, (NSUInteger)2, @"No parent found");
+    XCTAssertTrue([parent valueForKey:@"relatedParent"] != nil || [[parent valueForKey:@"inverseRelatedParent"] count] != 0);
+}
+
 - (void)testSaveAndMerge
 {
     [self leechStores];

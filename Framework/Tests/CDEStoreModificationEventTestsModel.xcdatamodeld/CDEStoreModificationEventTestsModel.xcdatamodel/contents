@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="3401" systemVersion="13B42" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="6751" systemVersion="14C1514" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="Child" syncable="YES">
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="maxedParent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Parent" inverseName="maxedChildren" inverseEntity="Parent" syncable="YES"/>
@@ -16,11 +16,13 @@
         <relationship name="child" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Child" inverseName="parent" inverseEntity="Child" syncable="YES"/>
         <relationship name="children" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Child" inverseName="parentWithSiblings" inverseEntity="Child" syncable="YES"/>
         <relationship name="friends" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Child" inverseName="testFriends" inverseEntity="Child" syncable="YES"/>
+        <relationship name="inverseRelatedParent" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Parent" inverseName="relatedParent" inverseEntity="Parent" syncable="YES"/>
         <relationship name="maxedChildren" optional="YES" toMany="YES" maxCount="2" deletionRule="Cascade" destinationEntity="Child" inverseName="maxedParent" inverseEntity="Child" syncable="YES"/>
         <relationship name="orderedChildren" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="Child" inverseName="orderedParent" inverseEntity="Child" syncable="YES"/>
+        <relationship name="relatedParent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Parent" inverseName="inverseRelatedParent" inverseEntity="Parent" syncable="YES"/>
     </entity>
     <elements>
         <element name="Child" positionX="0" positionY="0" width="128" height="135"/>
-        <element name="Parent" positionX="-549" positionY="0" width="128" height="178"/>
+        <element name="Parent" positionX="-549" positionY="0" width="128" height="208"/>
     </elements>
 </model>
