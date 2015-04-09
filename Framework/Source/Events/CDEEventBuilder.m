@@ -150,7 +150,7 @@
     };
     
     // Execute the block on the context's thread
-    if (context.concurrencyType == NSPrivateQueueConcurrencyType)
+    if (context.concurrencyType != NSConfinementConcurrencyType)
         [context performBlockAndWait:block];
     else
         block();
@@ -243,7 +243,7 @@
     };
     
     // Execute the block on the context's thread
-    if (context.concurrencyType == NSPrivateQueueConcurrencyType)
+    if (context.concurrencyType != NSConfinementConcurrencyType)
         [context performBlockAndWait:block];
     else
         block();
