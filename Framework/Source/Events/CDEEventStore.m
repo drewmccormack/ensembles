@@ -446,10 +446,15 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
     defaultPathToEventDataRootDirectory = [newPath copy];
 }
 
++ (NSString *)pathToEventDataRootDirectoryForRootDirectory:(NSString *)rootDir ensembleIdentifier:(NSString *)identifier
+{
+    NSString *path = [rootDir stringByAppendingPathComponent:identifier];
+    return path;
+}
+
 - (NSString *)pathToEventStoreRootDirectory
 {
-    NSString *path = [self.pathToEventDataRootDirectory stringByAppendingPathComponent:self.ensembleIdentifier];
-    return path;
+    return [self.class pathToEventDataRootDirectoryForRootDirectory:self.pathToEventDataRootDirectory ensembleIdentifier:self.ensembleIdentifier];
 }
 
 - (NSString *)pathToEventStore

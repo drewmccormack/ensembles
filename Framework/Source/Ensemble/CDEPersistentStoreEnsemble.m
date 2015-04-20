@@ -98,7 +98,9 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
         self.managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
         self.cloudFileSystem = newCloudFileSystem;
     
-        self.eventStore = [[CDEEventStore alloc] initWithEnsembleIdentifier:self.ensembleIdentifier pathToEventDataRootDirectory:eventDataRootURL.path];
+        BOOL success = [self setupEventStoreWithDataRootDirectoryURL:eventDataRootURL];
+        if (!success) return nil;
+        
         self.leeched = eventStore.containsEventData;
         if (self.leeched) [self.eventStore removeUnusedDataWithCompletion:NULL];
         
@@ -157,6 +159,29 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
         }
         [[NSNotificationCenter defaultCenter] postNotificationName:CDEPersistentStoreEnsembleDidSaveMergeChangesNotification object:strongSelf userInfo:@{CDEManagedObjectContextSaveNotificationKey : notification}];
     };
+}
+
+- (BOOL)setupEventStoreWithDataRootDirectoryURL:(NSURL *)eventDataRootURL
+{
+    self.eventStore = [[CDEEventStore alloc] initWithEnsembleIdentifier:self.ensembleIdentifier pathToEventDataRootDirectory:eventDataRootURL.path];
+    if (!self.eventStore) {
+        // Attempt to recover by removing local data
+        CDELog(CDELoggingLevelError, @"Failed to create event store. Serious error, so removing local data.");
+        NSString *ensembleRoot = [CDEEventStore pathToEventDataRootDirectoryForRootDirectory:eventDataRootURL.path ensembleIdentifier:self.ensembleIdentifier];
+        NSError *error = nil;
+        if (![[NSFileManager defaultManager] removeItemAtPath:ensembleRoot error:&error]) {
+            CDELog(CDELoggingLevelError, @"Attempt to remove corrupt ensemble data failed. Giving up: %@", error);
+            return NO;
+        }
+        else {
+            self.eventStore = [[CDEEventStore alloc] initWithEnsembleIdentifier:self.ensembleIdentifier pathToEventDataRootDirectory:eventDataRootURL.path];
+            if (!self.eventStore) {
+                CDELog(CDELoggingLevelError, @"Attempt to remove create event store failed again. Giving up.");
+                return NO;
+            }
+        }
+    }
+    return YES;
 }
 
 - (void)dealloc
