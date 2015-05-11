@@ -272,6 +272,8 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
 
 - (NSArray *)directoriesToMergeForDirectory:(NSString *)directory error:(NSError * __autoreleasing *)returnError
 {
+    if (!directory) return @[];
+    
     NSMutableArray *directoriesForMerging = [[NSMutableArray alloc] init];
     NSString *rootDir = [directory stringByDeletingLastPathComponent];
     NSString *ensembleName = [directory lastPathComponent];
@@ -285,6 +287,7 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
             [directoriesForMerging addObject:duplicateURL.path];
         }
     }
+    
     return directoriesForMerging;
 }
 
