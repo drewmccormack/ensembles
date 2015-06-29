@@ -140,7 +140,7 @@
     NSArray *parents = [context1 executeFetchRequest:[NSFetchRequest fetchRequestWithEntityName:@"Parent"] error:NULL];
     for (NSInteger i = 0; i < 6; i++) {
         for (id parent in parents) {
-            [parent setValue:@"tom" forKey:@"name"];
+            [parent setValue:[NSString stringWithFormat:@"tom%i", arc4random()] forKey:@"name"];
         }
         XCTAssertTrue([context1 save:NULL], @"Could not save");
     }
