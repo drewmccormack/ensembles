@@ -303,11 +303,13 @@
         NSMutableArray *newObjectIDs = [[NSMutableArray alloc] initWithCapacity:objects.count];
         for (NSManagedObject *object in objects) {
             NSManagedObjectID *objectID = object.objectID;
-            [newObjectIDs addObject:objectID];
-            
             NSArray *propertyChanges = propertyChangeValuesByObjectID[objectID];
-            for (CDEPropertyChangeValue *propertyChangeValue in propertyChanges) {
-                [propertyChangeValue updateWithObject:object isPreSave:isPreSave storeValues:storeValues];
+            
+            if(propertyChanges.count > 0) {
+                [newObjectIDs addObject:objectID];
+                for (CDEPropertyChangeValue *propertyChangeValue in propertyChanges) {
+                    [propertyChangeValue updateWithObject:object isPreSave:isPreSave storeValues:storeValues];
+                }
             }
         }
         objectIDs = newObjectIDs;
