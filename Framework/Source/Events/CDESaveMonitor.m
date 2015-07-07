@@ -202,8 +202,11 @@
     NSDictionary *deleteData = [eventBuilder changesDataForDeletedObjects:deletedObjects inManagedObjectContext:context];
     [changedValuesByContext removeObjectForKey:context];
 
-    if(((NSArray*)insertData[@"changeArrays"]).count + ((NSArray*)updateData[@"objectIDs"]).count + ((NSArray*)deleteData[@"orderedObjectIDs"]).count == 0)
-    {
+    // If there are no changes, we bail early and don't create any save event.
+    NSUInteger changeCount = [insertData[@"changeArrays"] count];
+    NSUInteger updateCount = [updateData[@"objectIDs"] count];
+    NSUInteger deleteCount = [deleteData[@"orderedObjectIDs"] count];
+    if (changeCount + updateCount + deleteCount == 0) {
         [self.eventStore deregisterIncompleteEventIdentifier:newUniqueId];
         return;
     }

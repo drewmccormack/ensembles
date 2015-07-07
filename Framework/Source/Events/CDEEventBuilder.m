@@ -304,7 +304,6 @@
         for (NSManagedObject *object in objects) {
             NSManagedObjectID *objectID = object.objectID;
             NSArray *propertyChanges = propertyChangeValuesByObjectID[objectID];
-            
             if(propertyChanges.count > 0) {
                 [newObjectIDs addObject:objectID];
                 for (CDEPropertyChangeValue *propertyChangeValue in propertyChanges) {
