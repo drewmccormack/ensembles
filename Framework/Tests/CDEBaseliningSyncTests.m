@@ -137,10 +137,11 @@
     XCTAssertTrue([context1 save:NULL], @"Could not save");
     
     // Each update is worth 0.2, so we need more than 5 for each object to trigger a rebase.
+    NSUInteger count = 0;
     NSArray *parents = [context1 executeFetchRequest:[NSFetchRequest fetchRequestWithEntityName:@"Parent"] error:NULL];
     for (NSInteger i = 0; i < 6; i++) {
         for (id parent in parents) {
-            [parent setValue:@"tom" forKey:@"name"];
+            [parent setValue:[NSString stringWithFormat:@"tom%lu", count++] forKey:@"name"];
         }
         XCTAssertTrue([context1 save:NULL], @"Could not save");
     }
@@ -192,7 +193,7 @@
     NSArray *parents = [context1 executeFetchRequest:[NSFetchRequest fetchRequestWithEntityName:@"Parent"] error:NULL];
     for (NSInteger i = 0; i < 11; i++) {
         for (id parent in parents) {
-            [parent setValue:@"tom" forKey:@"name"];
+            [parent setValue:[NSString stringWithFormat:@"tom%i", arc4random()] forKey:@"name"];
         }
         XCTAssertTrue([context1 save:NULL], @"Could not save");
     }

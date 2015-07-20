@@ -131,10 +131,15 @@
     NSMutableDictionary *changedValuesByObjectID = [NSMutableDictionary dictionaryWithCapacity:monitoredObjects.count];
     [monitoredObjects.allObjects cde_enumerateObjectsDrainingEveryIterations:50 usingBlock:^(NSManagedObject *object, NSUInteger index, BOOL *stop) {
         NSArray *propertyChanges = [CDEPropertyChangeValue propertyChangesForObject:object eventStore:self.eventStore propertyNames:object.changedValues.allKeys isPreSave:YES storeValues:NO];
-        NSManagedObjectID *objectID = object.objectID;
-        changedValuesByObjectID[objectID] = propertyChanges;
+        
+        // don't store updated objects with empty changes (transient, etc.)
+        if(propertyChanges.count > 0)
+        {
+            NSManagedObjectID *objectID = object.objectID;
+            changedValuesByObjectID[objectID] = propertyChanges;
+        }
     }];
-    
+
     NSManagedObjectContext *context = [objects.anyObject managedObjectContext];
     [changedValuesByContext setObject:changedValuesByObjectID forKey:context];
 }
@@ -197,6 +202,15 @@
     NSDictionary *deleteData = [eventBuilder changesDataForDeletedObjects:deletedObjects inManagedObjectContext:context];
     [changedValuesByContext removeObjectForKey:context];
 
+    // If there are no changes, we bail early and don't create any save event.
+    NSUInteger changeCount = [insertData[@"changeArrays"] count];
+    NSUInteger updateCount = [updateData[@"objectIDs"] count];
+    NSUInteger deleteCount = [deleteData[@"orderedObjectIDs"] count];
+    if (changeCount + updateCount + deleteCount == 0) {
+        [self.eventStore deregisterIncompleteEventIdentifier:newUniqueId];
+        return;
+    }
+    
     // Make sure the event is saved atomically
     [self.eventStore.managedObjectContext performBlock:^{
         // Global Ids
