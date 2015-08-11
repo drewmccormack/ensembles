@@ -282,7 +282,8 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
 /**
  Whether the ensemble is currently in the process of merging changes from other devices.
  
- Attempting to merge while another merge is in progress will lead to an error.
+ Attempting to merge while another merge is in progress will cause the second merge to be queued
+ and executed when the first merge completes.
  */
 @property (atomic, assign, readonly, getter = isMerging) BOOL merging;
 
