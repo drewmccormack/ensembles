@@ -28,7 +28,6 @@
 @end
 
 @implementation CDEEventIntegrator {
-    CDECompletionBlock completion;
     NSDictionary *saveInfoDictionary;
     dispatch_queue_t queue;
     id eventStoreChildContextSaveObserver;
@@ -129,11 +128,10 @@
 
 #pragma mark Merging Store Modification Events
 
-- (void)mergeEventsWithCompletion:(CDECompletionBlock)newCompletion
+- (void)mergeEventsWithCompletion:(CDECompletionBlock)completion
 {
     NSAssert([NSThread isMainThread], @"mergeEvents... called off main thread");
     
-    completion = [newCompletion copy];
     newEventUniqueId = nil;
     
     // Setup a context for accessing the main store
@@ -141,7 +139,7 @@
     NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:managedObjectModel];
     NSPersistentStore *persistentStore = [coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:self.persistentStoreOptions error:&error];
     if (!persistentStore) {
-        [self failWithError:error];
+        [self failWithCompletion:completion error:error];
         return;
     }
     
@@ -161,7 +159,7 @@
             // Apply changes
             BOOL integrationSucceeded = [self integrate:&error];
             if (!integrationSucceeded) {
-                [self failWithError:error];
+                [self failWithCompletion:completion error:error];
                 return;
             }
             
@@ -171,7 +169,7 @@
                 hasChanges = managedObjectContext.hasChanges;
             }];
             if (!hasChanges) {
-                [self completeSuccessfully];
+                [self completeSuccessfullyWithCompletion:completion];
                 return;
             }
             
@@ -188,14 +186,14 @@
             // Repair inconsistencies caused by integration
             BOOL repairSucceeded = [self repairWithMergeEventBuilder:eventBuilder error:&error];
             if (!repairSucceeded) {
-                [self failWithError:error];
+                [self failWithCompletion:completion error:error];
                 return;
             }
             
             // Commit (save) the changes
             BOOL commitSucceeded = [self commitWithMergeEventBuilder:eventBuilder error:&error];
             if (!commitSucceeded) {
-                [self failWithError:error];
+                [self failWithCompletion:completion error:error];
                 return;
             }
             
@@ -213,7 +211,7 @@
                 [eventStoreContext reset];
             }];
             if (!eventSaveSucceeded) {
-                [self failWithError:error];
+                [self failWithCompletion:completion error:error];
                 return;
             }
 
@@ -224,12 +222,12 @@
             saveInfoDictionary = nil;
             
             // Complete
-            [self completeSuccessfully];
+            [self completeSuccessfullyWithCompletion:completion];
         }
         @catch (NSException *exception) {
             NSDictionary *info = @{NSLocalizedFailureReasonErrorKey:exception.reason};
             NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeUnknown userInfo:info];
-            [self failWithError:error];
+            [self failWithCompletion:completion error:error];
         }
     });
 }
@@ -250,7 +248,7 @@
 
 #pragma mark Completing Merge
 
-- (void)failWithError:(NSError *)error
+- (void)failWithCompletion:(CDECompletionBlock)completion error:(NSError *)error
 {
     NSManagedObjectContext *eventContext = self.eventStore.managedObjectContext;
     if (newEventUniqueId) {
@@ -275,7 +273,7 @@
     });
 }
 
-- (void)completeSuccessfully
+- (void)completeSuccessfullyWithCompletion:(CDECompletionBlock)completion
 {
     if (newEventUniqueId) [self.eventStore deregisterIncompleteEventIdentifier:newEventUniqueId];
     newEventUniqueId = nil;
