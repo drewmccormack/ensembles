@@ -493,7 +493,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = IDM;
-				LastUpgradeCheck = 0600;
+				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = "The Mental Faculty B.V.";
 				TargetAttributes = {
 					074B959717EC783B0016F84D = {
@@ -754,6 +754,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -840,6 +841,7 @@
 				);
 				INFOPLIST_FILE = "Idiomatic/Idiomatic-Info.plist";
 				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mentalfaculty.idiomatic;
 				PRODUCT_NAME = Idiomatic;
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
@@ -866,6 +868,7 @@
 				);
 				INFOPLIST_FILE = "Idiomatic/Idiomatic-Info.plist";
 				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mentalfaculty.idiomatic;
 				PRODUCT_NAME = Idiomatic;
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
@@ -898,6 +901,7 @@
 				INFOPLIST_FILE = "IdiomaticMac/IdiomaticMac-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mentalfaculty.idiomatic.osx;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx;
@@ -928,6 +932,7 @@
 				INFOPLIST_FILE = "IdiomaticMac/IdiomaticMac-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mentalfaculty.idiomatic.osx;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SDKROOT = macosx;
