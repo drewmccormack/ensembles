@@ -47,5 +47,9 @@
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+        <string>dbapi-2</string>
+    </array>
 </dict>
 </plist>
