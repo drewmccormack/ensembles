@@ -1,6 +1,10 @@
 Release Notes
 =============
 
+1.4.2
+---
+- Added Quality of Service settings to all operation queues, to ensure they keep working even on mobile networks
+
 1.4.1
 ---
 - Minor changes to comments in code
