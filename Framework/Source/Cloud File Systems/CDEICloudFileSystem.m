@@ -57,12 +57,21 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
         
         operationQueue = [[NSOperationQueue alloc] init];
         operationQueue.maxConcurrentOperationCount = 1;
+        if ([operationQueue respondsToSelector:@selector(setQualityOfService:)]) {
+            [operationQueue setQualityOfService:NSQualityOfServiceUtility];
+        }
         
         presenterQueue = [[NSOperationQueue alloc] init];
         presenterQueue.maxConcurrentOperationCount = 1;
+        if ([presenterQueue respondsToSelector:@selector(setQualityOfService:)]) {
+            [presenterQueue setQualityOfService:NSQualityOfServiceUtility];
+        }
         
         downloadTrackingQueue = [[NSOperationQueue alloc] init];
         downloadTrackingQueue.maxConcurrentOperationCount = 1;
+        if ([downloadTrackingQueue respondsToSelector:@selector(setQualityOfService:)]) {
+            [downloadTrackingQueue setQualityOfService:NSQualityOfServiceUtility];
+        }
         
         timeOutQueue = dispatch_queue_create("com.mentalfaculty.ensembles.queue.icloudtimeout", DISPATCH_QUEUE_SERIAL);
         initiatingDownloadsQueue = dispatch_queue_create("com.mentalfaculty.ensembles.queue.initiatedownloads", DISPATCH_QUEUE_SERIAL);

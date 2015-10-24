@@ -95,6 +95,9 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
         session = newSession;
         queue = [[NSOperationQueue alloc] init];
         queue.maxConcurrentOperationCount = 1;
+        if ([queue respondsToSelector:@selector(setQualityOfService:)]) {
+            [queue setQualityOfService:NSQualityOfServiceUtility];
+        }
     }
     return self;
 }
