@@ -499,7 +499,10 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
     
     // Prevent event store being backed up
 #if !TARGET_OS_IPHONE
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wtautological-pointer-compare"
     if (&NSURLIsExcludedFromBackupKey != NULL) {
+#pragma clang diagnostic pop
 #endif
         NSURL *url = [NSURL fileURLWithPath:self.pathToEventStoreRootDirectory];
         NSError *metadataError;

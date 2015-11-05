@@ -381,7 +381,10 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
 {
     [self removeUbiquityContainerNotificationObservers];
     
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wtautological-pointer-compare"
     if (&NSUbiquityIdentityDidChangeNotification != NULL) {
+#pragma clang diagnostic pop
         __weak typeof(self) weakSelf = self;
         ubiquityIdentityObserver = [[NSNotificationCenter defaultCenter] addObserverForName:NSUbiquityIdentityDidChangeNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *note) {
             __strong typeof(weakSelf) strongSelf = weakSelf;
