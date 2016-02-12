@@ -80,11 +80,11 @@ To manually add Ensembles to your App's Xcode Project...
 
 By default, Ensembles only includes support for iCloud. To use other cloud services, such as Dropbox, you may need to add a few steps to the procedure above. 
 
-If you are using Cocoapods, add the optional subspec to the Podfile. For example, to include Dropbox, include
+If you are using CocoaPods, add the optional subspec to the Podfile. For example, to include Dropbox, include
 
 		pod "Ensembles/Dropbox", "~> 1.0"
 
-If you are installing Ensembles manually, rather than with Cocoapods, you need to locate the source files and frameworks relevant to the service you want to support. You can find frameworks in the `Vendor` folder, and source files in `Framework/Extensions`.
+If you are installing Ensembles manually, rather than with CocoaPods, you need to locate the source files and frameworks relevant to the service you want to support. You can find frameworks in the `Vendor` folder, and source files in `Framework/Extensions`.
 
 By way of example, if you want to support Dropbox, you need to add the DropboxSDK Xcode project as a dependency, link to the appropriate product library, and include the files `CDEDropboxCloudFileSystem.h` and `CDEDropboxCloudFileSystem.m` in your project.
 
