@@ -28,6 +28,11 @@
     
     for (NSString *propertyName in names) {
         NSPropertyDescription *propertyDesc = entity.propertiesByName[propertyName];
+        
+        if ([propertyDesc isKindOfClass:[NSFetchedPropertyDescription class]]) {
+            continue;
+        }
+        
         CDEPropertyChangeValue *change = [[CDEPropertyChangeValue alloc] initWithObject:object propertyDescription:propertyDesc eventStore:newEventStore isPreSave:isPreSave storeValues:storeValues];
         [propertyChanges addObject:change];
     }
