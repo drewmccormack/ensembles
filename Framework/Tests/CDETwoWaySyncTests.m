@@ -212,11 +212,11 @@
     id parent = [NSEntityDescription insertNewObjectForEntityForName:@"Parent" inManagedObjectContext:context1];
     
     id child1OnDevice1 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context1];
-    [child1OnDevice1 setName:@"child1"];
+    [child1OnDevice1 setValue:@"child1" forKey:@"name"];
     [child1OnDevice1 setValue:parent forKey:@"parentWithSiblings"];
 
     id child2OnDevice1 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context1];
-    [child2OnDevice1 setName:@"child2"];
+    [child2OnDevice1 setValue:@"child2" forKey:@"name"];
     [child2OnDevice1 setValue:parent forKey:@"parentWithSiblings"];
     
     XCTAssertTrue([context1 save:NULL], @"Could not save");
@@ -247,9 +247,9 @@
     id child2OnDevice1 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context1];
     id child3OnDevice1 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context1];
     
-    [child1OnDevice1 setName:@"child1"];
-    [child2OnDevice1 setName:@"child2"];
-    [child3OnDevice1 setName:@"child3"];
+    [child1OnDevice1 setValue:@"child1" forKey:@"name"];
+    [child2OnDevice1 setValue:@"child2" forKey:@"name"];
+    [child3OnDevice1 setValue:@"child3" forKey:@"name"];
     
     NSOrderedSet *set = [NSOrderedSet orderedSetWithArray:@[child1OnDevice1, child2OnDevice1, child3OnDevice1]];
     [parent setValue:set forKey:@"orderedChildren"];
@@ -303,9 +303,9 @@
     id child2OnDevice1 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context1];
     id child3OnDevice1 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context1];
     
-    [child1OnDevice1 setName:@"child1"];
-    [child2OnDevice1 setName:@"child2"];
-    [child3OnDevice1 setName:@"child3"];
+    [child1OnDevice1 setValue:@"child1" forKey:@"name"];
+    [child2OnDevice1 setValue:@"child2" forKey:@"name"];
+    [child3OnDevice1 setValue:@"child3" forKey:@"name"];
     
     NSOrderedSet *set = [NSOrderedSet orderedSetWithArray:@[ child1OnDevice1, child2OnDevice1, child3OnDevice1]];
     [parent setValue:set forKey:@"orderedChildren"];
@@ -322,7 +322,7 @@
     XCTAssertEqual(childrenOnDevice2.count, (NSUInteger)3, @"Expected 3 children");
 
     id child4OnDevice1 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context1];
-    [child4OnDevice1 setName:@"child4"];
+    [child4OnDevice1 setValue:@"child4" forKey:@"name"];
     set = [NSOrderedSet orderedSetWithArray:@[child1OnDevice1, child4OnDevice1, child2OnDevice1, child3OnDevice1]];
     [parent setValue:set forKey:@"orderedChildren"];
     XCTAssertTrue([context1 save:NULL], @"Could not save");
@@ -355,7 +355,7 @@
 
     // Device 1
     id A1 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context1];
-    [A1 setName:@"A"];
+    [A1 setValue:@"A" forKey:@"name"];
     
     NSOrderedSet *set = [NSOrderedSet orderedSetWithArray:@[A1]];
     [P1 setValue:set forKey:@"orderedChildren"];
@@ -371,9 +371,9 @@
     id G2 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context2];
     id H2 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context2];
 
-    [F2 setName:@"F"];
-    [G2 setName:@"G"];
-    [H2 setName:@"H"];
+    [F2 setValue:@"F" forKey:@"name"];
+    [G2 setValue:@"G" forKey:@"name"];
+    [H2 setValue:@"H" forKey:@"name"];
     
     set = [NSOrderedSet orderedSetWithArray:@[F2, G2, H2]];
     [P2 setValue:set forKey:@"orderedChildren"];
@@ -386,10 +386,10 @@
     id D1 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context1];
     id E1 = [NSEntityDescription insertNewObjectForEntityForName:@"Child" inManagedObjectContext:context1];
 
-    [B1 setName:@"B"];
-    [C1 setName:@"C"];
-    [D1 setName:@"D"];
-    [E1 setName:@"E"];
+    [B1 setValue:@"B" forKey:@"name"];
+    [C1 setValue:@"C" forKey:@"name"];
+    [D1 setValue:@"D" forKey:@"name"];
+    [E1 setValue:@"E" forKey:@"name"];
     
     set = [NSOrderedSet orderedSetWithArray:@[A1, B1, C1, D1, E1]];
     [P1 setValue:set forKey:@"orderedChildren"];

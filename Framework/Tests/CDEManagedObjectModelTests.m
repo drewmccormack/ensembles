@@ -38,8 +38,8 @@
 - (void)testModelHash
 {
     NSString *hash = [model cde_modelHash];
-    NSString *childHash = model.entityVersionHashesByName[@"Child"];
-    NSString *parentHash = model.entityVersionHashesByName[@"Parent"];
+    NSData *childHash = model.entityVersionHashesByName[@"Child"];
+    NSData *parentHash = model.entityVersionHashesByName[@"Parent"];
     NSString *expectedHash = [NSString stringWithFormat:@"Child_%@__Parent_%@", childHash, parentHash];
     XCTAssertEqualObjects(hash, expectedHash, @"Hash wrong");
 }
