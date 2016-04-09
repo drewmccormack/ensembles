@@ -192,6 +192,12 @@ It is not compulsory to provide global identifiers, but if you do, the framework
 
 If you do decide to provide global identifiers, it is up to you how you generate them, and where you store them. A common choice is to add an extra attribute to entities in your data model, and set that to a uuid on insertion into the store.
 
+#### Troubleshooting
+
+Ensembles has a built-in logging system, but by default only logs errors. It is often useful during development to see what the framework is doing, using the verbose logging setting. Simply make this call somewhere early in the launch process:
+
+    CDESetCurrentLoggingLevel(CDELoggingLevelVerbose);
+
 #### Unit Tests
 
 Unit tests are included for the Ensembles framework on each platform. To run the tests, open the Xcode workspace, choose the Ensembles Mac or Ensembles iOS target in the toolbar at the top, and select the menu item `Product > Test`.
