@@ -374,7 +374,9 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
             }
             
             // Reset the event store
-            [eventStore.managedObjectContext reset];
+            [eventStore.managedObjectContext performBlockAndWait:^{
+                [eventStore.managedObjectContext reset];
+            }];
             
             next(error, NO);
         }];
@@ -405,7 +407,9 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
     
     CDEAsynchronousTaskBlock completeLeechTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         // Reset the event store
-        [eventStore.managedObjectContext reset];
+        [self.eventStore.managedObjectContext performBlockAndWait:^{
+            [eventStore.managedObjectContext reset];
+        }];
         
         // Deleech if a save occurred during import
         if (saveOccurredDuringImport) {
