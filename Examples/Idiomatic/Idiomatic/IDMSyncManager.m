@@ -165,6 +165,8 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
         newSystem = multipeerCloudFileSystem;
 
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didImportFiles) name:CDEMultipeerCloudFileSystemDidImportFilesNotification object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didReceiveNewFilesAvailability:) name:CDEMultipeerCloudFileSystemDidReceiveNewFilesAvailabilityNotification object:nil];
     }
     
     return newSystem;
@@ -373,6 +375,13 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 - (void)didImportFiles
 {
     [self synchronizeWithCompletion:nil];
+}
+
+- (void)didReceiveNewFilesAvailability:(NSNotification *)note
+{
+    id peerID = note.userInfo[CDEMultipeerCloudFileSystemDidReceiveNewFilesAvailabilityPeerIDKey];
+    
+    [multipeerManager syncFilesWithPeer:peerID];
 }
 
 #pragma mark - CDEMonitoredManagedObjectContext
