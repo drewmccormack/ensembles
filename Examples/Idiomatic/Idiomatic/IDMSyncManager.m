@@ -65,6 +65,8 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
     self = [super init];
     if (self) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(icloudDidDownload:) name:CDEICloudFileSystemDidDownloadFilesNotification object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didSaveMonitoredManagedObjectContext:) name:CDEMonitoredManagedObjectContextDidSaveNotification object:nil];
     }
     return self;
 }
@@ -371,6 +373,17 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 - (void)didImportFiles
 {
     [self synchronizeWithCompletion:nil];
+}
+
+#pragma mark - CDEMonitoredManagedObjectContext
+
+- (void)didSaveMonitoredManagedObjectContext:(NSNotification *)note {
+    // Notify other peers to refresh their stores
+    if(multipeerManager) {
+        [self synchronizeWithCompletion:^(NSError *error) {
+            [multipeerManager notifyPeersForNewFilesAvailability];
+        }];
+    }
 }
 
 @end
