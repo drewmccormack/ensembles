@@ -109,7 +109,9 @@
             }
             break;
             
-        default:
+        case NSFetchedResultsChangeMove:
+            [tableView deleteRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationTop];
+            [tableView insertRowsAtIndexPaths:@[ newIndexPath ] withRowAnimation:UITableViewRowAnimationTop];
             break;
     }
 }
