@@ -11,10 +11,15 @@
 
 typedef NS_ENUM (NSInteger, CDEMultipeerMessageType) {
 	CDEMultipeerMessageTypeFileRetrievalRequest = 1,
-    CDEMultipeerMessageTypeFileRetrievalResponse = 2
+    CDEMultipeerMessageTypeFileRetrievalResponse = 2,
+    CDEMultipeerMessageTypeNewFilesAvailability = 3
 };
 
 NSString * const CDEMultipeerCloudFileSystemDidImportFilesNotification = @"CDEMultipeerCloudFileSystemDidImportFilesNotification";
+
+NSString * const CDEMultipeerCloudFileSystemDidReceiveNewFilesAvailabilityNotification = @"CDEMultipeerCloudFileSystemDidReceiveNewFilesAvailabilityNotification";
+
+NSString * const CDEMultipeerCloudFileSystemDidReceiveNewFilesAvailabilityPeerIDKey = @"peerID";
 
 NSString * const CDEMultipeerFilesPathsKey = @"filesPaths";
 NSString * const CDEMultipeerMessageTypeKey = @"messageType";
@@ -156,6 +161,19 @@ NSString * const CDEMultipeerMessageTypeKey = @"messageType";
     }
 }
 
+- (void)notifyPeersForNewFilesAvailability:(NSArray *)peerIDs
+{
+    NSDictionary *peerMessage = @{
+        CDEMultipeerMessageTypeKey : @(CDEMultipeerMessageTypeNewFilesAvailability)
+    };
+    NSData *peerMessageData = [NSKeyedArchiver archivedDataWithRootObject:peerMessage];
+    
+    for (id peerID in peerIDs) {
+        BOOL success = [self.multipeerConnection sendData:peerMessageData toPeerWithID:peerID];
+        if (!success) CDELog(CDELoggingLevelError, @"Could not send data to peer: %@", peerID);
+    }
+}
+
 - (NSString *)fullPathForRelativePath:(NSString *)path
 {
 	return [rootDirectory stringByAppendingPathComponent:path];
@@ -180,6 +198,13 @@ NSString * const CDEMultipeerMessageTypeKey = @"messageType";
     if (CDEMultipeerMessageTypeFileRetrievalRequest == messageType) {
         NSSet *remoteFiles = peerMessage[CDEMultipeerFilesPathsKey];
         [self handleFileRetrievalRequestFromPeerWithID:peerID withRemotePaths:remoteFiles];
+    }
+    else if(CDEMultipeerMessageTypeNewFilesAvailability == messageType) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:CDEMultipeerCloudFileSystemDidReceiveNewFilesAvailabilityNotification
+                                                                object:self
+                                                              userInfo:@{ CDEMultipeerCloudFileSystemDidReceiveNewFilesAvailabilityPeerIDKey: peerID }];
+        });
     }
 }
 
