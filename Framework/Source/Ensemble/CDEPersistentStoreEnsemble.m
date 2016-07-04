@@ -45,8 +45,8 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
 @property (nonatomic, strong, readwrite) NSURL *storeURL;
 @property (nonatomic, strong, readwrite) NSManagedObjectModel *managedObjectModel;
 @property (nonatomic, strong, readwrite) NSURL *managedObjectModelURL;
-@property (nonatomic, assign, readwrite, getter = isLeeched) BOOL leeched;
-@property (nonatomic, assign, readwrite, getter = isMerging) BOOL merging;
+@property (atomic, assign, readwrite, getter = isLeeched) BOOL leeched;
+@property (atomic, assign, readwrite, getter = isMerging) BOOL merging;
 @property (nonatomic, strong, readwrite) CDEEventStore *eventStore;
 @property (nonatomic, strong, readwrite) CDESaveMonitor *saveMonitor;
 @property (nonatomic, strong, readwrite) CDEEventIntegrator *eventIntegrator;

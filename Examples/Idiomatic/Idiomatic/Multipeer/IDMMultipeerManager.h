@@ -20,6 +20,6 @@
 - (void)stop;
 - (void)syncFilesWithPeer:(id)peerID;
 - (void)syncFilesWithAllPeers;
-- (void)notifyPeersForNewFilesAvailability;
+- (void)sendNotificationOfNewlyAvailableDataToAllPeers;
 
 @end

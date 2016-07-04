@@ -10,11 +10,11 @@
 #import <Ensembles/Ensembles.h>
 
 extern NSString * const CDEMultipeerCloudFileSystemDidImportFilesNotification;
-extern NSString * const CDEMultipeerCloudFileSystemDidReceiveNewFilesAvailabilityNotification;
-
-extern NSString * const CDEMultipeerCloudFileSystemDidReceiveNewFilesAvailabilityPeerIDKey;
 
 @protocol CDEMultipeerConnection <NSObject>
+
+@optional
+- (void)newDataWasAddedOnPeerWithID:(id <NSObject, NSCopying, NSCoding>)peerID;
 
 @required
 - (BOOL)sendData:(NSData *)data toPeerWithID:(id <NSObject, NSCopying, NSCoding>)peerID;
@@ -32,7 +32,7 @@ extern NSString * const CDEMultipeerCloudFileSystemDidReceiveNewFilesAvailabilit
 
 - (void)retrieveFilesFromPeersWithIDs:(NSArray *)peerIDs;
 
-- (void)notifyPeersForNewFilesAvailability:(NSArray *)peerIDs;
+- (void)sendNotificationOfNewlyAvailableDataToPeersWithIDs:(NSArray *)peerIDs;
 
 - (void)removeAllFiles;
 
