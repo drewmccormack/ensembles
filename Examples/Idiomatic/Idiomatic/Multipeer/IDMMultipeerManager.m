@@ -84,6 +84,20 @@ NSString *const kDiscoveryInfoUniqueIdentifer = @"DiscoveryInfoUniqueIdentifer";
 
 #pragma mark - Syncing Files
 
+- (void)syncFilesWithPeer:(id)peerID {
+    if (peerSession.connectedPeers.count == 0 && (!peerBrowser || !peerAdvertizer) ) {
+        [self start];
+        return;
+    }
+    
+    NSMutableArray *peers = [peerSession.connectedPeers mutableCopy];
+    [peers removeObject:peerSession.myPeerID];
+    
+    if([peers containsObject:peerID]) {
+        [self.multipeerCloudFileSystem retrieveFilesFromPeersWithIDs:@[ peerID ]];
+    }
+}
+
 - (void)syncFilesWithAllPeers
 {
     if (peerSession.connectedPeers.count == 0 && (!peerBrowser || !peerAdvertizer) ) {
@@ -94,6 +108,17 @@ NSString *const kDiscoveryInfoUniqueIdentifer = @"DiscoveryInfoUniqueIdentifer";
     NSMutableArray *peers = [peerSession.connectedPeers mutableCopy];
     [peers removeObject:peerSession.myPeerID];
     [self.multipeerCloudFileSystem retrieveFilesFromPeersWithIDs:peers];
+}
+
+- (void)notifyPeersForNewFilesAvailability {
+    if (peerSession.connectedPeers.count == 0 && (!peerBrowser || !peerAdvertizer) ) {
+        [self start];
+        return;
+    }
+
+    NSMutableArray *peers = [peerSession.connectedPeers mutableCopy];
+    [peers removeObject:peerSession.myPeerID];
+    [self.multipeerCloudFileSystem notifyPeersForNewFilesAvailability:peers];
 }
 
 - (BOOL)sendAndDiscardFileAtURL:(NSURL *)url toPeerWithID:(id<NSObject,NSCopying,NSCoding>)peerID
