@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+1.5.2
+---
+- Improved notifications for file transfers in the multipeer backend
+
+1.5.1
+---
+Minor changes.
+
 1.5
 ---
 Minor changes.
