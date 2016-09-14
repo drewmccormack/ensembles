@@ -1081,18 +1081,31 @@
 - (BOOL)saveContext:(NSError * __autoreleasing *)error
 {
     __block BOOL saved = NO;
+    __block NSError *localError;
     [managedObjectContext performBlockAndWait:^{
+        NSError *blockError;
         if (saveOccurredDuringMerge) {
-            *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeSaveOccurredDuringMerge userInfo:nil];
+            blockError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeSaveOccurredDuringMerge userInfo:nil];
+            localError = blockError;
             return;
         }
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(storeChangesFromContextDidSaveNotification:) name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
-        saved = [managedObjectContext save:error];
+        saved = [managedObjectContext save:&blockError];
         [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
+        
+        if (!saved) {
+            localError = blockError;
+        }
     }];
+    
+    if (!saved && error) {
+        *error = localError;
+    }
+    
     return saved;
 }
+
 
 - (void)storeChangesFromContextDidSaveNotification:(NSNotification *)notif
 {
