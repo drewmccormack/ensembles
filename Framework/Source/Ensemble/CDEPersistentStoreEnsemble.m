@@ -189,9 +189,15 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
 
 - (void)dealloc
 {
+    [self dismantle];
+}
+
+- (void)dismantle
+{
     if (observingIdentityToken) [(id)self.cloudFileSystem removeObserver:self forKeyPath:@"identityToken"];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [saveMonitor stopMonitoring];
+    [eventStore dismantle];
 }
 
 #pragma mark - Discovering and Managing Ensembles

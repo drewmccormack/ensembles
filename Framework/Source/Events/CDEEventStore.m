@@ -95,7 +95,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 
 - (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [self dismantle];
 }
 
 
@@ -421,15 +421,23 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 
 - (BOOL)removeEventStore
 {
-    self.persistentStoreIdentifier = nil;
-    incompleteEventIdentifiers = nil;
-    [self tearDownCoreDataStack];
+    [self dismantle];
     return [fileManager removeItemAtPath:self.pathToEventStoreRootDirectory error:NULL];
 }
 
 - (BOOL)containsEventData
 {
     return self.persistentStoreIdentifier && self.managedObjectContext;
+}
+
+- (void)dismantle
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [managedObjectContext performBlockAndWait:^{
+        self.persistentStoreIdentifier = nil;
+        incompleteEventIdentifiers = nil;
+        [self tearDownCoreDataStack];
+    }];
 }
 
 

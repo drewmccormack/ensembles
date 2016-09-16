@@ -1,6 +1,10 @@
 Release Notes
 =============
 
+Next
+---
+- Added `dismantle` method, which can be called a `CDEPersistentStoreEnsemble` is no longer needed.
+
 1.5.2
 ---
 - Improved notifications for file transfers in the multipeer backend

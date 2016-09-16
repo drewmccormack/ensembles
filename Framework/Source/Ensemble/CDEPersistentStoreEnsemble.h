@@ -418,6 +418,18 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
  */
 - (void)processPendingChangesWithCompletion:(CDECompletionBlock)block;
 
+
+///
+/// @name Dismantling an Ensemble
+///
+
+/**
+ Force the ensemble to dismantle. Normally this happens when it deallocs, but sometimes you may want to force it to happen early,
+ such as when you want to create a new ensemble that replaces an existing ensemble. In order to prevent the two ensembles accessing the same
+ data at the same time, you can tell one to dismantle, after which it will no longer use or access the disk, or monitor saves.
+ */
+- (void)dismantle;
+
 @end
 
 @interface CDEPersistentStoreEnsemble (Internal)

@@ -72,6 +72,7 @@
 
 - (void)tearDown
 {
+    [ensemble dismantle];
     [[NSFileManager defaultManager] removeItemAtPath:rootDir error:NULL];
     [super tearDown];
 }

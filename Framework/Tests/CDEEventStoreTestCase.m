@@ -131,7 +131,7 @@ static NSString *testStoreFile;
 }
 
 - (void)tearDown
-{
+{    
     [eventStore.managedObjectContext performBlockAndWait:^{
         [eventStore.managedObjectContext reset];
         eventStore = nil;

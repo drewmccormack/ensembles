@@ -73,9 +73,9 @@
 }
 
 - (void)tearDown
-{    
-    [ensemble1 stopMonitoringSaves];
-    [ensemble2 stopMonitoringSaves];
+{
+    [ensemble1 dismantle];
+    [ensemble2 dismantle];
     
     [context1 reset];
     [context2 reset];

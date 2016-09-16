@@ -156,6 +156,7 @@
 		0722B26217B76B2400496F4A /* CDERevision.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDERevision.m; sourceTree = "<group>"; };
 		0722B26317B76B2400496F4A /* CDERevisionSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDERevisionSet.h; sourceTree = "<group>"; };
 		0722B26417B76B2400496F4A /* CDERevisionSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDERevisionSet.m; sourceTree = "<group>"; };
+		07238CA61D8BCD170058C651 /* RELEASENOTES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = RELEASENOTES.md; path = ../RELEASENOTES.md; sourceTree = "<group>"; };
 		072A87D917EDFBB000F8B2CB /* CDEPersistentStoreImporter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEPersistentStoreImporter.h; sourceTree = "<group>"; };
 		072A87DA17EDFBB000F8B2CB /* CDEPersistentStoreImporter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEPersistentStoreImporter.m; sourceTree = "<group>"; };
 		072A87DE17EEE55600F8B2CB /* CDEEventBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEEventBuilder.h; sourceTree = "<group>"; };
@@ -554,6 +555,7 @@
 		07E492DD17172CB200FE81B5 = {
 			isa = PBXGroup;
 			children = (
+				07238CA61D8BCD170058C651 /* RELEASENOTES.md */,
 				0777BF0F17183FD500F1D0D2 /* Source */,
 				6DAD110118CA067A00237084 /* Supporting Files */,
 				07592CA8177F2D1000816034 /* Tests */,

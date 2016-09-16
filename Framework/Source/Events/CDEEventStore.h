@@ -43,6 +43,8 @@
 
 - (instancetype)initWithEnsembleIdentifier:(NSString *)identifier pathToEventDataRootDirectory:(NSString *)rootDirectory;
 
+- (void)dismantle;
+
 - (void)flushWithCompletion:(CDECompletionBlock)completion;
 
 - (BOOL)removeEventStore;

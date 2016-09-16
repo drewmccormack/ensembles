@@ -90,6 +90,7 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
     dropboxSession = nil;
     
     ensemble.delegate = nil;
+    [ensemble dismantle];
     ensemble = nil;
     
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:IDMCloudServiceUserDefaultKey];
