@@ -3,6 +3,8 @@ Release Notes
 
 Next
 ---
+- Added a module target for iOS.
+- Added the Simple Sync in Swift sample app.
 - Added `dismantle` method, which can be called a `CDEPersistentStoreEnsemble` is no longer needed.
 
 1.5.2

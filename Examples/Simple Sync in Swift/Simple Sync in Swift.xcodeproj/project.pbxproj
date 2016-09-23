@@ -11,21 +11,14 @@
 		072920151C5E898700558715 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 072920141C5E898700558715 /* ViewController.swift */; };
 		072920181C5E898700558715 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 072920161C5E898700558715 /* Main.storyboard */; };
 		0729201D1C5E898700558715 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0729201C1C5E898700558715 /* Assets.xcassets */; };
-		072920391C5E8A0500558715 /* Ensembles.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 072920371C5E89A800558715 /* Ensembles.framework */; };
-		0729203B1C5E8A3A00558715 /* Ensembles.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 072920371C5E89A800558715 /* Ensembles.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0729203E1C5E8A9200558715 /* NumberHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0729203D1C5E8A9200558715 /* NumberHolder.swift */; };
 		072920411C5E8B8700558715 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 0729203F1C5E8B8700558715 /* Model.xcdatamodeld */; };
 		072920441C5E8BB200558715 /* Launch.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 072920421C5E8BB200558715 /* Launch.storyboard */; };
+		0770E5691D9516CB0010902E /* Ensembles.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 072920371C5E89A800558715 /* Ensembles.framework */; };
+		0770E56A1D9516CB0010902E /* Ensembles.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 072920371C5E89A800558715 /* Ensembles.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		070612391D87D81E00503EE9 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 072920271C5E89A800558715 /* Ensembles iOS.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 07AC052D1D6D8D0E00AF2337;
-			remoteInfo = "Ensembles tvOS";
-		};
 		072920301C5E89A800558715 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 072920271C5E89A800558715 /* Ensembles iOS.xcodeproj */;
@@ -54,17 +47,25 @@
 			remoteGlobalIDString = E9D6301A1BFEB26300B60D60;
 			remoteInfo = "Ensembles iOS Module";
 		};
+		0770E56B1D9516CB0010902E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 072920271C5E89A800558715 /* Ensembles iOS.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 07F2D9B31D950FDB00EB9483;
+			remoteInfo = "Ensembles iOS Module";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		0729203A1C5E8A2300558715 /* CopyFiles */ = {
+		0770E56D1D9516CB0010902E /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				0729203B1C5E8A3A00558715 /* Ensembles.framework in CopyFiles */,
+				0770E56A1D9516CB0010902E /* Ensembles.framework in Embed Frameworks */,
 			);
+			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -88,7 +89,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				072920391C5E8A0500558715 /* Ensembles.framework in Frameworks */,
+				0770E5691D9516CB0010902E /* Ensembles.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -135,7 +136,6 @@
 				072920331C5E89A800558715 /* Ensembles.bundle */,
 				072920351C5E89A800558715 /* Tests iOS.xctest */,
 				072920371C5E89A800558715 /* Ensembles.framework */,
-				0706123A1D87D81E00503EE9 /* Ensembles_tvOS.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -150,11 +150,12 @@
 				0729200B1C5E898600558715 /* Sources */,
 				0729200C1C5E898600558715 /* Frameworks */,
 				0729200D1C5E898600558715 /* Resources */,
-				0729203A1C5E8A2300558715 /* CopyFiles */,
+				0770E56D1D9516CB0010902E /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				0770E56C1D9516CB0010902E /* PBXTargetDependency */,
 			);
 			name = "Simple Sync in Swift";
 			productName = "Simple Sync in Swift";
@@ -208,13 +209,6 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		0706123A1D87D81E00503EE9 /* Ensembles_tvOS.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Ensembles_tvOS.framework;
-			remoteRef = 070612391D87D81E00503EE9 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		072920311C5E89A800558715 /* libensembles.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -271,6 +265,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		0770E56C1D9516CB0010902E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Ensembles iOS Module";
+			targetProxy = 0770E56B1D9516CB0010902E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		072920161C5E898700558715 /* Main.storyboard */ = {
