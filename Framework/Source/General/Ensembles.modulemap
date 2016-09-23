@@ -1,0 +1,18 @@
+framework module Ensembles {
+    
+    header "CDEAsynchronousOperation.h"
+    header "CDEAsynchronousTaskQueue.h"
+    header "CDEAvailabilityMacros.h"
+    header "CDECloudDirectory.h"
+    header "CDECloudFile.h"
+    header "CDECloudFileSystem.h"
+    header "CDEDefines.h"
+    header "CDEFileDownloadOperation.h"
+    header "CDEFileUploadOperation.h"
+    header "CDEFoundationAdditions.h"
+    header "CDEICloudFileSystem.h"
+    header "CDELocalCloudFileSystem.h"
+    header "CDEPersistentStoreEnsemble.h"
+    header "NSMapTable+CDEAdditions.h"
+    header "NSManagedObjectModel+CDEAdditions.h"
+}

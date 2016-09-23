@@ -329,7 +329,7 @@
         NSPersistentStoreCoordinator *coordinator = changesData[@"persistentStoreCoordinator"];
         NSDictionary *propertyChangeValuesByObjectID = CDENSNullToNil(changesData[@"propertyChangeValuesByObjectID"]);
         
-        [coordinator lock];
+        [(id)coordinator lock];
         
         NSArray *globalIds = [CDEGlobalIdentifier fetchGlobalIdentifiersForObjectIDs:objectIDs inManagedObjectContext:eventManagedObjectContext];
         [globalIds cde_enumerateObjectsDrainingEveryIterations:50 usingBlock:^(CDEGlobalIdentifier *globalId, NSUInteger index, BOOL *stop) {
@@ -346,7 +346,7 @@
             [self addObjectChangeOfType:CDEObjectChangeTypeUpdate forGlobalIdentifier:globalId entityName:objectID.entity.name propertyChanges:propertyChanges];
         }];
         
-        [coordinator unlock];
+        [(id)coordinator unlock];
     }];
 }
 

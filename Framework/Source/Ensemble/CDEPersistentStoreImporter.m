@@ -46,9 +46,9 @@
         NSURL *storeURL = [NSURL fileURLWithPath:persistentStorePath];
         NSDictionary *options = self.persistentStoreOptions;
         if (!options) options = @{NSMigratePersistentStoresAutomaticallyOption: @YES, NSInferMappingModelAutomaticallyOption: @YES};
-        [coordinator lock];
+        [(id)coordinator lock];
         [coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:options error:&error];
-        [coordinator unlock];
+        [(id)coordinator unlock];
     }];
     
     if (error) {

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="9525" systemVersion="15C50" minimumToolsVersion="Xcode 4.3">
+    <entity name="NumberHolder" representedClassName=".NumberHolder" syncable="YES">
+        <attribute name="number" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="uniqueIdentifier" attributeType="String" defaultValueString="NumberHolder" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="NumberHolder" positionX="-63" positionY="-18" width="128" height="75"/>
+    </elements>
+</model>

@@ -139,7 +139,7 @@ typedef void (^CDEDirectoryContentsCallback)(NSArray *contents, NSError *error);
  
  The completion block takes an `NSError`, which should be `nil` upon successful completion. The block should be called on the main thread.
 
- @param block The completion block, which takes one argument, an `NSError`.
+ @param completion The completion block, which takes one argument, an `NSError`.
  */
 - (void)performInitialPreparation:(CDECompletionBlock)completion;
 
@@ -156,7 +156,7 @@ typedef void (^CDEDirectoryContentsCallback)(NSArray *contents, NSError *error);
  The completion block takes an `NSError`, which should be `nil` upon successful completion. The block should be called on the main thread.
  
  @param ensembleDir Path to the directory of the ensemble.
- @param block The completion block, which takes one argument, an `NSError`.
+ @param completion The completion block, which takes one argument, an `NSError`.
  */
 - (void)repairEnsembleDirectory:(NSString *)ensembleDir completion:(CDECompletionBlock)completion;
 

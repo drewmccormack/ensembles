@@ -1,0 +1,446 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		072920131C5E898700558715 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 072920121C5E898700558715 /* AppDelegate.swift */; };
+		072920151C5E898700558715 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 072920141C5E898700558715 /* ViewController.swift */; };
+		072920181C5E898700558715 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 072920161C5E898700558715 /* Main.storyboard */; };
+		0729201D1C5E898700558715 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0729201C1C5E898700558715 /* Assets.xcassets */; };
+		072920391C5E8A0500558715 /* Ensembles.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 072920371C5E89A800558715 /* Ensembles.framework */; };
+		0729203B1C5E8A3A00558715 /* Ensembles.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 072920371C5E89A800558715 /* Ensembles.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		0729203E1C5E8A9200558715 /* NumberHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0729203D1C5E8A9200558715 /* NumberHolder.swift */; };
+		072920411C5E8B8700558715 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 0729203F1C5E8B8700558715 /* Model.xcdatamodeld */; };
+		072920441C5E8BB200558715 /* Launch.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 072920421C5E8BB200558715 /* Launch.storyboard */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		070612391D87D81E00503EE9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 072920271C5E89A800558715 /* Ensembles iOS.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 07AC052D1D6D8D0E00AF2337;
+			remoteInfo = "Ensembles tvOS";
+		};
+		072920301C5E89A800558715 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 072920271C5E89A800558715 /* Ensembles iOS.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 07BF374517F184DD00C56F64;
+			remoteInfo = "Ensembles iOS";
+		};
+		072920321C5E89A800558715 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 072920271C5E89A800558715 /* Ensembles iOS.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 07571F0F1910EC02008479A9;
+			remoteInfo = "Ensembles Resources";
+		};
+		072920341C5E89A800558715 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 072920271C5E89A800558715 /* Ensembles iOS.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 070D336118018A960054BA23;
+			remoteInfo = "Tests iOS";
+		};
+		072920361C5E89A800558715 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 072920271C5E89A800558715 /* Ensembles iOS.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = E9D6301A1BFEB26300B60D60;
+			remoteInfo = "Ensembles iOS Module";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		0729203A1C5E8A2300558715 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				0729203B1C5E8A3A00558715 /* Ensembles.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0729200F1C5E898600558715 /* Simple Sync in Swift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Simple Sync in Swift.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		072920121C5E898700558715 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		072920141C5E898700558715 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		072920171C5E898700558715 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		0729201C1C5E898700558715 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		072920211C5E898700558715 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		072920271C5E89A800558715 /* Ensembles iOS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "Ensembles iOS.xcodeproj"; path = "../../Framework/Ensembles iOS.xcodeproj"; sourceTree = "<group>"; };
+		072920381C5E89CA00558715 /* Simple Sync in Swift.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Simple Sync in Swift.entitlements"; sourceTree = "<group>"; };
+		0729203D1C5E8A9200558715 /* NumberHolder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NumberHolder.swift; sourceTree = "<group>"; };
+		072920401C5E8B8700558715 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		072920431C5E8BB200558715 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Launch.storyboard; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		0729200C1C5E898600558715 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				072920391C5E8A0500558715 /* Ensembles.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		072920061C5E898600558715 = {
+			isa = PBXGroup;
+			children = (
+				072920271C5E89A800558715 /* Ensembles iOS.xcodeproj */,
+				072920111C5E898700558715 /* Simple Sync in Swift */,
+				072920101C5E898600558715 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		072920101C5E898600558715 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0729200F1C5E898600558715 /* Simple Sync in Swift.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		072920111C5E898700558715 /* Simple Sync in Swift */ = {
+			isa = PBXGroup;
+			children = (
+				072920121C5E898700558715 /* AppDelegate.swift */,
+				072920141C5E898700558715 /* ViewController.swift */,
+				0729203D1C5E8A9200558715 /* NumberHolder.swift */,
+				072920161C5E898700558715 /* Main.storyboard */,
+				0729201C1C5E898700558715 /* Assets.xcassets */,
+				072920421C5E8BB200558715 /* Launch.storyboard */,
+				072920211C5E898700558715 /* Info.plist */,
+				0729203F1C5E8B8700558715 /* Model.xcdatamodeld */,
+				072920381C5E89CA00558715 /* Simple Sync in Swift.entitlements */,
+			);
+			path = "Simple Sync in Swift";
+			sourceTree = "<group>";
+		};
+		072920281C5E89A800558715 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				072920311C5E89A800558715 /* libensembles.a */,
+				072920331C5E89A800558715 /* Ensembles.bundle */,
+				072920351C5E89A800558715 /* Tests iOS.xctest */,
+				072920371C5E89A800558715 /* Ensembles.framework */,
+				0706123A1D87D81E00503EE9 /* Ensembles_tvOS.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0729200E1C5E898600558715 /* Simple Sync in Swift */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 072920241C5E898700558715 /* Build configuration list for PBXNativeTarget "Simple Sync in Swift" */;
+			buildPhases = (
+				0729200B1C5E898600558715 /* Sources */,
+				0729200C1C5E898600558715 /* Frameworks */,
+				0729200D1C5E898600558715 /* Resources */,
+				0729203A1C5E8A2300558715 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Simple Sync in Swift";
+			productName = "Simple Sync in Swift";
+			productReference = 0729200F1C5E898600558715 /* Simple Sync in Swift.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		072920071C5E898600558715 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0720;
+				LastUpgradeCheck = 0800;
+				ORGANIZATIONNAME = "Drew McCormack";
+				TargetAttributes = {
+					0729200E1C5E898600558715 = {
+						CreatedOnToolsVersion = 7.2;
+						DevelopmentTeam = P7BXV6PHLD;
+						LastSwiftMigration = 0800;
+						SystemCapabilities = {
+							com.apple.iCloud = {
+								enabled = 1;
+							};
+						};
+					};
+				};
+			};
+			buildConfigurationList = 0729200A1C5E898600558715 /* Build configuration list for PBXProject "Simple Sync in Swift" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 072920061C5E898600558715;
+			productRefGroup = 072920101C5E898600558715 /* Products */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 072920281C5E89A800558715 /* Products */;
+					ProjectRef = 072920271C5E89A800558715 /* Ensembles iOS.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				0729200E1C5E898600558715 /* Simple Sync in Swift */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		0706123A1D87D81E00503EE9 /* Ensembles_tvOS.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Ensembles_tvOS.framework;
+			remoteRef = 070612391D87D81E00503EE9 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		072920311C5E89A800558715 /* libensembles.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libensembles.a;
+			remoteRef = 072920301C5E89A800558715 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		072920331C5E89A800558715 /* Ensembles.bundle */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = Ensembles.bundle;
+			remoteRef = 072920321C5E89A800558715 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		072920351C5E89A800558715 /* Tests iOS.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "Tests iOS.xctest";
+			remoteRef = 072920341C5E89A800558715 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		072920371C5E89A800558715 /* Ensembles.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Ensembles.framework;
+			remoteRef = 072920361C5E89A800558715 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		0729200D1C5E898600558715 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0729201D1C5E898700558715 /* Assets.xcassets in Resources */,
+				072920181C5E898700558715 /* Main.storyboard in Resources */,
+				072920441C5E8BB200558715 /* Launch.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0729200B1C5E898600558715 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0729203E1C5E8A9200558715 /* NumberHolder.swift in Sources */,
+				072920411C5E8B8700558715 /* Model.xcdatamodeld in Sources */,
+				072920151C5E898700558715 /* ViewController.swift in Sources */,
+				072920131C5E898700558715 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		072920161C5E898700558715 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				072920171C5E898700558715 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		072920421C5E8BB200558715 /* Launch.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				072920431C5E8BB200558715 /* Base */,
+			);
+			name = Launch.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		072920221C5E898700558715 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		072920231C5E898700558715 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		072920251C5E898700558715 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "Simple Sync in Swift/Simple Sync in Swift.entitlements";
+				INFOPLIST_FILE = "Simple Sync in Swift/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mentalfaculty.simplesyncswift;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		072920261C5E898700558715 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "Simple Sync in Swift/Simple Sync in Swift.entitlements";
+				INFOPLIST_FILE = "Simple Sync in Swift/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.mentalfaculty.simplesyncswift;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0729200A1C5E898600558715 /* Build configuration list for PBXProject "Simple Sync in Swift" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				072920221C5E898700558715 /* Debug */,
+				072920231C5E898700558715 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		072920241C5E898700558715 /* Build configuration list for PBXNativeTarget "Simple Sync in Swift" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				072920251C5E898700558715 /* Debug */,
+				072920261C5E898700558715 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		0729203F1C5E8B8700558715 /* Model.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				072920401C5E8B8700558715 /* Model.xcdatamodel */,
+			);
+			currentVersion = 072920401C5E8B8700558715 /* Model.xcdatamodel */;
+			path = Model.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = 072920071C5E898600558715 /* Project object */;
+}
