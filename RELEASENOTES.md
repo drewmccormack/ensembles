@@ -1,11 +1,12 @@
 Release Notes
 =============
 
-Next
+1.6
 ---
 - Added a module target for iOS.
 - Added the Simple Sync in Swift sample app.
 - Added `dismantle` method, which can be called a `CDEPersistentStoreEnsemble` is no longer needed.
+- Fixed a number of autoreleasing-NSError argument memory management issues.
 
 1.5.2
 ---
