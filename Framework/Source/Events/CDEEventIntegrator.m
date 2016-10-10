@@ -154,7 +154,7 @@
     // Integrate on background queue
     dispatch_async(queue,^{
         @try {
-            __block NSError *error;
+            __block NSError *error = nil;
             
             // Apply changes
             BOOL integrationSucceeded = [self integrate:&error];
@@ -200,15 +200,17 @@
             // Save changes event context
             __block BOOL eventSaveSucceeded = NO;
             [eventStoreContext performBlockAndWait:^{
+                NSError *blockError = nil;
                 BOOL isUnique = [self checkUniquenessOfEventWithRevision:revision];
                 if (isUnique) {
                     [eventBuilder finalizeNewEvent];
-                    eventSaveSucceeded = [eventStoreContext save:&error];
+                    eventSaveSucceeded = [eventStoreContext save:&blockError];
                 }
                 else {
-                    error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeSaveOccurredDuringMerge userInfo:nil];
+                    blockError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeSaveOccurredDuringMerge userInfo:nil];
                 }
                 [eventStoreContext reset];
+                error = blockError;
             }];
             if (!eventSaveSucceeded) {
                 [self failWithCompletion:completion error:error];
@@ -320,6 +322,7 @@
     [eventStoreContext performBlockAndWait:^{
         // Get events
         NSArray *storeModEvents = nil;
+        NSError *blockError = nil;
         if (needFullIntegration) {
             // All events, including baseline
             NSMutableArray *events = [[CDEStoreModificationEvent fetchNonBaselineEventsInManagedObjectContext:eventStoreContext] mutableCopy];
@@ -330,8 +333,9 @@
         }
         else {
             // Get all modification events added since the last merge
-            storeModEvents = [revisionManager fetchUncommittedStoreModificationEvents:error];
+            storeModEvents = [revisionManager fetchUncommittedStoreModificationEvents:&blockError];
             if (!storeModEvents) {
+                if (error) *error = blockError;
                 success = NO;
                 return;
             }
@@ -340,14 +344,18 @@
             // Add any modification events concurrent with the new events. Results are ordered.
             // We repeat this until there is no change in the set. This will be when there are
             // no events existing outside the set that are concurrent with the events in the set.
-            storeModEvents = [revisionManager recursivelyFetchStoreModificationEventsConcurrentWithEvents:storeModEvents error:error];
+            storeModEvents = [revisionManager recursivelyFetchStoreModificationEventsConcurrentWithEvents:storeModEvents error:&blockError];
         }
-        if (storeModEvents == nil) success = NO;
+        if (storeModEvents == nil) {
+            success = NO;
+            if (error) *error = blockError;
+        }
         if (storeModEvents.count == 0) return;
         
         // Check prerequisites
-        BOOL canIntegrate = [revisionManager checkIntegrationPrequisitesForEvents:storeModEvents error:error];
+        BOOL canIntegrate = [revisionManager checkIntegrationPrequisitesForEvents:storeModEvents error:&blockError];
         if (!canIntegrate) {
+            if (error) *error = blockError;
             success = NO;
             return;
         }
@@ -377,11 +385,13 @@
                 // otherwise related objects may not exist. So we create objects first, and only
                 // set relationships in the next phase.
                 NSMutableDictionary *appliedInsertsByEntity = [NSMutableDictionary dictionary];
+                NSError *innerPoolError = nil;
                 for (NSEntityDescription *entity in changedEntities) {
-                    NSArray *appliedInsertChanges = [self insertObjectsForStoreModificationEvents:@[storeModEvent] entity:entity error:error];
+                    NSArray *appliedInsertChanges = [self insertObjectsForStoreModificationEvents:@[storeModEvent] entity:entity error:&innerPoolError];
                     if (!appliedInsertChanges) {
+                        blockError = innerPoolError;
                         success = NO;
-                        return;
+                        goto fail;
                     }
                     appliedInsertsByEntity[entity.name] = appliedInsertChanges;
                     
@@ -393,20 +403,24 @@
                 // We treat insertions on a par with updates here.
                 for (NSEntityDescription *entity in changedEntities) {
                     NSArray *inserts = appliedInsertsByEntity[entity.name];
-                    success = [self updateObjectsForStoreModificationEvents:@[storeModEvent] entity:entity includingInsertedObjects:inserts error:error];
-                    if (!success) return;
+                    success = [self updateObjectsForStoreModificationEvents:@[storeModEvent] entity:entity includingInsertedObjects:inserts error:&innerPoolError];
+                    blockError = innerPoolError;
+                    if (!success) goto fail;
                 }
                 
                 // Finally deletions
                 for (NSEntityDescription *entity in changedEntities) {
-                    success = [self deleteObjectsForStoreModificationEvents:@[storeModEvent] entity:entity error:error];
-                    if (!success) return;
+                    success = [self deleteObjectsForStoreModificationEvents:@[storeModEvent] entity:entity error:&innerPoolError];
+                    blockError = innerPoolError;
+                    if (!success) goto fail;
                 }
             }
         }
         
         // In a full integration, remove any objects that didn't get inserted
         if (needFullIntegration) [self deleteUnreferencedObjectsInObjectIDsByEntity:insertedObjectIDsByEntity];
+        
+        fail: if (!success && error) *error = blockError;
     }];
     
     return success;
@@ -540,6 +554,8 @@
         for (NSUInteger i = 0; i < numberOfNewObjects; i++) {
             id newObject = [NSEntityDescription insertNewObjectForEntityForName:entity.name inManagedObjectContext:managedObjectContext];
             if (!newObject) {
+                NSError *localError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeUnknown userInfo:nil];
+                if (error) *error = localError;
                 success = NO;
                 return;
             }
@@ -551,8 +567,12 @@
     // Get permanent store object ids, and then URIs
     __block NSArray *uris;
     [managedObjectContext performBlockAndWait:^{
-        success = [managedObjectContext obtainPermanentIDsForObjects:newObjects error:error];
-        if (!success) return;
+        NSError *localError = nil;
+        success = [managedObjectContext obtainPermanentIDsForObjects:newObjects error:&localError];
+        if (!success) {
+            if (error) *error = localError;
+            return;
+        }
         
         uris = [newObjects valueForKeyPath:@"objectID.URIRepresentation.absoluteString"];
     }];
@@ -668,7 +688,7 @@
         }
     }
     @catch (NSException *exception) {
-        *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeUnknown userInfo:@{NSLocalizedFailureReasonErrorKey:exception.reason}];
+        if (error) *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeUnknown userInfo:@{NSLocalizedFailureReasonErrorKey:exception.reason}];
         return NO;
     }
     
@@ -837,13 +857,16 @@
         // Save any changes made in the reparation context.
         [reparationContext performBlockAndWait:^{
             if (reparationContext.hasChanges) {
-                BOOL success = [eventBuilder addChangesForUnsavedManagedObjectContext:reparationContext error:error];
+                NSError *localError = nil;
+                BOOL success = [eventBuilder addChangesForUnsavedManagedObjectContext:reparationContext error:&localError];
                 if (!success) {
+                    if (error) *error = localError;
                     merged = NO;
                     return;
                 }
 
-                merged = [reparationContext save:error];
+                merged = [reparationContext save:&localError];
+                if (error) *error = localError;
                 if (!merged) CDELog(CDELoggingLevelError, @"Saving merge context after willSave changes failed: %@", *error);
             }
         }];
@@ -893,8 +916,10 @@
         NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:entityName];
         fetch.predicate = [NSPredicate predicateWithFormat:@"SELF IN %@", objectIDs];
         fetch.includesSubentities = NO;
-        objects = [managedObjectContext executeFetchRequest:fetch error:error];
+        NSError *localError = nil;
+        objects = [managedObjectContext executeFetchRequest:fetch error:&localError];
         objectIDsOfFetched = [objects valueForKeyPath:@"objectID"];
+        if (error) *error = localError;
     }];
     if (!objects) return nil;
     
@@ -1064,8 +1089,10 @@
             __block BOOL needExtraSave = NO;
             [reparationContext performBlockAndWait:^{
                 if (retry && reparationContext.hasChanges) {
-                    BOOL success = [eventBuilder addChangesForUnsavedManagedObjectContext:reparationContext error:error];
-                    success = success && [reparationContext save:error];
+                    NSError *localError = nil;
+                    BOOL success = [eventBuilder addChangesForUnsavedManagedObjectContext:reparationContext error:&localError];
+                    success = success && [reparationContext save:&localError];
+                    if (error) *error = localError;
                     if (success) needExtraSave = YES;
                 }
             }];
@@ -1100,7 +1127,7 @@
     }];
     
     if (!saved && error) {
-        *error = localError;
+        if (error) *error = localError;
     }
     
     return saved;

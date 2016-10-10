@@ -43,12 +43,14 @@
         context.persistentStoreCoordinator = coordinator;
         context.undoManager = nil;
         
+        NSError *localError = nil;
         NSURL *storeURL = [NSURL fileURLWithPath:persistentStorePath];
         NSDictionary *options = self.persistentStoreOptions;
         if (!options) options = @{NSMigratePersistentStoresAutomaticallyOption: @YES, NSInferMappingModelAutomaticallyOption: @YES};
         [(id)coordinator lock];
-        [coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:options error:&error];
+        [coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:options error:&localError];
         [(id)coordinator unlock];
+        error = localError;
     }];
     
     if (error) {
@@ -76,10 +78,11 @@
             fetch.fetchBatchSize = 100;
             fetch.includesSubentities = NO;
             
-            NSArray *objects = [context executeFetchRequest:fetch error:&error];
+            NSError *localError = nil;
+            NSArray *objects = [context executeFetchRequest:fetch error:&localError];
             if (!objects) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    if (completion) completion(error);
+                    if (completion) completion(localError);
                 });
                 return;
             }
@@ -89,11 +92,12 @@
         [eventBuilder addChangesForInsertedObjects:allObjects objectsAreSaved:YES inManagedObjectContext:context];
         
         [eventContext performBlock:^{
+            NSError *localError = nil;
             [eventBuilder finalizeNewEvent];
-            [eventContext save:&error];
+            [eventContext save:&localError];
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                if (completion) completion(error);
+                if (completion) completion(localError);
             });
         }];
     }];

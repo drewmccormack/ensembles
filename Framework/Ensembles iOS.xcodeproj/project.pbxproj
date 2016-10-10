@@ -262,6 +262,13 @@
 			remoteGlobalIDString = 07571F0E1910EC02008479A9;
 			remoteInfo = "Ensembles Resources iOS";
 		};
+		0758BAB11D984C28001857FF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 07BF373D17F184DD00C56F64 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 07571F0E1910EC02008479A9;
+			remoteInfo = "Ensembles Resources iOS";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -923,6 +930,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				0758BAB21D984C28001857FF /* PBXTargetDependency */,
 			);
 			name = "Ensembles iOS";
 			productName = "Ensembles iOS";
@@ -1216,6 +1224,11 @@
 			isa = PBXTargetDependency;
 			target = 07571F0E1910EC02008479A9 /* Ensembles Resources iOS */;
 			targetProxy = 07571F1C1910ECF5008479A9 /* PBXContainerItemProxy */;
+		};
+		0758BAB21D984C28001857FF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 07571F0E1910EC02008479A9 /* Ensembles Resources iOS */;
+			targetProxy = 0758BAB11D984C28001857FF /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
