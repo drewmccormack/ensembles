@@ -212,7 +212,7 @@ static NSString *kCDEDefaultStoreType;
         }
     }
     @catch (NSException *exception) {
-        if (error) *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeUnknown userInfo:@{NSLocalizedFailureReasonErrorKey:exception.reason}];
+        if (error) *error = [[NSError alloc] initWithDomain:CDEErrorDomain code:CDEErrorCodeUnknown userInfo:@{NSLocalizedFailureReasonErrorKey:exception.reason}];
         return NO;
     }
     

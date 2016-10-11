@@ -146,6 +146,8 @@
 - (BOOL)checkRebasingPrerequisitesForEvents:(NSArray *)events error:(NSError * __autoreleasing *)error
 {
     __block BOOL result = YES;
+    __block NSError *methodError = nil;
+    
     [eventManagedObjectContext performBlockAndWait:^{
         CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchMostRecentBaselineStoreModificationEventInManagedObjectContext:eventManagedObjectContext];
         
@@ -153,29 +155,31 @@
         if (baseline) eventsWithBaseline = [@[baseline] arrayByAddingObjectsFromArray:events];
         
         if (![self checkAllDataFilesExistForStoreModificationEvents:eventsWithBaseline]) {
-            if (error) *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeMissingDataFiles userInfo:nil];
+            methodError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeMissingDataFiles userInfo:nil];
             result = NO;
             return;
         }
         
         if (![self checkAllDependenciesExistForStoreModificationEvents:events]) {
-            if (error) *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeMissingDependencies userInfo:nil];
+            methodError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeMissingDependencies userInfo:nil];
             result = NO;
             return;
         }
         
         if (![self checkContinuityOfStoreModificationEvents:eventsWithBaseline]) {
-            if (error) *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeDiscontinuousRevisions userInfo:nil];
+            methodError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeDiscontinuousRevisions userInfo:nil];
             result = NO;
             return;
         }
         
         if (![self checkModelVersionsOfStoreModificationEvents:eventsWithBaseline]) {
-            if (error) *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeUnknownModelVersion userInfo:nil];
+            methodError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeUnknownModelVersion userInfo:nil];
             result = NO;
             return;
         }
     }];
+    
+    if (error) *error = methodError;
     
     return result;
 }

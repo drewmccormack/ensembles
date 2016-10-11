@@ -303,7 +303,7 @@
         NSString *path = [self.localDownloadDirectory stringByAppendingPathComponent:file];
         BOOL success = [self.eventStore importDataFile:path];
         if (!success) {
-            if (error) *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFileAccessFailed userInfo:nil];
+            if (error) *error = [[NSError alloc] initWithDomain:CDEErrorDomain code:CDEErrorCodeFileAccessFailed userInfo:nil];
             return NO;
         }
     }
@@ -422,7 +422,7 @@
     for (NSString *file in toTransfer) {
         BOOL success = [self.eventStore exportDataFile:file toDirectory:self.localUploadDirectory];
         if (!success) {
-            if (error) *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFileAccessFailed userInfo:nil];
+            if (error) *error = [[NSError alloc] initWithDomain:CDEErrorDomain code:CDEErrorCodeFileAccessFailed userInfo:nil];
             return NO;
         }
     }
@@ -569,7 +569,7 @@
         BOOL success = [self.eventStore removeNewlyImportedDataFile:file];
         if (!success) {
             NSDictionary *info = @{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Could not remove data file: %@", file]};
-            if (error) *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFileAccessFailed userInfo:info];
+            if (error) *error = [[NSError alloc] initWithDomain:CDEErrorDomain code:CDEErrorCodeFileAccessFailed userInfo:info];
             return NO;
         }
     }
