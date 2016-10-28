@@ -255,12 +255,12 @@
     NSManagedObjectContext *eventContext = self.eventStore.managedObjectContext;
     if (newEventUniqueId) {
         [eventContext performBlockAndWait:^{
+            NSError *innerError = nil;
             CDEStoreModificationEvent *event = [CDEStoreModificationEvent fetchStoreModificationEventWithUniqueIdentifier:newEventUniqueId inManagedObjectContext:eventContext];
             if (event) {
-                NSError *error = nil;
                 [eventContext deleteObject:event];
-                if (![eventContext save:&error]) {
-                    CDELog(CDELoggingLevelError, @"Could not save after deleting partially merged event from a failed merge. Will reset context: %@", error);
+                if (![eventContext save:&innerError]) {
+                    CDELog(CDELoggingLevelError, @"Could not save after deleting partially merged event from a failed merge. Will reset context: %@", innerError);
                     [eventContext reset];
                 }
             }
@@ -895,13 +895,17 @@
 - (NSArray *)fetchObjectChangesOfType:(CDEObjectChangeType)type fromStoreModificationEvents:(id <NSFastEnumeration>)events forEntity:(NSEntityDescription *)entity error:(NSError * __autoreleasing *)error;
 {
     NSArray *result = nil;
+    NSError *methodError = nil;
     @autoreleasepool {
+        NSError *localError = nil;
         NSFetchRequest *fetch = [NSFetchRequest fetchRequestWithEntityName:@"CDEObjectChange"];
         fetch.predicate = [NSPredicate predicateWithFormat:@"nameOfEntity = %@ && type = %d && storeModificationEvent in %@", entity.name, type, events];
         fetch.sortDescriptors = [self objectChangeSortDescriptors];
         fetch.relationshipKeyPathsForPrefetching = @[@"globalIdentifier"];
-        result = [self.eventStore.managedObjectContext executeFetchRequest:fetch error:error];
+        result = [self.eventStore.managedObjectContext executeFetchRequest:fetch error:&localError];
+        methodError = localError;
     }
+    if (error) *error = methodError;
     return result;
 }
 
