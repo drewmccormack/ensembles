@@ -114,7 +114,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CDEPersistentStoreEnsembl
                 error in
                 viewController.activityIndicator?.stopAnimating()
                 viewController.refresh()
-                if let c = completion { c() }
+                completion?()
             }
         }
         else {
@@ -122,7 +122,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CDEPersistentStoreEnsembl
                 error in
                 viewController.activityIndicator?.stopAnimating()
                 viewController.refresh()
-                if let c = completion { c() }
+                completion?()
             }
         }
     }
