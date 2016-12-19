@@ -1,6 +1,10 @@
 Release Notes
 =============
 
+1.6.1
+---
+- Memory fixes for `NSError` propagation. The problems arose due to changes in `performBlock` methods, which now have an internal autorelease pool.
+
 1.6
 ---
 - Added a module target for iOS.
