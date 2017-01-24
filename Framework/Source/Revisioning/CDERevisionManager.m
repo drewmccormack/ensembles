@@ -149,31 +149,36 @@
     __block NSError *methodError = nil;
     
     [eventManagedObjectContext performBlockAndWait:^{
+        NSError *blockError = nil;
         CDEStoreModificationEvent *baseline = [CDEStoreModificationEvent fetchMostRecentBaselineStoreModificationEventInManagedObjectContext:eventManagedObjectContext];
         
         NSArray *eventsWithBaseline = events;
         if (baseline) eventsWithBaseline = [@[baseline] arrayByAddingObjectsFromArray:events];
         
         if (![self checkAllDataFilesExistForStoreModificationEvents:eventsWithBaseline]) {
-            methodError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeMissingDataFiles userInfo:nil];
+            blockError = [[NSError alloc] initWithDomain:CDEErrorDomain code:CDEErrorCodeMissingDataFiles userInfo:nil];
+            methodError = blockError;
             result = NO;
             return;
         }
         
         if (![self checkAllDependenciesExistForStoreModificationEvents:events]) {
-            methodError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeMissingDependencies userInfo:nil];
+            blockError = [[NSError alloc] initWithDomain:CDEErrorDomain code:CDEErrorCodeMissingDependencies userInfo:nil];
+            methodError = blockError;
             result = NO;
             return;
         }
         
         if (![self checkContinuityOfStoreModificationEvents:eventsWithBaseline]) {
-            methodError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeDiscontinuousRevisions userInfo:nil];
+            blockError = [[NSError alloc] initWithDomain:CDEErrorDomain code:CDEErrorCodeDiscontinuousRevisions userInfo:nil];
+            methodError = blockError;
             result = NO;
             return;
         }
         
         if (![self checkModelVersionsOfStoreModificationEvents:eventsWithBaseline]) {
-            methodError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeUnknownModelVersion userInfo:nil];
+            blockError = [[NSError alloc] initWithDomain:CDEErrorDomain code:CDEErrorCodeUnknownModelVersion userInfo:nil];
+            methodError = blockError;
             result = NO;
             return;
         }
