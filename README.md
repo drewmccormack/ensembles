@@ -3,7 +3,7 @@ Core Data Ensembles
 
 _Author:_ Drew McCormack<br>
 _Created:_ 29th September, 2013<br>
-_Last Updated:_ 23rd September, 2016
+_Last Updated:_ 15th February, 2017
 
 *Ensembles 2 is now available for purchase at [ensembles.io](http://www.ensembles.io). It has performance improvements, extra backends (eg CloudKit, Dropbox Sync), and other features. This version of Ensembles continues to be maintained and supported.*
 
@@ -34,22 +34,7 @@ To add Ensembles to your App's Xcode Project with CocoaPods...
 		platform :ios, '7.0'
 		pod "Ensembles", "~> 1.0"
 
-To manually add the Ensembles static library to your App's Xcode Project...
-
-1. In Finder, drag the `Ensembles iOS.xcodeproj` project from the `Framework` directory into your Xcode project.
-2. Select your App's project root in the source list on the left, and then select the App's target.
-3. In the General tab, click the + button in the _Linked Frameworks and Libraries_ section.
-4. Choose the `libensembles.a` library and add it.
-5. Select the _Build Settings_ tab. Locate the _Other Linker Flags_ setting, and add the flag `-ObjC`.
-6. Select the _Build Phases_ tab. Open _Target Dependencies_, and click the + button.
-7. Locate the `Ensembles Resources iOS` product, and add that as a dependency.
-8. Open the `Ensembles iOS.xcodeproj` project in the source list, and open the Products group.
-9. Drag the `Ensembles.bundle` product into the _Copy Bundle Resources_ build phase of your app.
-10. Add the following import in your precompiled header file, or in any files using Ensembles.
-
-        #import <Ensembles/Ensembles.h>
-
-If you would like to use the Ensembles module instead of the static library, try this...
+If you would like to use the Ensembles framework (module), try this...
 
 1. In Finder, drag the `Ensembles iOS.xcodeproj` project from the `Framework` directory into your Xcode project.
 2. Select your App's project root in the source list on the left, and then select the App's target.
@@ -64,8 +49,23 @@ For Objective-C
 For Swift
 
         import Ensembles
-        
-#### Incorporating Ensembles in an OS X Project
+
+To manually add the Ensembles static library instead of the module...
+
+1. In Finder, drag the `Ensembles iOS.xcodeproj` project from the `Framework` directory into your Xcode project.
+2. Select your App's project root in the source list on the left, and then select the App's target.
+3. In the General tab, click the + button in the _Linked Frameworks and Libraries_ section.
+4. Choose the `libensembles.a` library and add it.
+5. Select the _Build Settings_ tab. Locate the _Other Linker Flags_ setting, and add the flag `-ObjC`.
+6. Select the _Build Phases_ tab. Open _Target Dependencies_, and click the + button.
+7. Locate the `Ensembles Resources iOS` product, and add that as a dependency.
+8. Open the `Ensembles iOS.xcodeproj` project in the source list, and open the Products group.
+9. Drag the `Ensembles.bundle` product into the _Copy Bundle Resources_ build phase of your app.
+10. Add the following import in your precompiled header file, or in any files using Ensembles.
+	
+		#import <Ensembles/Ensembles.h>
+
+#### Incorporating Ensembles in an macOS Project
    
 To add Ensembles to your App's Xcode Project with CocoaPods...
 
@@ -74,23 +74,20 @@ To add Ensembles to your App's Xcode Project with CocoaPods...
 		platform :osx, '10.9'
 		pod "Ensembles", "~> 1.0"
 			
-To manually add Ensembles to your App's Xcode Project...
+
+If you want to manually add Ensembles to your App's Xcode Project...
 
 1. In Finder, drag the `Ensembles Mac.xcodeproj` project from the `Framework` directory into your Xcode project.
 2. Select your App's project root in the source list on the left, and then select the App's target.
-3. In the General tab, click the + button in the _Linked Frameworks and Libraries_ section.
+3. In the General tab, click the + button in the _Embedded Binaries_ section.
 4. Choose `Ensembles.framework` and add it.
-5. Create a new build phase to copy frameworks into your app bundle (if you don’t already have one). To do this...
- * Select the project root in the source list, then select your app’s target.
- * Open the *Build Phases* tab.
- * Click the + button at the top of the list.
- * Choose *New Copy Files Build Phase* from the popup menu.
- * Disclose the contents of the new *Copy Files* phase, and choose *Frameworks* from the *Destination* popup button.
- * Click the + button at the bottom of the *Copy Files* phase section, choose *Ensembles.framework*, and click *Add*.
-6. Locate the _Runpath Search Path_ build setting, and add `@loader_path/../Frameworks`.
-7. Add the following import in your precompiled header file, or in any files using Ensembles.
+5. Add the following import in your precompiled header file, or in any files using Ensembles.
 
         #import <Ensembles/Ensembles.h>
+
+For Swift use
+
+        import Ensembles
 
 #### Including Optional Cloud Services
 
