@@ -439,6 +439,7 @@
 {
     CDEGlobalIdentifier *globalId = nil;
     globalId = globalIdentifiersByObjectID[propertyChange.relatedIdentifier];
+    globalId = CDENSNullToNil(globalId);
     if (propertyChange.relatedIdentifier && !globalId) {
         CDELog(CDELoggingLevelError, @"No global id found for to-one relationship with target objectID: %@", propertyChange.relatedIdentifier);
     }
