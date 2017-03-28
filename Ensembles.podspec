@@ -49,7 +49,7 @@ Pod::Spec.new do |s|
   
   s.subspec 'Multipeer' do |ss|
     ss.dependency 'Ensembles/Core'
-    ss.dependency 'SSZipArchive'
+    ss.dependency 'ZipArchive'
     ss.framework = 'MultipeerConnectivity'
     ss.source_files = 'Framework/Extensions/CDEMultipeerCloudFileSystem.{h,m}'
   end
