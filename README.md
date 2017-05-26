@@ -153,7 +153,7 @@ The initialization of an ensemble is typically only a few lines long.
 	cloudFileSystem = [[CDEICloudFileSystem alloc] 
 		initWithUbiquityContainerIdentifier:@"P7BXV6PHLD.com.mentalfaculty.idiomatic"];
 	ensemble = [[CDEPersistentStoreEnsemble alloc] initWithEnsembleIdentifier:@"MainStore" 
-		persistentStorePath:storeURL.path 
+		persistentStoreURL:storeURL 
 		managedObjectModelURL:modelURL
 		cloudFileSystem:cloudFileSystem];
 	ensemble.delegate = self;
