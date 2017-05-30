@@ -7,3 +7,6 @@
 [submodule "Vendor/SSZipArchive"]
 	path = Vendor/SSZipArchive
 	url = https://github.com/soffes/ssziparchive.git
+[submodule "Vendor/DropboxSDKV2"]
+	path = Vendor/DropboxSDKV2
+	url = https://github.com/dropbox/dropbox-sdk-obj-c.git

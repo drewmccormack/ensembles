@@ -198,6 +198,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [saveMonitor stopMonitoring];
     [eventStore dismantle];
+    observingIdentityToken = NO;
 }
 
 #pragma mark - Discovering and Managing Ensembles

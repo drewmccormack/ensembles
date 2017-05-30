@@ -7,11 +7,11 @@
 //
 
 #import <CoreData/CoreData.h>
-#import <DropboxSDK/DropboxSDK.h>
+#import <ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h>
 #import <Security/Security.h>
 
 #import "IDMSyncManager.h"
-#import "CDEDropboxCloudFileSystem.h"
+#import "CDEDropboxV2CloudFileSystem.h"
 #import "CDENodeCloudFileSystem.h"
 #import "IDMNodeSyncSettingsViewController.h"
 #import "CDEMultipeerCloudFileSystem.h"
@@ -33,7 +33,7 @@ NSString * const IDMICloudContainerIdentifier = nil;
 NSString * const IDMDropboxAppKey = @"fjgu077wm7qffv0";
 NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 
-@interface IDMSyncManager () <CDEPersistentStoreEnsembleDelegate, DBSessionDelegate, CDEDropboxCloudFileSystemDelegate, CDENodeCloudFileSystemDelegate>
+@interface IDMSyncManager () <CDEPersistentStoreEnsembleDelegate, CDEDropboxV2CloudFileSystemDelegate, CDENodeCloudFileSystemDelegate>
 
 @end
 
@@ -42,7 +42,6 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
     NSUInteger activeMergeCount;
     CDECompletionBlock dropboxLinkSessionCompletion;
     CDECompletionBlock nodeCredentialUpdateCompletion;
-    DBSession *dropboxSession;
     IDMMultipeerManager *multipeerManager;
 }
 
@@ -86,8 +85,9 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 
     [self clearNodePassword];
     
-    [dropboxSession unlinkAll];
-    dropboxSession = nil;
+    if ([DBClientsManager authorizedClient]) {
+        [DBClientsManager unlinkAndResetClients];
+    }
     
     ensemble.delegate = nil;
     [ensemble dismantle];
@@ -138,9 +138,16 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
         newSystem = [[CDEICloudFileSystem alloc] initWithUbiquityContainerIdentifier:IDMICloudContainerIdentifier];
     }
     else if ([cloudService isEqualToString:IDMDropboxService]) {
-        dropboxSession = [[DBSession alloc] initWithAppKey:IDMDropboxAppKey appSecret:IDMDropboxAppSecret root:kDBRootAppFolder];
-        dropboxSession.delegate = self;
-        CDEDropboxCloudFileSystem *newDropboxSystem = [[CDEDropboxCloudFileSystem alloc] initWithSession:dropboxSession];
+//        dropboxSession = [[DBSession alloc] initWithAppKey:IDMDropboxAppKey appSecret:IDMDropboxAppSecret root:kDBRootAppFolder];
+//        dropboxSession.delegate = self;
+//        CDEDropboxV2CloudFileSystem *newDropboxSystem = [[CDEDropboxV2CloudFileSystem alloc] initWithSession:dropboxSession];
+//        newDropboxSystem.delegate = self;
+//        newSystem = newDropboxSystem;
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            [DBClientsManager setupWithAppKey:IDMDropboxAppKey];
+        });
+        CDEDropboxV2CloudFileSystem *newDropboxSystem = [[CDEDropboxV2CloudFileSystem alloc] init];
         newDropboxSystem.delegate = self;
         newSystem = newDropboxSystem;
     }
@@ -253,30 +260,68 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 
 #pragma mark - Dropbox Session
 
-- (BOOL)handleOpenURL:(NSURL *)url {
-    if ([dropboxSession handleOpenURL:url]) {
-		if ([dropboxSession isLinked]) {
-            if (dropboxLinkSessionCompletion) dropboxLinkSessionCompletion(nil);
-		}
-        else {
-            NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeAuthenticationFailure userInfo:nil];
-            if (dropboxLinkSessionCompletion) dropboxLinkSessionCompletion(error);
-        }
-        dropboxLinkSessionCompletion = NULL;
-		return YES;
+- (BOOL)handleOpenURL:(NSURL *)url
+{
+    DBOAuthResult *authResult = [DBClientsManager handleRedirectURL:url];
+    if (!authResult) {
+        return NO;
     }
-    return NO;
+    
+    if ([authResult isSuccess]) {
+        // Here's an example of injecting a custom API client created from an access token
+        // (e.g. when working in a multi-user environment)
+        if ([cloudFileSystem isKindOfClass:[CDEDropboxV2CloudFileSystem class]]) {
+            CDEDropboxV2CloudFileSystem *dropboxSystem = cloudFileSystem;
+            if (!dropboxSystem.client) {
+                NSString *accessToken = authResult.accessToken.accessToken;
+                dropboxSystem.client = [[DBUserClient alloc] initWithAccessToken:accessToken];
+            }
+        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (dropboxLinkSessionCompletion) dropboxLinkSessionCompletion(nil);
+            dropboxLinkSessionCompletion = NULL;
+        });
+    }
+    else {
+        NSError *error = [NSError errorWithDomain:CDEErrorDomain
+                                             code:CDEErrorCodeAuthenticationFailure
+                                         userInfo:nil];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (dropboxLinkSessionCompletion) dropboxLinkSessionCompletion(error);
+            dropboxLinkSessionCompletion = NULL;
+        });
+    }
+    
+    return YES;
 }
 
-- (void)linkSessionForDropboxCloudFileSystem:(CDEDropboxCloudFileSystem *)fileSystem completion:(CDECompletionBlock)completion
+- (void)linkSessionForDropboxCloudFileSystem:(CDEDropboxV2CloudFileSystem *)fileSystem completion:(CDECompletionBlock)completion
 {
-    UIWindow *window = [[UIApplication sharedApplication] keyWindow];
+    // User is already authorized, call the completion block right away
+    if ([DBClientsManager authorizedClient] != nil) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completion(nil);
+        });
+        return;
+    }
+    
     dropboxLinkSessionCompletion = [completion copy];
-    [dropboxSession linkFromController:window.rootViewController];
+    UIApplication *application = [UIApplication sharedApplication];
+    UIViewController *rootController = [[application keyWindow] rootViewController];
+    [DBClientsManager authorizeFromController:application
+                                   controller:rootController
+                                      openURL:^(NSURL *url){ [[UIApplication sharedApplication] openURL:url]; }];
 }
 
-- (void)sessionDidReceiveAuthorizationFailure:(DBSession*)session userId:(NSString *)userId
+- (void)applicationDidBecomeActive:(NSNotification *)notif
 {
+    // Need to check if there is a live dropbox link session, because if the user doesn't have the
+    // Dropbox app, and cancels the login in the browser, we get no callback to say it failed.
+    if (dropboxLinkSessionCompletion) {
+        NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeAuthenticationFailure userInfo:nil];
+        dropboxLinkSessionCompletion(error);
+        dropboxLinkSessionCompletion = NULL;
+    }
 }
 
 #pragma mark - Node-S3 Backend Delegate Methods

@@ -47,6 +47,15 @@ Pod::Spec.new do |s|
     ss.source_files = 'Framework/Extensions/CDEDropboxCloudFileSystem.{h,m}'
   end
   
+  s.subspec 'DropboxV2' do |ss|
+    # Bump deployment targets to match ObjectiveDropboxOfficial's
+    ss.ios.deployment_target = '8.0'
+    ss.osx.deployment_target = '10.10'
+    ss.dependency 'Ensembles/Core'
+    ss.dependency 'ObjectiveDropboxOfficial', '~> 3.0.18'
+    ss.source_files = 'Framework/Extensions/CDEDropboxV2CloudFileSystem.{h,m}'
+  end
+  
   s.subspec 'Multipeer' do |ss|
     ss.dependency 'Ensembles/Core'
     ss.dependency 'SSZipArchive'
