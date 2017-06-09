@@ -237,7 +237,7 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
 
 - (void)listFolderContinueWithAuthorizedClient:(DBUserClient *)authorizedClient directory:(CDECloudDirectory *)directory atDirectoryfullDropboxPath:(NSString *)directoryfullDropboxPath cursor:(NSString *)cursor completion:(CDEDirectoryContentsCallback)block
 {
-    DBRpcTask *task = [client.filesRoutes listFolderContinue:cursor];
+    DBRpcTask *task = [authorizedClient.filesRoutes listFolderContinue:cursor];
     task.retryCount = kCDENumberOfRetriesForFailedAttempt;
     [task setResponseBlock:^(DBFILESListFolderResult *result, DBFILESListFolderContinueError * _Nullable routeError, DBRequestError * _Nullable error) {
         if (routeError) CDELog(CDELoggingLevelError, @"Dropbox: routeError in listFolderContinue: %@\ndirectoryfullDropboxPath: %@", routeError, directoryfullDropboxPath);
@@ -420,6 +420,14 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
 
 - (void)uploadLocalFiles:(NSArray *)fromPaths toPaths:(NSArray *)toPaths retryCounter:(NSUInteger)retryCounter completion:(CDECompletionBlock)block
 {
+    DBUserClient *authorizedClient = [self authorizedClient];
+    if (!authorizedClient) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (block) block([[self class] genericAuthorizationError]);
+        });
+        return;
+    }
+    
     NSMutableArray<DBFILESCommitInfo *> *commitInfoFiles = [NSMutableArray array];
     NSMutableArray<NSURL *> *clientSideFileURLs = [NSMutableArray array];
     
@@ -436,7 +444,7 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
     }
     // Create a dictionary of client side file URLs to commit info files
     NSDictionary<NSURL *, DBFILESCommitInfo *> *clientSideFileURLsToCommitInfoFiles = [NSDictionary dictionaryWithObjects:commitInfoFiles forKeys:clientSideFileURLs];
-    [client.filesRoutes batchUploadFiles:clientSideFileURLsToCommitInfoFiles
+    [authorizedClient.filesRoutes batchUploadFiles:clientSideFileURLsToCommitInfoFiles
                                    queue:nil
                            progressBlock:nil
                            responseBlock:^(NSDictionary<NSURL *, DBFILESUploadSessionFinishBatchResultEntry *> *fileUrlsToBatchResultEntries, DBASYNCPollError *finishBatchRouteError, DBRequestError *finishBatchRequestError, NSDictionary<NSURL *, DBRequestError *> *fileUrlsToRequestErrors) {
