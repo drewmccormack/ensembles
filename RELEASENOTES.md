@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+1.7
+---
+- Backported Dropbox v2 backend from Ensembles 2 (Dropbox is terminating the v1 API)
+- Using ZipArchive project, which is actively developed, instead of SSZipArchive project
+
 1.6.2
 ---
 - Fixed memory issues related to new `NSError` autorelease behaviour
