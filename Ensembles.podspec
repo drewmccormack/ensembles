@@ -49,10 +49,10 @@ Pod::Spec.new do |s|
   
   s.subspec 'DropboxV2' do |ss|
     # Bump deployment targets to match ObjectiveDropboxOfficial's
-    ss.ios.deployment_target = '8.0'
+    ss.ios.deployment_target = '9.0'
     ss.osx.deployment_target = '10.10'
     ss.dependency 'Ensembles/Core'
-    ss.dependency 'ObjectiveDropboxOfficial', '~> 3.0.18'
+    ss.dependency 'ObjectiveDropboxOfficial', '~> 3.1'
     ss.source_files = 'Framework/Extensions/CDEDropboxV2CloudFileSystem.{h,m}'
   end
   
