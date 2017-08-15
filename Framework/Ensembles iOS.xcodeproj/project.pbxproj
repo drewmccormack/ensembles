@@ -424,7 +424,7 @@
 		07F001BD18427645001A0504 /* IntegratorMergeTestsFixture.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = IntegratorMergeTestsFixture.json; sourceTree = "<group>"; };
 		07F2D9B41D950FDB00EB9483 /* Ensembles.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Ensembles.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		07F2D9B71D950FDB00EB9483 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		07F2DA121D95141900EB9483 /* Ensembles.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; name = Ensembles.modulemap; path = Source/General/Ensembles.modulemap; sourceTree = "<group>"; };
+		07F2DA121D95141900EB9483 /* Ensembles.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; name = Ensembles.modulemap; path = General/Ensembles.modulemap; sourceTree = "<group>"; };
 		34700E9D188B225700FD00B1 /* CDEAvailabilityMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEAvailabilityMacros.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -646,8 +646,7 @@
 				07BF37A317F1853000C56F64 /* Revisioning */,
 				07D183FA1892824200E89B89 /* Baselines */,
 			);
-			name = Source;
-			path = "Ensembles iOS";
+			path = Source;
 			sourceTree = "<group>";
 		};
 		07BF376E17F1853000C56F64 /* Cloud Management */ = {
@@ -767,7 +766,8 @@
 				0701771318C25F2A00C4DA01 /* CDEFileUploadOperation.h */,
 				0701771418C25F2A00C4DA01 /* CDEFileUploadOperation.m */,
 			);
-			path = "Cloud File Systems";
+			name = "Cloud File Systems";
+			path = Source;
 			sourceTree = SOURCE_ROOT;
 		};
 		07D183FA1892824200E89B89 /* Baselines */ = {
