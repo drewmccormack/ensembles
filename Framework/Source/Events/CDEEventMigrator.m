@@ -158,7 +158,8 @@ static NSString *kCDEDefaultStoreType;
                     NSString *storeType = metadata[NSStoreTypeKey];
                     if (!storeType) @throw [[NSException alloc] initWithName:CDEException reason:@"" userInfo:nil];
                     
-                    NSDictionary *options = @{NSMigratePersistentStoresAutomaticallyOption: @YES, NSInferMappingModelAutomaticallyOption: @YES};
+#warning Using hard coded string here to get around problems in Xcode 9 Beta. Replace this with constant in final release
+                    NSDictionary *options = @{NSMigratePersistentStoresAutomaticallyOption: @YES, NSInferMappingModelAutomaticallyOption: @YES, @"_NSBinaryStoreInsecureDecodingCompatibilityOption": @YES};
                     fileStore = [importContext.persistentStoreCoordinator addPersistentStoreWithType:storeType configuration:nil URL:fileURL options:options error:&error];
                     if (!fileStore) @throw [[NSException alloc] initWithName:CDEException reason:@"" userInfo:nil];
                     
