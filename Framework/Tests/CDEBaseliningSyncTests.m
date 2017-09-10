@@ -355,7 +355,12 @@
     NSManagedObjectModel *eventModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
     NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:eventModel];
     baselineContext.persistentStoreCoordinator = coordinator;
-    NSDictionary *options = @{@"_NSBinaryStoreInsecureDecodingCompatibilityOption": @YES};
+    NSDictionary *options = nil;
+  
+    if (@available(iOS 11.0, *)) {
+        options = @{NSBinaryStoreInsecureDecodingCompatibilityOption: @YES};
+    }
+  
     NSPersistentStore *store = [coordinator addPersistentStoreWithType:NSBinaryStoreType configuration:nil URL:baselineURL options:options error:NULL];
     XCTAssertNotNil(store, @"Store was nil");
     return baselineContext;
