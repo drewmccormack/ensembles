@@ -117,7 +117,7 @@
     NSPersistentStoreCoordinator *psc = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:model];
     NSDictionary *options = nil;
   
-    if (@available(iOS 11.0, *)) {
+    if (@available(iOS 11.0, macOS 10.13, *)) {
         options = @{NSBinaryStoreInsecureDecodingCompatibilityOption: @YES};
     }
     

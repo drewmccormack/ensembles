@@ -159,7 +159,7 @@ static NSString *kCDEDefaultStoreType;
                     if (!storeType) @throw [[NSException alloc] initWithName:CDEException reason:@"" userInfo:nil];
                   
                     NSDictionary *options = nil;
-                    if (@available(iOS 11.0, *)) {
+                    if (@available(macos 10.13, ios 11.0, tvos 11.0, watchos 4.0, *)) {
                         options = @{NSMigratePersistentStoresAutomaticallyOption: @YES, NSInferMappingModelAutomaticallyOption: @YES, NSBinaryStoreInsecureDecodingCompatibilityOption: @YES};
                     } else {
                         // Fallback on earlier versions
