@@ -115,7 +115,12 @@
     NSURL *url = [NSURL fileURLWithPath:exportedEventsFile];
     NSManagedObjectModel *model = self.eventStore.managedObjectContext.persistentStoreCoordinator.managedObjectModel;
     NSPersistentStoreCoordinator *psc = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:model];
-    NSDictionary *options = @{@"_NSBinaryStoreInsecureDecodingCompatibilityOption" : @YES};
+    NSDictionary *options = nil;
+  
+    if (@available(iOS 11.0, *)) {
+        options = @{NSBinaryStoreInsecureDecodingCompatibilityOption: @YES};
+    }
+    
     [psc addPersistentStoreWithType:NSBinaryStoreType configuration:nil URL:url options:options error:NULL];
     NSManagedObjectContext *newContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
     newContext.persistentStoreCoordinator = psc;
