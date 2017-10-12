@@ -21,8 +21,8 @@ Pod::Spec.new do |s|
   }
   s.author = { "Drew McCormack" => "drewmccormack@mac.com" }
 
-  s.ios.deployment_target = '6.0'
-  s.osx.deployment_target = '10.7'
+  s.ios.deployment_target = '8.0'
+  s.osx.deployment_target = '10.8'
   
   s.source        = { 
     :git => 'https://github.com/drewmccormack/ensembles.git', 
@@ -40,19 +40,12 @@ Pod::Spec.new do |s|
     ss.frameworks = 'CoreData'
   end
   
-  s.subspec 'Dropbox' do |ss|
-    ss.dependency 'Ensembles/Core'
-    ss.ios.dependency 'Dropbox-iOS-SDK'
-    ss.osx.dependency 'Dropbox-OSX-SDK'
-    ss.source_files = 'Framework/Extensions/CDEDropboxCloudFileSystem.{h,m}'
-  end
-  
   s.subspec 'DropboxV2' do |ss|
     # Bump deployment targets to match ObjectiveDropboxOfficial's
     ss.ios.deployment_target = '9.0'
     ss.osx.deployment_target = '10.10'
     ss.dependency 'Ensembles/Core'
-    ss.dependency 'ObjectiveDropboxOfficial', '~> 3.3'
+    ss.dependency 'ObjectiveDropboxOfficial', '3.3'
     ss.source_files = 'Framework/Extensions/CDEDropboxV2CloudFileSystem.{h,m}'
   end
   
@@ -63,9 +56,4 @@ Pod::Spec.new do |s|
     ss.source_files = 'Framework/Extensions/CDEMultipeerCloudFileSystem.{h,m}'
   end
   
-  s.subspec 'Node' do |ss|
-    ss.dependency 'Ensembles/Core'
-    ss.source_files = 'Framework/Extensions/CDENodeCloudFileSystem.{h,m}'
-  end
-
 end
