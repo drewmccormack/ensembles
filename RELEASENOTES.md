@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+1.7.1
+---
+- Updated version of Dropbox v2
+- Fixes for new security features in binary Core Data stores
+- Better Carthage support
+
 1.7
 ---
 - Backported Dropbox v2 backend from Ensembles 2 (Dropbox is terminating the v1 API)
