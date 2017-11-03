@@ -38,16 +38,12 @@
 		07746AAF18C6276F00A267F5 /* IDMSyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 07746AAE18C6276F00A267F5 /* IDMSyncManager.m */; };
 		0791BCE317F6F58C00E7C31B /* Ensembles iOS.xcodeproj in Resources */ = {isa = PBXBuildFile; fileRef = 0791BCE217F6F58C00E7C31B /* Ensembles iOS.xcodeproj */; };
 		07973EF9183BE32C007F48CA /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07973EF8183BE32C007F48CA /* CoreData.framework */; };
-		07B85F4319574CDF00269E75 /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = 07B85F3919574CDF00269E75 /* ioapi.c */; };
-		07B85F4419574CDF00269E75 /* mztools.c in Sources */ = {isa = PBXBuildFile; fileRef = 07B85F3B19574CDF00269E75 /* mztools.c */; };
-		07B85F4519574CDF00269E75 /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = 07B85F3D19574CDF00269E75 /* unzip.c */; };
-		07B85F4619574CDF00269E75 /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = 07B85F3F19574CDF00269E75 /* zip.c */; };
-		07B85F4719574CDF00269E75 /* SSZipArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 07B85F4219574CDF00269E75 /* SSZipArchive.m */; };
+		07D0601F1FACD9BB003783D3 /* ZipArchive.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07D060141FACD985003783D3 /* ZipArchive.framework */; };
+		07D060201FACD9BB003783D3 /* ZipArchive.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 07D060141FACD985003783D3 /* ZipArchive.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		07D9F0051910FD7600D191FA /* Ensembles.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 07571F411910F2BE008479A9 /* Ensembles.bundle */; };
 		07D9F0261911077900D191FA /* Ensembles.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07168C0418E037FC00153494 /* Ensembles.framework */; };
 		07D9F029191107FC00D191FA /* Ensembles.framework in Resources */ = {isa = PBXBuildFile; fileRef = 07168C0418E037FC00153494 /* Ensembles.framework */; };
 		0BA4D0F319572DED00FA29F9 /* CDEMultipeerCloudFileSystem.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BA4D0F219572DED00FA29F9 /* CDEMultipeerCloudFileSystem.m */; };
-		0BA4D0F519572DFF00FA29F9 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0BA4D0F419572DFF00FA29F9 /* libz.dylib */; };
 		0BA833F719572D53001FA15B /* IDMMultipeerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 0BA833E919572D53001FA15B /* IDMMultipeerManager.m */; };
 		9477ED311800137300C2A419 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9477ED301800137300C2A419 /* Cocoa.framework */; };
 		9477ED3B1800137300C2A419 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 9477ED391800137300C2A419 /* InfoPlist.strings */; };
@@ -124,6 +120,41 @@
 			remoteGlobalIDString = 07BF374517F184DD00C56F64;
 			remoteInfo = "Ensembles iOS";
 		};
+		07D060131FACD985003783D3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 07D0600C1FACD985003783D3 /* ZipArchive.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B423AE1A1C0DF76A0004A2F1;
+			remoteInfo = "ZipArchive-iOS";
+		};
+		07D060151FACD985003783D3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 07D0600C1FACD985003783D3 /* ZipArchive.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = AFF75A241C37279600F450AC;
+			remoteInfo = "ZipArchive-Mac";
+		};
+		07D060171FACD985003783D3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 07D0600C1FACD985003783D3 /* ZipArchive.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 37952C261F63B50D00DD6677;
+			remoteInfo = "ZipArchive-tvos";
+		};
+		07D060191FACD985003783D3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 07D0600C1FACD985003783D3 /* ZipArchive.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 37952C5E1F63BB7100DD6677;
+			remoteInfo = "ZipArchive-watchos";
+		};
+		07D060211FACD9BB003783D3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 07D0600C1FACD985003783D3 /* ZipArchive.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = B423AE191C0DF76A0004A2F1;
+			remoteInfo = "ZipArchive-iOS";
+		};
 		07D9F0031910FD2400D191FA /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0791BCE217F6F58C00E7C31B /* Ensembles iOS.xcodeproj */;
@@ -155,6 +186,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				073658B61EDD521A001C26F4 /* ObjectiveDropboxOfficial.framework in Embed Frameworks */,
+				07D060201FACD9BB003783D3 /* ZipArchive.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -202,22 +234,11 @@
 		07746AAE18C6276F00A267F5 /* IDMSyncManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IDMSyncManager.m; sourceTree = "<group>"; };
 		0791BCE217F6F58C00E7C31B /* Ensembles iOS.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "Ensembles iOS.xcodeproj"; path = "../../Framework/Ensembles iOS.xcodeproj"; sourceTree = "<group>"; };
 		07973EF8183BE32C007F48CA /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
-		07B85F3819574CDF00269E75 /* crypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypt.h; sourceTree = "<group>"; };
-		07B85F3919574CDF00269E75 /* ioapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ioapi.c; sourceTree = "<group>"; };
-		07B85F3A19574CDF00269E75 /* ioapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ioapi.h; sourceTree = "<group>"; };
-		07B85F3B19574CDF00269E75 /* mztools.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mztools.c; sourceTree = "<group>"; };
-		07B85F3C19574CDF00269E75 /* mztools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mztools.h; sourceTree = "<group>"; };
-		07B85F3D19574CDF00269E75 /* unzip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = unzip.c; sourceTree = "<group>"; };
-		07B85F3E19574CDF00269E75 /* unzip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unzip.h; sourceTree = "<group>"; };
-		07B85F3F19574CDF00269E75 /* zip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = zip.c; sourceTree = "<group>"; };
-		07B85F4019574CDF00269E75 /* zip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zip.h; sourceTree = "<group>"; };
-		07B85F4119574CDF00269E75 /* SSZipArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SSZipArchive.h; sourceTree = "<group>"; };
-		07B85F4219574CDF00269E75 /* SSZipArchive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SSZipArchive.m; sourceTree = "<group>"; };
 		07BF372E17F17D4100C56F64 /* Idiomatic.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Idiomatic.entitlements; sourceTree = "<group>"; };
 		07BF37D417F189EB00C56F64 /* libensembles_ios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libensembles_ios.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		07D0600C1FACD985003783D3 /* ZipArchive.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ZipArchive.xcodeproj; path = ../../Vendor/SSZipArchive/ZipArchive.xcodeproj; sourceTree = "<group>"; };
 		0BA4D0F119572DED00FA29F9 /* CDEMultipeerCloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDEMultipeerCloudFileSystem.h; path = ../../Framework/Extensions/CDEMultipeerCloudFileSystem.h; sourceTree = "<group>"; };
 		0BA4D0F219572DED00FA29F9 /* CDEMultipeerCloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDEMultipeerCloudFileSystem.m; path = ../../Framework/Extensions/CDEMultipeerCloudFileSystem.m; sourceTree = "<group>"; };
-		0BA4D0F419572DFF00FA29F9 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		0BA833E819572D53001FA15B /* IDMMultipeerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IDMMultipeerManager.h; path = Multipeer/IDMMultipeerManager.h; sourceTree = "<group>"; };
 		0BA833E919572D53001FA15B /* IDMMultipeerManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IDMMultipeerManager.m; path = Multipeer/IDMMultipeerManager.m; sourceTree = "<group>"; };
 		9477ED211800132E00C2A419 /* Ensembles Mac.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "Ensembles Mac.xcodeproj"; path = "../../Framework/Ensembles Mac.xcodeproj"; sourceTree = "<group>"; };
@@ -246,7 +267,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0BA4D0F519572DFF00FA29F9 /* libz.dylib in Frameworks */,
+				07D0601F1FACD9BB003783D3 /* ZipArchive.framework in Frameworks */,
 				07571F4D1910F738008479A9 /* libensembles.a in Frameworks */,
 				077231E218C6080D0065BFEE /* MobileCoreServices.framework in Frameworks */,
 				077231E018C604610065BFEE /* Security.framework in Frameworks */,
@@ -303,6 +324,7 @@
 		074B958F17EC783B0016F84D = {
 			isa = PBXGroup;
 			children = (
+				07D0600C1FACD985003783D3 /* ZipArchive.xcodeproj */,
 				073658A21EDD49B7001C26F4 /* ObjectiveDropboxOfficial.xcodeproj */,
 				9477ED211800132E00C2A419 /* Ensembles Mac.xcodeproj */,
 				0791BCE217F6F58C00E7C31B /* Ensembles iOS.xcodeproj */,
@@ -326,8 +348,6 @@
 		074B959A17EC783B0016F84D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				07B85F3619574CDF00269E75 /* SSZipArchive */,
-				0BA4D0F419572DFF00FA29F9 /* libz.dylib */,
 				077231E118C6080D0065BFEE /* MobileCoreServices.framework */,
 				077231DF18C604610065BFEE /* Security.framework */,
 				07973EF8183BE32C007F48CA /* CoreData.framework */,
@@ -391,31 +411,15 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		07B85F3619574CDF00269E75 /* SSZipArchive */ = {
+		07D0600D1FACD985003783D3 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				07B85F3719574CDF00269E75 /* minizip */,
-				07B85F4119574CDF00269E75 /* SSZipArchive.h */,
-				07B85F4219574CDF00269E75 /* SSZipArchive.m */,
+				07D060141FACD985003783D3 /* ZipArchive.framework */,
+				07D060161FACD985003783D3 /* ZipArchive.framework */,
+				07D060181FACD985003783D3 /* ZipArchive.framework */,
+				07D0601A1FACD985003783D3 /* ZipArchive.framework */,
 			);
-			name = SSZipArchive;
-			path = ../../Vendor/SSZipArchive/SSZipArchive;
-			sourceTree = "<group>";
-		};
-		07B85F3719574CDF00269E75 /* minizip */ = {
-			isa = PBXGroup;
-			children = (
-				07B85F3819574CDF00269E75 /* crypt.h */,
-				07B85F3919574CDF00269E75 /* ioapi.c */,
-				07B85F3A19574CDF00269E75 /* ioapi.h */,
-				07B85F3B19574CDF00269E75 /* mztools.c */,
-				07B85F3C19574CDF00269E75 /* mztools.h */,
-				07B85F3D19574CDF00269E75 /* unzip.c */,
-				07B85F3E19574CDF00269E75 /* unzip.h */,
-				07B85F3F19574CDF00269E75 /* zip.c */,
-				07B85F4019574CDF00269E75 /* zip.h */,
-			);
-			path = minizip;
+			name = Products;
 			sourceTree = "<group>";
 		};
 		9477ED221800132E00C2A419 /* Products */ = {
@@ -483,6 +487,7 @@
 				07D9F0041910FD2400D191FA /* PBXTargetDependency */,
 				07571F4C1910F700008479A9 /* PBXTargetDependency */,
 				073658B81EDD521A001C26F4 /* PBXTargetDependency */,
+				07D060221FACD9BB003783D3 /* PBXTargetDependency */,
 			);
 			name = "Idiomatic iOS";
 			productName = Idiomatic;
@@ -562,6 +567,10 @@
 					ProductGroup = 073658A31EDD49B7001C26F4 /* Products */;
 					ProjectRef = 073658A21EDD49B7001C26F4 /* ObjectiveDropboxOfficial.xcodeproj */;
 				},
+				{
+					ProductGroup = 07D0600D1FACD985003783D3 /* Products */;
+					ProjectRef = 07D0600C1FACD985003783D3 /* ZipArchive.xcodeproj */;
+				},
 			);
 			projectRoot = "";
 			targets = (
@@ -621,6 +630,34 @@
 			remoteRef = 077F113E17F709ED0093A212 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		07D060141FACD985003783D3 /* ZipArchive.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = ZipArchive.framework;
+			remoteRef = 07D060131FACD985003783D3 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		07D060161FACD985003783D3 /* ZipArchive.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = ZipArchive.framework;
+			remoteRef = 07D060151FACD985003783D3 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		07D060181FACD985003783D3 /* ZipArchive.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = ZipArchive.framework;
+			remoteRef = 07D060171FACD985003783D3 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		07D0601A1FACD985003783D3 /* ZipArchive.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = ZipArchive.framework;
+			remoteRef = 07D060191FACD985003783D3 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		9477ED2A1800132F00C2A419 /* Tests Mac.xctest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
@@ -662,22 +699,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				07B85F4519574CDF00269E75 /* unzip.c in Sources */,
 				07746AAF18C6276F00A267F5 /* IDMSyncManager.m in Sources */,
 				074B95A817EC783B0016F84D /* main.m in Sources */,
 				0751809918B743C500CE4264 /* IDMMediaFile.m in Sources */,
 				070F46FA1805D51400EE36E5 /* IDMTag.m in Sources */,
-				07B85F4619574CDF00269E75 /* zip.c in Sources */,
 				074B95DB17EC7DCD0016F84D /* IDMTagsViewController.m in Sources */,
 				074B95E117EC9F470016F84D /* IDMNoteEditingViewController.m in Sources */,
-				07B85F4419574CDF00269E75 /* mztools.c in Sources */,
 				077231DE18C5FCDA0065BFEE /* IDMNodeSyncSettingsViewController.m in Sources */,
 				0BA4D0F319572DED00FA29F9 /* CDEMultipeerCloudFileSystem.m in Sources */,
 				070F46F91805D51400EE36E5 /* IDMNote.m in Sources */,
-				07B85F4319574CDF00269E75 /* ioapi.c in Sources */,
 				074B95AC17EC783B0016F84D /* IDMAppDelegate.m in Sources */,
 				070176F118BD17DF00C4DA01 /* CDENodeCloudFileSystem.m in Sources */,
-				07B85F4719574CDF00269E75 /* SSZipArchive.m in Sources */,
 				070F46FB1805D51400EE36E5 /* Model.xcdatamodeld in Sources */,
 				074B95DE17EC7DDF0016F84D /* IDMNotesViewController.m in Sources */,
 				073658A11EDD4936001C26F4 /* CDEDropboxV2CloudFileSystem.m in Sources */,
@@ -712,6 +744,11 @@
 			isa = PBXTargetDependency;
 			name = "Ensembles iOS";
 			targetProxy = 07571F4B1910F700008479A9 /* PBXContainerItemProxy */;
+		};
+		07D060221FACD9BB003783D3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "ZipArchive-iOS";
+			targetProxy = 07D060211FACD9BB003783D3 /* PBXContainerItemProxy */;
 		};
 		07D9F0041910FD2400D191FA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
