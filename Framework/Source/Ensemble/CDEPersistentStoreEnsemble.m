@@ -117,7 +117,10 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
         self.cloudManager = [[CDECloudManager alloc] initWithEventStore:self.eventStore cloudFileSystem:self.cloudFileSystem];
         
         self.baselineConsolidator = [[CDEBaselineConsolidator alloc] initWithEventStore:self.eventStore];
+        self.baselineConsolidator.ensemble = self;
+        
         self.rebaser = [[CDERebaser alloc] initWithEventStore:self.eventStore];
+        self.rebaser.ensemble = self;
         
         [self performInitialChecks];
     }
