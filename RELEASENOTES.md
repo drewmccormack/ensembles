@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+1.7.2
+---
+- Updated SSZipArchive version
+- Fixed a bug where the ensemble identifier was not set properly in baseline consolidation
+
 1.7.1
 ---
 - Updated version of Dropbox v2
