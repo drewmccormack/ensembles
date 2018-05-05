@@ -196,10 +196,14 @@ NSString * const CDEMultipeerMessageTypeKey = @"messageType";
         [self handleFileRetrievalRequestFromPeerWithID:peerID withRemotePaths:remoteFiles];
     }
     else if (CDEMultipeerMessageTypeNewDataAvailable == messageType) {
-        [multipeerConnection newDataWasAddedOnPeerWithID:peerID];
+        if ([multipeerConnection respondsToSelector:@selector(newDataWasAddedOnPeerWithID:)]) {
+            [multipeerConnection newDataWasAddedOnPeerWithID:peerID];
+        }
     }
     else if (CDEMultipeerMessageTypeFileRetrievalResponseNoFiles == messageType) {
-        [multipeerConnection fileRetrievalRequestCompletedWithNoFilesFromPeerWithID:peerID];
+        if ([multipeerConnection respondsToSelector:@selector(fileRetrievalRequestCompletedWithNoFilesFromPeerWithID:)]) {
+            [multipeerConnection fileRetrievalRequestCompletedWithNoFilesFromPeerWithID:peerID];
+        }
     }
 }
 
