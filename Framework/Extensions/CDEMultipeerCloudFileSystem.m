@@ -11,7 +11,7 @@
 
 typedef NS_ENUM (NSInteger, CDEMultipeerMessageType) {
 	CDEMultipeerMessageTypeFileRetrievalRequest = 1,
-    CDEMultipeerMessageTypeFileRetrievalResponse = 2,
+    CDEMultipeerMessageTypeFileRetrievalResponseNoFiles = 2,
     CDEMultipeerMessageTypeNewDataAvailable = 3
 };
 
@@ -198,6 +198,9 @@ NSString * const CDEMultipeerMessageTypeKey = @"messageType";
     else if (CDEMultipeerMessageTypeNewDataAvailable == messageType) {
         [multipeerConnection newDataWasAddedOnPeerWithID:peerID];
     }
+    else if (CDEMultipeerMessageTypeFileRetrievalResponseNoFiles == messageType) {
+        [multipeerConnection fileRetrievalRequestCompletedWithNoFilesFromPeerWithID:peerID];
+    }
 }
 
 - (void)handleFileRetrievalRequestFromPeerWithID:(id <NSObject, NSCopying, NSCoding>)peerID withRemotePaths:(NSSet *)remotePaths
@@ -209,7 +212,14 @@ NSString * const CDEMultipeerMessageTypeKey = @"messageType";
     [filesMissingRemotely minusSet:remotePaths];
     CDELog(CDELoggingLevelVerbose, @"Sending files to peer: %@", filesMissingRemotely);
     
-    if (filesMissingRemotely.count == 0) return;
+    if (filesMissingRemotely.count == 0) {
+        NSDictionary *peerMessage = @{
+            CDEMultipeerMessageTypeKey : @(CDEMultipeerMessageTypeFileRetrievalResponseNoFiles)
+        };
+        NSData *peerMessageData = [NSKeyedArchiver archivedDataWithRootObject:peerMessage];
+        [multipeerConnection sendData:peerMessageData toPeerWithID:peerID];
+        return;
+    }
     
     NSURL *tempURL = [self makeArchiveForPaths:filesMissingRemotely];
     if (!tempURL) {

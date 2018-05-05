@@ -15,6 +15,7 @@ extern NSString * const CDEMultipeerCloudFileSystemDidImportFilesNotification;
 
 @optional
 - (void)newDataWasAddedOnPeerWithID:(id <NSObject, NSCopying, NSCoding>)peerID;
+- (void)fileRetrievalRequestCompletedWithNoFilesFromPeerWithID:(id <NSObject, NSCopying, NSCoding>)peerID;
 
 @required
 - (BOOL)sendData:(NSData *)data toPeerWithID:(id <NSObject, NSCopying, NSCoding>)peerID;
