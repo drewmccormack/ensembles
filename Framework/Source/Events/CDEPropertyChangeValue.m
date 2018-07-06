@@ -209,35 +209,37 @@
 
 - (void)storeToManyRelationshipChangeForDescription:(NSPropertyDescription *)propertyDesc newValue:(NSSet *)newValue
 {
-    NSSet *originalObjectIDs = self.relatedObjectIDs;
-    
-    NSError *error;
-    NSSet *newRelatedObjects = newValue;
-    NSManagedObjectContext *context = [newRelatedObjects.anyObject managedObjectContext];
-    if (context && ![context obtainPermanentIDsForObjects:newRelatedObjects.allObjects error:&error]) {
-        CDELog(CDELoggingLevelError, @"Failed to get permanent ids: %@", error);
-    }
-    NSSet *newRelatedObjectIDs = [newValue valueForKeyPath:@"objectID"];
-    
-    NSSet *addedObjectIDs, *removedObjectIDs;
-    if (originalObjectIDs) {
-        // Determine the added and removed by comparing with original values
-        NSMutableSet *mutableAdded = [newRelatedObjectIDs mutableCopy];
-        [mutableAdded minusSet:originalObjectIDs];
-        addedObjectIDs = mutableAdded;
+    if (newValue) {
+        NSSet *originalObjectIDs = self.relatedObjectIDs;
         
-        NSMutableSet *mutableRemoved = [originalObjectIDs mutableCopy];
-        [mutableRemoved minusSet:newRelatedObjectIDs];
-        removedObjectIDs = mutableRemoved;
+        NSError *error;
+        NSSet *newRelatedObjects = newValue;
+        NSManagedObjectContext *context = [newRelatedObjects.anyObject managedObjectContext];
+        if (context && ![context obtainPermanentIDsForObjects:newRelatedObjects.allObjects error:&error]) {
+            CDELog(CDELoggingLevelError, @"Failed to get permanent ids: %@", error);
+        }
+        NSSet *newRelatedObjectIDs = [newValue valueForKeyPath:@"objectID"];
+        
+        NSSet *addedObjectIDs, *removedObjectIDs;
+        if (originalObjectIDs) {
+            // Determine the added and removed by comparing with original values
+            NSMutableSet *mutableAdded = [newRelatedObjectIDs mutableCopy];
+            [mutableAdded minusSet:originalObjectIDs];
+            addedObjectIDs = mutableAdded;
+            
+            NSMutableSet *mutableRemoved = [originalObjectIDs mutableCopy];
+            [mutableRemoved minusSet:newRelatedObjectIDs];
+            removedObjectIDs = mutableRemoved;
+        }
+        else {
+            addedObjectIDs = newRelatedObjectIDs;
+            removedObjectIDs = [NSSet set];
+        }
+        
+        self.addedIdentifiers = addedObjectIDs;
+        self.removedIdentifiers = removedObjectIDs;
+        self.movedIdentifiersByIndex = nil;
     }
-    else {
-        addedObjectIDs = newRelatedObjectIDs;
-        removedObjectIDs = [NSSet set];
-    }
-    
-    self.addedIdentifiers = addedObjectIDs;
-    self.removedIdentifiers = removedObjectIDs;
-    self.movedIdentifiersByIndex = nil;
 }
 
 - (void)storeOrderedToManyRelationshipChangeForDescription:(NSRelationshipDescription *)propertyDesc newValue:(NSOrderedSet *)newValue
