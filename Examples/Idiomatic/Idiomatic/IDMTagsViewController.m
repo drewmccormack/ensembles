@@ -60,9 +60,9 @@
     }];
 }
 
-- (void)viewDidUnload
+- (void)viewDidDisappear:(BOOL)animated
 {
-    [super viewDidUnload];
+    [super viewDidDisappear:animated];
     [[NSNotificationCenter defaultCenter] removeObserver:syncDidBeginNotif];
     [[NSNotificationCenter defaultCenter] removeObserver:syncDidEndNotif];
 }
