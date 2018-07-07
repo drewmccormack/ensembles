@@ -36,7 +36,6 @@
 		077231E018C604610065BFEE /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 077231DF18C604610065BFEE /* Security.framework */; };
 		077231E218C6080D0065BFEE /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 077231E118C6080D0065BFEE /* MobileCoreServices.framework */; };
 		07746AAF18C6276F00A267F5 /* IDMSyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 07746AAE18C6276F00A267F5 /* IDMSyncManager.m */; };
-		0791BCE317F6F58C00E7C31B /* Ensembles iOS.xcodeproj in Resources */ = {isa = PBXBuildFile; fileRef = 0791BCE217F6F58C00E7C31B /* Ensembles iOS.xcodeproj */; };
 		07973EF9183BE32C007F48CA /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07973EF8183BE32C007F48CA /* CoreData.framework */; };
 		07D0601F1FACD9BB003783D3 /* ZipArchive.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07D060141FACD985003783D3 /* ZipArchive.framework */; };
 		07D060201FACD9BB003783D3 /* ZipArchive.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 07D060141FACD985003783D3 /* ZipArchive.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -672,7 +671,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0791BCE317F6F58C00E7C31B /* Ensembles iOS.xcodeproj in Resources */,
 				074B95B417EC783B0016F84D /* Images.xcassets in Resources */,
 				074B95A617EC783B0016F84D /* InfoPlist.strings in Resources */,
 				07D9F0051910FD7600D191FA /* Ensembles.bundle in Resources */,
