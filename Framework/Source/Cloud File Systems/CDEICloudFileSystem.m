@@ -133,14 +133,14 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
 {
     [operationQueue addOperationWithBlock:^{
         BOOL loggedIn = NO;
-        if ([fileManager respondsToSelector:@selector(ubiquityIdentityToken)]) {
-            loggedIn = [fileManager ubiquityIdentityToken] != nil && ([fileManager URLForUbiquityContainerIdentifier:ubiquityContainerIdentifier] != nil);
+        if ([self->fileManager respondsToSelector:@selector(ubiquityIdentityToken)]) {
+            loggedIn = [self->fileManager ubiquityIdentityToken] != nil && ([self->fileManager URLForUbiquityContainerIdentifier:self->ubiquityContainerIdentifier] != nil);
         }
         else {
-            loggedIn = [fileManager URLForUbiquityContainerIdentifier:ubiquityContainerIdentifier] != nil;
+            loggedIn = [self->fileManager URLForUbiquityContainerIdentifier:self->ubiquityContainerIdentifier] != nil;
         }
         
-        isConnected = loggedIn;
+        self->isConnected = loggedIn;
         
         dispatch_async(dispatch_get_main_queue(), ^{
             if (completion) completion(nil, loggedIn);
@@ -182,7 +182,7 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
         NSError *error = nil;
         
         // Root directory
-        NSString *rootDirectory = rootDirectoryURL.path;
+        NSString *rootDirectory = self->rootDirectoryURL.path;
         NSArray *rootPathsToMerge = [self directoriesToMergeForDirectory:rootDirectory error:&error];
         if (!rootPathsToMerge) {
             [self dispatchCompletion:completion withError:error];
@@ -243,14 +243,14 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
             if ([dirEnum.fileAttributes.fileType isEqualToString:NSFileTypeDirectory]) {
                 [coordinator cde_coordinateWritingItemAtURL:ensembleURL options:0 timeout:CDEFileCoordinatorTimeOut error:&fileCoordinatorError byAccessor:^(NSURL *newURL) {
                     NSError *error = nil;
-                    BOOL success = [fileManager createDirectoryAtURL:newURL withIntermediateDirectories:YES attributes:nil error:&error];
+                    BOOL success = [self->fileManager createDirectoryAtURL:newURL withIntermediateDirectories:YES attributes:nil error:&error];
                     if (!success) fileManagerError = error;
                 }];
             }
             else if ([dirEnum.fileAttributes.fileType isEqualToString:NSFileTypeRegular]) {
                 [coordinator cde_coordinateReadingItemAtURL:duplicateURL options:0 writingItemAtURL:ensembleURL options:NSFileCoordinatorWritingForReplacing timeout:CDEFileCoordinatorTimeOut error:&fileCoordinatorError byAccessor:^(NSURL *newReadingURL, NSURL *newWritingURL) {
                     NSError *error = nil;
-                    BOOL success = [fileManager copyItemAtURL:newReadingURL toURL:newWritingURL error:&error];
+                    BOOL success = [self->fileManager copyItemAtURL:newReadingURL toURL:newWritingURL error:&error];
                     if (!success) fileManagerError = error;
                 }];
             }
@@ -268,7 +268,7 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
         __block NSError *fileManagerError = nil;
         [coordinator cde_coordinateWritingItemAtURL:dirToMergeURL options:NSFileCoordinatorWritingForDeleting timeout:CDEFileCoordinatorTimeOut error:&coordinatorError byAccessor:^(NSURL *newURL) {
             NSError *error = nil;
-            BOOL success = [fileManager removeItemAtURL:newURL error:&error];
+            BOOL success = [self->fileManager removeItemAtURL:newURL error:&error];
             if (!success) fileManagerError = error;
         }];
         
@@ -313,7 +313,7 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
 {
     [operationQueue addOperationWithBlock:^{
         [self updateRootDirectoryURL];
-        if (!rootDirectoryURL) {
+        if (!self->rootDirectoryURL) {
             NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeServerError userInfo:@{NSLocalizedDescriptionKey : @"Could not retrieve URLForUbiquityContainerIdentifier. Check container id for iCloud."}];
             CDELog(CDELoggingLevelError, @"Failed to get the URL of the iCloud ubiquity container: %@", error);
             [self dispatchCompletion:completion withError:error];
@@ -324,8 +324,8 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
         __block BOOL fileExistsAtPath = NO;
         __block BOOL existingFileIsDirectory = NO;
         NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:self];
-        [coordinator cde_coordinateReadingItemAtURL:rootDirectoryURL options:NSFileCoordinatorReadingWithoutChanges timeout:CDEFileCoordinatorTimeOut error:&error byAccessor:^(NSURL *newURL) {
-            fileExistsAtPath = [fileManager fileExistsAtPath:newURL.path isDirectory:&existingFileIsDirectory];
+        [coordinator cde_coordinateReadingItemAtURL:self->rootDirectoryURL options:NSFileCoordinatorReadingWithoutChanges timeout:CDEFileCoordinatorTimeOut error:&error byAccessor:^(NSURL *newURL) {
+            fileExistsAtPath = [self->fileManager fileExistsAtPath:newURL.path isDirectory:&existingFileIsDirectory];
         }];
         if (error) {
             CDELog(CDELoggingLevelWarning, @"File coordinator error: %@", error);
@@ -335,17 +335,17 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
         
         __block NSError *fileManagerError = nil;
         if (!fileExistsAtPath) {
-            [coordinator cde_coordinateWritingItemAtURL:rootDirectoryURL options:0 timeout:CDEFileCoordinatorTimeOut error:&error byAccessor:^(NSURL *newURL) {
+            [coordinator cde_coordinateWritingItemAtURL:self->rootDirectoryURL options:0 timeout:CDEFileCoordinatorTimeOut error:&error byAccessor:^(NSURL *newURL) {
                 NSError *error;
-                BOOL success = [fileManager createDirectoryAtURL:newURL withIntermediateDirectories:YES attributes:nil error:&error];
+                BOOL success = [self->fileManager createDirectoryAtURL:newURL withIntermediateDirectories:YES attributes:nil error:&error];
                 if (!success) fileManagerError = error;
             }];
         }
         else if (fileExistsAtPath && !existingFileIsDirectory) {
-            [coordinator cde_coordinateWritingItemAtURL:rootDirectoryURL options:NSFileCoordinatorWritingForReplacing timeout:CDEFileCoordinatorTimeOut error:&error byAccessor:^(NSURL *newURL) {
+            [coordinator cde_coordinateWritingItemAtURL:self->rootDirectoryURL options:NSFileCoordinatorWritingForReplacing timeout:CDEFileCoordinatorTimeOut error:&error byAccessor:^(NSURL *newURL) {
                 NSError *error;
-                [fileManager removeItemAtURL:newURL error:NULL];
-                BOOL success = [fileManager createDirectoryAtURL:newURL withIntermediateDirectories:YES attributes:nil error:&error];
+                [self->fileManager removeItemAtURL:newURL error:NULL];
+                BOOL success = [self->fileManager createDirectoryAtURL:newURL withIntermediateDirectories:YES attributes:nil error:&error];
                 if (!success) fileManagerError = error;
             }];
         }
@@ -499,13 +499,13 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
             
             dispatch_async(initiatingDownloadsQueue, ^{
                 NSError *error;
-                BOOL startedDownload = [fileManager startDownloadingUbiquitousItemAtURL:url error:&error];
+                BOOL startedDownload = [self->fileManager startDownloadingUbiquitousItemAtURL:url error:&error];
                 if ( startedDownload ) {
                     unsigned long long bytesRemainingForThisFile = 0;
                     
                     @synchronized(self) {
-                        [downloadingURLs addObject:url];
-                        [handlingURLs removeObject:url];
+                        [self->downloadingURLs addObject:url];
+                        [self->handlingURLs removeObject:url];
                         
                         unsigned long long fileSize = fileSizeNumber ? fileSizeNumber.unsignedLongLongValue : 0;
                         if ( downloaded && !downloaded.boolValue ) {
@@ -517,7 +517,7 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
                         [self postProgressNotificationIfNecessary];
                     }
                     
-                    [downloadTrackingQueue addOperationWithBlock:^{
+                    [self->downloadTrackingQueue addOperationWithBlock:^{
                         NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:self];
                         NSError *error = nil;
                         __block BOOL complete = NO;
@@ -547,7 +547,7 @@ NSString * const CDEICloudFileSystemDidMakeDownloadProgressNotification = @"CDEI
                     }];
                 } else {
                     @synchronized(self) {
-                        [handlingURLs removeObject:url];
+                        [self->handlingURLs removeObject:url];
                     }
                     CDELog(CDELoggingLevelWarning, @"Error starting download: %@", error);
                 }
@@ -651,7 +651,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
 - (void)fileExistsAtPath:(NSString *)path completion:(void(^)(BOOL exists, BOOL isDirectory, NSError *error))block
 {
     [operationQueue addOperationWithBlock:^{
-        if (!self.isConnected || !rootDirectoryURL) {
+        if (!self.isConnected || !self->rootDirectoryURL) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (block) block(NO, NO, [self notConnectedError]);
             });
@@ -667,7 +667,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
         NSString *fullPath = [self fullPathForPath:path];
         NSURL *url = [NSURL fileURLWithPath:fullPath];
         [coordinator cde_coordinateReadingItemAtURL:url options:0 timeout:CDEFileCoordinatorTimeOut error:&fileCoordinatorError byAccessor:^(NSURL *newURL) {
-            exists = [fileManager fileExistsAtPath:newURL.path isDirectory:&isDirectory];
+            exists = [self->fileManager fileExistsAtPath:newURL.path isDirectory:&isDirectory];
         }];
         
         NSError *error = fileCoordinatorError ? : nil;
@@ -681,7 +681,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
 - (void)contentsOfDirectoryAtPath:(NSString *)path completion:(void(^)(NSArray *contents, NSError *error))block
 {
     [operationQueue addOperationWithBlock:^{
-        if (!self.isConnected || !rootDirectoryURL) {
+        if (!self.isConnected || !self->rootDirectoryURL) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (block) block(nil, [self notConnectedError]);
             });
@@ -696,7 +696,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
         __block NSArray *contents = nil;
         NSURL *url = [NSURL fileURLWithPath:[self fullPathForPath:path]];
         [coordinator cde_coordinateReadingItemAtURL:url options:0 timeout:CDEFileCoordinatorTimeOut error:&fileCoordinatorError byAccessor:^(NSURL *newURL) {
-            NSDirectoryEnumerator *dirEnum = [fileManager enumeratorAtPath:[self fullPathForPath:path]];
+            NSDirectoryEnumerator *dirEnum = [self->fileManager enumeratorAtPath:[self fullPathForPath:path]];
             NSDictionary *info = @{NSLocalizedDescriptionKey : [NSString stringWithFormat:@"Couldn't create directory enumerator for path: %@", path]};
             if (!dirEnum) fileManagerError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeFileAccessFailed userInfo:info];
             
@@ -737,7 +737,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
 - (void)createDirectoryAtPath:(NSString *)path completion:(CDECompletionBlock)block
 {
     [operationQueue addOperationWithBlock:^{
-        if (!self.isConnected || !rootDirectoryURL) {
+        if (!self.isConnected || !self->rootDirectoryURL) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (block) block([self notConnectedError]);
             });
@@ -751,10 +751,10 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
         
         NSURL *url = [NSURL fileURLWithPath:[self fullPathForPath:path]];
         NSString *path = [url.path stringByStandardizingPath];
-        [locallyModifiedPaths addObject:path];
+        [self->locallyModifiedPaths addObject:path];
         
         [coordinator cde_coordinateWritingItemAtURL:url options:0 timeout:CDEFileCoordinatorTimeOut error:&fileCoordinatorError byAccessor:^(NSURL *newURL) {
-            [fileManager createDirectoryAtPath:newURL.path withIntermediateDirectories:NO attributes:nil error:&fileManagerError];
+            [self->fileManager createDirectoryAtPath:newURL.path withIntermediateDirectories:NO attributes:nil error:&fileManagerError];
         }];
         
         NSError *error = fileCoordinatorError ? : fileManagerError ? : nil;
@@ -768,7 +768,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
 - (void)removeItemAtPath:(NSString *)path completion:(CDECompletionBlock)block
 {
     [operationQueue addOperationWithBlock:^{
-        if (!self.isConnected || !rootDirectoryURL) {
+        if (!self.isConnected || !self->rootDirectoryURL) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (block) block([self notConnectedError]);
             });
@@ -782,10 +782,10 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
         
         NSURL *url = [NSURL fileURLWithPath:[self fullPathForPath:path]];
         NSString *path = [url.path stringByStandardizingPath];
-        [locallyModifiedPaths addObject:path];
+        [self->locallyModifiedPaths addObject:path];
         
         [coordinator cde_coordinateWritingItemAtURL:url options:NSFileCoordinatorWritingForDeleting timeout:CDEFileCoordinatorTimeOut error:&fileCoordinatorError byAccessor:^(NSURL *newURL) {
-            [fileManager removeItemAtPath:newURL.path error:&fileManagerError];
+            [self->fileManager removeItemAtPath:newURL.path error:&fileManagerError];
         }];
         
         NSError *error = fileCoordinatorError ? : fileManagerError ? : nil;
@@ -799,7 +799,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
 - (void)uploadLocalFile:(NSString *)fromPath toPath:(NSString *)toPath completion:(CDECompletionBlock)block
 {
     [operationQueue addOperationWithBlock:^{
-        if (!self.isConnected || !rootDirectoryURL) {
+        if (!self.isConnected || !self->rootDirectoryURL) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (block) block([self notConnectedError]);
             });
@@ -814,11 +814,11 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
         NSURL *fromURL = [NSURL fileURLWithPath:fromPath];
         NSURL *toURL = [NSURL fileURLWithPath:[self fullPathForPath:toPath]];
         NSString *path = [toURL.path stringByStandardizingPath];
-        [locallyModifiedPaths addObject:path];
+        [self->locallyModifiedPaths addObject:path];
         
         [coordinator cde_coordinateReadingItemAtURL:fromURL options:0 writingItemAtURL:toURL options:NSFileCoordinatorWritingForReplacing timeout:CDEFileCoordinatorTimeOut error:&fileCoordinatorError byAccessor:^(NSURL *newReadingURL, NSURL *newWritingURL) {
-            [fileManager removeItemAtPath:newWritingURL.path error:NULL];
-            [fileManager copyItemAtPath:newReadingURL.path toPath:newWritingURL.path error:&fileManagerError];
+            [self->fileManager removeItemAtPath:newWritingURL.path error:NULL];
+            [self->fileManager copyItemAtPath:newReadingURL.path toPath:newWritingURL.path error:&fileManagerError];
         }];
         
         NSError *error = fileCoordinatorError ? : fileManagerError ? : nil;
@@ -832,7 +832,7 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
 - (void)downloadFromPath:(NSString *)fromPath toLocalFile:(NSString *)toPath completion:(CDECompletionBlock)block
 {
     [operationQueue addOperationWithBlock:^{
-        if (!self.isConnected || !rootDirectoryURL) {
+        if (!self.isConnected || !self->rootDirectoryURL) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (block) block([self notConnectedError]);
             });
@@ -847,8 +847,8 @@ static const NSTimeInterval CDEFileCoordinatorTimeOut = 10.0;
         NSURL *fromURL = [NSURL fileURLWithPath:[self fullPathForPath:fromPath]];
         NSURL *toURL = [NSURL fileURLWithPath:toPath];
         [coordinator cde_coordinateReadingItemAtURL:fromURL options:0 writingItemAtURL:toURL options:NSFileCoordinatorWritingForReplacing timeout:CDEFileCoordinatorTimeOut error:&fileCoordinatorError byAccessor:^(NSURL *newReadingURL, NSURL *newWritingURL) {
-            [fileManager removeItemAtPath:newWritingURL.path error:NULL];
-            [fileManager copyItemAtPath:newReadingURL.path toPath:newWritingURL.path error:&fileManagerError];
+            [self->fileManager removeItemAtPath:newWritingURL.path error:NULL];
+            [self->fileManager copyItemAtPath:newReadingURL.path toPath:newWritingURL.path error:&fileManagerError];
         }];
         
         NSError *error = fileCoordinatorError ? : fileManagerError ? : nil;

@@ -122,9 +122,9 @@
         if (block) {
             CDEAsynchronousTaskCallbackBlock next = [^(NSError *error, BOOL stop) {
                 BOOL shouldStop = NO;
-                if (error && terminationPolicy == CDETaskQueueTerminationPolicyStopOnError) shouldStop = YES;
-                if (!error && terminationPolicy == CDETaskQueueTerminationPolicyStopOnSuccess) shouldStop = YES;
-                [errors addObject:(error ? : [NSNull null])];
+                if (error && self->terminationPolicy == CDETaskQueueTerminationPolicyStopOnError) shouldStop = YES;
+                if (!error && self->terminationPolicy == CDETaskQueueTerminationPolicyStopOnSuccess) shouldStop = YES;
+                [self->errors addObject:(error ? : [NSNull null])];
                 if (stop) shouldStop = YES;
                 if (shouldStop) {
                     dispatch_async(dispatch_get_main_queue(), ^{

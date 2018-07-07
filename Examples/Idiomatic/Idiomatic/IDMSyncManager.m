@@ -199,7 +199,7 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
     if (!ensemble.isLeeched) {
         [ensemble leechPersistentStoreWithCompletion:^(NSError *error) {
             [self decrementMergeCount];
-            if (error && !ensemble.isLeeched) {
+            if (error && !self->ensemble.isLeeched) {
                 NSLog(@"Could not leech to ensemble: %@", error);
                 [self disconnectFromSyncServiceWithCompletion:^{
                     if (completion) completion(error);
@@ -213,7 +213,7 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
     else {
         [ensemble mergeWithCompletion:^(NSError *error) {
             [self decrementMergeCount];
-            [multipeerManager syncFilesWithAllPeers];
+            [self->multipeerManager syncFilesWithAllPeers];
             if (error) NSLog(@"Error merging: %@", error);
             if (completion) completion(error);
         }];
@@ -243,7 +243,7 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 - (void)persistentStoreEnsemble:(CDEPersistentStoreEnsemble *)ensemble didSaveMergeChangesWithNotification:(NSNotification *)notification
 {
     [managedObjectContext performBlock:^{
-        [managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
+        [self->managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
     }];
 }
 
@@ -278,8 +278,8 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
             }
         }
         dispatch_async(dispatch_get_main_queue(), ^{
-            if (dropboxLinkSessionCompletion) dropboxLinkSessionCompletion(nil);
-            dropboxLinkSessionCompletion = NULL;
+            if (self->dropboxLinkSessionCompletion) self->dropboxLinkSessionCompletion(nil);
+            self->dropboxLinkSessionCompletion = NULL;
         });
     }
     else {
@@ -287,8 +287,8 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
                                              code:CDEErrorCodeAuthenticationFailure
                                          userInfo:nil];
         dispatch_async(dispatch_get_main_queue(), ^{
-            if (dropboxLinkSessionCompletion) dropboxLinkSessionCompletion(error);
-            dropboxLinkSessionCompletion = NULL;
+            if (self->dropboxLinkSessionCompletion) self->dropboxLinkSessionCompletion(error);
+            self->dropboxLinkSessionCompletion = NULL;
         });
     }
     
@@ -426,7 +426,7 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 - (void)didSaveMonitoredManagedObjectContext:(NSNotification *)note {
     // Notify other peers of new data
     [self synchronizeWithCompletion:^(NSError *error) {
-        [multipeerManager sendNotificationOfNewlyAvailableDataToAllPeers];
+        [self->multipeerManager sendNotificationOfNewlyAvailableDataToAllPeers];
     }];
 }
 

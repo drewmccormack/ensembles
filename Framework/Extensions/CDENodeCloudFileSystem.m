@@ -184,7 +184,7 @@
         
         CDEFileUploadOperation *operation = [[CDEFileUploadOperation alloc] initWithURLRequest:request localPath:fromPath];
         operation.completion = completion;
-        [operationQueue addOperation:operation];
+        [self->operationQueue addOperation:operation];
     }];
 }
 
@@ -203,7 +203,7 @@
         request.cachePolicy = NSURLRequestReloadIgnoringLocalAndRemoteCacheData;
         CDEFileDownloadOperation *operation = [[CDEFileDownloadOperation alloc] initWithURLRequest:request localPath:toPath];
         operation.completion = completion;
-        [operationQueue addOperation:operation];
+        [self->operationQueue addOperation:operation];
     }];
 }
 

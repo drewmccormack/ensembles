@@ -39,12 +39,12 @@
     
     NSManagedObjectContext *context = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
     [context performBlockAndWait:^{
-        NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:managedObjectModel];
+        NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:self->managedObjectModel];
         context.persistentStoreCoordinator = coordinator;
         context.undoManager = nil;
         
         NSError *localError = nil;
-        NSURL *storeURL = [NSURL fileURLWithPath:persistentStorePath];
+        NSURL *storeURL = [NSURL fileURLWithPath:self->persistentStorePath];
         NSDictionary *options = self.persistentStoreOptions;
         if (!options) options = @{NSMigratePersistentStoresAutomaticallyOption: @YES, NSInferMappingModelAutomaticallyOption: @YES};
         [(id)coordinator lock];
@@ -73,7 +73,7 @@
     
     NSMutableSet *allObjects = [[NSMutableSet alloc] initWithCapacity:1000];
     [context performBlock:^{
-        for (NSEntityDescription *entity in managedObjectModel) {
+        for (NSEntityDescription *entity in self->managedObjectModel) {
             NSFetchRequest *fetch = [[NSFetchRequest alloc] initWithEntityName:entity.name];
             fetch.fetchBatchSize = 100;
             fetch.includesSubentities = NO;

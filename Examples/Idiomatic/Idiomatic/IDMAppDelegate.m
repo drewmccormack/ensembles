@@ -62,9 +62,9 @@
 {
     UIBackgroundTaskIdentifier identifier = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:NULL];
     dispatch_async(dispatch_get_global_queue(0, 0), ^{
-        [managedObjectContext performBlock:^{
-            if (managedObjectContext.hasChanges) {
-                [managedObjectContext save:NULL];
+        [self->managedObjectContext performBlock:^{
+            if (self->managedObjectContext.hasChanges) {
+                [self->managedObjectContext save:NULL];
             }
             
             [[IDMSyncManager sharedSyncManager] synchronizeWithCompletion:^(NSError *error) {

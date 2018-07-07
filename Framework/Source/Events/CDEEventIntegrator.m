@@ -165,8 +165,8 @@
             
             // If no changes, complete
             __block BOOL hasChanges;
-            [managedObjectContext performBlockAndWait:^{
-                hasChanges = managedObjectContext.hasChanges;
+            [self->managedObjectContext performBlockAndWait:^{
+                hasChanges = self->managedObjectContext.hasChanges;
             }];
             if (!hasChanges) {
                 [self completeSuccessfullyWithCompletion:completion];
@@ -175,13 +175,13 @@
             
             // Create id of new event
             // Register event in case of crashes
-            newEventUniqueId = [[NSProcessInfo processInfo] globallyUniqueString];
-            [self.eventStore registerIncompleteEventIdentifier:newEventUniqueId isMandatory:NO];
+            self->newEventUniqueId = [[NSProcessInfo processInfo] globallyUniqueString];
+            [self.eventStore registerIncompleteEventIdentifier:self->newEventUniqueId isMandatory:NO];
             
             // Create a merge event
             CDEEventBuilder *eventBuilder = [[CDEEventBuilder alloc] initWithEventStore:self.eventStore];
             eventBuilder.ensemble = self.ensemble;
-            CDERevision *revision = [eventBuilder makeNewEventOfType:CDEStoreModificationEventTypeMerge uniqueIdentifier:newEventUniqueId];
+            CDERevision *revision = [eventBuilder makeNewEventOfType:CDEStoreModificationEventTypeMerge uniqueIdentifier:self->newEventUniqueId];
         
             // Repair inconsistencies caused by integration
             BOOL repairSucceeded = [self repairWithMergeEventBuilder:eventBuilder error:&error];
@@ -219,9 +219,9 @@
 
             // Notify of save
             [self.managedObjectContext performBlockAndWait:^{
-                if (didSaveBlock) didSaveBlock(managedObjectContext, saveInfoDictionary);
+                if (self->didSaveBlock) self->didSaveBlock(self->managedObjectContext, self->saveInfoDictionary);
             }];
-            saveInfoDictionary = nil;
+            self->saveInfoDictionary = nil;
             
             // Complete
             [self completeSuccessfullyWithCompletion:completion];
@@ -256,7 +256,7 @@
     if (newEventUniqueId) {
         [eventContext performBlockAndWait:^{
             NSError *innerError = nil;
-            CDEStoreModificationEvent *event = [CDEStoreModificationEvent fetchStoreModificationEventWithUniqueIdentifier:newEventUniqueId inManagedObjectContext:eventContext];
+            CDEStoreModificationEvent *event = [CDEStoreModificationEvent fetchStoreModificationEventWithUniqueIdentifier:self->newEventUniqueId inManagedObjectContext:eventContext];
             if (event) {
                 [eventContext deleteObject:event];
                 if (![eventContext save:&innerError]) {
@@ -377,7 +377,7 @@
                     // Determine which entities have changes
                     NSSet *changedEntityNames = [storeModEvent.objectChanges valueForKeyPath:@"nameOfEntity"];
                     NSMutableArray *changedEntities = [[changedEntityNames.allObjects cde_arrayByTransformingObjectsWithBlock:^(NSString *name) {
-                        return managedObjectModel.entitiesByName[name];
+                        return self->managedObjectModel.entitiesByName[name];
                     }] mutableCopy];
                     [changedEntities removeObject:[NSNull null]];
                     
@@ -498,7 +498,7 @@
     [managedObjectContext performBlockAndWait:^{
         for (NSString *uri in storeURIs) {
             NSURL *url = [NSURL URLWithString:uri];
-            NSManagedObjectID *objectID = [managedObjectContext.persistentStoreCoordinator managedObjectIDForURIRepresentation:url];
+            NSManagedObjectID *objectID = [self->managedObjectContext.persistentStoreCoordinator managedObjectIDForURIRepresentation:url];
             if (objectID) [objectIDs addObject:objectID];
         }
     }];
@@ -513,7 +513,7 @@
             fetch.includesSubentities = NO;
             fetch.predicate = [NSPredicate predicateWithFormat:@"NOT (SELF IN %@)", objectIDs];
             NSError *error;
-            NSArray *unreferencedObjects = [managedObjectContext executeFetchRequest:fetch error:&error];
+            NSArray *unreferencedObjects = [self->managedObjectContext executeFetchRequest:fetch error:&error];
             for (NSManagedObject *object in unreferencedObjects) {
                 [self nullifyRelationshipsAndDeleteObject:object];
             }
@@ -544,8 +544,8 @@
                 objectNeedsCreating = YES;
             }
             else {
-                NSManagedObjectID *objectID = [managedObjectContext.persistentStoreCoordinator managedObjectIDForURIRepresentation:url];
-                NSManagedObject *object = objectID ? [managedObjectContext existingObjectWithID:objectID error:NULL] : nil;
+                NSManagedObjectID *objectID = [self->managedObjectContext.persistentStoreCoordinator managedObjectIDForURIRepresentation:url];
+                NSManagedObject *object = objectID ? [self->managedObjectContext existingObjectWithID:objectID error:NULL] : nil;
                 objectNeedsCreating = !object || object.isDeleted || nil == object.managedObjectContext;
             }
             if (objectNeedsCreating) [indexesNeedingNewObjects addObject:@(i)];
@@ -563,7 +563,7 @@
     NSUInteger numberOfNewObjects = changesNeedingNewObjects.count;
     [managedObjectContext performBlockAndWait:^{
         for (NSUInteger i = 0; i < numberOfNewObjects; i++) {
-            id newObject = [NSEntityDescription insertNewObjectForEntityForName:entity.name inManagedObjectContext:managedObjectContext];
+            id newObject = [NSEntityDescription insertNewObjectForEntityForName:entity.name inManagedObjectContext:self->managedObjectContext];
             if (!newObject) {
                 NSError *localError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeUnknown userInfo:nil];
                 methodError = localError;
@@ -580,7 +580,7 @@
     __block NSArray *uris;
     [managedObjectContext performBlockAndWait:^{
         NSError *localError = nil;
-        success = [managedObjectContext obtainPermanentIDsForObjects:newObjects error:&localError];
+        success = [self->managedObjectContext obtainPermanentIDsForObjects:newObjects error:&localError];
         if (!success) {
             methodError = localError;
             return;
@@ -850,14 +850,14 @@
     __block NSError *methodError;
     
     [managedObjectContext performBlockAndWait:^{
-        contextHasChanges = managedObjectContext.hasChanges;
+        contextHasChanges = self->managedObjectContext.hasChanges;
     }];
     
     if (contextHasChanges && shouldSaveBlock) {
         // Setup a context to store repairs
         NSManagedObjectContext *reparationContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
         [reparationContext performBlockAndWait:^{
-            reparationContext.parentContext = managedObjectContext;
+            reparationContext.parentContext = self->managedObjectContext;
         }];
         
         // Call block on the saving context queue
@@ -938,7 +938,7 @@
         fetch.predicate = [NSPredicate predicateWithFormat:@"SELF IN %@", objectIDs];
         fetch.includesSubentities = NO;
         NSError *localError = nil;
-        objects = [managedObjectContext executeFetchRequest:fetch error:&localError];
+        objects = [self->managedObjectContext executeFetchRequest:fetch error:&localError];
         objectIDsOfFetched = [objects valueForKeyPath:@"objectID"];
         methodError = localError;
     }];
@@ -1101,7 +1101,7 @@
             // Setup a child reparation context
             NSManagedObjectContext *reparationContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
             [reparationContext performBlockAndWait:^{
-                reparationContext.parentContext = managedObjectContext;
+                reparationContext.parentContext = self->managedObjectContext;
             }];
             
             // Inform of failure, and give chance to repair
@@ -1143,15 +1143,15 @@
     
     [managedObjectContext performBlockAndWait:^{
         NSError *blockError;
-        if (saveOccurredDuringMerge) {
+        if (self->saveOccurredDuringMerge) {
             blockError = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeSaveOccurredDuringMerge userInfo:nil];
             localError = blockError;
             return;
         }
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(storeChangesFromContextDidSaveNotification:) name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
-        saved = [managedObjectContext save:&blockError];
-        [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:managedObjectContext];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(storeChangesFromContextDidSaveNotification:) name:NSManagedObjectContextDidSaveNotification object:self->managedObjectContext];
+        saved = [self->managedObjectContext save:&blockError];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:self->managedObjectContext];
         
         if (!saved) {
             localError = blockError;

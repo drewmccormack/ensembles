@@ -83,21 +83,21 @@
     
     CDEAsynchronousTaskBlock baselinesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self.cloudFileSystem contentsOfDirectoryAtPath:self.remoteBaselinesDirectory completion:^(NSArray *baselineContents, NSError *error) {
-            if (!error) snapshotBaselineFilenames = [NSSet setWithArray:[baselineContents valueForKeyPath:@"name"]];
+            if (!error) self->snapshotBaselineFilenames = [NSSet setWithArray:[baselineContents valueForKeyPath:@"name"]];
             next(error, NO);
         }];
     };
     
     CDEAsynchronousTaskBlock eventsTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self.cloudFileSystem contentsOfDirectoryAtPath:self.remoteEventsDirectory completion:^(NSArray *eventContents, NSError *error) {
-            if (!error) snapshotEventFilenames = [NSSet setWithArray:[eventContents valueForKeyPath:@"name"]];
+            if (!error) self->snapshotEventFilenames = [NSSet setWithArray:[eventContents valueForKeyPath:@"name"]];
             next(error, NO);
         }];
     };
     
     CDEAsynchronousTaskBlock dataTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         [self.cloudFileSystem contentsOfDirectoryAtPath:self.remoteDataDirectory completion:^(NSArray *dataContents, NSError *error) {
-            if (!error) snapshotDataFilenames = [NSSet setWithArray:[dataContents valueForKeyPath:@"name"]];
+            if (!error) self->snapshotDataFilenames = [NSSet setWithArray:[dataContents valueForKeyPath:@"name"]];
             next(error, NO);
         }];
     };
@@ -273,7 +273,7 @@
             }];
             
             if (eventsExist && eventFile.eventShouldBeUnique) {
-                [fileManager removeItemAtPath:path error:NULL];
+                [self->fileManager removeItemAtPath:path error:NULL];
                 next(nil, NO);
                 return;
             }
@@ -281,7 +281,7 @@
             // Migrate data into event store
             dispatch_async(dispatch_get_main_queue(), ^{
                 [migrator migrateEventsInFromFiles:@[path] completion:^(NSError *error) {
-                    [fileManager removeItemAtPath:path error:NULL];
+                    [self->fileManager removeItemAtPath:path error:NULL];
                     next(error, NO);
                 }];
             });
@@ -382,9 +382,9 @@
             // Migrate data to file
             dispatch_async(dispatch_get_main_queue(), ^{
                 BOOL isDir;
-                if ([fileManager fileExistsAtPath:path isDirectory:&isDir]) {
+                if ([self->fileManager fileExistsAtPath:path isDirectory:&isDir]) {
                     NSError *error;
-                    if (![fileManager removeItemAtPath:path error:&error]) {
+                    if (![self->fileManager removeItemAtPath:path error:&error]) {
                         next(error, NO);
                         return;
                     }
@@ -445,7 +445,7 @@
             dispatch_async(dispatch_get_main_queue(), ^{
                 CDELog(CDELoggingLevelVerbose, @"Uploading file to remote path: %@", remotePath);
                 [self.cloudFileSystem uploadLocalFile:localPath toPath:remotePath completion:^(NSError *error) {
-                    [fileManager removeItemAtPath:localPath error:NULL];
+                    [self->fileManager removeItemAtPath:localPath error:NULL];
                     if (error) CDELog(CDELoggingLevelError, @"Failed file upload with error: %@", error);
                     next(error, NO);
                 }];
@@ -745,7 +745,7 @@
                 NSDictionary *info = nil;
                 if (!error) {
                     info = [NSDictionary dictionaryWithContentsOfFile:localPath];
-                    [fileManager removeItemAtPath:localPath error:NULL];
+                    [self->fileManager removeItemAtPath:localPath error:NULL];
                 }
                 if (error) CDELog(CDELoggingLevelError, @"Download failed for with error: %@", error);
                 if (completion) completion(info, error);
@@ -775,7 +775,7 @@
     NSString *remotePath = [self.remoteStoresDirectory stringByAppendingPathComponent:identifier];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.cloudFileSystem uploadLocalFile:localPath toPath:remotePath completion:^(NSError *error) {
-            [fileManager removeItemAtPath:localPath error:NULL];
+            [self->fileManager removeItemAtPath:localPath error:NULL];
             if (completion) completion(error);
         }];
     });

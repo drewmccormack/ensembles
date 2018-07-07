@@ -52,42 +52,42 @@
 {
     __block CDERevision *returnRevision = nil;
     [eventManagedObjectContext performBlockAndWait:^{
-        eventType = type;
+        self->eventType = type;
         
-        CDERevisionNumber lastRevision = eventStore.lastRevisionSaved;
+        CDERevisionNumber lastRevision = self->eventStore.lastRevisionSaved;
         NSString *persistentStoreId = self.eventStore.persistentStoreIdentifier;
 
-        CDERevisionManager *revisionManager = [[CDERevisionManager alloc] initWithEventStore:eventStore];
+        CDERevisionManager *revisionManager = [[CDERevisionManager alloc] initWithEventStore:self->eventStore];
         revisionManager.managedObjectModelURL = self.ensemble.managedObjectModelURL;
         CDEGlobalCount globalCountBeforeMakingEvent = [revisionManager maximumGlobalCount];
 
-        event = [NSEntityDescription insertNewObjectForEntityForName:@"CDEStoreModificationEvent" inManagedObjectContext:eventManagedObjectContext];
+        self->event = [NSEntityDescription insertNewObjectForEntityForName:@"CDEStoreModificationEvent" inManagedObjectContext:self->eventManagedObjectContext];
         
-        event.type = CDEStoreModificationEventTypeIncomplete;
-        event.timestamp = [NSDate timeIntervalSinceReferenceDate];
-        event.globalCount = globalCountBeforeMakingEvent+1;
-        event.modelVersion = [self.ensemble.managedObjectModel cde_entityHashesPropertyList];
-        if (uniqueIdOrNil) event.uniqueIdentifier = uniqueIdOrNil;
+        self->event.type = CDEStoreModificationEventTypeIncomplete;
+        self->event.timestamp = [NSDate timeIntervalSinceReferenceDate];
+        self->event.globalCount = globalCountBeforeMakingEvent+1;
+        self->event.modelVersion = [self.ensemble.managedObjectModel cde_entityHashesPropertyList];
+        if (uniqueIdOrNil) self->event.uniqueIdentifier = uniqueIdOrNil;
         
-        CDEEventRevision *revision = [NSEntityDescription insertNewObjectForEntityForName:@"CDEEventRevision" inManagedObjectContext:eventManagedObjectContext];
+        CDEEventRevision *revision = [NSEntityDescription insertNewObjectForEntityForName:@"CDEEventRevision" inManagedObjectContext:self->eventManagedObjectContext];
         revision.persistentStoreIdentifier = persistentStoreId;
         revision.revisionNumber = lastRevision+1;
-        revision.storeModificationEvent = event;
+        revision.storeModificationEvent = self->event;
         
         // Set the state of other stores
-        if (eventType == CDEStoreModificationEventTypeSave) {
+        if (self->eventType == CDEStoreModificationEventTypeSave) {
             CDERevisionSet *newRevisionSet = [revisionManager revisionSetForLastMergeOrBaseline];
             [newRevisionSet removeRevisionForPersistentStoreIdentifier:persistentStoreId];
-            event.revisionSetOfOtherStoresAtCreation = newRevisionSet;
+            self->event.revisionSetOfOtherStoresAtCreation = newRevisionSet;
         }
-        else if (eventType == CDEStoreModificationEventTypeMerge) {
+        else if (self->eventType == CDEStoreModificationEventTypeMerge) {
             CDERevisionSet *mostRecentSet = [revisionManager revisionSetOfMostRecentEvents];
             [mostRecentSet removeRevisionForPersistentStoreIdentifier:persistentStoreId];
-            event.revisionSetOfOtherStoresAtCreation = mostRecentSet;
+            self->event.revisionSetOfOtherStoresAtCreation = mostRecentSet;
         }
         
-        [eventManagedObjectContext processPendingChanges];
-        if (persistentStoreId) returnRevision = [event.revisionSet revisionForPersistentStoreIdentifier:persistentStoreId];
+        [self->eventManagedObjectContext processPendingChanges];
+        if (persistentStoreId) returnRevision = [self->event.revisionSet revisionForPersistentStoreIdentifier:persistentStoreId];
     }];
     
     return returnRevision;
@@ -96,7 +96,7 @@
 - (void)finalizeNewEvent
 {
     [eventManagedObjectContext performBlockAndWait:^{
-        event.type = eventType;
+        self->event.type = self->eventType;
     }];
 }
 
@@ -191,7 +191,7 @@
         // Retrieve existing global identifiers
         NSArray *existingGlobalIdentifiers = nil;
         if (globalIdStrings) {
-            existingGlobalIdentifiers = [CDEGlobalIdentifier fetchGlobalIdentifiersForIdentifierStrings:globalIdStrings withEntityNames:entityNames inManagedObjectContext:eventManagedObjectContext];
+            existingGlobalIdentifiers = [CDEGlobalIdentifier fetchGlobalIdentifiersForIdentifierStrings:globalIdStrings withEntityNames:entityNames inManagedObjectContext:self->eventManagedObjectContext];
         }
         
         NSMutableArray *globalIds = [[NSMutableArray alloc] init];
@@ -204,7 +204,7 @@
             
             CDEGlobalIdentifier *newGlobalId = existingGlobalIdentifier;
             if (!newGlobalId) {
-                newGlobalId = [NSEntityDescription insertNewObjectForEntityForName:@"CDEGlobalIdentifier" inManagedObjectContext:eventManagedObjectContext];
+                newGlobalId = [NSEntityDescription insertNewObjectForEntityForName:@"CDEGlobalIdentifier" inManagedObjectContext:self->eventManagedObjectContext];
                 newGlobalId.nameOfEntity = entityName;
                 if (globalIdString) newGlobalId.globalIdentifier = globalIdString;
             }
@@ -218,7 +218,7 @@
         returnArray = globalIds;
         
         NSError *error;
-        if (![eventManagedObjectContext save:&error]) CDELog(CDELoggingLevelError, @"Error saving event store: %@", error);
+        if (![self->eventManagedObjectContext save:&error]) CDELog(CDELoggingLevelError, @"Error saving event store: %@", error);
     }];
     return returnArray;
 }
@@ -255,7 +255,7 @@
 {
     [eventManagedObjectContext performBlockAndWait:^{
         NSArray *orderedObjectIDs = changesData[@"orderedObjectIDs"];
-        NSArray *globalIds = [CDEGlobalIdentifier fetchGlobalIdentifiersForObjectIDs:orderedObjectIDs inManagedObjectContext:eventManagedObjectContext];
+        NSArray *globalIds = [CDEGlobalIdentifier fetchGlobalIdentifiersForObjectIDs:orderedObjectIDs inManagedObjectContext:self->eventManagedObjectContext];
         [globalIds enumerateObjectsUsingBlock:^(CDEGlobalIdentifier *globalId, NSUInteger i, BOOL *stop) {
             NSManagedObjectID *objectID = orderedObjectIDs[i];
             
@@ -264,7 +264,7 @@
                 return;
             }
             
-            CDEObjectChange *change = [NSEntityDescription insertNewObjectForEntityForName:@"CDEObjectChange" inManagedObjectContext:eventManagedObjectContext];
+            CDEObjectChange *change = [NSEntityDescription insertNewObjectForEntityForName:@"CDEObjectChange" inManagedObjectContext:self->eventManagedObjectContext];
             change.storeModificationEvent = self.event;
             change.type = CDEObjectChangeTypeDelete;
             change.nameOfEntity = objectID.entity.name;
@@ -331,7 +331,7 @@
         
         [(id)coordinator lock];
         
-        NSArray *globalIds = [CDEGlobalIdentifier fetchGlobalIdentifiersForObjectIDs:objectIDs inManagedObjectContext:eventManagedObjectContext];
+        NSArray *globalIds = [CDEGlobalIdentifier fetchGlobalIdentifiersForObjectIDs:objectIDs inManagedObjectContext:self->eventManagedObjectContext];
         [globalIds cde_enumerateObjectsDrainingEveryIterations:50 usingBlock:^(CDEGlobalIdentifier *globalId, NSUInteger index, BOOL *stop) {
             if ((id)globalId == [NSNull null]) {
                 CDELog(CDELoggingLevelWarning, @"Tried to store updates for object with no global identifier. Skipping.");

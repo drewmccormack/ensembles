@@ -229,7 +229,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
     dispatch_async(dispatch_get_main_queue(), ^{
         [self checkCloudFileSystemIdentityWithCompletion:^(NSError *error) {
             if (!error) {
-                observingIdentityToken = YES;
+                self->observingIdentityToken = YES;
                 [(id)self.cloudFileSystem addObserver:self forKeyPath:@"identityToken" options:0 context:(__bridge void *)kCDEIdentityTokenContext];
             }
         }];
@@ -268,7 +268,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
                 
                 NSError *error;
                 if ([context save:&error]) {
-                    [eventStore deregisterIncompleteEventIdentifier:eventId];
+                    [self->eventStore deregisterIncompleteEventIdentifier:eventId];
                 }
                 else {
                     CDELog(CDELoggingLevelError, @"Could not save after deleting incomplete event: %@", error);
@@ -359,7 +359,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
     
     CDEAsynchronousTaskBlock importTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         // Listen for save notifications, and fail if a save to the store happens during the import
-        saveOccurredDuringImport = NO;
+        self->saveOccurredDuringImport = NO;
         [self beginObservingSaveNotifications];
         
         // Inform delegate of import
@@ -384,8 +384,8 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
             }
             
             // Reset the event store
-            [eventStore.managedObjectContext performBlockAndWait:^{
-                [eventStore.managedObjectContext reset];
+            [self->eventStore.managedObjectContext performBlockAndWait:^{
+                [self->eventStore.managedObjectContext reset];
             }];
             
             next(error, NO);
@@ -418,11 +418,11 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
     CDEAsynchronousTaskBlock completeLeechTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         // Reset the event store
         [self.eventStore.managedObjectContext performBlockAndWait:^{
-            [eventStore.managedObjectContext reset];
+            [self->eventStore.managedObjectContext reset];
         }];
         
         // Deleech if a save occurred during import
-        if (saveOccurredDuringImport) {
+        if (self->saveOccurredDuringImport) {
             NSError *error = nil;
             error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeSaveOccurredDuringLeeching userInfo:nil];
             [self forceDeleechDueToError:error];
@@ -462,14 +462,14 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
     
     CDEAsynchronousTaskBlock deleechTask = ^(CDEAsynchronousTaskCallbackBlock next) {
         if (!self.isLeeched) {
-            [eventStore removeEventStore];
+            [self->eventStore removeEventStore];
             NSError *error = [[NSError alloc] initWithDomain:CDEErrorDomain code:CDEErrorCodeDisallowedStateChange userInfo:nil];
             next(error, NO);
             return;
         }
         
-        BOOL removedStore = [eventStore removeEventStore];
-        self.leeched = eventStore.containsEventData;
+        BOOL removedStore = [self->eventStore removeEventStore];
+        self.leeched = self->eventStore.containsEventData;
         
         NSError *error = nil;
         if (!removedStore) error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeUnknown userInfo:nil];
@@ -584,7 +584,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
         }
         
         NSFileManager *fileManager = [[NSFileManager alloc] init];
-        if (![fileManager fileExistsAtPath:storeURL.path]) {
+        if (![fileManager fileExistsAtPath:self->storeURL.path]) {
             NSError *error = [NSError errorWithDomain:CDEErrorDomain code:CDEErrorCodeMissingStore userInfo:nil];
             next(error, NO);
             return;
@@ -599,8 +599,8 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
     [tasks addObject:setupTask];
     
     CDEAsynchronousTaskBlock repairTask = ^(CDEAsynchronousTaskCallbackBlock next) {
-        if ([cloudFileSystem respondsToSelector:@selector(repairEnsembleDirectory:completion:)]) {
-            [cloudFileSystem repairEnsembleDirectory:self.cloudManager.remoteEnsembleDirectory completion:^(NSError *error) {
+        if ([self->cloudFileSystem respondsToSelector:@selector(repairEnsembleDirectory:completion:)]) {
+            [self->cloudFileSystem repairEnsembleDirectory:self.cloudManager.remoteEnsembleDirectory completion:^(NSError *error) {
                 next(error, NO);
             }];
         }
@@ -625,7 +625,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
     [tasks addObject:checkRegistrationTask];
     
     CDEAsynchronousTaskBlock processChangesTask = ^(CDEAsynchronousTaskCallbackBlock next) {
-        [eventStore flushWithCompletion:^(NSError *error) {
+        [self->eventStore flushWithCompletion:^(NSError *error) {
             next(error, NO);
         }];
     };
@@ -774,7 +774,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
     }
     
     [operationQueue addOperationWithBlock:^{
-        [eventStore flushWithCompletion:^(NSError *error) {
+        [self->eventStore flushWithCompletion:^(NSError *error) {
             [self dispatchCompletion:completion withError:error];
         }];
     }];

@@ -237,7 +237,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 {
     __block CDERevisionNumber revisionNumber = -1;
     [managedObjectContext performBlockAndWait:^{
-        CDEStoreModificationEvent *event = [CDEStoreModificationEvent fetchMostRecentBaselineStoreModificationEventInManagedObjectContext:managedObjectContext];
+        CDEStoreModificationEvent *event = [CDEStoreModificationEvent fetchMostRecentBaselineStoreModificationEventInManagedObjectContext:self->managedObjectContext];
         CDERevision *revision = [event.revisionSet revisionForPersistentStoreIdentifier:self.persistentStoreIdentifier];
         if (revision) revisionNumber = revision.revisionNumber;
     }];
@@ -251,7 +251,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 {
     __block NSString *result = nil;
     [managedObjectContext performBlockAndWait:^{
-        CDEStoreModificationEvent *event = [CDEStoreModificationEvent fetchMostRecentBaselineStoreModificationEventInManagedObjectContext:managedObjectContext];
+        CDEStoreModificationEvent *event = [CDEStoreModificationEvent fetchMostRecentBaselineStoreModificationEventInManagedObjectContext:self->managedObjectContext];
         result = event.uniqueIdentifier;
     }];
     return result;
@@ -388,7 +388,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
     [self saveStoreMetadata];
     [self.managedObjectContext performBlock:^{
         NSError *error = nil;
-        success = [managedObjectContext save:&error];
+        success = [self->managedObjectContext save:&error];
         dispatch_async(dispatch_get_main_queue(), ^{
             if (completion) completion(success ? nil : error);
         });
@@ -435,7 +435,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [managedObjectContext performBlockAndWait:^{
         self.persistentStoreIdentifier = nil;
-        incompleteEventIdentifiers = nil;
+        self->incompleteEventIdentifiers = nil;
         [self tearDownCoreDataStack];
     }];
 }
@@ -554,9 +554,9 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
     
     managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
     [managedObjectContext performBlockAndWait:^{
-        managedObjectContext.persistentStoreCoordinator = coordinator;
-        managedObjectContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
-        managedObjectContext.undoManager = nil;
+        self->managedObjectContext.persistentStoreCoordinator = coordinator;
+        self->managedObjectContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
+        self->managedObjectContext.undoManager = nil;
     }];
     
     BOOL success = managedObjectContext != nil;
@@ -568,7 +568,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:NSManagedObjectContextDidSaveNotification object:nil];
     [managedObjectContext performBlockAndWait:^{
-        [managedObjectContext reset];
+        [self->managedObjectContext reset];
     }];
     managedObjectContext = nil;
 }

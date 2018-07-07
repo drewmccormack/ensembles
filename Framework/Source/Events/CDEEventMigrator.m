@@ -45,7 +45,7 @@ static NSString *kCDEDefaultStoreType;
     [eventStore.managedObjectContext performBlock:^{
         NSError *error = nil;
         CDEStoreModificationEvent *event = nil;
-        event = [CDEStoreModificationEvent fetchStoreModificationEventWithAllowedTypes:types persistentStoreIdentifier:eventStore.persistentStoreIdentifier revisionNumber:revisionNumber inManagedObjectContext:eventStore.managedObjectContext];
+        event = [CDEStoreModificationEvent fetchStoreModificationEventWithAllowedTypes:types persistentStoreIdentifier:self->eventStore.persistentStoreIdentifier revisionNumber:revisionNumber inManagedObjectContext:self->eventStore.managedObjectContext];
         if (event) {
             [self migrateStoreModificationEvents:@[event] toFile:path completion:completion];
         }
@@ -64,7 +64,7 @@ static NSString *kCDEDefaultStoreType;
     [eventStore.managedObjectContext performBlock:^{
         NSError *error = nil;
         CDEStoreModificationEvent *baseline = nil;
-        baseline = [CDEStoreModificationEvent fetchStoreModificationEventWithUniqueIdentifier:uniqueId globalCount:count persistentStorePrefix:storePrefix inManagedObjectContext:eventStore.managedObjectContext];
+        baseline = [CDEStoreModificationEvent fetchStoreModificationEventWithUniqueIdentifier:uniqueId globalCount:count persistentStorePrefix:storePrefix inManagedObjectContext:self->eventStore.managedObjectContext];
         if (baseline) {
             NSAssert(baseline.type == CDEStoreModificationEventTypeBaseline, @"Wrong event type for baseline");
             [self migrateStoreModificationEvents:@[baseline] toFile:path completion:completion];
@@ -142,7 +142,7 @@ static NSString *kCDEDefaultStoreType;
     
     [self.eventStore.managedObjectContext performBlock:^{
         NSManagedObjectContext *importContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
-        NSPersistentStoreCoordinator *mainCoordinator = eventStore.managedObjectContext.persistentStoreCoordinator;
+        NSPersistentStoreCoordinator *mainCoordinator = self->eventStore.managedObjectContext.persistentStoreCoordinator;
         NSPersistentStoreCoordinator *persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:mainCoordinator.managedObjectModel];
         importContext.persistentStoreCoordinator = persistentStoreCoordinator;
         importContext.undoManager = nil;
