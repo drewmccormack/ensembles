@@ -135,7 +135,7 @@ NSString *const kDiscoveryInfoUniqueIdentifer = @"DiscoveryInfoUniqueIdentifer";
 - (BOOL)sendData:(NSData *)data toPeerWithID:(id<NSObject,NSCopying,NSCoding>)peerID
 {
     NSError *error = nil;
-    BOOL success = [peerSession sendData:data toPeers:@[peerID] withMode:MCSessionSendDataReliable error:&error];
+    BOOL success = [peerSession sendData:data toPeers:@[(id)peerID] withMode:MCSessionSendDataReliable error:&error];
     if (!success) CDELog(CDELoggingLevelError, @"Failed to send data to peer: %@", error);
     return success;
 }
