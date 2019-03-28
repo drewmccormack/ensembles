@@ -1,10 +1,10 @@
 Release Notes
 =============
 
-1.7.2
+1.8
 ---
-- Updated SSZipArchive version
-- Fixed a bug where the ensemble identifier was not set properly in baseline consolidation
+- Some fixes in multipeer file system
+- Cleaned up a lot of warnings in latest Xcode
 
 1.7.1
 ---
