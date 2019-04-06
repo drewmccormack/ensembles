@@ -7,7 +7,12 @@
 //
 
 #import "CDEMultipeerCloudFileSystem.h"
+
+#ifdef COCOAPODS
+#import "ZipArchive.h"
+#else
 #import <ZipArchive/ZipArchive.h>
+#endif
 
 typedef NS_ENUM (NSInteger, CDEMultipeerMessageType) {
 	CDEMultipeerMessageTypeFileRetrievalRequest = 1,
