@@ -18,7 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CDEPersistentStoreEnsembl
     
     // MARK: App Delegate Methods
     
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Use verbose logging for sync
         CDESetCurrentLoggingLevel(CDELoggingLevel.verbose.rawValue)
         
@@ -64,11 +64,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CDEPersistentStoreEnsembl
     
     // MARK: Notification Handlers
     
-    func localSaveOccurred(_ notif: Notification) {
+    @objc func localSaveOccurred(_ notif: Notification) {
         self.sync(nil)
     }
     
-    func cloudDataDidDownload(_ notif: Notification) {
+    @objc func cloudDataDidDownload(_ notif: Notification) {
         self.sync(nil)
     }
     
@@ -106,7 +106,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CDEPersistentStoreEnsembl
     var cloudFileSystem: CDECloudFileSystem!
     var ensemble: CDEPersistentStoreEnsemble!
     
-    func sync(_ completion: ((Void) -> Void)?) {
+    func sync(_ completion: (() -> Void)?) {
         let viewController = self.window?.rootViewController as! ViewController
         viewController.activityIndicator?.startAnimating()
         if !ensemble.isLeeched {
