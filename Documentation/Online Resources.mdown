@@ -24,7 +24,7 @@
 * [On Vesper Sync](http://mentalfaculty.tumblr.com/post/66955072014/on-vesper-sync) by Drew McCormack
 
 ### Third-Party Developers on Ensembles
-* [Sync Ensemble](http://nimbleworks.co.uk/blog/sync-ensemble) by Nimbleworks
+* [Sync Ensemble](https://web.archive.org/web/20140316044213/http://nimbleworks.co.uk/blog/sync-ensemble) by Nimbleworks
 * [MealPlan Sync with Ensembles](http://blog.stevex.net/2014/03/mealplan-sync-with-ensembles/) by Steve Tibbett
 
 ### Articles Related to Sync
