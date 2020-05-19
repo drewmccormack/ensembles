@@ -34,9 +34,9 @@
 		07571F4D1910F738008479A9 /* libensembles.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 077F113F17F709ED0093A212 /* libensembles.a */; };
 		077231DE18C5FCDA0065BFEE /* IDMNodeSyncSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 077231DD18C5FCDA0065BFEE /* IDMNodeSyncSettingsViewController.m */; };
 		077231E018C604610065BFEE /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 077231DF18C604610065BFEE /* Security.framework */; };
-		077231E218C6080D0065BFEE /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 077231E118C6080D0065BFEE /* MobileCoreServices.framework */; };
 		07746AAF18C6276F00A267F5 /* IDMSyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 07746AAE18C6276F00A267F5 /* IDMSyncManager.m */; };
 		07973EF9183BE32C007F48CA /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07973EF8183BE32C007F48CA /* CoreData.framework */; };
+		07C99096247405FD00B44BB2 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07C99095247405FD00B44BB2 /* CoreServices.framework */; };
 		07D0601F1FACD9BB003783D3 /* ZipArchive.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07D060141FACD985003783D3 /* ZipArchive.framework */; };
 		07D060201FACD9BB003783D3 /* ZipArchive.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 07D060141FACD985003783D3 /* ZipArchive.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		07D9F0051910FD7600D191FA /* Ensembles.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 07571F411910F2BE008479A9 /* Ensembles.bundle */; };
@@ -235,6 +235,7 @@
 		07973EF8183BE32C007F48CA /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		07BF372E17F17D4100C56F64 /* Idiomatic.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Idiomatic.entitlements; sourceTree = "<group>"; };
 		07BF37D417F189EB00C56F64 /* libensembles_ios.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libensembles_ios.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		07C99095247405FD00B44BB2 /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
 		07D0600C1FACD985003783D3 /* ZipArchive.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ZipArchive.xcodeproj; path = ../../Vendor/SSZipArchive/ZipArchive.xcodeproj; sourceTree = "<group>"; };
 		0BA4D0F119572DED00FA29F9 /* CDEMultipeerCloudFileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CDEMultipeerCloudFileSystem.h; path = ../../Framework/Extensions/CDEMultipeerCloudFileSystem.h; sourceTree = "<group>"; };
 		0BA4D0F219572DED00FA29F9 /* CDEMultipeerCloudFileSystem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CDEMultipeerCloudFileSystem.m; path = ../../Framework/Extensions/CDEMultipeerCloudFileSystem.m; sourceTree = "<group>"; };
@@ -268,9 +269,9 @@
 			files = (
 				07D0601F1FACD9BB003783D3 /* ZipArchive.framework in Frameworks */,
 				07571F4D1910F738008479A9 /* libensembles.a in Frameworks */,
-				077231E218C6080D0065BFEE /* MobileCoreServices.framework in Frameworks */,
 				077231E018C604610065BFEE /* Security.framework in Frameworks */,
 				07973EF9183BE32C007F48CA /* CoreData.framework in Frameworks */,
+				07C99096247405FD00B44BB2 /* CoreServices.framework in Frameworks */,
 				074B959E17EC783B0016F84D /* CoreGraphics.framework in Frameworks */,
 				074B95A017EC783B0016F84D /* UIKit.framework in Frameworks */,
 				073658B51EDD521A001C26F4 /* ObjectiveDropboxOfficial.framework in Frameworks */,
@@ -347,6 +348,7 @@
 		074B959A17EC783B0016F84D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				07C99095247405FD00B44BB2 /* CoreServices.framework */,
 				077231E118C6080D0065BFEE /* MobileCoreServices.framework */,
 				077231DF18C604610065BFEE /* Security.framework */,
 				07973EF8183BE32C007F48CA /* CoreData.framework */,
@@ -518,7 +520,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = IDM;
-				LastUpgradeCheck = 0940;
+				LastUpgradeCheck = 1140;
 				ORGANIZATIONNAME = "The Mental Faculty B.V.";
 				TargetAttributes = {
 					074B959717EC783B0016F84D = {
@@ -544,7 +546,7 @@
 			};
 			buildConfigurationList = 074B959317EC783B0016F84D /* Build configuration list for PBXProject "Idiomatic" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
@@ -800,6 +802,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -859,6 +862,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -960,6 +964,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
@@ -995,6 +1000,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",

@@ -711,7 +711,9 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
+				Base,
 			);
 			mainGroup = 07E492DD17172CB200FE81B5;
 			productRefGroup = 07E492E717172CB200FE81B5 /* Products */;
