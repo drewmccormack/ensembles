@@ -1,12 +1,12 @@
 Pod::Spec.new do |s|
 
   s.name         = "Ensembles"
-  s.version      = "1.8"
+  s.version      = "1.9"
   s.summary      = "A peer-to-peer synchronization framework for Core Data."
 
   s.description  =  <<-DESC
                     Ensembles extends Apple's Core Data framework to add 
-                    peer-to-peer synchronization for Mac OS and iOS. 
+                    synchronization for Mac OS and iOS. 
                     Multiple SQLite persistent stores can be coupled together 
                     via a file synchronization platform like iCloud or Dropbox. 
                     The framework can be readily extended to support any 
