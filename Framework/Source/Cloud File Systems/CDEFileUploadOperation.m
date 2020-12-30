@@ -47,7 +47,10 @@
 
 - (void)beginAsynchronousTask
 {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated"
     connection = [[NSURLConnection alloc] initWithRequest:mutableRequest delegate:self startImmediately:YES];
+#pragma clang diagnostic pop
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response

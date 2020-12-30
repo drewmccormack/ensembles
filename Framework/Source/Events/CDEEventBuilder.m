@@ -150,7 +150,10 @@
     };
     
     // Execute the block on the context's thread
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated"
     if (context.concurrencyType != NSConfinementConcurrencyType)
+#pragma clang diagnostic pop
         [context performBlockAndWait:block];
     else
         block();
@@ -243,7 +246,10 @@
     };
     
     // Execute the block on the context's thread
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated"
     if (context.concurrencyType != NSConfinementConcurrencyType)
+#pragma clang diagnostic pop
         [context performBlockAndWait:block];
     else
         block();
@@ -314,7 +320,10 @@
         objectIDs = newObjectIDs;
     };
     
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated"
     if (context.concurrencyType != NSConfinementConcurrencyType)
+#pragma clang diagnostic pop
         [context performBlockAndWait:block];
     else
         block();

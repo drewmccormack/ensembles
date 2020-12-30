@@ -99,7 +99,10 @@ static NSString *kCDEDefaultStoreType;
 {
     CDELog(CDELoggingLevelVerbose, @"Migrating event store events to file");
     
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated"
     NSManagedObjectContext *exportContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
+#pragma clang diagnostic pop
     NSPersistentStoreCoordinator *mainCoordinator = eventStore.managedObjectContext.persistentStoreCoordinator;
     NSPersistentStoreCoordinator *persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:mainCoordinator.managedObjectModel];
     exportContext.persistentStoreCoordinator = persistentStoreCoordinator;
@@ -141,7 +144,10 @@ static NSString *kCDEDefaultStoreType;
     CDELog(CDELoggingLevelVerbose, @"Migrating file events to event store from paths: %@", paths);
     
     [self.eventStore.managedObjectContext performBlock:^{
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated"
         NSManagedObjectContext *importContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSConfinementConcurrencyType];
+#pragma clang diagnostic pop
         NSPersistentStoreCoordinator *mainCoordinator = self->eventStore.managedObjectContext.persistentStoreCoordinator;
         NSPersistentStoreCoordinator *persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:mainCoordinator.managedObjectModel];
         importContext.persistentStoreCoordinator = persistentStoreCoordinator;
@@ -154,7 +160,10 @@ static NSString *kCDEDefaultStoreType;
                 @autoreleasepool {
                     NSURL *fileURL = [NSURL fileURLWithPath:path];
                     
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated"
                     NSDictionary *metadata = [NSPersistentStoreCoordinator metadataForPersistentStoreOfType:nil URL:fileURL error:&error];
+#pragma clang diagnostic pop
                     NSString *storeType = metadata[NSStoreTypeKey];
                     if (!storeType) @throw [[NSException alloc] initWithName:CDEException reason:@"" userInfo:nil];
                   

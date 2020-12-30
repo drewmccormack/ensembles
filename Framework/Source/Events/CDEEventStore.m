@@ -105,7 +105,10 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 {
     NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
     if (self.persistentStoreIdentifier) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated"
         NSData *identityData = [NSKeyedArchiver archivedDataWithRootObject:self.cloudFileSystemIdentityToken];
+#pragma clang diagnostic pop
         [dictionary addEntriesFromDictionary:@{
            kCDEPersistentStoreIdentifierKey : self.persistentStoreIdentifier,
            kCDECloudFileSystemIdentityKey : identityData,
@@ -125,10 +128,16 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
 - (void)restoreStoreMetadata
 {
     NSString *path = self.pathToStoreInfoFile;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated"
     NSDictionary *storeMetadata = [NSDictionary dictionaryWithContentsOfFile:path];
+#pragma clang diagnostic pop
     if (storeMetadata) {
         NSData *identityData = storeMetadata[kCDECloudFileSystemIdentityKey];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated"
         cloudFileSystemIdentityToken = identityData ? [NSKeyedUnarchiver unarchiveObjectWithData:identityData] : nil;
+#pragma clang diagnostic pop
         persistentStoreIdentifier = storeMetadata[kCDEPersistentStoreIdentifierKey];
         incompleteEventIdentifiers = [storeMetadata[kCDEIncompleteEventIdentifiersKey] mutableCopy];
         identifierOfBaselineUsedToConstructStore = storeMetadata[kCDEIdentifierOfBaselineUsedToConstructStore];
