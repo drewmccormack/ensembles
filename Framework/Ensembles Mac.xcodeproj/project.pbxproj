@@ -127,6 +127,7 @@
 		6DAD116918CA074600237084 /* CDERebaser.h in Headers */ = {isa = PBXBuildFile; fileRef = 07E64F5A18799F6800305C22 /* CDERebaser.h */; };
 		6DAD116A18CA074600237084 /* CDERebaser.m in Sources */ = {isa = PBXBuildFile; fileRef = 07E64F5B18799F6800305C22 /* CDERebaser.m */; };
 		6DAD116E18CA07B600237084 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6DAD116C18CA07B600237084 /* InfoPlist.strings */; };
+		E07E32FC25A94A4500FB04A8 /* CDEPropertyChangeValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = E07E32FB25A94A4500FB04A8 /* CDEPropertyChangeValueTransformer.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -278,6 +279,8 @@
 		6DAD110F18CA067A00237084 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		6DAD116B18CA07B000237084 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = "Supporting Files/Info.plist"; sourceTree = SOURCE_ROOT; };
 		6DAD116D18CA07B600237084 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "Supporting Files/en.lproj/InfoPlist.strings"; sourceTree = SOURCE_ROOT; };
+		E07E32FA25A94A4500FB04A8 /* CDEPropertyChangeValueTransformer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CDEPropertyChangeValueTransformer.h; path = ../Events/CDEPropertyChangeValueTransformer.h; sourceTree = "<group>"; };
+		E07E32FB25A94A4500FB04A8 /* CDEPropertyChangeValueTransformer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CDEPropertyChangeValueTransformer.m; path = ../Events/CDEPropertyChangeValueTransformer.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -532,6 +535,8 @@
 				07BF7A1A177F0A9D0029D500 /* CDEObjectChange.m */,
 				07BF7A01177F0A9D0029D500 /* CDEPropertyChangeValue.h */,
 				07BF7A02177F0A9D0029D500 /* CDEPropertyChangeValue.m */,
+				E07E32FA25A94A4500FB04A8 /* CDEPropertyChangeValueTransformer.h */,
+				E07E32FB25A94A4500FB04A8 /* CDEPropertyChangeValueTransformer.m */,
 				07BF7A1D177F0A9D0029D500 /* CDEStoreModificationEvent.h */,
 				07BF7A1E177F0A9D0029D500 /* CDEStoreModificationEvent.m */,
 				07897FF618B25880001E8A23 /* CDEDataFile.h */,
@@ -816,6 +821,7 @@
 				6DAD116418CA074100237084 /* CDERevision.m in Sources */,
 				6DAD113018CA071700237084 /* CDEAsynchronousOperation.m in Sources */,
 				070C675D18F4162E00266A4E /* CDEEventFile.m in Sources */,
+				E07E32FC25A94A4500FB04A8 /* CDEPropertyChangeValueTransformer.m in Sources */,
 				6DAD115918CA073000237084 /* CDEDataFile.m in Sources */,
 				6DAD116618CA074100237084 /* CDERevisionSet.m in Sources */,
 				6DAD114718CA072A00237084 /* CDEEventIntegrator.m in Sources */,

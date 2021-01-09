@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="2" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="5064" systemVersion="13C1021" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17709" systemVersion="20C69" minimumToolsVersion="Xcode 4.3" sourceLanguage="Objective-C" userDefinedModelVersionIdentifier="2">
     <entity name="CDEDataFile" representedClassName="CDEDataFile" syncable="YES">
         <attribute name="filename" attributeType="String" syncable="YES"/>
         <relationship name="objectChange" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDEObjectChange" inverseName="dataFiles" inverseEntity="CDEObjectChange" syncable="YES"/>
     </entity>
     <entity name="CDEEventRevision" representedClassName="CDEEventRevision" syncable="YES">
         <attribute name="persistentStoreIdentifier" attributeType="String" indexed="YES" syncable="YES"/>
-        <attribute name="revisionNumber" attributeType="Integer 64" minValueString="0" defaultValueString="0" indexed="YES" syncable="YES"/>
+        <attribute name="revisionNumber" attributeType="Integer 64" minValueString="0" defaultValueString="0" usesScalarValueType="NO" indexed="YES" syncable="YES"/>
         <relationship name="storeModificationEvent" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDEStoreModificationEvent" inverseName="eventRevision" inverseEntity="CDEStoreModificationEvent" syncable="YES">
             <userInfo>
                 <entry key="excludeFromMigration" value="1"/>
@@ -40,8 +40,8 @@
     </entity>
     <entity name="CDEObjectChange" representedClassName="CDEObjectChange" syncable="YES">
         <attribute name="nameOfEntity" attributeType="String" indexed="YES" syncable="YES"/>
-        <attribute name="propertyChangeValues" optional="YES" attributeType="Transformable" syncable="YES"/>
-        <attribute name="type" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="propertyChangeValues" optional="YES" attributeType="Transformable" valueTransformerName="CDEPropertyChangeValueTransformer" syncable="YES"/>
+        <attribute name="type" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="NO" syncable="YES"/>
         <relationship name="dataFiles" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CDEDataFile" inverseName="objectChange" inverseEntity="CDEDataFile" syncable="YES"/>
         <relationship name="globalIdentifier" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="CDEGlobalIdentifier" inverseName="objectChanges" inverseEntity="CDEGlobalIdentifier" syncable="YES"/>
         <relationship name="storeModificationEvent" minCount="1" maxCount="1" deletionRule="Nullify" destinationEntity="CDEStoreModificationEvent" inverseName="objectChanges" inverseEntity="CDEStoreModificationEvent" syncable="YES"/>
@@ -53,10 +53,10 @@
         </compoundIndexes>
     </entity>
     <entity name="CDEStoreModificationEvent" representedClassName="CDEStoreModificationEvent" syncable="YES">
-        <attribute name="globalCount" attributeType="Integer 64" minValueString="0" defaultValueString="0" indexed="YES" syncable="YES"/>
+        <attribute name="globalCount" attributeType="Integer 64" minValueString="0" defaultValueString="0" usesScalarValueType="NO" indexed="YES" syncable="YES"/>
         <attribute name="modelVersion" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="timestamp" attributeType="Date" syncable="YES"/>
-        <attribute name="type" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="timestamp" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="type" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="NO" syncable="YES"/>
         <attribute name="uniqueIdentifier" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="eventRevision" minCount="1" maxCount="1" deletionRule="Cascade" destinationEntity="CDEEventRevision" inverseName="storeModificationEvent" inverseEntity="CDEEventRevision" syncable="YES"/>
         <relationship name="eventRevisionsOfOtherStores" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CDEEventRevision" inverseName="storeModificationEventForOtherStores" inverseEntity="CDEEventRevision" syncable="YES"/>
@@ -66,7 +66,7 @@
         <element name="CDEDataFile" positionX="144" positionY="-513" width="144" height="73"/>
         <element name="CDEEventRevision" positionX="88" positionY="-81" width="128" height="103"/>
         <element name="CDEGlobalIdentifier" positionX="396" positionY="-459" width="128" height="103"/>
-        <element name="CDEObjectChange" positionX="106" positionY="-324" width="128" height="133"/>
+        <element name="CDEObjectChange" positionX="106" positionY="-324" width="128" height="119"/>
         <element name="CDEStoreModificationEvent" positionX="-288" positionY="-315" width="198" height="163"/>
     </elements>
 </model>

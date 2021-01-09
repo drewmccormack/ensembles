@@ -13,7 +13,7 @@
 #import "CDERevision.h"
 #import "CDEGlobalIdentifier.h"
 #import "CDEDataFile.h"
-
+#import "CDEPropertyChangeValue.h"
 
 NSString * const kCDEPersistentStoreIdentifierKey = @"persistentStoreIdentifier";
 NSString * const kCDECloudFileSystemIdentityKey = @"cloudFileSystemIdentity";
@@ -60,6 +60,7 @@ static NSString *defaultPathToEventDataRootDirectory = nil;
         NSString *path = [appSupportDir stringByAppendingPathComponent:bundleIdentifier];
         path = [path stringByAppendingPathComponent:@"com.mentalfaculty.ensembles.eventdata"];
         [self setDefaultPathToEventDataRootDirectory:path];
+        [CDEPropertyChangeValue registerTransformer];
     }
 }
 

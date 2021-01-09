@@ -9,6 +9,7 @@
 #import "CDEPropertyChangeValue.h"
 #import "CDEDefines.h"
 #import "CDEEventStore.h"
+#import "CDEPropertyChangeValueTransformer.h"
 
 @interface CDEPropertyChangeValue ()
 
@@ -19,7 +20,19 @@
 @end
 
 
+Class secureTransformerClass = nil;
+
+
 @implementation CDEPropertyChangeValue
+
++ (void)registerTransformer {
+    NSString *name = @"CDEPropertyChangeValueTransformer";
+    if (NSClassFromString(@"NSSecureUnarchiveFromDataTransformer")) {
+        Class c = NSClassFromString(@"CDEPropertyChangeValueTransformer");
+        [NSValueTransformer setValueTransformer:[c new] forName:name];
+    }
+    secureTransformerClass = NSClassFromString(@"NSSecureUnarchiveFromDataTransformer");
+}
 
 + (NSArray *)propertyChangesForObject:(NSManagedObject *)object eventStore:(CDEEventStore *)newEventStore propertyNames:(id)names isPreSave:(BOOL)isPreSave storeValues:(BOOL)storeValues
 {
@@ -28,10 +41,9 @@
     
     for (NSString *propertyName in names) {
         NSPropertyDescription *propertyDesc = entity.propertiesByName[propertyName];
-        
-        if ([propertyDesc isKindOfClass:[NSFetchedPropertyDescription class]]) {
-            continue;
-        }
+        if (propertyDesc.isTransient) continue;
+//        if ([propertyDesc.userInfo[CDEIgnoredKey] boolValue]) continue;
+        if ([propertyDesc isKindOfClass:[NSFetchedPropertyDescription class]]) continue;
         
         CDEPropertyChangeValue *change = [[CDEPropertyChangeValue alloc] initWithObject:object propertyDescription:propertyDesc eventStore:newEventStore isPreSave:isPreSave storeValues:storeValues];
         [propertyChanges addObject:change];
@@ -70,6 +82,11 @@
     return self;
 }
 
+- (instancetype)init
+{
+    return [self initWithType:CDEPropertyChangeTypeAttribute propertyName:@""];
+}
+
 #pragma mark NSCoding
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder
@@ -102,7 +119,6 @@
     if (self.removedIdentifiers) [aCoder encodeObject:self.removedIdentifiers forKey:@"removedIdentifiers"];
     if (self.movedIdentifiersByIndex) [aCoder encodeObject:self.movedIdentifiersByIndex forKey:@"movedIdentifiersByIndex"];
 }
-
 
 #pragma mark Property Types
 
@@ -148,7 +164,13 @@
     // Get the new value
     id newValue;
     if (isPreSave) {
+        // Defaults won't be in the changedValues, so fall back to object values if needed
         newValue = object.changedValues[self.propertyName];
+        if (!newValue) {
+            [object willAccessValueForKey:self.propertyName];
+            newValue = [object primitiveValueForKey:self.propertyName];
+            [object didAccessValueForKey:self.propertyName];
+        }
     }
     else {
         NSDictionary *committedValues = [object committedValuesForKeys:@[self.propertyName]];
@@ -181,9 +203,24 @@
     NSAttributeDescription *attribute = (id)propertyDesc;
     if ([attribute valueTransformerName]) {
         NSValueTransformer *valueTransformer = [NSValueTransformer valueTransformerForName:attribute.valueTransformerName];
-        newValue = [valueTransformer transformedValue:newValue];
+        if (secureTransformerClass && [valueTransformer isKindOfClass:secureTransformerClass]) {
+            // It seems that if a secure transformer (or subclass) is used, the transform direction is reversed.
+            newValue = [valueTransformer reverseTransformedValue:newValue];
+        } else {
+            newValue = [valueTransformer transformedValue:newValue];
+        }
     }
-    
+    else if (attribute.attributeType == NSTransformableAttributeType) {
+        // Core Data warns that in a future update this will default to NSSecureUnarchiveFromData,
+        // instead of NSKeyedUnarchiveFromDataTransformerName. When that happens, this should
+        // conditionally create a NSSecureUnarchiveFromData transformer depending on the version of Core Data.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated"
+        NSValueTransformer *keyedTransformer = [NSValueTransformer valueTransformerForName:NSKeyedUnarchiveFromDataTransformerName];
+#pragma clang diagnostic pop
+        newValue = [keyedTransformer reverseTransformedValue:newValue];
+    }
+        
     // Put data bigger than 10KB or so in an external file
     if ([newValue isKindOfClass:[NSData class]] && [(NSData *)newValue length] > 10e3) {
         NSAssert(self.eventStore, @"Storing large data attribute requires event store");
@@ -209,37 +246,35 @@
 
 - (void)storeToManyRelationshipChangeForDescription:(NSPropertyDescription *)propertyDesc newValue:(NSSet *)newValue
 {
-    if (newValue) {
-        NSSet *originalObjectIDs = self.relatedObjectIDs;
-        
-        NSError *error;
-        NSSet *newRelatedObjects = newValue;
-        NSManagedObjectContext *context = [newRelatedObjects.anyObject managedObjectContext];
-        if (context && ![context obtainPermanentIDsForObjects:newRelatedObjects.allObjects error:&error]) {
-            CDELog(CDELoggingLevelError, @"Failed to get permanent ids: %@", error);
-        }
-        NSSet *newRelatedObjectIDs = [newValue valueForKeyPath:@"objectID"];
-        
-        NSSet *addedObjectIDs, *removedObjectIDs;
-        if (originalObjectIDs) {
-            // Determine the added and removed by comparing with original values
-            NSMutableSet *mutableAdded = [newRelatedObjectIDs mutableCopy];
-            [mutableAdded minusSet:originalObjectIDs];
-            addedObjectIDs = mutableAdded;
-            
-            NSMutableSet *mutableRemoved = [originalObjectIDs mutableCopy];
-            [mutableRemoved minusSet:newRelatedObjectIDs];
-            removedObjectIDs = mutableRemoved;
-        }
-        else {
-            addedObjectIDs = newRelatedObjectIDs;
-            removedObjectIDs = [NSSet set];
-        }
-        
-        self.addedIdentifiers = addedObjectIDs;
-        self.removedIdentifiers = removedObjectIDs;
-        self.movedIdentifiersByIndex = nil;
+    NSSet *originalObjectIDs = self.relatedObjectIDs;
+    
+    NSError *error;
+    NSSet *newRelatedObjects = newValue;
+    NSManagedObjectContext *context = [newRelatedObjects.anyObject managedObjectContext];
+    if (context && ![context obtainPermanentIDsForObjects:newRelatedObjects.allObjects error:&error]) {
+        CDELog(CDELoggingLevelError, @"Failed to get permanent ids: %@", error);
     }
+    NSSet *newRelatedObjectIDs = [newValue valueForKeyPath:@"objectID"];
+    
+    NSSet *addedObjectIDs, *removedObjectIDs;
+    if (originalObjectIDs) {
+        // Determine the added and removed by comparing with original values
+        NSMutableSet *mutableAdded = [newRelatedObjectIDs mutableCopy];
+        [mutableAdded minusSet:originalObjectIDs];
+        addedObjectIDs = mutableAdded;
+        
+        NSMutableSet *mutableRemoved = [originalObjectIDs mutableCopy];
+        [mutableRemoved minusSet:newRelatedObjectIDs];
+        removedObjectIDs = mutableRemoved;
+    }
+    else {
+        addedObjectIDs = newRelatedObjectIDs;
+        removedObjectIDs = [NSSet set];
+    }
+    
+    self.addedIdentifiers = addedObjectIDs;
+    self.removedIdentifiers = removedObjectIDs;
+    self.movedIdentifiersByIndex = nil;
 }
 
 - (void)storeOrderedToManyRelationshipChangeForDescription:(NSRelationshipDescription *)propertyDesc newValue:(NSOrderedSet *)newValue
@@ -289,7 +324,45 @@
             returnValue = nil;
         }
         else {
-            returnValue = [valueTransformer reverseTransformedValue:returnValue];
+            if (secureTransformerClass && [valueTransformer isKindOfClass:secureTransformerClass]) {
+                // Seems the transform logic is reversed for secure transformers
+                returnValue = [valueTransformer transformedValue:returnValue];
+            }
+            else {
+                returnValue = [valueTransformer reverseTransformedValue:returnValue];
+            }
+        }
+    }
+    else if (attribute.attributeType == NSTransformableAttributeType && [returnValue isKindOfClass:[NSData class]]) {
+        // Try first with legacy insecure transformer
+        BOOL legacyTransformerFailed = NO;
+        @try {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated"
+            NSValueTransformer *keyedTransformer = [NSValueTransformer valueTransformerForName:NSKeyedUnarchiveFromDataTransformerName];
+#pragma clang diagnostic pop
+            returnValue = [keyedTransformer transformedValue:returnValue];
+        }
+        @catch ( NSException *exception ) {
+            legacyTransformerFailed = YES;
+            returnValue = nil;
+        }
+        
+        // If the legacy transformer failed, try with the new secure transformer
+        if (legacyTransformerFailed) {
+            if (secureTransformerClass) {
+                @try {
+                    NSValueTransformer *keyedTransformer = [NSValueTransformer valueTransformerForName:NSStringFromClass(secureTransformerClass)];
+                    returnValue = [keyedTransformer transformedValue:returnValue];
+                }
+                @catch ( NSException *exception ) {
+                    CDELog(CDELoggingLevelError, @"Failed to retrieve key unarchive (insecure + secure tried) data for attribute: %@", attribute);
+                    returnValue = nil;
+                }
+            }
+            else {
+                CDELog(CDELoggingLevelError, @"Failed to retrieve key unarchive data for attribute: %@", attribute);
+            }
         }
     }
     

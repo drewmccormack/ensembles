@@ -238,6 +238,10 @@
 		07F2DA071D9511B600EB9483 /* CDEBaselineConsolidator.h in Headers */ = {isa = PBXBuildFile; fileRef = 07D183FB1892824200E89B89 /* CDEBaselineConsolidator.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		07F2DA081D9511B600EB9483 /* CDERebaser.h in Headers */ = {isa = PBXBuildFile; fileRef = 07D183FD1892824200E89B89 /* CDERebaser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		07F2DA091D95130B00EB9483 /* CDEEventStoreModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 072BA97C180AACD9003AA94E /* CDEEventStoreModel.xcdatamodeld */; };
+		E07E32B425A93A3900FB04A8 /* CDEPropertyChangeValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = E07E32B225A93A3900FB04A8 /* CDEPropertyChangeValueTransformer.m */; };
+		E07E32B525A93A3900FB04A8 /* CDEPropertyChangeValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = E07E32B225A93A3900FB04A8 /* CDEPropertyChangeValueTransformer.m */; };
+		E07E32B625A93A3900FB04A8 /* CDEPropertyChangeValueTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = E07E32B325A93A3900FB04A8 /* CDEPropertyChangeValueTransformer.h */; };
+		E07E32B725A93A3900FB04A8 /* CDEPropertyChangeValueTransformer.h in Headers */ = {isa = PBXBuildFile; fileRef = E07E32B325A93A3900FB04A8 /* CDEPropertyChangeValueTransformer.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -426,6 +430,8 @@
 		07F2D9B71D950FDB00EB9483 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		07F2DA121D95141900EB9483 /* Ensembles.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; name = Ensembles.modulemap; path = General/Ensembles.modulemap; sourceTree = "<group>"; };
 		34700E9D188B225700FD00B1 /* CDEAvailabilityMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEAvailabilityMacros.h; sourceTree = "<group>"; };
+		E07E32B225A93A3900FB04A8 /* CDEPropertyChangeValueTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CDEPropertyChangeValueTransformer.m; sourceTree = "<group>"; };
+		E07E32B325A93A3900FB04A8 /* CDEPropertyChangeValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CDEPropertyChangeValueTransformer.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -691,6 +697,8 @@
 				07BF378717F1853000C56F64 /* CDEEventMigrator.m */,
 				07BF378A17F1853000C56F64 /* CDEPropertyChangeValue.h */,
 				07BF378B17F1853000C56F64 /* CDEPropertyChangeValue.m */,
+				E07E32B325A93A3900FB04A8 /* CDEPropertyChangeValueTransformer.h */,
+				E07E32B225A93A3900FB04A8 /* CDEPropertyChangeValueTransformer.m */,
 				07BF378C17F1853000C56F64 /* CDESaveMonitor.h */,
 				07BF378D17F1853000C56F64 /* CDESaveMonitor.m */,
 			);
@@ -831,6 +839,7 @@
 				07571EFE1910E171008479A9 /* CDERevision.h in Headers */,
 				07571EFF1910E171008479A9 /* CDERevisionManager.h in Headers */,
 				07571F001910E171008479A9 /* CDERevisionSet.h in Headers */,
+				E07E32B625A93A3900FB04A8 /* CDEPropertyChangeValueTransformer.h in Headers */,
 				07571F011910E171008479A9 /* CDEBaselineConsolidator.h in Headers */,
 				07571F021910E171008479A9 /* CDERebaser.h in Headers */,
 			);
@@ -874,6 +883,7 @@
 				07F2DA041D9511B600EB9483 /* CDERevision.h in Headers */,
 				07F2DA051D9511B600EB9483 /* CDERevisionManager.h in Headers */,
 				07F2DA061D9511B600EB9483 /* CDERevisionSet.h in Headers */,
+				E07E32B725A93A3900FB04A8 /* CDEPropertyChangeValueTransformer.h in Headers */,
 				07F2DA071D9511B600EB9483 /* CDEBaselineConsolidator.h in Headers */,
 				07F2DA081D9511B600EB9483 /* CDERebaser.h in Headers */,
 			);
@@ -1136,6 +1146,7 @@
 				07BF37BC17F1853000C56F64 /* CDEEventRevision.m in Sources */,
 				0701770618C1EDE700C4DA01 /* CDEAsynchronousOperation.m in Sources */,
 				07973EFE183BE40A007F48CA /* CDEICloudFileSystem.m in Sources */,
+				E07E32B425A93A3900FB04A8 /* CDEPropertyChangeValueTransformer.m in Sources */,
 				07BF37B917F1853000C56F64 /* CDEDefines.m in Sources */,
 				070C676018F43E2E00266A4E /* CDEEventFile.m in Sources */,
 				07BF37BF17F1853000C56F64 /* CDEObjectChange.m in Sources */,
@@ -1186,6 +1197,7 @@
 				07F2D9CF1D95118700EB9483 /* CDEEventFile.m in Sources */,
 				07F2D9D01D95118700EB9483 /* CDECloudDirectory.m in Sources */,
 				07F2D9D11D95118700EB9483 /* CDECloudFile.m in Sources */,
+				E07E32B525A93A3900FB04A8 /* CDEPropertyChangeValueTransformer.m in Sources */,
 				07F2D9D21D95118700EB9483 /* CDECloudManager.m in Sources */,
 				07F2D9D31D95118700EB9483 /* CDEPersistentStoreEnsemble.m in Sources */,
 				07F2D9D41D95118700EB9483 /* CDEPersistentStoreImporter.m in Sources */,

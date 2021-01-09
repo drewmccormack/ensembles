@@ -47,4 +47,6 @@ typedef NS_ENUM(NSInteger, CDEPropertyChangeType) {
 
 - (void)mergeToManyRelationshipFromSubordinatePropertyChangeValue:(CDEPropertyChangeValue *)propertyValue;
 
++ (void)registerTransformer;
+
 @end
