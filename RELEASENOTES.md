@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+NEXT
+---
+- Introduced custom value transformer for CDEPropertyValueChange to silence secure transformer warnings
+- Added code to handle secure attribute transformers in user model
+
 1.8
 ---
 - Some fixes in multipeer file system
