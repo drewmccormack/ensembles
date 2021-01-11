@@ -207,8 +207,11 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
                                               includeMediaInfo:@(NO)
                                                 includeDeleted:@(NO)
                                includeHasExplicitSharedMembers:@(NO)
-                                         includeMountedFolders:@NO
-                                                         limit:nil];
+                                         includeMountedFolders:@(NO)
+                                                         limit:nil
+                                                    sharedLink:nil
+                                         includePropertyGroups:nil
+                                   includeNonDownloadableFiles:nil];
     task.retryCount = kCDENumberOfRetriesForFailedAttempt;
     [task setResponseBlock:^(DBFILESListFolderResult * _Nullable result, DBFILESListFolderError * _Nullable routeError, DBRequestError * _Nullable error) {
         if (routeError) CDELog(CDELoggingLevelError, @"Dropbox: routeError in listFolder: %@\npath: %@", routeError, path);
@@ -388,7 +391,7 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
         });
         return;
     }
-    DBRpcTask *task = [authorizedClient.filesRoutes deleteV2:[self fullDropboxPathForPath:path]];
+    DBRpcTask *task = [authorizedClient.filesRoutes delete_V2:[self fullDropboxPathForPath:path]];
     task.retryCount = kCDENumberOfRetriesForFailedAttempt;
     [task setResponseBlock:^(DBFILESMetadata * _Nullable metadata, DBFILESDeleteError * _Nullable routeError, DBRequestError * _Nullable error) {
         if (routeError) CDELog(CDELoggingLevelError, @"Dropbox: routeError in delete_: %@\npath: %@", routeError, [self fullDropboxPathForPath:path]);
@@ -437,7 +440,7 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
     // Build the commit info array of dropbox files
     NSArray<NSString *> *toFullDropboxPaths = [self fullDropboxPathsForPaths:toPaths];
     for (NSString *toFullDropboxPath in toFullDropboxPaths) {
-        DBFILESCommitInfo *commitInfo = [[DBFILESCommitInfo alloc] initWithPath:toFullDropboxPath mode:nil autorename:nil clientModified:nil mute:@(YES)];
+        DBFILESCommitInfo *commitInfo = [[DBFILESCommitInfo alloc] initWithPath:toFullDropboxPath mode:nil autorename:nil clientModified:nil mute:@(YES) propertyGroups:nil strictConflict:nil];
         [commitInfoFiles addObject:commitInfo];
     }
     // Build the URL array of client side files
@@ -557,7 +560,7 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
         });
         return;
     }
-    DBUploadTask *task = [authorizedClient.filesRoutes uploadUrl:[self fullDropboxPathForPath:toPath] mode:nil autorename:nil clientModified:nil mute:@(YES) inputUrl:fromPath];
+    DBUploadTask *task = [authorizedClient.filesRoutes uploadUrl:[self fullDropboxPathForPath:toPath] mode:nil autorename:nil clientModified:nil mute:@(YES) propertyGroups:nil strictConflict:nil inputUrl:fromPath];
     task.retryCount = kCDENumberOfRetriesForFailedAttempt;
     [task setResponseBlock:^(DBFILESFileMetadata * _Nullable metadata, DBFILESUploadError * _Nullable routeError, DBRequestError * _Nullable error) {
         if (routeError) CDELog(CDELoggingLevelError, @"Dropbox: routeError in uploadUrl: %@\nfromPath: %@\ntoPath: %@", routeError, fromPath, [self fullDropboxPathForPath:toPath]);
@@ -671,7 +674,7 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
         return;
     }
     
-    DBRpcTask *routes = [authorizedClient.filesRoutes listFolderGetLatestCursor:[self fullDropboxPathForPath:@"/"] recursive:@(YES) includeMediaInfo:@(NO) includeDeleted:@(NO) includeHasExplicitSharedMembers:@(NO) includeMountedFolders:@NO limit:nil];
+    DBRpcTask *routes = [authorizedClient.filesRoutes listFolderGetLatestCursor:[self fullDropboxPathForPath:@"/"] recursive:@(YES) includeMediaInfo:@(NO) includeDeleted:@(NO) includeHasExplicitSharedMembers:@(NO) includeMountedFolders:@(NO) limit:nil sharedLink:nil includePropertyGroups:nil includeNonDownloadableFiles:nil];
     routes.retryCount = kCDENumberOfRetriesForFailedAttempt;
     [routes setResponseBlock:^(DBFILESListFolderGetLatestCursorResult *result, DBFILESListFolderError *routeError,DBRequestError *error) {
         if (routeError) CDELog(CDELoggingLevelError, @"Dropbox: routeError in listFolder before longpoll: %@", routeError);

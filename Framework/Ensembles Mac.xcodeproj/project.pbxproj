@@ -607,8 +607,7 @@
 				6DAD116B18CA07B000237084 /* Info.plist */,
 				6DAD116C18CA07B600237084 /* InfoPlist.strings */,
 			);
-			name = "Supporting Files";
-			path = Ensembles;
+			path = "Supporting Files";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -703,7 +702,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = CDE;
-				LastUpgradeCheck = 1220;
+				LastUpgradeCheck = 1230;
 				ORGANIZATIONNAME = "Drew McCormack";
 				TargetAttributes = {
 					07592CA5177F2D1000816034 = {
@@ -899,7 +898,6 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				INFOPLIST_FILE = "Tests/Tests-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -934,7 +932,6 @@
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				INFOPLIST_FILE = "Tests/Tests-Info.plist";
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
