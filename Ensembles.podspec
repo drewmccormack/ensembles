@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "Ensembles"
-  s.version      = "1.9"
+  s.version      = "1.10"
   s.summary      = "A peer-to-peer synchronization framework for Core Data."
 
   s.description  =  <<-DESC
@@ -45,7 +45,7 @@ Pod::Spec.new do |s|
     ss.ios.deployment_target = '9.0'
     ss.osx.deployment_target = '10.10'
     ss.dependency 'Ensembles/Core'
-    ss.dependency 'ObjectiveDropboxOfficial', '3.3'
+    ss.dependency 'ObjectiveDropboxOfficial', '6.2.3'
     ss.source_files = 'Framework/Extensions/CDEDropboxV2CloudFileSystem.{h,m}'
   end
   
