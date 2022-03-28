@@ -1,7 +1,11 @@
 Release Notes
 =============
 
-NEXT
+1.10
+---
+- Updated Dropbox to 6.2.3, and introduced Dropbox scopes for Idiomatic.
+
+1.9
 ---
 - Introduced custom value transformer for CDEPropertyValueChange to silence secure transformer warnings
 - Added code to handle secure attribute transformers in user model

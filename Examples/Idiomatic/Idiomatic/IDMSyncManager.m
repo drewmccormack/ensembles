@@ -262,36 +262,33 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
 
 - (BOOL)handleOpenURL:(NSURL *)url
 {
-    DBOAuthResult *authResult = [DBClientsManager handleRedirectURL:url];
-    if (!authResult) {
-        return NO;
-    }
-    
-    if ([authResult isSuccess]) {
-        // Here's an example of injecting a custom API client created from an access token
-        // (e.g. when working in a multi-user environment)
-        if ([cloudFileSystem isKindOfClass:[CDEDropboxV2CloudFileSystem class]]) {
-            CDEDropboxV2CloudFileSystem *dropboxSystem = cloudFileSystem;
-            if (!dropboxSystem.client) {
-                NSString *accessToken = authResult.accessToken.accessToken;
-                dropboxSystem.client = [[DBUserClient alloc] initWithAccessToken:accessToken];
+    [DBClientsManager handleRedirectURL:url completion: ^(DBOAuthResult *authResult) {
+        if ([authResult isSuccess]) {
+            // Here's an example of injecting a custom API client created from an access token
+            // (e.g. when working in a multi-user environment)
+            if ([self->cloudFileSystem isKindOfClass:[CDEDropboxV2CloudFileSystem class]]) {
+                CDEDropboxV2CloudFileSystem *dropboxSystem = self->cloudFileSystem;
+                if (!dropboxSystem.client) {
+                    NSString *accessToken = authResult.accessToken.accessToken;
+                    dropboxSystem.client = [[DBUserClient alloc] initWithAccessToken:accessToken];
+                }
             }
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (self->dropboxLinkSessionCompletion) self->dropboxLinkSessionCompletion(nil);
+                self->dropboxLinkSessionCompletion = NULL;
+            });
         }
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (self->dropboxLinkSessionCompletion) self->dropboxLinkSessionCompletion(nil);
-            self->dropboxLinkSessionCompletion = NULL;
-        });
-    }
-    else {
-        NSError *error = [NSError errorWithDomain:CDEErrorDomain
-                                             code:CDEErrorCodeAuthenticationFailure
-                                         userInfo:nil];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (self->dropboxLinkSessionCompletion) self->dropboxLinkSessionCompletion(error);
-            self->dropboxLinkSessionCompletion = NULL;
-        });
-    }
-    
+        else {
+            NSError *error = [NSError errorWithDomain:CDEErrorDomain
+                                                 code:CDEErrorCodeAuthenticationFailure
+                                             userInfo:nil];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (self->dropboxLinkSessionCompletion) self->dropboxLinkSessionCompletion(error);
+                self->dropboxLinkSessionCompletion = NULL;
+            });
+        }
+    }];
+
     return YES;
 }
 
@@ -304,13 +301,18 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
         });
         return;
     }
-    
+
     dropboxLinkSessionCompletion = [completion copy];
+    
+    // We need these Dropbox scopes: account_info.read, files.metadata.write, files.metadata.read, files.content.write, files.content.read
+    // Enable these scopes in your Dropbox App Console at developer.dropbox.com
     UIApplication *application = [UIApplication sharedApplication];
     UIViewController *rootController = [[application keyWindow] rootViewController];
-    [DBClientsManager authorizeFromController:application
-                                   controller:rootController
-                                      openURL:^(NSURL *url){ [[UIApplication sharedApplication] openURL:url]; }];
+    [DBClientsManager authorizeFromControllerV2:application
+                                     controller:rootController
+                          loadingStatusDelegate:nil
+                                        openURL:^(NSURL *url){ [[UIApplication sharedApplication] openURL:url]; }
+                                   scopeRequest:nil];
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)notif
