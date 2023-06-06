@@ -269,8 +269,7 @@ NSString * const IDMDropboxAppSecret = @"djibc9zfvppronm";
             if ([self->cloudFileSystem isKindOfClass:[CDEDropboxV2CloudFileSystem class]]) {
                 CDEDropboxV2CloudFileSystem *dropboxSystem = self->cloudFileSystem;
                 if (!dropboxSystem.client) {
-                    NSString *accessToken = authResult.accessToken.accessToken;
-                    dropboxSystem.client = [[DBUserClient alloc] initWithAccessToken:accessToken];
+                    dropboxSystem.client = [DBClientsManager authorizedClient];
                 }
             }
             dispatch_async(dispatch_get_main_queue(), ^{
