@@ -198,7 +198,7 @@
     
     // Change the first baseline into our new baseline by assigning a different unique id
     // Global count should be maximum, ie, just keep the count of the existing first baseline.
-    // A baseline global count is not required to preceed save/merge events, and assigning the
+    // A baseline global count is not required to precede save/merge events, and assigning the
     // maximum will give this new baseline precedence over older baselines.
     CDEStoreModificationEvent *firstBaseline = baselines.firstObject;
     firstBaseline.uniqueIdentifier = [[NSProcessInfo processInfo] globallyUniqueString];

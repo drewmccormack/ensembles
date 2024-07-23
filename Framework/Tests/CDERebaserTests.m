@@ -190,7 +190,7 @@
     [self addEventsForType:CDEStoreModificationEventTypeSave storeId:@"123" globalCounts:@[@1, @2, @3, @4] revisions:@[@3, @4, @5, @6]];
     [self addEventsForType:CDEStoreModificationEventTypeMerge storeId:@"store1" globalCounts:@[@1, @2, @3, @4] revisions:@[@9, @10, @11, @12]];
     
-    [rebaser deleteEventsPreceedingBaselineWithCompletion:^(NSError *error) {
+    [rebaser deleteEventsPrecedingBaselineWithCompletion:^(NSError *error) {
         XCTAssertNil(error, @"Deleting failed");
         [context performBlockAndWait:^{
             NSArray *types = @[@(CDEStoreModificationEventTypeSave), @(CDEStoreModificationEventTypeMerge)];

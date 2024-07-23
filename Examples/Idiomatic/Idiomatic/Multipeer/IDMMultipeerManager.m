@@ -10,7 +10,7 @@
 #import <Ensembles/Ensembles.h>
 
 NSString *const IDMSyncPeerService = @"idiomatic";
-NSString *const kDiscoveryInfoUniqueIdentifer = @"DiscoveryInfoUniqueIdentifer";
+NSString *const kDiscoveryInfoUniqueIdentifier = @"DiscoveryInfoUniqueIdentifier";
 
 @interface IDMMultipeerManager () <MCNearbyServiceBrowserDelegate, MCNearbyServiceAdvertiserDelegate, MCSessionDelegate>
 {
@@ -52,7 +52,7 @@ NSString *const kDiscoveryInfoUniqueIdentifer = @"DiscoveryInfoUniqueIdentifer";
 	peerSession = [[MCSession alloc] initWithPeer:peerID securityIdentity:nil encryptionPreference:MCEncryptionRequired];
 	peerSession.delegate = self;
 
-    peerAdvertizer = [[MCNearbyServiceAdvertiser alloc] initWithPeer:peerID discoveryInfo:@{kDiscoveryInfoUniqueIdentifer : uniqueIdentifier} serviceType:IDMSyncPeerService];
+    peerAdvertizer = [[MCNearbyServiceAdvertiser alloc] initWithPeer:peerID discoveryInfo:@{kDiscoveryInfoUniqueIdentifier : uniqueIdentifier} serviceType:IDMSyncPeerService];
     peerAdvertizer.delegate = self;
     [peerAdvertizer startAdvertisingPeer];
 
@@ -186,7 +186,7 @@ NSString *const kDiscoveryInfoUniqueIdentifer = @"DiscoveryInfoUniqueIdentifer";
     if ([peerID isEqual:peerSession.myPeerID]) return;
     if ([peerSession.connectedPeers containsObject:peerID]) return;
     
-    NSString *otherPeerUniqueIdentifier = info[kDiscoveryInfoUniqueIdentifer];
+    NSString *otherPeerUniqueIdentifier = info[kDiscoveryInfoUniqueIdentifier];
     BOOL shouldAccept = ([otherPeerUniqueIdentifier compare:uniqueIdentifier] != NSOrderedDescending);
     if (!shouldAccept) return;
     

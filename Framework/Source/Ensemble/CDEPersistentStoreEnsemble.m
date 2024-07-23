@@ -681,7 +681,7 @@ NSString * const CDEManagedObjectContextSaveNotificationKey = @"managedObjectCon
     [tasks addObject:importRemoteEventsTask];
     
     CDEAsynchronousTaskBlock removeOutdatedEventsTask = ^(CDEAsynchronousTaskCallbackBlock next) {
-        [self.rebaser deleteEventsPreceedingBaselineWithCompletion:^(NSError *error) {
+        [self.rebaser deleteEventsPrecedingBaselineWithCompletion:^(NSError *error) {
             next(error, NO);
         }];
     };

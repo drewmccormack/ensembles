@@ -189,7 +189,7 @@
     return result;
 }
 
-- (BOOL)checkIntegrationPrequisitesForEvents:(NSArray *)events error:(NSError * __autoreleasing *)error
+- (BOOL)checkIntegrationPrerequisitesForEvents:(NSArray *)events error:(NSError * __autoreleasing *)error
 {
     __block BOOL result = YES;
     __block NSError *outsideBlockError = nil;
