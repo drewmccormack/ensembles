@@ -27,7 +27,7 @@
 extern NSString * const CDEMonitoredManagedObjectContextWillSaveNotification;
 
 /**
- Posted when the ensemble observes that a `NSManagedObjectContext` has saved to the monitored persistent store. You can monitor this notification rather than the standard `NSManagedObjectContexDidSaveNotification` if you want to be sure that the ensemble has already processed the save when the notification is observed. If you observe `NSManagedObjectContextDidSaveNotification` directly, you can't be sure that the ensemble has observed the notification, because order of receivers is not defined.
+ Posted when the ensemble observes that a `NSManagedObjectContext` has saved to the monitored persistent store. You can monitor this notification rather than the standard `NSManagedObjectContextDidSaveNotification` if you want to be sure that the ensemble has already processed the save when the notification is observed. If you observe `NSManagedObjectContextDidSaveNotification` directly, you can't be sure that the ensemble has observed the notification, because order of receivers is not defined.
  
   The object for the notification is not the ensemble, but the context that is saving. The ensemble observing the save is accessible in the `userInfo` dictionary via the key `persistentStoreEnsemble`.
  */
@@ -49,7 +49,7 @@ extern NSString * const CDEManagedObjectContextSaveNotificationKey;
 
 
 /**
- A protocol that includes methods invoked by the `CDEPeristentStoreEnsemble`. The ensemble uses this to inform of sync-related changes.
+ A protocol that includes methods invoked by the `CDEPersistentStoreEnsemble`. The ensemble uses this to inform of sync-related changes.
  */
 @protocol CDEPersistentStoreEnsembleDelegate <NSObject>
 

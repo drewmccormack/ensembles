@@ -31,7 +31,7 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
 - (NSError *)errorForRouteError:(NSObject * _Nullable)routeError requestError:(DBRequestError * _Nullable)requestError result:(NSObject * _Nullable)result
 {
     NSError *error = nil;
-    // It's not likely that no error will arrive if result is nil. However, we handle this case as well (where all params are nil) to stay on the safe side. (so we leave no scneario where we miss an error, even when no error is reported)
+    // It's not likely that no error will arrive if result is nil. However, we handle this case as well (where all params are nil) to stay on the safe side. (so we leave no scenario where we miss an error, even when no error is reported)
     if (routeError || requestError || !result) {
         if (requestError.nsError) {
             error = [requestError.nsError copy];
@@ -299,7 +299,7 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
             file.size = ((DBFILESFileMetadata *)child).size.unsignedLongLongValue;
             item = file;
         } else {
-            // Even though includeDeleted is NO in the previously invoked [listFolder] method, DBFILESDeletedMetadata objects are still expected in case files were deleted after method invokation. See https://www.dropboxforum.com/t5/API-support/DBFILESUserAuthRoutes-listFolderContinue-returns-deleted-files/m-p/221985#M11817
+            // Even though includeDeleted is NO in the previously invoked [listFolder] method, DBFILESDeletedMetadata objects are still expected in case files were deleted after method invocation. See https://www.dropboxforum.com/t5/API-support/DBFILESUserAuthRoutes-listFolderContinue-returns-deleted-files/m-p/221985#M11817
             continue;
         }
         // Detect the topmost directory (use lowercase strings to avoid case sensitive compare issues)
@@ -482,7 +482,7 @@ static const NSUInteger kCDENumberOfRetriesForFailedAttempt = 5;
                                                                     completion:block];
                                }
                                else {
-                                   // Upload succeded
+                                   // Upload succeeded
                                    if (retryCounter) {
                                        CDELog(CDELoggingLevelWarning, @"Dropbox: batch upload succeeded: attempt %ld", (long)retryCounter);
                                    }

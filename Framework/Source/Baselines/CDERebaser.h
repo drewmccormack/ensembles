@@ -19,7 +19,7 @@
 
 - (instancetype)initWithEventStore:(CDEEventStore *)eventStore;
 
-- (void)deleteEventsPreceedingBaselineWithCompletion:(CDECompletionBlock)completion;
+- (void)deleteEventsPrecedingBaselineWithCompletion:(CDECompletionBlock)completion;
 
 - (void)estimateEventStoreCompactionFollowingRebaseWithCompletion:(void(^)(float compaction))completion;
 - (void)shouldRebaseWithCompletion:(void(^)(BOOL result))completion;

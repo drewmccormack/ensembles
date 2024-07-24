@@ -251,7 +251,7 @@
         XCTAssertTrue(passedCheck, @"Should not be any dependencies for one event");
     }];
     
-    BOOL passedCheck = [revisionManager checkIntegrationPrequisitesForEvents:events error:NULL];
+    BOOL passedCheck = [revisionManager checkIntegrationPrerequisitesForEvents:events error:NULL];
     XCTAssertTrue(passedCheck, @"Integration prerequisites should pass");
 }
 
@@ -273,7 +273,7 @@
     passedCheck = [revisionManager checkContinuityOfStoreModificationEvents:events];
     XCTAssertTrue(passedCheck, @"Continuity should pass");
     
-    passedCheck = [revisionManager checkIntegrationPrequisitesForEvents:events error:NULL];
+    passedCheck = [revisionManager checkIntegrationPrerequisitesForEvents:events error:NULL];
     XCTAssertTrue(passedCheck, @"Integration prerequisites should pass");
 }
 
@@ -289,7 +289,7 @@
         events = [CDEStoreModificationEvent fetchNonBaselineEventsInManagedObjectContext:moc];
     }];
     
-    BOOL passedCheck = [revisionManager checkIntegrationPrequisitesForEvents:events error:NULL];
+    BOOL passedCheck = [revisionManager checkIntegrationPrerequisitesForEvents:events error:NULL];
     XCTAssertFalse(passedCheck, @"Should fail check with no baseline in place, due to missing event");
 
     [moc performBlockAndWait:^{
@@ -308,7 +308,7 @@
     passedCheck = [revisionManager checkContinuityOfStoreModificationEvents:events];
     XCTAssertTrue(passedCheck, @"Continuity should pass");
     
-    passedCheck = [revisionManager checkIntegrationPrequisitesForEvents:events error:NULL];
+    passedCheck = [revisionManager checkIntegrationPrerequisitesForEvents:events error:NULL];
     XCTAssertTrue(passedCheck, @"Integration prerequisites should pass");
 }
 
@@ -331,7 +331,7 @@
     passedCheck = [revisionManager checkContinuityOfStoreModificationEvents:events];
     XCTAssertTrue(passedCheck, @"Continuity should pass");
     
-    passedCheck = [revisionManager checkIntegrationPrequisitesForEvents:events error:NULL];
+    passedCheck = [revisionManager checkIntegrationPrerequisitesForEvents:events error:NULL];
     XCTAssertTrue(passedCheck, @"Integration prerequisites should pass");
 }
 
@@ -355,7 +355,7 @@
     XCTAssertFalse(passedCheck, @"Continuity should fail");
     
     NSError *error;
-    passedCheck = [revisionManager checkIntegrationPrequisitesForEvents:events error:&error];
+    passedCheck = [revisionManager checkIntegrationPrerequisitesForEvents:events error:&error];
     XCTAssertFalse(passedCheck, @"Integration prerequisites should fail");
     XCTAssertEqual(error.code, CDEErrorCodeDiscontinuousRevisions, @"Wrong error code");
 }
@@ -376,7 +376,7 @@
     XCTAssertFalse(passedCheck, @"Should not pass dependencies");
     
     NSError *error;
-    passedCheck = [revisionManager checkIntegrationPrequisitesForEvents:events error:&error];
+    passedCheck = [revisionManager checkIntegrationPrerequisitesForEvents:events error:&error];
     XCTAssertFalse(passedCheck, @"Integration prerequisites should fail");
     XCTAssertEqual(error.code, CDEErrorCodeMissingDependencies, @"Wrong error code");
 }
@@ -402,7 +402,7 @@
     XCTAssertFalse(passedCheck, @"Integration prerequisites should fail");
     
     NSError *error;
-    passedCheck = [revisionManager checkIntegrationPrequisitesForEvents:events error:&error];
+    passedCheck = [revisionManager checkIntegrationPrerequisitesForEvents:events error:&error];
     XCTAssertEqual(error.code, CDEErrorCodeUnknownModelVersion, @"Wrong error code");
 }
 

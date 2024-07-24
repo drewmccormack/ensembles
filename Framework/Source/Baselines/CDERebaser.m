@@ -46,7 +46,7 @@
 
 #pragma mark Removing Out-of-Date Events
 
-- (void)deleteEventsPreceedingBaselineWithCompletion:(CDECompletionBlock)completion
+- (void)deleteEventsPrecedingBaselineWithCompletion:(CDECompletionBlock)completion
 {
     NSManagedObjectContext *context = eventStore.managedObjectContext;
     [context performBlock:^{

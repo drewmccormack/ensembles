@@ -354,7 +354,7 @@
         if (storeModEvents.count == 0) return;
         
         // Check prerequisites
-        BOOL canIntegrate = [revisionManager checkIntegrationPrequisitesForEvents:storeModEvents error:&blockError];
+        BOOL canIntegrate = [revisionManager checkIntegrationPrerequisitesForEvents:storeModEvents error:&blockError];
         if (!canIntegrate) {
             methodError = blockError;
             success = NO;
@@ -709,10 +709,10 @@
 }
 
 // Called on main context queue
-- (void)applyAttributeChanges:(NSArray *)properyChangeValues toObject:(NSManagedObject *)object
+- (void)applyAttributeChanges:(NSArray *)propertyChangeValues toObject:(NSManagedObject *)object
 {
     NSEntityDescription *entity = object.entity;
-    for (CDEPropertyChangeValue *changeValue in properyChangeValues) {
+    for (CDEPropertyChangeValue *changeValue in propertyChangeValues) {
         NSAttributeDescription *attribute = entity.attributesByName[changeValue.propertyName];
         if (!attribute) {
             // Likely attribute removed from model since change
