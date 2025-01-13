@@ -3,13 +3,15 @@ Core Data Ensembles
 
 _Author:_ Drew McCormack<br>
 _Created:_ 29th September, 2013<br>
-_Last Updated:_ 15th February, 2017
+_Last Updated:_ 13th January, 2025
 
-*Ensembles 2 is now available for purchase at [ensembles.io](http://www.ensembles.io). It has performance improvements, extra backends (eg CloudKit, Dropbox Sync), and other features. This version of Ensembles continues to be maintained and supported.*
+*Ensembles 2 is now available for purchase at [ensembles.io](http://www.ensembles.io). It has performance improvements, extra backends (eg CloudKit, WebDAV), and other features. This version of Ensembles continues to be maintained and supported.*
 
 *There is a [Google Group](https://groups.google.com/forum/#!forum/ensembles) for discussing best practices with other developers.*
 
-Ensembles is an Objective-C framework &mdash; with Swift support &mdash; that extends Apple's Core Data framework to add peer-to-peer synchronization for Mac OS and iOS. Multiple SQLite persistent stores can be coupled together via a file synchronization platform like iCloud or Dropbox. The framework can be readily extended to support any service capable of moving files between devices, including custom servers.
+Ensembles is a [local-first](https://www.inkandswitch.com/local-first/) framework, extending Apple's Core Data framework to add synchronization for macOS and iOS, without the need for any specialized server infrastructure.
+
+Multiple SQLite persistent stores can be coupled together via file synchronization platforms like iCloud and Dropbox, and even direct peer-to-peer connections. The framework can be readily extended to support any service capable of moving files between devices, including custom servers.
 
 #### Downloading Ensembles
 
