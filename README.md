@@ -3,11 +3,9 @@ Core Data Ensembles
 
 _Author:_ Drew McCormack<br>
 _Created:_ 29th September, 2013<br>
-_Last Updated:_ 13th January, 2025
+_Last Updated:_ 11th March, 2026
 
-*Ensembles 2 is now available for purchase at [ensembles.io](http://www.ensembles.io). It has performance improvements, extra backends (eg CloudKit, WebDAV), and other features. This version of Ensembles continues to be maintained and supported.*
-
-*There is a [Google Group](https://groups.google.com/forum/#!forum/ensembles) for discussing best practices with other developers.*
+*Ensembles 3 is now available from [ensembles.io](http://www.ensembles.io). It has performance improvements, extra backends (eg CloudKit, WebDAV), and other features. This version of Ensembles continues to be maintained and supported.*
 
 Ensembles is a [local-first](https://www.inkandswitch.com/local-first/) framework, extending Apple's Core Data framework to add synchronization for macOS and iOS, without the need for any specialized server infrastructure.
 
