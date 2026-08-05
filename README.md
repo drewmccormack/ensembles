@@ -3,9 +3,9 @@ Core Data Ensembles
 
 _Author:_ Drew McCormack<br>
 _Created:_ 29th September, 2013<br>
-_Last Updated:_ 11th March, 2026
+_Last Updated:_ 5th August, 2026
 
-*Ensembles 3 is now available from [ensembles.io](http://www.ensembles.io). It has performance improvements, extra backends (eg CloudKit, WebDAV), and other features. This version of Ensembles is deprecated.*
+*This version of Ensembles is deprecated. [Ensembles 3](https://www.ensembles.io) is a complete rewrite in Swift, and the only local-first sync framework supporting both SwiftData and Core Data. It includes many backends (CloudKit, Dropbox, Google Drive, OneDrive, S3, WebDAV, and more), can be extended to work with virtually any online storage, and even supports end-to-end encryption.*
 
 Ensembles is a [local-first](https://www.inkandswitch.com/local-first/) framework, extending Apple's Core Data framework to add synchronization for macOS and iOS, without the need for any specialized server infrastructure.
 
